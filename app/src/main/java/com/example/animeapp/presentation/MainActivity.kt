@@ -1,36 +1,28 @@
 package com.example.animeapp.presentation
 
-import android.annotation.SuppressLint
-import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.twotone.Call
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.MutableLiveData
 import com.example.animeapp.presentation.custom.CustomItem
+import com.example.animeapp.presentation.custom.MainViewModel
 import com.example.animeapp.ui.theme.AnimeAppTheme
-import com.example.animeapp.ui.theme.domain.models.AnimeSearchModel
-import com.example.animeapp.ui.theme.domain.models.Data
-import com.example.animeapp.ui.theme.domain.repository.ApiService
+import com.example.animeapp.ui.domain.models.searchModel.Data
 import kotlinx.coroutines.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
 
+    private val viewModel by viewModels<MainViewModel>()
 
-    @SuppressLint("CoroutineCreationDuringComposition")
+    @OptIn(DelicateCoroutinesApi::class)
+//    @SuppressLint("CoroutineCreationDuringComposition", "StateFlowValueCalledInComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -40,27 +32,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-                    val scope = rememberCoroutineScope()
-                    var job: Job? by remember {
-                        mutableStateOf(null)
+                    viewModel.loadList()
+                    val data = viewModel.dataListResponse.observeAsState()
+                    if (data.value != null) {
+                        MakeListOfAnime(data = data.value!!.toList())
                     }
-
-                    job = scope.launch {
-                        val response = ApiService.api.getAnimeModel()
-                        if (response.isSuccessful) {
-//                            response.body()?.let { MakeListOfAnime(data = it.data) }
-                            Log.d("MAIN-ACTIVITY", "onResponse activated")
-                            response.body()?.data?.forEach {
-                                Log.d(
-                                    "->",
-                                    "[" + it.title + "| " + "EPISODES:" + it.episodes + "  |" + it.rating + "]"
-                                )
-                            }
-                        }
-
-                    }
-//                    MakeListOfAnime(job)
 
                 }
             }
@@ -68,46 +44,24 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
- fun getResponse(): Response<AnimeSearchModel> {
-    TODO()
 
-}
 
 @Composable
 fun MakeListOfAnime(data: List<Data>) {
+
     LazyColumn(modifier = Modifier.fillMaxHeight()) {
-        items(data) { item ->
+        itemsIndexed(data) { _, item ->
             CustomItem(data = item)
         }
     }
 }
 
-@Composable
-fun TimerScreen() {
-    val scope = rememberCoroutineScope()
-    Column {
-        Button(onClick = {
-            println("Timer started")
-            scope.launch {
-                try {
-                    println("Timer ended")
 
-                } catch (ex: Exception) {
-                    println("Timer cancelled")
-                }
-            }
-        }) {
-            Text("Start Timer")
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    TimerScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun DefaultPreview() {
+//    TimerScreen()
+//}
 
 
 

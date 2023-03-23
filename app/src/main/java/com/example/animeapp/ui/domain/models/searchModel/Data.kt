@@ -1,5 +1,6 @@
-package com.example.animeapp.ui.theme.domain.models
+package com.example.animeapp.ui.domain.models.searchModel
 
+import com.example.animeapp.ui.domain.exampleModels.Images
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -13,5 +14,8 @@ data class Data(
     @SerializedName("rating") val rating: String,
     @Expose
     @SerializedName("title") val title: String,
+
+    @Expose
+    @SerializedName("images") val images: com.example.animeapp.ui.domain.exampleModels.Images,
 //    @SerializedName("year") val year: Int
 )

@@ -1,4 +1,4 @@
-package com.example.animeapp.ui.theme.domain.models
+package com.example.animeapp.ui.domain.models.searchModel
 
 
 import com.google.gson.annotations.Expose

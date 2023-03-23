@@ -1,4 +1,4 @@
-package com.example.animeapp.ui.theme.domain.models
+package com.example.animeapp.ui.domain.models.searchModel
 
 data class To(
     val day: Int,

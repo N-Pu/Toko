@@ -1,6 +1,6 @@
-package com.example.animeapp.ui.theme.domain.models
+package com.example.animeapp.ui.domain.models.searchModel
 
-data class Demographic(
+data class Genre(
     val mal_id: Int,
     val name: String,
     val type: String,
