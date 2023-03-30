@@ -10,10 +10,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.animeapp.ui.domain.exampleModels.Images
-import com.example.animeapp.ui.domain.exampleModels.Webp
-import com.example.animeapp.ui.domain.models.searchModel.Data
-import com.example.animeapp.ui.domain.models.searchModel.Jpg
+import com.example.animeapp.domain.exampleModels.Images
+import com.example.animeapp.domain.exampleModels.Webp
+import com.example.animeapp.domain.searchModel.Data
+import com.example.animeapp.domain.searchModel.Jpg
 
 @Composable
 fun CustomItem(data: Data) {
