@@ -14,9 +14,6 @@ import com.example.animeapp.presentation.theme.AnimeAppTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel by viewModels<MainViewModel>()
-
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -28,42 +25,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     MainScreenSearchPanel()
 
-//                    viewModel.inputNameOfSearch()
-
-//                    val data = viewModel.dataListResponse.observeAsState()
-//                    if (data.value != null) {
-//                        MakeListOfAnime(data = data.value!!.toList())
-//                    }
-
                 }
             }
         }
     }
 }
 
-
-
-
-
-
-
-
-//@Composable
-//fun MakeListOfAnime(data: List<Data>) {
-//
-//    LazyColumn(modifier = Modifier.fillMaxHeight()) {
-//        itemsIndexed(data) { _, item ->
-//            CustomItem(data = item)
-//        }
-//    }
-//}
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    TimerScreen()
-//}
 
 
 

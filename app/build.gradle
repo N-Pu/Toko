@@ -81,11 +81,13 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + cor_version
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:' + cor_version
 
+    //ViewModel for Compose
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
     implementation "androidx.compose.runtime:runtime-livedata:1.4.0"
 
     //COIL
-    implementation "io.coil-kt:coil:2.2.2"
+//    implementation "io.coil-kt:coil:2.2.2"
+    implementation "io.coil-kt:coil-compose:2.2.2"
 
 
 
