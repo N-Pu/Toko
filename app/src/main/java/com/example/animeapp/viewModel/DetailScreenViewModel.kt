@@ -1,6 +1,7 @@
 package com.example.animeapp.viewModel
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.animeapp.domain.detailModel.Broadcast
@@ -12,20 +13,29 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class DetailScreenViewModel : ViewModel() {
+object DetailScreenViewModel : ViewModel() {
     private val animeRepository = api
 
     private val _animeDetails = MutableStateFlow<Data?>(null)
     val animeDetails = _animeDetails.asStateFlow()
 
     //    @SuppressLint("SuspiciousIndentation")
+    @SuppressLint("SuspiciousIndentation")
     fun onTapAnime(id: Int) {
         viewModelScope.launch {
+
             val response = animeRepository.getDetailsFromAnime(id)
-            if (response.isSuccessful)
-                response.body()?.data.let { data ->
-                    _animeDetails.value = data
+
+            try {
+                if (response.isSuccessful) {
+                    response.body()?.data.let { data ->
+                        _animeDetails.value = data
+                    }
                 }
+            } catch (e: java.lang.NullPointerException) {
+                Log.e("DetailScreenViewModel", e.message.toString())
+            }
+
         }
     }
 }

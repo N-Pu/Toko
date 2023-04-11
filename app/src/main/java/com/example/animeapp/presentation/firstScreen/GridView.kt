@@ -49,14 +49,14 @@ fun GridAdder(
     }
 }
 
-
+//private val viewModelDetail = DetailScreenViewModel()
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnimeCardBox(
     anime: Data,
     navController: NavHostController
 ) {
-    val viewModelDetail = remember { DetailScreenViewModel() }
+
 
 
     Card(
@@ -64,13 +64,9 @@ fun AnimeCardBox(
         modifier = Modifier
             .clip(RoundedCornerShape(6.dp))
             .clickable {
+//                viewModelDetail.onTapAnime(anime.mal_id)
                 navController.navigate(route = "detail_screen/" + anime.mal_id) {
-
                     popUpTo(Screen.Detail.route) {
-
-
-                        viewModelDetail.onTapAnime(anime.mal_id)
-
                         inclusive = true
                     }
                 }

@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.animeapp.presentation.firstScreen.MainScreenSearchPanel
 import com.example.animeapp.presentation.secondScreen.DetailScreen
+import com.example.animeapp.viewModel.DetailScreenViewModel
 
 
 @Composable
@@ -22,9 +23,11 @@ fun SetupNavGraph(navController: NavHostController) {
             route = Screen.Detail.route,
             arguments = listOf(navArgument("id") {
                 type = NavType.IntType
-            })) {
-            DetailScreen(navController = navController)
-            Log.d("Arg", it.arguments?.getInt("id").toString())
+            })
+        ) {
+            it.arguments?.getInt("id")
+                ?.let { it1 -> DetailScreen(navController = navController, id = it1) }
+            Log.d("Arg", "ID (IN SetupNavGraph) " + it.arguments?.getInt("id").toString())
 
         }
     }

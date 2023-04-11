@@ -20,34 +20,38 @@ import kotlinx.coroutines.flow.combine
 
 
 @Composable
-fun DetailScreen(navController: NavHostController) {
-
-    val viewModel2 =
-        androidx.lifecycle.viewmodel.compose.viewModel<DetailScreenViewModel>() // temp name
-    val animeDetail by viewModel2.animeDetails.collectAsStateWithLifecycle()
-    Text(text = "If it works - text will be a little bit lower")
+fun DetailScreen(navController: NavHostController, id: Int) {
 
 
-    val painter = rememberAsyncImagePainter(model = animeDetail?.images?.webp?.large_image_url)
+    ActivateDitailScreen(id = id)
 
-    Log.d("ANIMEDETAIL", animeDetail.toString()) // somehow it's empty
+//    val viewModel2 =
+//        androidx.lifecycle.viewmodel.compose.viewModel<DetailScreenViewModel>() // temp name
+//    val animeDetail by viewModel2.animeDetails.collectAsStateWithLifecycle()
+//    Text(text = "If it works - text will be a little bit lower")
 
 
-    Box(modifier = Modifier.fillMaxSize()) {
+//    val painter = rememberAsyncImagePainter(model = animeDetail?.images?.webp?.large_image_url)
+
+//    Log.d("ANIMEDETAIL", animeDetail.toString()) // somehow it's empty
 
 
-        animeDetail?.let { Text(text = it.title) }
-        Image(
-            painter = painter,
-            contentDescription = "Image",
-            modifier = Modifier.fillMaxSize()
-        )
+//    Box(modifier = Modifier.fillMaxSize()) {
 
-    }
 
-    Text(text = "HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEY")
+//        animeDetail?.let { Text(text = it.title) }
+//        Image(
+//            painter = painter,
+//            contentDescription = "Image",
+//            modifier = Modifier.fillMaxSize()
+//        )
+
+//    }
+
+//    Text(text = "HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEY")
 
 
     navController.navigate(route = Screen.Home.route)
     navController.popBackStack()
 }
+

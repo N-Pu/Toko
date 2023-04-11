@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.viewModel.DetailScreenViewModel
@@ -19,7 +20,7 @@ import com.example.animeapp.viewModel.HomeScreenViewModel
 @Composable
 fun MainScreenSearchPanel(navController: NavHostController) {
     val viewModel =
-        androidx.lifecycle.viewmodel.compose.viewModel<HomeScreenViewModel>()
+       viewModel<HomeScreenViewModel>()
 
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val animeList by viewModel.animeList.collectAsStateWithLifecycle()
