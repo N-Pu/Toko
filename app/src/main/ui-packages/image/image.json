@@ -1,0 +1,67 @@
+{
+  "name": "image",
+  "version": 32,
+  "source-key": {
+    "type": "figma",
+    "file": "iONfR4wPmmZCixoQulm0eY",
+    "node": "4:2",
+    "version": "3253099775",
+    "component-id": "ef08af974791f38f6a51e2f5e598bb919f5eebb3"
+  },
+  "default": "Image",
+  "documentation": "Hello Card component used to display the image and title content",
+  "design": {
+    "atoms": [
+      {
+        "type": "group",
+        "id": "top_level",
+        "root": "true"
+      },
+      {
+        "type": "image",
+        "id": "Image"
+      }
+    ],
+    "modes": {
+      "Image": {
+        "rules": [
+          {
+            "id": "top_level",
+            "is-structured": "false",
+            "children": [
+              "Image"
+            ],
+            "clip-content": "false"
+          },
+          {
+            "id": "Image",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              }
+            },
+            "image-content": "image.jpeg",
+            "scale": "cover"
+          }
+        ]
+      }
+    }
+  },
+  "previews": [
+    {
+      "design": "Image",
+      "size": {
+        "width": 216.0,
+        "height": 124.0
+      }
+    }
+  ],
+  "adin-component-search-paths": [],
+  "image-search-paths": [],
+  "vector-search-paths": []
+}
