@@ -1,8 +1,9 @@
 package com.example.animeapp.domain.repository
 
 
+import com.example.animeapp.domain.detailModel.AnimeDetailModel
 import com.example.animeapp.domain.searchModel.AnimeSearchModel
-import kotlinx.coroutines.flow.StateFlow
+import com.google.gson.annotations.Expose
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -13,22 +14,17 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 private const val BASE_URL = "https://api.jikan.moe/"
+private const val GET_DETAILS_URL = "https://api.jikan.moe/v4/anime/"
 
 
 interface ApiService {
 
-//    @GET("v4/anime")
-//    suspend fun getAnimeModel(): Response<AnimeSearchModel>
 
-    @GET("$BASE_URL/v4/anime?")    // (в конце добавить лимит limit=20)
+    @GET("${BASE_URL}v4/anime")    // (в конце добавить лимит limit=20)
     suspend fun getAnimeSearchByName(@Query("q") nameOfAnime: String): Response<AnimeSearchModel>
 
-//    @GET("search/anime")
-//    suspend fun searchAnime(@Query("q") query: String): Response<AnimeSearchModel>
-
-
-//    @GET("v4/anime")
-//    fun getData(): Call<Data>
+    @GET("$GET_DETAILS_URL{id}/full")
+    suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<AnimeDetailModel>
 
 
     companion object {

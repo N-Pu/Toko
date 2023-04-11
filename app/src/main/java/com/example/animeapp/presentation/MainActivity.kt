@@ -6,11 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
-import com.example.animeapp.presentation.searchPanel.MainScreenSearchPanel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.animeapp.presentation.theme.AnimeAppTheme
+import com.example.animeapp.presentation.theme.MainBackgroundColor
+import com.example.animeapp.presentation.navigation.SetupNavGraph
 
 class MainActivity : ComponentActivity() {
 
+    lateinit var navController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -18,9 +22,13 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MainBackgroundColor
+
+
                 ) {
-                    MainScreenSearchPanel()
+                    navController = rememberNavController()
+                    SetupNavGraph(navController = navController)
+
 
                 }
             }

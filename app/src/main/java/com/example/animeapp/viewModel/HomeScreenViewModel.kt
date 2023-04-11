@@ -11,7 +11,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 
-class MainViewModel : ViewModel() {
+class HomeScreenViewModel : ViewModel() {
 
 
     private val animeRepository = api
@@ -29,21 +29,34 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 if (text.isNotBlank()) {
-                    _animeList.value = animeRepository.getAnimeSearchByName(text).body()?.data!!
-                    delay(700L)
+
+                    _isSearching.update {
+                        true
+                    }
+
+                    _animeList.value = animeRepository
+                        .getAnimeSearchByName(text)
+                        .body()?.data!!
+                    delay(500L)
                 } else {
                     _animeList.value = emptyList()
                 }
+
+                _isSearching.update { false }
+
             } catch (e: java.lang.NullPointerException) {
-                Log.e("mainViewModel", e.message.toString())
+                Log.e("HomeScreenViewModel", e.message.toString())
             } catch (e: java.net.UnknownHostException) {
-                Log.e("mainViewModel", "Connection failed: " + e.message.toString())
+                Log.e("HomeScreenViewModel", "Connection failed: " + e.message.toString())
             }
 
 
         }
 
     }
+
+//    private val _imageMetadata = MutableStateFlow(0f)
+//    val imageMetadata = _imageMetadata.asStateFlow()
 
 
 }
