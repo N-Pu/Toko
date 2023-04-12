@@ -30,8 +30,9 @@ fun ActivateDetailScreen(id: Int) {
 
 
     val scrollState = rememberScrollState()
-    animeDetailData.value?.let { data ->
 
+    animeDetailData.value?.let { data ->
+        val painterState = rememberAsyncImagePainter(model = data.images.webp.large_image_url)
 
         Column(
             modifier = Modifier
@@ -42,7 +43,7 @@ fun ActivateDetailScreen(id: Int) {
         ) {
 
 
-            val painterState = rememberAsyncImagePainter(model = data.images.webp.large_image_url)
+
             DisplayPicture(painter = painterState)
 
 
@@ -60,10 +61,8 @@ fun ActivateDetailScreen(id: Int) {
                     color = Color.Black
                 )
             )
-//            data.synopsis?.let { Text(text = it) }
             Text(text = data.synopsis ?: "")
         }
-
 
     }
 
