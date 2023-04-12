@@ -1,8 +1,8 @@
 package com.example.animeapp.domain.detailModel
 
-import com.google.gson.annotations.Expose
+
 import com.google.gson.annotations.SerializedName
-import kotlinx.coroutines.flow.MutableStateFlow
+
 
 data class Data(
 
@@ -30,7 +30,7 @@ data class Data(
      @SerializedName("source") val source: String,
      @SerializedName("status") val status: String,
      @SerializedName("studios") val studios: List<Studio>,
-     @SerializedName("synopsis") val synopsis: String,
+     @SerializedName("synopsis") val synopsis: String?,
      @SerializedName("themes") val themes: List<Theme>,
      @SerializedName("title") val title: String,
      @SerializedName("title_english") val title_english: String,

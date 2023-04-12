@@ -10,7 +10,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
@@ -25,7 +24,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.searchModel.Data
 import com.example.animeapp.presentation.navigation.Screen
 import com.example.animeapp.presentation.theme.LightYellow
-import com.example.animeapp.viewModel.DetailScreenViewModel
 
 
 @Composable
@@ -49,7 +47,6 @@ fun GridAdder(
     }
 }
 
-//private val viewModelDetail = DetailScreenViewModel()
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnimeCardBox(
@@ -89,26 +86,6 @@ fun AnimeCardBox(
         )
 
 
-        // DO IT LATER -> probably isn't working
-//        Image(
-//            painter = painter,
-//            contentScale = ContentScale.Crop,
-//            contentDescription = "contentDescription",
-//            modifier = Modifier
-////                .padding(16.dp, 0.dp, 16.dp, 0.dp)
-////                .fillMaxWidth()
-//                .then(
-//                    // here is always null - i don't know why
-//                    (painter.state as? AsyncImagePainter.State.Success)
-//                        ?.painter
-//                        ?.intrinsicSize
-//                        ?.let { intrinsicSize ->
-//                            Modifier.aspectRatio(intrinsicSize.width / intrinsicSize.height)
-//                        } ?: Modifier
-//                )
-//        )
-
-
         Text(text = anime.score.toString())
         Text(text = anime.scored_by.toString())
 
@@ -134,33 +111,8 @@ fun AnimeCardBox(
         )
     }
 
-//        .let {
-//        DetailScreenViewModel().onTapAnime(id = anime.mal_id)
-//    }
-
 
 }
-
-
-//    @Preview
-//    @Composable
-//    fun AnimeCardBoxPrev() {
-//
-//        AnimeCardBox(
-//            anime = Data(
-//                1,
-//                "DSDSDSDSffff",
-//                "BOOOOOO",
-//                Images(
-//                    Jpg(
-//                        "S",
-//                        "S",
-//                        "s"
-//                    ), Webp("b", "V", "ffd")
-//                )
-//            ),
-//        )
-//    }
 
 
 
