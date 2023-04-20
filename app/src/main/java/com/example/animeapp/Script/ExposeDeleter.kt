@@ -1,7 +1,7 @@
 import java.io.File
 
 fun main() {
-    val folderPath = "E:\\Stuff\\AnimeApp\\app\\src\\main\\java\\com\\example\\animeapp\\domain\\searchModel" // Укажите путь до папки, в которой нужно найти файлы (классы)
+    val folderPath = "E:\\Stuff\\AnimeApp\\app\\src\\main\\java\\com\\example\\animeapp\\domain\\CharactersModel" // Укажите путь до папки, в которой нужно найти файлы (классы)
     findAndProcessFiles(folderPath)
 }
 

@@ -1,18 +1,16 @@
-package com.example.animeapp.viewModel
-
 
 import android.util.Log
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.animeapp.domain.repository.ApiService.Companion.api
 import com.example.animeapp.domain.searchModel.Data
-import kotlinx.coroutines.*
+
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 
 
 class HomeScreenViewModel : ViewModel() {
-
 
     private val animeRepository = api
 
@@ -24,42 +22,43 @@ class HomeScreenViewModel : ViewModel() {
 
     private val _animeList = MutableStateFlow<List<Data>>(emptyList())
     val animeList = _animeList.asStateFlow()
+
+    private val searchDebouncer = MutableSharedFlow<String>()
+
+    init {
+        // Start collecting search queries with Debounce
+        viewModelScope.launch {
+            searchDebouncer
+                .debounce(500L)
+                .distinctUntilChanged()
+                .collectLatest { searchQuery ->
+                    if (searchQuery.isNotBlank()) {
+                        performSearch(searchQuery)
+                    } else {
+                        _animeList.value = emptyList()
+                    }
+                }
+        }
+    }
+
     fun onSearchTextChange(text: String) {
         _searchText.value = text
         viewModelScope.launch {
-            try {
-                if (text.isNotBlank()) {
-
-                    _isSearching.update {
-                        true
-                    }
-
-                    _animeList.value = animeRepository
-                        .getAnimeSearchByName(text)
-                        .body()?.data!!
-                    delay(500L)
-                } else {
-                    _animeList.value = emptyList()
-                }
-
-                _isSearching.update { false }
-
-            } catch (e: java.lang.NullPointerException) {
-                Log.e("HomeScreenViewModel", e.message.toString())
-            } catch (e: java.net.UnknownHostException) {
-                Log.e("HomeScreenViewModel", "Connection failed: " + e.message.toString())
-            }
-
-
+            searchDebouncer.emit(text)
         }
-
     }
 
-//    private val _imageMetadata = MutableStateFlow(0f)
-//    val imageMetadata = _imageMetadata.asStateFlow()
-
-
+    private suspend fun performSearch(query: String) {
+        try {
+            _isSearching.value = true
+            val response = animeRepository.getAnimeSearchByName(query).body()
+            _animeList.value = response?.data ?: emptyList()
+        } catch (e: NullPointerException) {
+            Log.e("HomeScreenViewModel", e.message.toString())
+        } catch (e: UnknownHostException) {
+            Log.e("HomeScreenViewModel", "Connection failed: " + e.message.toString())
+        } finally {
+            _isSearching.value = false
+        }
+    }
 }
-
-
-

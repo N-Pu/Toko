@@ -1,5 +1,8 @@
 package com.example.animeapp.presentation.firstScreen
 
+
+
+import HomeScreenViewModel
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -12,8 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.animeapp.presentation.animations.LoadingAnimation
-import com.example.animeapp.viewModel.DetailScreenViewModel
-import com.example.animeapp.viewModel.HomeScreenViewModel
+//import com.example.animeapp.viewModel.HomeScreenViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)

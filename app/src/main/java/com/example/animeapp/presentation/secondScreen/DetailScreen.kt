@@ -13,12 +13,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 
 
+
+
+
+// this is the problem, it's cycling
 @Composable
 fun DetailScreen(navController: NavHostController, id: Int) {
-
-    ActivateDetailScreen(id = id)
     navController.navigate(route = Screen.Home.route)
     navController.popBackStack()
+    ActivateDetailScreen(id = id)
+//    CharactersViewModel().addCharacterAndSeyu(id)
+
 }
 
 
@@ -34,7 +39,7 @@ fun DisplayPicture(painter: AsyncImagePainter) {
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.TopCenter)
-            .height(600.dp)
+                .height(600.dp)
 
         )
     }

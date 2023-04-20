@@ -10,8 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.animeapp.presentation.firstScreen.MainScreenSearchPanel
 import com.example.animeapp.presentation.secondScreen.DetailScreen
-import com.example.animeapp.viewModel.DetailScreenViewModel
 
+private var isLogPrinted = false
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -25,43 +25,16 @@ fun SetupNavGraph(navController: NavHostController) {
                 type = NavType.IntType
             })
         ) {
-            it.arguments?.getInt("id")
-                ?.let { it1 -> DetailScreen(navController = navController, id = it1) }
-            Log.d("Arg", "ID (IN SetupNavGraph) " + it.arguments?.getInt("id").toString())
-
+            val id = it.arguments?.getInt("id")
+            if (id != null) {
+                DetailScreen(navController = navController, id = id)
+                if (!isLogPrinted) {
+                    Log.d("Arg", "ID (IN SetupNavGraph) $id")
+                    isLogPrinted = true
+                }
+            }
         }
     }
 }
 
-//@Composable
-//fun Screen1(navController: NavHostController) {
-//    // Использование navController внутри композабельной функции
-//
-//    Box(modifier = Modifier
-//        .fillMaxSize()
-//        .background(Color.Blue)
-//        .clickable {
-//            navController.navigate("screen2")
-//        }) {
-//
-//    }
-//
-//}
-//
-//@Composable
-//fun Screen2(navController: NavHostController) {
-//    // Использование navController внутри композабельной функции
-//    Button(onClick = { navController.navigate("screen1") }) {
-//        Text("Go to Screen 1")
-//    }
-//}
-//
-//@Composable
-//fun MyApp() {
-//    val navController = rememberNavController()
-//
-//    NavHost(navController, startDestination = "screen1") {
-//        composable("screen1") { Screen1(navController) }
-//        composable("screen2") { Screen2(navController) }
-//    }
-//}
+

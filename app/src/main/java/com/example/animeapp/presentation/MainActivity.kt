@@ -1,6 +1,7 @@
 package com.example.animeapp.presentation
 
 import android.os.Bundle
+
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.animeapp.presentation.theme.AnimeAppTheme
 import com.example.animeapp.presentation.theme.MainBackgroundColor
 import com.example.animeapp.presentation.navigation.SetupNavGraph
+
 
 class MainActivity : ComponentActivity() {
 
@@ -29,6 +31,14 @@ class MainActivity : ComponentActivity() {
                     navController = rememberNavController()
                     SetupNavGraph(navController = navController)
 
+//                    Log.d("main", lifecycle.currentState.name)
+//                    when (lifecycle.currentState) {
+//                        Lifecycle.State.DESTROYED -> Log.d("main", lifecycle.currentState.name)
+//                        Lifecycle.State.INITIALIZED -> Log.d("main", lifecycle.currentState.name)
+//                        Lifecycle.State.CREATED -> Log.d("main", lifecycle.currentState.name)
+//                        Lifecycle.State.STARTED -> Log.d("main", lifecycle.currentState.name)
+//                        Lifecycle.State.RESUMED -> Log.d("main", lifecycle.currentState.name)
+//                    }
 
                 }
             }
