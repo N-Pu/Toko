@@ -1,7 +1,6 @@
 package com.example.animeapp.presentation.firstScreen
 
 
-
 import HomeScreenViewModel
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
@@ -15,25 +14,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.animeapp.presentation.animations.LoadingAnimation
-//import com.example.animeapp.viewModel.HomeScreenViewModel
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenSearchPanel(navController: NavHostController) {
     val viewModel =
-       viewModel<HomeScreenViewModel>()
+        viewModel<HomeScreenViewModel>()
 
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val animeList by viewModel.animeList.collectAsStateWithLifecycle()
     val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
-
-
-
-
-//    val animeDetail by viewModel2.animeDetails.collectAsStateWithLifecycle()
-
-
 
 
     Column(
@@ -46,11 +38,12 @@ fun MainScreenSearchPanel(navController: NavHostController) {
             modifier = Modifier.fillMaxWidth(),
             label = { Text(text = "Search anime...") },
             enabled = true,
-            shape = RoundedCornerShape(36.dp)
+            shape = RoundedCornerShape(36.dp),
+            maxLines = 1
         )
 
         if (isSearching.not()) {
-            GridAdder(listData = animeList, navController = navController )
+            GridAdder(listData = animeList, navController = navController)
         } else {
             LoadingAnimation()
         }

@@ -101,7 +101,7 @@ fun AnimeCardBox(
             colors = CardDefaults.cardColors(containerColor = LightYellow),
             shape = RectangleShape,
         ) {
-            val painter = rememberAsyncImagePainter(model = anime.images.webp.large_image_url)
+            val painter = rememberAsyncImagePainter(model = anime.images.webp.image_url)
 
 
 
