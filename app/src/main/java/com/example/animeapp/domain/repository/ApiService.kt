@@ -1,9 +1,10 @@
 package com.example.animeapp.domain.repository
 
 
-import com.example.animeapp.domain.CharactersModel.CharactersModel
+import com.example.animeapp.domain.charactersModel.CharactersModel
 import com.example.animeapp.domain.detailModel.AnimeDetailModel
 import com.example.animeapp.domain.searchModel.AnimeSearchModel
+import com.example.animeapp.domain.staffModel.StaffModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -28,6 +29,9 @@ interface ApiService {
 
     @GET("$GET_DETAILS_URL{id}/characters")
     suspend fun getCharactersFromId(@Path("id") id: Int): Response<CharactersModel>
+
+    @GET("$GET_DETAILS_URL{id}/staff")
+    suspend fun getStaffFromId(@Path("id") id: Int): Response<StaffModel>
 
 
     companion object {

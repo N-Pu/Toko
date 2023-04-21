@@ -15,15 +15,11 @@ import androidx.compose.ui.unit.dp
 
 
 
-
-// this is the problem, it's cycling
 @Composable
 fun DetailScreen(navController: NavHostController, id: Int) {
     navController.navigate(route = Screen.Home.route)
     navController.popBackStack()
     ActivateDetailScreen(id = id)
-//    CharactersViewModel().addCharacterAndSeyu(id)
-
 }
 
 

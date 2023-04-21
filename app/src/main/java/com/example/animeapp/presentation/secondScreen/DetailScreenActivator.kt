@@ -14,7 +14,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.animeapp.presentation.secondScreen.CharactersList.ShowList
+import com.example.animeapp.presentation.secondScreen.StaffList.DisplayStaffList
+import com.example.animeapp.presentation.secondScreen.charactersList.DisplayCast
+import com.example.animeapp.presentation.secondScreen.customVisuals.DisplayCustomGenreBoxes
 import com.example.animeapp.viewModel.DetailScreenViewModel
 
 
@@ -28,7 +30,7 @@ fun ActivateDetailScreen(id: Int) {
 
 
     if (data != null) {
-        val painterState = rememberAsyncImagePainter(model = data.images.webp.large_image_url)
+        val painterState = rememberAsyncImagePainter(model = data.images.jpg.large_image_url)
 
         LazyColumn(
             modifier = Modifier
@@ -37,11 +39,10 @@ fun ActivateDetailScreen(id: Int) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+
             item {
                 DisplayPicture(painter = painterState)
                 Spacer(modifier = Modifier.height(16.dp))
-
-
                 Text(
                     text = data.title,
                     fontSize = 50.sp,
@@ -54,13 +55,26 @@ fun ActivateDetailScreen(id: Int) {
                     )
                 )
             }
+
             item {
-                // All primitive data types
+
+                DisplayCustomGenreBoxes(genres = data.genres)
+            }
+
+
+            item {
                 Text(text = data.synopsis ?: "")
             }
+
+
+
             item {
-                ShowList(mal_id = id)
+                DisplayCast(mal_id = id)
             }
+
+
+            item { DisplayStaffList(mal_id = id) }
+
             item {
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -94,7 +108,10 @@ fun ActivateDetailScreen(id: Int) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(text = "jap title =" + data.title_japanese)
                 Spacer(modifier = Modifier.height(16.dp))
+            }
 
+
+            item {
 //                ExoPlayerView(data.trailer.youtube_id)
                 Text(
                     text = "trailer url =" + data.trailer.url +
