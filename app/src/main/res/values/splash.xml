@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AnimeApp.Splash" parent="Theme.SplashScreen" >
+
+    <item name="windowSplashScreenBackground">#FFFEFBF0</item>
+    <item name="windowSplashScreenAnimatedIcon">@drawable/toko_logo</item>
+    <item name="postSplashScreenTheme">@style/Theme.SplashScreen</item>
+    </style>
+</resources>

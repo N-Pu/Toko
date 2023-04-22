@@ -19,7 +19,7 @@ import com.example.animeapp.presentation.animations.LoadingAnimation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreenSearchPanel(navController: NavHostController) {
+fun MainScreen(navController: NavHostController) {
     val viewModel =
         viewModel<HomeScreenViewModel>()
 

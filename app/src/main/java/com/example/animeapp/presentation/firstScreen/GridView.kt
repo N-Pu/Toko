@@ -116,7 +116,6 @@ fun AnimeCardBox(
                 )
                 Column(
                     modifier = Modifier
-//                    .align(Alignment.TopStart)
                         .background(Color.White.copy(alpha = 0.5f))
                 ) {
 
@@ -154,71 +153,6 @@ fun AnimeCardBox(
     }
 }
 
-
-//@OptIn(ExperimentalFoundationApi::class)
-//@Composable
-//fun AnimeCardBox(
-//    anime: Data,
-//    navController: NavHostController
-//) {
-//
-//
-//
-//    Card(
-//        modifier = Modifier
-//            .clip(RoundedCornerShape(6.dp))
-//            .clickable {
-//                navController.navigate(route = "detail_screen/" + anime.mal_id) {
-//                    popUpTo(Screen.Detail.route) {
-//                        inclusive = true
-//                    }
-//                }
-//            },
-//
-//        colors = CardDefaults.cardColors(containerColor = LightYellow),
-//        shape = RectangleShape
-//
-//    ) {
-//        val painter = rememberAsyncImagePainter(model = anime.images.webp.large_image_url)
-//        // Coil image loader
-//        Image(
-//            painter = painter,
-//            contentDescription = "Images for each Anime",
-//            modifier = Modifier
-//                .aspectRatio(9f / 11f),
-//
-//            contentScale = ContentScale.FillBounds
-//
-//        )
-//
-//
-//        Text(text = anime.score.toString())
-//        Text(text = anime.scored_by.toString())
-//
-//
-//
-//
-//        Text(
-//            text = anime.title,
-//            textAlign = TextAlign.Center,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .basicMarquee(
-//                    iterations = Int.MAX_VALUE,
-//                    delayMillis = 2000,
-//                    initialDelayMillis = 2000,
-//                    velocity = 50.dp
-//                ),
-//            fontFamily = FontFamily.Monospace,
-//            fontWeight = FontWeight(1000),
-//            overflow = TextOverflow.Ellipsis,
-//            maxLines = 1
-//
-//        )
-//    }
-//
-//
-//}
 
 
 

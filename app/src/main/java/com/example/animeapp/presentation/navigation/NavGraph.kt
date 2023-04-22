@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.animeapp.presentation.firstScreen.MainScreenSearchPanel
+import com.example.animeapp.presentation.firstScreen.MainScreen
 import com.example.animeapp.presentation.secondScreen.DetailScreen
 
 private var isLogPrinted = false
@@ -17,7 +17,7 @@ private var isLogPrinted = false
 fun SetupNavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
-            MainScreenSearchPanel(navController)
+            MainScreen(navController)
         }
         composable(
             route = Screen.Detail.route,
