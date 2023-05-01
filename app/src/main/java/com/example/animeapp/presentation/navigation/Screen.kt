@@ -1,10 +1,21 @@
 package com.example.animeapp.presentation.navigation
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.ui.graphics.vector.ImageVector
 
 
+sealed class Screen(val route: String, val icon: ImageVector, val contentDescription: String) {
+    object Home : Screen("home_screen", Icons.Filled.Search, "Search Anime")
+    object Detail : Screen("detail_screen/{id}", Icons.Filled.List, "Details on Anime")
+    object News : Screen("news_screen", Icons.Filled.ShoppingCart, "Current News on Anime")
+    object Favorites : Screen("favorites_screen", Icons.Filled.FavoriteBorder, "Favorite anime")
 
-sealed class Screen(val route: String) {
-    object Splash : Screen("splash_screen")
-    object Home : Screen("home_screen")
-    object Detail : Screen("detail_screen/{id}")
+}
+
+object Nothing {
+    const val value = "no_id"
 }

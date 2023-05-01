@@ -1,9 +1,9 @@
 package com.example.animeapp.presentation.firstScreen
 
 
+import HomeScreenViewModel
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.TweenSpec
-
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
@@ -14,40 +14,43 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.searchModel.Data
-import com.example.animeapp.presentation.navigation.Screen
 import com.example.animeapp.presentation.theme.LightYellow
+import com.example.animeapp.viewModel.IdViewModel
+
 
 
 @Composable
 fun GridAdder(
     listData: List<Data>,
-    navController: NavHostController
+    searchViewModel: HomeScreenViewModel,
+    navController: NavHostController,
+    idViewModel: IdViewModel,
+
 ) {
+
+
+
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 140.dp),
@@ -58,7 +61,7 @@ fun GridAdder(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         itemsIndexed(listData) { _, anime ->
-            AnimeCardBox(anime = anime, navController)
+            AnimeCardBox(anime = anime, navController, idViewModel = idViewModel)
 
         }
     }
@@ -68,12 +71,15 @@ fun GridAdder(
 @Composable
 fun AnimeCardBox(
     anime: Data,
-    navController: NavHostController
+    navController: NavController,
+    idViewModel: IdViewModel,
+//    savedAnimeViewModel: SavedAnimeViewModel
 ) {
 
     var isVisible by remember {
         mutableStateOf(false)
     }
+
 
 
     AnimatedVisibility(
@@ -92,11 +98,11 @@ fun AnimeCardBox(
             modifier = Modifier
                 .clip(RoundedCornerShape(6.dp))
                 .clickable {
-                    navController.navigate(route = "detail_screen/" + anime.mal_id) {
-                        popUpTo(Screen.Detail.route) {
-                            inclusive = true
-                        }
-                    }
+                    idViewModel.setId(anime.mal_id)
+//                    navigateToDetailScreen(navController, anime.mal_id)
+                    navigateToDetailScreen(navController, idViewModel.getId())
+
+//                    savedAnimeViewModel.saveAnime(anime)
                 },
             colors = CardDefaults.cardColors(containerColor = LightYellow),
             shape = RectangleShape,

@@ -14,7 +14,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -22,19 +21,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.charactersModel.Data
 import com.example.animeapp.domain.charactersModel.VoiceActor
-import com.example.animeapp.viewModel.CharactersViewModel
 
 @Composable
-fun DisplayCast(mal_id: Int) {
-    val viewModel = viewModel<CharactersViewModel>()
-    viewModel.addCharacterAndSeyu(mal_id)
-    val charactersList by viewModel.charactersList.collectAsStateWithLifecycle()
+fun DisplayCast(castList: List<Data>) {
 
     Text(text = "Cast", textDecoration = TextDecoration.Underline)
     LazyRow(
@@ -42,15 +35,19 @@ fun DisplayCast(mal_id: Int) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        itemsIndexed(charactersList) { _, data ->
+        itemsIndexed(castList) { _, data ->
             val characterPainter =
                 rememberAsyncImagePainter(model = data.character.images.webp.image_url)
+
             CharacterComponentsCard(characterData = data, characterPainter = characterPainter)
+
             Spacer(modifier = Modifier.size(20.dp))
             data.voice_actors.forEach {
                 val personPainter =
                     rememberAsyncImagePainter(model = it.person.images.jpg.image_url)
+
                 PersonComponentsCard(voiceActor = it, personPainter = personPainter)
+
                 Spacer(modifier = Modifier.size(20.dp))
             }
 

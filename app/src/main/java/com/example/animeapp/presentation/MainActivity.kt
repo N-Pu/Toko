@@ -10,19 +10,22 @@ import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.animeapp.domain.repository.MalApiService
+import com.example.animeapp.presentation.appConstraction.TokoAppActivator
 import com.example.animeapp.presentation.theme.AnimeAppTheme
 import com.example.animeapp.presentation.theme.MainBackgroundColor
-import com.example.animeapp.presentation.navigation.SetupNavGraph
 import com.example.animeapp.presentation.theme.LightYellow
+
+import com.example.animeapp.viewModel.viewModelFactory.MyViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
 
 
-
-    lateinit var navController: NavHostController
+    private lateinit var navController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -40,7 +43,23 @@ class MainActivity : ComponentActivity() {
                 ) {
                     installSplashScreen() // Custom Splash Screen
                     navController = rememberNavController()
-                    SetupNavGraph(navController = navController)
+
+                    val myViewModelFactory = MyViewModelFactory(MalApiService.Companion)
+                    val viewModel = ViewModelProvider(this,myViewModelFactory)
+//                   val d = viewModel.get(StaffViewModel::class.java)
+
+//                    val searchViewModel = viewModel<HomeScreenViewModel>()
+//                    val detailViewModel = viewModel<DetailScreenViewModel>()
+//                    val castViewModel = viewModel<CharactersViewModel>()
+//                    val staffViewModel = viewModel<StaffViewModel>()
+//                    val idViewModel = viewModel<IdViewModel>()
+//                    val savedAnimeViewModel = viewModel<SavedAnimeViewModel>()
+                    TokoAppActivator(
+                        navController = navController,
+                        viewModelProvider = viewModel
+//                        savedAnimeViewModel = savedAnimeViewModel
+                    )
+//                    SetupNavGraph(navController = navController)
 
                 }
             }

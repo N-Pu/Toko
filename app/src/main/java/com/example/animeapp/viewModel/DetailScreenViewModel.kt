@@ -4,28 +4,34 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.animeapp.domain.detailModel.Data
-import com.example.animeapp.domain.repository.ApiService.Companion.api
+import com.example.animeapp.domain.repository.MalApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-object DetailScreenViewModel : ViewModel() {
-    private val animeRepository = api
+class DetailScreenViewModel(malApiService: MalApiService.Companion) : ViewModel() {
+    private val animeRepository = malApiService.api
 
     private val _animeDetails = MutableStateFlow<Data?>(null)
     val animeDetails: StateFlow<Data?> get() = _animeDetails
+    private val loadedIds = mutableMapOf<Int, Boolean>()
 
     fun onTapAnime(id: Int) {
+        if (loadedIds[id] == true) {
+            return // Если данные уже загружены, выходим
+        }
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
+                    loadedIds.clear()
                     val response = animeRepository.getDetailsFromAnime(id)
                     if (response.isSuccessful) {
                         response.body()?.data.let { data ->
                             withContext(Dispatchers.Main) {
                                 _animeDetails.value = data
+                                loadedIds[id] = true // Помечаем, что данные загружены
                             }
                         }
                     }

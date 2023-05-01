@@ -1,4 +1,4 @@
-package com.example.animeapp.presentation.secondScreen.StaffList
+package com.example.animeapp.presentation.secondScreen.staffList
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +14,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -22,18 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.staffModel.Data
-import com.example.animeapp.viewModel.StaffViewModel
 
 @Composable
-fun DisplayStaffList(mal_id: Int) {
-    val viewModel = viewModel<StaffViewModel>()
-    viewModel.addStaffFromId(mal_id)
-    val staffList by viewModel.staffList.collectAsStateWithLifecycle()
+fun DisplayStaffList(staffList: List<Data>) {
     LazyListEditor(listData = staffList)
 }
 

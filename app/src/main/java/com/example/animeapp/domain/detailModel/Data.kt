@@ -57,6 +57,4 @@ data class Data(
      @SerializedName("type") val type: String,
      @SerializedName("url") val url: String,
      @SerializedName("year") val year: Int
-) {
-
-}
+)

@@ -7,25 +7,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.animeapp.presentation.animations.LoadingAnimation
-
+import com.example.animeapp.viewModel.IdViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
-    val viewModel =
-        viewModel<HomeScreenViewModel>()
+fun MainScreen(
+    navController: NavHostController,
+    searchViewModel: HomeScreenViewModel,
+    idViewModel: IdViewModel,
+//    savedAnimeViewModel: SavedAnimeViewModel
+) {
 
-    val searchText by viewModel.searchText.collectAsStateWithLifecycle()
-    val animeList by viewModel.animeList.collectAsStateWithLifecycle()
-    val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
+
+    val searchText by searchViewModel.searchText.collectAsStateWithLifecycle()
+    val animeList by searchViewModel.animeList.collectAsStateWithLifecycle()
+    val isSearching by searchViewModel.isSearching.collectAsStateWithLifecycle()
 
 
     Column(
@@ -34,16 +39,31 @@ fun MainScreen(navController: NavHostController) {
     ) {
         OutlinedTextField(
             value = searchText,
-            onValueChange = viewModel::onSearchTextChange,
+            onValueChange = searchViewModel::onSearchTextChange,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text(text = "Search anime...") },
+            label = {
+//                Text(text = "Search anime...")
+                    Icon(Icons.Filled.Search, "Search Icon")
+                    },
             enabled = true,
             shape = RoundedCornerShape(36.dp),
-            maxLines = 1
+           singleLine = true,
+            placeholder = {
+                Text(text = "Searching anime...")
+            },
+//            leadingIcon = {
+//                Icon(Icons.Filled.Person, "Search Icon")
+//            }
+
         )
 
         if (isSearching.not()) {
-            GridAdder(listData = animeList, navController = navController)
+            GridAdder(
+                searchViewModel = searchViewModel,
+                navController = navController,
+                idViewModel = idViewModel,
+                listData = animeList
+            )
         } else {
             LoadingAnimation()
         }

@@ -18,10 +18,6 @@ import com.example.animeapp.domain.detailModel.Genre
 import kotlin.random.Random
 
 
-
-
-
-
 @Composable
 fun RandomColorBox(
     text: String, color: Color, modifier: Modifier = Modifier
@@ -67,6 +63,6 @@ fun DisplayCustomGenreBoxes(genres: List<Genre>) {
 @Preview
 @Composable
 fun PrevDisplayCustomGenreBoxes() {
-//    val genres = listOf("Action", "Comedy", "Drama", "Horror", "Sci-Fi", "Thriller")
+    val genres = listOf("Action", "Comedy", "Drama", "Horror", "Sci-Fi", "Thriller")
 //    DisplayCustomGenreBoxes(genres = genres)
 }

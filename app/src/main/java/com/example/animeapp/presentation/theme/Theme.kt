@@ -12,14 +12,14 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = LightYellow,
-    secondary = LightYellow,
+    primary = MainBackgroundColor,
+    secondary = Brown,
     tertiary = LightYellow
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = LightYellow,
-    secondary = LightYellow,
+    primary = MainBackgroundColor,
+    secondary = Brown,
     tertiary = LightYellow
 
     /* Other default colors to override

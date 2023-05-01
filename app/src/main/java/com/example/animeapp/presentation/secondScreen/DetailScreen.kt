@@ -1,25 +1,29 @@
 package com.example.animeapp.presentation.secondScreen
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImagePainter
-import com.example.animeapp.presentation.navigation.Screen
 import androidx.compose.ui.layout.ContentScale
 
 import androidx.compose.ui.unit.dp
-
-
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 
 
 @Composable
-fun DetailScreen(navController: NavHostController, id: Int) {
-    navController.navigate(route = Screen.Home.route)
-    navController.popBackStack()
-    ActivateDetailScreen(id = id)
+fun DetailScreen(
+    navController: NavController,
+    viewModelProvider: ViewModelProvider
+) {
+    ActivateDetailScreen(
+        viewModelProvider = viewModelProvider
+    )
+
+
 }
 
 

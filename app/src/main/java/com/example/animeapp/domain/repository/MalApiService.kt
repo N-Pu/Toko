@@ -18,7 +18,7 @@ private const val BASE_URL = "https://api.jikan.moe/"
 private const val GET_DETAILS_URL = "https://api.jikan.moe/v4/anime/"
 
 
-interface ApiService {
+interface MalApiService {
 
 
     @GET("${BASE_URL}v4/anime")    // (в конце добавить лимит limit=20)
@@ -46,14 +46,14 @@ interface ApiService {
             .build()
 
 
-        val api: ApiService by lazy {
+        val api: MalApiService by lazy {
 
             Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient)
                 .build()
-                .create(ApiService::class.java)
+                .create(MalApiService::class.java)
         }
     }
 
