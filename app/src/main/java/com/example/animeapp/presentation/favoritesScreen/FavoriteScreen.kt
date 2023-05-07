@@ -9,9 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 
+
 @Composable
 fun Fav(navController: NavController) {
-
+//    if (navController.previousBackStackEntry?.destination?.route == DetailOnCast.value){
+//        navController.popBackStack(DetailOnCast.value, inclusive = true)
+//    }
 
 
     Box(

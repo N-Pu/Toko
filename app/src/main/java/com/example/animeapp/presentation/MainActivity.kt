@@ -2,7 +2,6 @@ package com.example.animeapp.presentation
 
 import android.os.Bundle
 import android.view.Window
-
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -20,6 +19,7 @@ import com.example.animeapp.presentation.theme.MainBackgroundColor
 import com.example.animeapp.presentation.theme.LightYellow
 
 import com.example.animeapp.viewModel.viewModelFactory.MyViewModelFactory
+
 
 
 class MainActivity : ComponentActivity() {
@@ -45,21 +45,18 @@ class MainActivity : ComponentActivity() {
                     navController = rememberNavController()
 
                     val myViewModelFactory = MyViewModelFactory(MalApiService.Companion)
-                    val viewModel = ViewModelProvider(this,myViewModelFactory)
-//                   val d = viewModel.get(StaffViewModel::class.java)
+                    val viewModel = ViewModelProvider(this, myViewModelFactory)
 
-//                    val searchViewModel = viewModel<HomeScreenViewModel>()
-//                    val detailViewModel = viewModel<DetailScreenViewModel>()
-//                    val castViewModel = viewModel<CharactersViewModel>()
-//                    val staffViewModel = viewModel<StaffViewModel>()
-//                    val idViewModel = viewModel<IdViewModel>()
-//                    val savedAnimeViewModel = viewModel<SavedAnimeViewModel>()
-                    TokoAppActivator(
-                        navController = navController,
-                        viewModelProvider = viewModel
-//                        savedAnimeViewModel = savedAnimeViewModel
-                    )
-//                    SetupNavGraph(navController = navController)
+                    TokoAppActivator(navController = navController, viewModelProvider = viewModel)
+
+
+
+//                    System.setProperty("webdriver.ie.driver", "IEDriverServer.exe")
+//                    val driver: WebDriver = ChromeDriver()
+//                    val link = driver.get("https://myanimelist.net/news")
+//                    driver.get("chrome://settings/clearBrowserData")
+//                    Log.d("MAIN-SELENIUM", link.toString())
+
 
                 }
             }

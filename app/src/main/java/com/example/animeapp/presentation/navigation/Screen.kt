@@ -19,3 +19,18 @@ sealed class Screen(val route: String, val icon: ImageVector, val contentDescrip
 object Nothing {
     const val value = "no_id"
 }
+
+object DetailOnCast{
+    const val value = "detail_on_cast"
+}
+object DetailOnStaff{
+    const val value = "detail_on_staff"
+}
+
+object CharacterDetail{
+    const val value = "detail_on_character/{id}"
+}
+
+object StaffDetail{
+    const val value = "detail_on_staff/{id}"
+}

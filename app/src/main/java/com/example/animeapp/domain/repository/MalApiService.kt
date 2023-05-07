@@ -1,9 +1,13 @@
 package com.example.animeapp.domain.repository
 
 
-import com.example.animeapp.domain.charactersModel.CharactersModel
+
+import com.example.animeapp.domain.castModel.CastModel
+import com.example.animeapp.domain.characterModel.CharacterFullModel
+import com.example.animeapp.domain.characterPictures.CharacterPicturesModel
 import com.example.animeapp.domain.detailModel.AnimeDetailModel
 import com.example.animeapp.domain.searchModel.AnimeSearchModel
+import com.example.animeapp.domain.staffMemberFullModel.StaffMemberFullModel
 import com.example.animeapp.domain.staffModel.StaffModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -15,6 +19,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 private const val BASE_URL = "https://api.jikan.moe/"
+private const val BASE_URL_FOR_CHARACTER = "https://api.jikan.moe/v4/"
 private const val GET_DETAILS_URL = "https://api.jikan.moe/v4/anime/"
 
 
@@ -28,11 +33,19 @@ interface MalApiService {
     suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<AnimeDetailModel>
 
     @GET("$GET_DETAILS_URL{id}/characters")
-    suspend fun getCharactersFromId(@Path("id") id: Int): Response<CharactersModel>
+    suspend fun getCharactersFromId(@Path("id") id: Int): Response<CastModel>
+
+    @GET("${BASE_URL_FOR_CHARACTER}characters/{id}/full")
+    suspend fun getCharacterFullFromId(@Path("id") id: Int): Response<CharacterFullModel>
+    @GET("${BASE_URL_FOR_CHARACTER}characters/{id}/pictures")
+    suspend fun getCharacterFullPictures(@Path("id") id: Int): Response<CharacterPicturesModel>
 
     @GET("$GET_DETAILS_URL{id}/staff")
     suspend fun getStaffFromId(@Path("id") id: Int): Response<StaffModel>
 
+
+    @GET("${BASE_URL_FOR_CHARACTER}people/{id}/full")
+    suspend fun getStaffFullFromId(@Path("id") id: Int): Response<StaffMemberFullModel>
 
     companion object {
 

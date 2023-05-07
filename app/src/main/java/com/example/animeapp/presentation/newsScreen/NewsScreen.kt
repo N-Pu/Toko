@@ -8,9 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import com.example.animeapp.presentation.navigation.DetailOnCast
 
 @Composable
 fun News(navController: NavController) {
+    if (navController.previousBackStackEntry?.destination?.route == DetailOnCast.value){
+        navController.popBackStack(DetailOnCast.value, inclusive = true)
+    }
 
     Box(
         modifier = Modifier
