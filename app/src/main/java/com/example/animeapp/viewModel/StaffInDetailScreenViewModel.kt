@@ -5,11 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.animeapp.domain.repository.MalApiService
 import com.example.animeapp.domain.staffModel.Data
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class StaffInDetailScreenViewModel(malApiService: MalApiService.Companion) : ViewModel() {
 
@@ -27,20 +25,18 @@ class StaffInDetailScreenViewModel(malApiService: MalApiService.Companion) : Vie
                 return@launch
             }
 
-            withContext(Dispatchers.IO) {
-                staffCache.clear()
-                try {
-                    val response = animeRepository.getStaffFromId(id)
-                    if (response.isSuccessful) {
-                        val staff = response.body()?.data ?: emptyList()
-                        staffCache[id] = staff
-                        _staffList.value = staff
-                    }
-                } catch (e: Exception) {
-                    Log.e("StaffViewModel", e.message.toString())
+            try {
+                val response = animeRepository.getStaffFromId(id)
+                if (response.isSuccessful) {
+                    val staff = response.body()?.data ?: emptyList()
+                    staffCache[id] = staff
+                    _staffList.value = staff
+                } else if (response.code() == 404) {
+                    _staffList.value = emptyList()
                 }
+            } catch (e: Exception) {
+                Log.e("StaffViewModel", e.message.toString())
             }
         }
     }
-
 }

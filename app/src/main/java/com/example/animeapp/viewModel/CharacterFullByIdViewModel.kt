@@ -32,7 +32,6 @@ class CharacterFullByIdViewModel(malApiService: MalApiService.Companion) : ViewM
             withContext(Dispatchers.IO) {
                 try {
                     _isSearching.value = true
-                    charactersCache.clear()
                     val response = animeRepository.getCharacterFullFromId(mal_id)
                     if (response.isSuccessful) {
                         val character = response.body()?.data
@@ -45,10 +44,6 @@ class CharacterFullByIdViewModel(malApiService: MalApiService.Companion) : ViewM
                     _isSearching.value = false
                 }
             }
-
-
         }
     }
-
-
 }
