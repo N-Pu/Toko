@@ -19,26 +19,30 @@ class CastInDetailScreenViewModel(malApiService: MalApiService.Companion) : View
 
     fun addCastFromId(id: Int) {
         viewModelScope.launch {
-
             val cachedCharacters = castCache[id]
             if (cachedCharacters != null) {
                 _castList.value = cachedCharacters
                 return@launch
             }
-
             withContext(Dispatchers.IO) {
                 try {
-                    castCache.clear()
                     val response = animeRepository.getCharactersFromId(id)
                     if (response.isSuccessful) {
                         val characters = response.body()?.data ?: emptyList()
                         castCache[id] = characters
                         _castList.value = characters
+                    } else if (response.code() == 404) {
+                        // если получен ответ 404, присваиваем пустой список
+                        _castList.value = emptyList()
                     }
                 } catch (e: Exception) {
                     Log.e("CastInDetailScreenViewModel", e.message.toString())
+                    // если произошла ошибка, присваиваем null
+                    _castList.value = emptyList()
                 }
+
             }
         }
     }
 }
+
