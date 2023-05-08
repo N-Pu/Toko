@@ -48,7 +48,7 @@ fun DisplayCast(
 ) {
     Log.d("size", castList.size.toString())
 
-    val trimmedCast = IsMoreForCharacters().isMoreThenSevenCharacters(castList)
+    val trimmedCast = IsMoreForCharacters().isMoreThenTenCharacters(castList)
     val castWithJapVoiceActors = hasJapVoiceActor(trimmedCast)
 
     Text(

@@ -51,7 +51,7 @@ fun ListEditor(listData: List<Data>, navController: NavController) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        val trimmedStaff = IsMoreThenForStaff().isMoreThenSevenStaff(listData)
+        val trimmedStaff = IsMoreThenForStaff().isMoreThenTenStaff(listData)
         trimmedStaff.forEach { data ->
             val personPainter =
                 rememberAsyncImagePainter(model = data.person.images.jpg.image_url)
