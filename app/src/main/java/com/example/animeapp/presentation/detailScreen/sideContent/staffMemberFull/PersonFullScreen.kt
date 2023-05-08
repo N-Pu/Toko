@@ -99,7 +99,6 @@ fun DisplayStaffMemberFromId(
                 }
             }
 
-
             staffFullState.value?.let {
                 itemsIndexed(it.anime) { _, anime ->
                     Text(
