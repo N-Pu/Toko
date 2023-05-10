@@ -51,6 +51,7 @@ import com.example.animeapp.R
 import com.example.animeapp.domain.searchModel.Data
 import com.example.animeapp.presentation.theme.LightYellow
 import com.example.animeapp.viewModel.IdViewModel
+import java.util.Locale
 
 
 @Composable
@@ -224,7 +225,7 @@ fun AnimeCardBox(
 //
 //}
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewGridView() {
@@ -354,14 +355,15 @@ fun formatScoredBy(float: Float): String {
     return if (float == 0f) {
         "N/A"
     } else {
-        val formattedString = String.format("%.1f", float)
+        val formattedString = String.format(Locale.US, "%.1f", float)
         if (formattedString.endsWith(".0")) {
             formattedString.substring(0, formattedString.length - 2)
         } else {
-            formattedString
+            formattedString.replace(",", ".")
         }
     }
 }
+
 
 fun formatScore(float: Float?): String {
     return if (float == null || float == 0f) {
@@ -376,7 +378,7 @@ fun formatScore(float: Float?): String {
 @Composable
 fun DropDownMenu() {
 
-   AddFavorites()
+    AddFavorites()
 
 }
 
@@ -385,9 +387,13 @@ fun AddFavorites() {
     var expanded by remember { mutableStateOf(false) }
     val items = listOf("Planned", "Watching", "Watched", "Dropped")
 
-    Box(modifier = Modifier.offset(130.dp, 170.dp)){
+    Box(modifier = Modifier.offset(130.dp, 170.dp)) {
         IconButton(onClick = { expanded = true }, modifier = Modifier.align(Alignment.BottomEnd)) {
-            Icon(Icons.Default.AddCircle, contentDescription = null, tint = MaterialTheme.colorScheme.inversePrimary)
+            Icon(
+                Icons.Default.AddCircle,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.inversePrimary
+            )
         }
 
         DropdownMenu(

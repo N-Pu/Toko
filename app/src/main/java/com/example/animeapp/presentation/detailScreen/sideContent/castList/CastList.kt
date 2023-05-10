@@ -214,7 +214,6 @@ fun getJapOrFirstVoiceActor(data: Data): VoiceActor? {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun Prev() {
