@@ -1,19 +1,34 @@
-package com.example.animeapp.presentation.detailScreen
+package com.example.animeapp.presentation.detailScreen.mainPage
 
 
+
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+
 import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
@@ -21,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.presentation.animations.LoadingAnimation
+import com.example.animeapp.presentation.detailScreen.DisplayPicture
 import com.example.animeapp.presentation.detailScreen.sideContent.castList.DisplayCast
 import com.example.animeapp.presentation.detailScreen.mainPage.customVisuals.DisplayCustomGenreBoxes
 import com.example.animeapp.presentation.detailScreen.sideContent.staffList.DisplayStaff
@@ -29,6 +45,7 @@ import com.example.animeapp.viewModel.DetailScreenViewModel
 import com.example.animeapp.viewModel.IdViewModel
 import com.example.animeapp.viewModel.StaffInDetailScreenViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 
@@ -37,7 +54,7 @@ fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
     navController: NavController,
 
-) {
+    ) {
 
 
     val id by viewModelProvider[IdViewModel::class.java].mal_id.collectAsStateWithLifecycle()
@@ -47,8 +64,11 @@ fun ActivateDetailScreen(
     LaunchedEffect(key1 = id) {
         withContext(Dispatchers.IO) {
             viewModelProvider[DetailScreenViewModel::class.java].onTapAnime(id)
+            delay(300)
             viewModelProvider[StaffInDetailScreenViewModel::class.java].addStaffFromId(id)
+            delay(300)
             viewModelProvider[CastInDetailScreenViewModel::class.java].addCastFromId(id)
+
         }
     }
 
@@ -103,9 +123,9 @@ fun ActivateDetailScreen(
 
 
 
-                Text(text = detailData.synopsis ?: "")
+                ExpandableText(text = detailData.synopsis ?: "")
 
-
+//                Text(text = detailData.synopsis ?: "")
 
 
                 if (castData.isNotEmpty()) {
@@ -215,6 +235,51 @@ fun ActivateDetailScreen(
         }
     } else {
         LoadingAnimation()
+    }
+}
+
+
+
+@Composable
+fun ExpandableText(text: String) {
+    var expanded by remember { mutableStateOf(false) }
+    val toggleExpanded: () -> Unit = { expanded = !expanded }
+
+    val maxLines = if (expanded) Int.MAX_VALUE else 4
+
+    Column {
+        Text(
+            text = text,
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.clickable(onClick = toggleExpanded),
+            softWrap = true
+        )
+
+        // it does not work when you put 4 and it sometimes does not work in number 1
+        if (text.count { it == '\n' } >= 1) {
+            Row(modifier = Modifier.animateContentSize()) {
+                if (expanded) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable(onClick = toggleExpanded)
+                            .align(Alignment.CenterVertically)
+                            .fillMaxWidth()
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable(onClick = toggleExpanded)
+                            .align(Alignment.CenterVertically)
+                            .fillMaxWidth()
+                    )
+                }
+            }
+        }
     }
 }
 

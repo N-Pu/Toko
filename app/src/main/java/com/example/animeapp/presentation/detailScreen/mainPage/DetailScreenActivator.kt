@@ -12,6 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import com.example.animeapp.presentation.detailScreen.mainPage.ActivateDetailScreen
 
 
 @Composable
