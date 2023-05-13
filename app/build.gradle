@@ -1,8 +1,12 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
 
+kotlin {
+    jvmToolchain(8)
+}
 android {
     namespace 'com.example.animeapp'
     compileSdk 33
@@ -35,6 +39,7 @@ android {
     }
     buildFeatures {
         compose true
+        viewBinding true // for dao
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.4.3'
@@ -57,9 +62,9 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
 
 
-    implementation "androidx.compose.material3:material3-window-size-class:1.0.1"
-    implementation "androidx.compose.material3:material3:1.0.1"
-    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation "androidx.compose.material3:material3-window-size-class:1.1.0"
+    implementation "androidx.compose.material3:material3:1.1.0"
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation platform('androidx.compose:compose-bom:2022.10.00')
     implementation 'androidx.compose.ui:ui-graphics'
 
@@ -92,7 +97,7 @@ dependencies {
 
     implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.1"
 
-    implementation "androidx.compose.runtime:runtime-livedata:1.4.2"
+    implementation "androidx.compose.runtime:runtime-livedata:1.4.3"
 
 
     //navigation compose
@@ -115,9 +120,23 @@ dependencies {
 
 
 
+    //Room
+//    implementation 'androidx.room:room-ktx:2.5.1'
+//    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+//    implementation 'androidx.room:room-runtime:2.5.1'
+//    kapt 'androidx.room:room-compiler:2.5.1'
+//    kapt 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
+//    kapt 'androidx.lifecycle:lifecycle-compiler:2.6.1'
+
+//    implementation 'androidx.room:room-runtime:2.5.1'
+//    kapt 'androidx.room:room-compiler:2.5.1'
+//    annotationProcessor "androidx.room:room-compiler:2.5.1"
+
 
     //selenium webdriver
 
 //    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.9.0'
+
+
 
 }

@@ -12,13 +12,13 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.animeapp.domain.repository.MalApiService
+import com.example.animeapp.repository.MalApiService
 import com.example.animeapp.presentation.appConstraction.TokoAppActivator
 import com.example.animeapp.presentation.theme.AnimeAppTheme
 import com.example.animeapp.presentation.theme.MainBackgroundColor
 import com.example.animeapp.presentation.theme.LightYellow
 
-import com.example.animeapp.viewModel.viewModelFactory.MyViewModelFactory
+import com.example.animeapp.domain.viewModel.viewModelFactory.MyViewModelFactory
 
 
 
@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
 
 
     private lateinit var navController: NavHostController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     installSplashScreen() // Custom Splash Screen
                     navController = rememberNavController()
 
-                    val myViewModelFactory = MyViewModelFactory(MalApiService.Companion)
+                    val myViewModelFactory = MyViewModelFactory(MalApiService)
                     val viewModel = ViewModelProvider(this, myViewModelFactory)
 
                     TokoAppActivator(navController = navController, viewModelProvider = viewModel)

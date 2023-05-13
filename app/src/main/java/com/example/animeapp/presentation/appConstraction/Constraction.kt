@@ -19,8 +19,6 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.DismissibleDrawerSheet
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -35,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -46,13 +43,11 @@ import com.example.animeapp.presentation.navigation.CharacterDetail
 import com.example.animeapp.presentation.navigation.Nothing
 import com.example.animeapp.presentation.navigation.Screen
 import com.example.animeapp.presentation.navigation.SetupNavGraph
-import com.example.animeapp.presentation.navigation.StaffDetail
-import com.example.animeapp.viewModel.IdViewModel
-
+import com.example.animeapp.domain.viewModel.IdViewModel
+import com.example.animeapp.presentation.theme.LightYellow
 import androidx.compose.material3.BottomAppBar as BottomAppBar
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TokoAppActivator(
     navController: NavHostController,
@@ -67,11 +62,13 @@ fun TokoAppActivator(
     //check if destination matches needed route -> show button
     navController.addOnDestinationChangedListener { _, destination, _ ->
         showButton = when (destination.route) {
-            Screen.Detail.route, CharacterDetail.value, StaffDetail.value -> true
+            Screen.Detail.route,
+//            CharacterDetail.value,
+//            StaffDetail.value
+            -> true
             else -> false
         }
     }
-
 
     Scaffold(bottomBar = {
         BottomNavigationBar(
@@ -116,7 +113,6 @@ fun MyFloatingButton(navController: NavController, showButton: Boolean) {
     }
 }
 
-
 @Composable
 fun BottomNavigationBar(
     navController: NavController, idViewModel: IdViewModel
@@ -126,11 +122,12 @@ fun BottomNavigationBar(
         Screen.Home, Screen.Detail, Screen.News, Screen.Favorites
     )
 
-//    val id by idViewModel.mal_id.collectAsStateWithLifecycle()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    BottomAppBar {
+    BottomAppBar(
+        modifier = Modifier.height(36.dp), containerColor = LightYellow
+    ) {
         NavigationBarItem(icon = {
             Icon(
                 imageVector = items[0].icon, contentDescription = items[0].contentDescription
@@ -261,66 +258,24 @@ fun BottomNavigationBar(
             }
         })
 
-//        items.forEach { item ->
-//            NavigationBarItem(
-//                icon = {
-//                    Icon(
-//                        imageVector = item.icon,
-//                        contentDescription = item.contentDescription
-//                    )
-//                },
-//                selected = currentRoute == item.route,
-//                onClick = {
-//
-//                    try {
-//
-//                        if (item.route == "detail_screen/{id}") {
-//                            item.route = "detail_screen"
-//                        }
-//                            navController.navigate(item.route) {
-//                                navController.graph.startDestinationRoute?.let { route ->
-//                                    popUpTo(route) {
-//                                        saveState = true
-////                                    inclusive = true
-//                                    }
-//                                }
-//                                // Avoid multiple copies of the same destination when
-//                                // reselecting the same item
-//                                launchSingleTop = true
-//                                // Restore state when reselecting a previously selected item
-//                                restoreState = true
-//                            }
-//
-//
-//
-//
-//                    } catch (e: IllegalArgumentException) {
-//
-//                        Log.e("CATCH", item.route + " " + e.message.toString())
-//
-//                    }
-//                }
-//
-//            )
-//        }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Preview
 @Composable
 fun Prev() {
 
-    DismissibleDrawerSheet(modifier = Modifier.background(Color.Blue)) {
 
-    }
     Scaffold(
         bottomBar = {
 
-            Row(modifier = Modifier
-                .width(200.dp)
-                .height(40.dp)
-                .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))) {
+            Row(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(40.dp)
+                    .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))
+            ) {
 
 
                 IconButton(onClick = { /*TODO*/ }) {
