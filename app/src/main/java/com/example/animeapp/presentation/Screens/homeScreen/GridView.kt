@@ -28,10 +28,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,38 +53,16 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.R
-//import com.example.animeapp.dao.MainDb
+import com.example.animeapp.dao.AnimeItem
+import com.example.animeapp.dao.MainDb
 import com.example.animeapp.domain.models.searchModel.Data
 import com.example.animeapp.presentation.theme.LightYellow
 import com.example.animeapp.domain.viewModel.IdViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 
-//@Composable
-//fun GridAdder(
-//    listData: List<Data>,
-//    searchViewModel: HomeScreenViewModel,
-//    navController: NavHostController,
-//    idViewModel: IdViewModel,
-//
-//    ) {
-//
-//
-//    LazyVerticalGrid(
-//        columns = GridCells.Adaptive(minSize = 140.dp),
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .fillMaxHeight(),
-//        horizontalArrangement = Arrangement.spacedBy(16.dp),
-//        verticalArrangement = Arrangement.spacedBy(16.dp)
-//    ) {
-//        itemsIndexed(listData) { _, anime ->
-//            AnimeCardBox(anime = anime, navController, idViewModel = idViewModel)
-//
-//        }
-//    }
-//
-//}
 @Composable
 fun GridAdder(
 
@@ -113,16 +91,11 @@ fun GridAdder(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnimeCardBox(
-    anime: Data,
-    navController: NavController,
-    viewModelProvider: ViewModelProvider
+    anime: Data, navController: NavController, viewModelProvider: ViewModelProvider
 ) {
-
-    var isVisible by remember {
-        mutableStateOf(false)
-    }
-
-    val selectedCategory = remember { mutableStateOf("") }
+    val viewModel = viewModelProvider[IdViewModel::class.java]
+    var isVisible by remember { mutableStateOf(false) }
+    val painter = rememberAsyncImagePainter(model = anime.images.webp.image_url)
 
     AnimatedVisibility(
         visible = isVisible, enter = fadeIn(
@@ -136,7 +109,7 @@ fun AnimeCardBox(
             modifier = Modifier
                 .clip(RoundedCornerShape(6.dp))
                 .clickable {
-                    viewModelProvider[IdViewModel::class.java].setId(anime.mal_id)
+                    viewModel.setId(anime.mal_id)
                     navigateToDetailScreen(
                         navController, anime.mal_id
                     )
@@ -144,7 +117,6 @@ fun AnimeCardBox(
             colors = CardDefaults.cardColors(containerColor = LightYellow),
             shape = RectangleShape,
         ) {
-            val painter = rememberAsyncImagePainter(model = anime.images.webp.image_url)
             Box {
                 // Coil image loader
                 Image(
@@ -210,7 +182,6 @@ fun AnimeCardBox(
                     score = formatScore(anime.score),
                     scoredBy = formatScoredBy(anime.scored_by),
                     animeImage = anime.images.jpg.image_url,
-                    category = selectedCategory,
                     context = LocalContext.current
                 )
 
@@ -247,10 +218,6 @@ fun AnimeCardBox(
 }
 
 
-
-
-
-
 fun formatScoredBy(float: Float): String {
     return if (float == 0f) {
         "N/A"
@@ -274,19 +241,41 @@ fun formatScore(float: Float?): String {
 }
 
 
-
 @Composable
 fun AddFavorites(
     mal_id: Int,
-    category: MutableState<String>,
     anime: String,
     score: String,
     scoredBy: String,
     animeImage: String,
-    context : Context
+    context: Context
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     var expanded by remember { mutableStateOf(false) }
     val items = listOf("Planned", "Watching", "Watched", "Dropped")
+
+    // Keep track of the selected item
+    var selectedItem by remember { mutableStateOf("") }
+
+    // Fetch data when the button is clicked on a specific item
+    LaunchedEffect(selectedItem) {
+        if (selectedItem.isNotEmpty()) {
+            coroutineScope.launch(Dispatchers.IO) {
+                val dao = MainDb.getDb(context).getDao()
+                dao.addToCategory(
+                    AnimeItem(
+                        mal_id,
+                        anime = anime,
+                        score = score,
+                        scored_by = scoredBy,
+                        animeImage = animeImage,
+                        category = selectedItem
+                    )
+                )
+            }
+        }
+    }
 
     Box(modifier = Modifier.offset(130.dp, 170.dp)) {
         IconButton(onClick = { expanded = true }, modifier = Modifier.align(Alignment.BottomEnd)) {
@@ -304,23 +293,15 @@ fun AddFavorites(
         ) {
             items.forEach { item ->
                 DropdownMenuItem(onClick = {
-                    category.value = item
-
-                    // Запись выбранной категории в базу данных
-//                    val dao = MainDb.getDb(context).getDao()
-//                    dao.addToCategory(mal_id, category.value, anime, score, scoredBy, animeImage)
-
-                    // Закрытие выпадающего меню
+                    selectedItem = item
                     expanded = false
-                }, text = {
-                    Text(text = item)
-                })
+                }, text = { Text(text = item) })
+
+
             }
         }
     }
 }
-
-
 
 
 @OptIn(ExperimentalFoundationApi::class)
