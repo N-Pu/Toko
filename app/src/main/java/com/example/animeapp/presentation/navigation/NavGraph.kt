@@ -102,7 +102,12 @@ fun SetupNavGraph(navController: NavHostController, viewModelProvider: ViewModel
             DetailScreen(navController = navController, viewModelProvider = viewModelProvider)
             Log.d("CATCHED ID = ", id.toString())
         }
-        composable(route = Screen.Favorites.route) { Fav(navController) }
+        composable(route = Screen.Favorites.route) {
+            Fav(
+                navController = navController,
+                viewModelProvider = viewModelProvider
+            )
+        }
         composable(route = Screen.News.route) { News(navController) }
         composable(route = Nothing.value) { NoId(navController) }
         composable(route = DetailOnCast.value) {
