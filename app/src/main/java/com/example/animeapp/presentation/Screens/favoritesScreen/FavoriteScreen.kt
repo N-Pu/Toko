@@ -1,7 +1,6 @@
 package com.example.animeapp.presentation.Screens.favoritesScreen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,23 +18,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.animeapp.dao.Dao
+import com.example.animeapp.dao.MainDb
 
 @Composable
 fun Fav(navController: NavController) {
-//    if (navController.previousBackStackEntry?.destination?.route == DetailOnCast.value){
-//        navController.popBackStack(DetailOnCast.value, inclusive = true)
-//    }
 
+    AnimeListScreen()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Red)
-    ) {
-
-        Text(text = "FAV")
-    }
 }
 
 
@@ -60,11 +52,13 @@ enum class AnimeListType {
 @Composable
 fun AnimeListScreen() {
     var selectedListType by remember { mutableStateOf(AnimeListType.WATCHING) }
+    val dao = MainDb.getDb(LocalContext.current).getDao()
 
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color.Blue)) {
+            .background(Color.White)
+    ) {
         Row(
             Modifier
                 .weight(1f / 9)
@@ -113,18 +107,18 @@ fun AnimeListScreen() {
 
         // Разный список аниме в зависимости от выбранного типа
         when (selectedListType) {
-            AnimeListType.WATCHING -> AnimeListWatching()
-            AnimeListType.PLANNED -> AnimeListPlanned()
-            AnimeListType.WATCHED -> AnimeListWatched()
-            AnimeListType.DROPPED -> AnimeListDropped()
+            AnimeListType.WATCHING -> AnimeListWatching(dao)
+            AnimeListType.PLANNED -> AnimeListPlanned(dao)
+            AnimeListType.WATCHED -> AnimeListWatched(dao)
+            AnimeListType.DROPPED -> AnimeListDropped(dao)
         }
     }
 }
 
+
 @Composable
-fun AnimeListWatching() {
-    // Список аниме для типа "Смотрю"
-    val animeList = listOf("Аниме 1", "Аниме 2", "Аниме 3", "Аниме 3", "Аниме 3")
+fun AnimeListWatching(dao: Dao) {
+    val animeListState by dao.getWatchingAnime().collectAsState(initial = emptyList())
 
     // Отображение списка аниме
     Column(
@@ -135,16 +129,17 @@ fun AnimeListWatching() {
         Text("Список аниме, которые я смотрю", style = MaterialTheme.typography.labelSmall)
         Spacer(modifier = Modifier.height(16.dp))
 
-        for (anime in animeList) {
-            Text(anime, style = MaterialTheme.typography.bodyLarge)
+        animeListState.forEach { animeItem ->
+            Text(animeItem.anime, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
 
+
 @Composable
-fun AnimeListPlanned() {
-    val animeList = listOf("Аниме 1", "Аниме 3")
+fun AnimeListPlanned(dao: Dao) {
+    val animeListState by dao.getPlannedAnime().collectAsState(initial = emptyList())
 
     // Отображение списка аниме
     Column(
@@ -152,36 +147,20 @@ fun AnimeListPlanned() {
             .fillMaxWidth()
             .fillMaxHeight(9.5f / 10f)
     ) {
-        Text("Список аниме, которые я смотрю", style = MaterialTheme.typography.labelSmall)
+        Text("Список аниме, которые я планирую посмотреть", style = MaterialTheme.typography.labelSmall)
         Spacer(modifier = Modifier.height(16.dp))
 
-        for (anime in animeList) {
-            Text(anime, style = MaterialTheme.typography.bodyLarge)
+        animeListState.forEach { animeItem ->
+            Text(animeItem.anime, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
 
+
 @Composable
-fun AnimeListWatched() {
-    val animeList = listOf(
-        "Аниме 1",
-        "Аниме 2",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3",
-        "Аниме 3"
-    )
+fun AnimeListWatched(dao: Dao) {
+    val animeListState by dao.getWatchedAnime().collectAsState(initial = emptyList())
 
     // Отображение списка аниме
     Column(
@@ -189,19 +168,20 @@ fun AnimeListWatched() {
             .fillMaxWidth()
             .fillMaxHeight(9.5f / 10f)
     ) {
-        Text("Список аниме, которые я смотрю", style = MaterialTheme.typography.labelSmall)
+        Text("Список аниме, которые я смотрел", style = MaterialTheme.typography.labelSmall)
         Spacer(modifier = Modifier.height(16.dp))
 
-        for (anime in animeList) {
-            Text(anime, style = MaterialTheme.typography.bodyLarge)
+        animeListState.forEach { animeItem ->
+            Text(animeItem.anime, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
 
+
 @Composable
-fun AnimeListDropped() {
-    val animeList = listOf("Аниме 1")
+fun AnimeListDropped(dao: Dao) {
+    val animeListState by dao.getDroppedAnime().collectAsState(initial = emptyList())
 
     // Отображение списка аниме
     Column(
@@ -209,48 +189,13 @@ fun AnimeListDropped() {
             .fillMaxWidth()
             .fillMaxHeight(9.5f / 10f)
     ) {
-        Text("Список аниме, которые я смотрю", style = MaterialTheme.typography.labelSmall)
+        Text("Список аниме, которые я бросил", style = MaterialTheme.typography.labelSmall)
         Spacer(modifier = Modifier.height(16.dp))
 
-        for (anime in animeList) {
-            Text(anime, style = MaterialTheme.typography.bodyLarge)
+        animeListState.forEach { animeItem ->
+            Text(animeItem.anime, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
 
-
-//@Composable
-//fun AnimeScreen() {
-//    Column(modifier = Modifier.fillMaxSize()) {
-//        // Row с кнопками
-//        Row(
-//            modifier = Modifier
-////                .height(IntrinsicSize.Max).
-//                . fillMaxWidth()
-////                .weight(1f / 9f)
-//        ) {
-//            ButtonArea(text = "Смотрю")
-//            ButtonArea(text = "Запланировано")
-//            ButtonArea(text = "Просмотрено")
-//            ButtonArea(text = "Брошено")
-//        }
-//
-//        // Контент для каждой кнопки
-//        }
-//    }
-//
-//
-//@Composable
-//fun ButtonArea(text: String) {
-//    Box(
-//        modifier = Modifier
-//            .background(Color.Red)
-//            .clickable(onClick = {
-//
-//            }),
-//        contentAlignment = Alignment.Center
-//    ) {
-//        Text(text)
-//    }
-//}

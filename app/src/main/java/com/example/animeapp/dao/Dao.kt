@@ -38,18 +38,18 @@ interface Dao {
     fun getAnimeInCategory(category: String): Flow<List<AnimeItem>>
 
     // Функция для получения всех аниме в категории WATCHING
-    @Query("SELECT * FROM animeItems WHERE category = 'WATCHING'")
+    @Query("SELECT * FROM animeItems WHERE category = 'Watching'")
     fun getWatchingAnime(): Flow<List<AnimeItem>>
 
     // Функция для получения всех аниме в категории DROPPED
-    @Query("SELECT * FROM animeItems WHERE category = 'DROPPED'")
+    @Query("SELECT * FROM animeItems WHERE category = 'Dropped'")
     fun getDroppedAnime(): Flow<List<AnimeItem>>
 
     // Функция для получения всех аниме в категории WATCHED
-    @Query("SELECT * FROM animeItems WHERE category = 'WATCHED'")
+    @Query("SELECT * FROM animeItems WHERE category = 'Watched'")
     fun getWatchedAnime(): Flow<List<AnimeItem>>
 
     // Функция для получения всех аниме в категории PLANNED
-    @Query("SELECT * FROM animeItems WHERE category = 'PLANNED'")
+    @Query("SELECT * FROM animeItems WHERE category = 'Planned'")
     fun getPlannedAnime(): Flow<List<AnimeItem>>
 }
