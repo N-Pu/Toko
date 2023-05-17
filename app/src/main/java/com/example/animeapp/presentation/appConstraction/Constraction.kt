@@ -76,7 +76,7 @@ fun TokoAppActivator(
         )
     }, floatingActionButton = {
 
-        MyFloatingButton(navController = navController, showButton = showButton, viewModelProvider = viewModelProvider)
+        MyFloatingButton( showButton = showButton)
 
     }, floatingActionButtonPosition = FabPosition.Center, content = { padding ->
         padding.calculateTopPadding()
@@ -94,7 +94,7 @@ fun TokoAppActivator(
 
 
 @Composable
-fun MyFloatingButton(navController: NavController, showButton: Boolean, viewModelProvider: ViewModelProvider) {
+fun MyFloatingButton( showButton: Boolean, ) {
 //    val context = LocalContext.current
 
 //    val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
@@ -127,6 +127,7 @@ fun MyFloatingButton(navController: NavController, showButton: Boolean, viewMode
 //        )
 //    }
 }
+
 
 @Composable
 fun BottomNavigationBar(
