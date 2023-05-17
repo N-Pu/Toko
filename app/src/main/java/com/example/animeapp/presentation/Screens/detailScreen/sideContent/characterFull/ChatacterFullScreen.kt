@@ -134,7 +134,7 @@ fun DisplayCharacterFromId(
                         text = about, textAlign = TextAlign.Center
                     )
                 }
-
+                Spacer(modifier = Modifier.size(28.dp))
             }
 
         }

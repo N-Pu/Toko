@@ -33,7 +33,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -59,18 +58,14 @@ import com.example.animeapp.presentation.theme.LightYellow
 
 @Composable
 fun Fav(navController: NavController, viewModelProvider: ViewModelProvider) {
-
     AnimeListScreen(navController = navController, viewModelProvider = viewModelProvider)
-
 }
-
 
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewFavoriteScreen() {
-
+    // TODO: Implement preview
 }
-
 
 enum class AnimeListType {
     WATCHING, PLANNED, WATCHED, DROPPED
@@ -80,224 +75,141 @@ enum class AnimeListType {
 fun AnimeListScreen(navController: NavController, viewModelProvider: ViewModelProvider) {
     var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
     val dao = MainDb.getDb(LocalContext.current).getDao()
-    val scrollStateWatching = rememberLazyGridState()
-    val scrollStatePlanned = rememberLazyGridState()
-    val scrollStateWatched = rememberLazyGridState()
-    val scrollStateDropped = rememberLazyGridState()
+    val scrollState = rememberLazyGridState()
 
     Column(
         Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        Row(
-            Modifier
-                .weight(2f / 10)
-                .background(Color.Red)
-        ) {
-            TextButton(
+        Row(modifier = Modifier.weight(2f / 10)) {
+            AnimeListButton(
+                listType = AnimeListType.WATCHING,
+                selectedListType = selectedListType,
                 onClick = { selectedListType = AnimeListType.WATCHING },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedListType == AnimeListType.WATCHING) Color.Green else Color.LightGray
-                )
-            ) {
-                Text("WATCHING")
-            }
-
-            Button(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            )
+            AnimeListButton(
+                listType = AnimeListType.PLANNED,
+                selectedListType = selectedListType,
                 onClick = { selectedListType = AnimeListType.PLANNED },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedListType == AnimeListType.PLANNED) Color.Green else Color.LightGray
-                )
-            ) {
-                Text("PLANNED")
-            }
-
-            Button(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            )
+            AnimeListButton(
+                listType = AnimeListType.WATCHED,
+                selectedListType = selectedListType,
                 onClick = { selectedListType = AnimeListType.WATCHED },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedListType == AnimeListType.WATCHED) Color.Green else Color.LightGray
-                )
-            ) {
-                Text("WATCHED")
-            }
-
-            Button(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            )
+            AnimeListButton(
+                listType = AnimeListType.DROPPED,
+                selectedListType = selectedListType,
                 onClick = { selectedListType = AnimeListType.DROPPED },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedListType == AnimeListType.DROPPED) Color.Green else Color.LightGray
-                )
-            ) {
-                Text("DROPPED")
-            }
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            )
         }
-        // Разный список аниме в зависимости от выбранного типа
+
         when (selectedListType) {
-            AnimeListType.WATCHING -> AnimeListWatching(
+            AnimeListType.WATCHING -> AnimeList(
                 dao = dao,
+                category = "Watching",
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                scrollState = scrollStateWatching
+                scrollState = scrollState
             )
 
-            AnimeListType.PLANNED -> AnimeListPlanned(
+            AnimeListType.PLANNED -> AnimeList(
                 dao = dao,
+                category = "Planned",
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                scrollState = scrollStatePlanned
+                scrollState = scrollState
             )
 
-            AnimeListType.WATCHED -> AnimeListWatched(
+            AnimeListType.WATCHED -> AnimeList(
                 dao = dao,
+                category = "Watched",
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                scrollState = scrollStateWatched
+                scrollState = scrollState
             )
 
-            AnimeListType.DROPPED -> AnimeListDropped(
+            AnimeListType.DROPPED -> AnimeList(
                 dao = dao,
+                category = "Dropped",
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                scrollState = scrollStateDropped
+                scrollState = scrollState
             )
         }
+
         Spacer(modifier = Modifier.height(35.dp))
     }
 }
 
-
 @Composable
-fun AnimeListWatching(
-    dao: Dao,
-    navController: NavController,
-    viewModelProvider: ViewModelProvider,
-    scrollState: LazyGridState
+fun AnimeListButton(
+    listType: AnimeListType,
+    selectedListType: AnimeListType,
+    onClick: () -> Unit,
+    modifier: Modifier
 ) {
-    val animeListState by dao.getWatchingAnime()
-        .collectAsStateWithLifecycle(initialValue = emptyList())
-
-    // Отображение списка аниме
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(9f / 10f)
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (selectedListType == listType) Color.Green else Color.LightGray
+        )
     ) {
-        LazyVerticalGrid(columns = GridCells.Adaptive(140.dp), state = scrollState) {
-            items(animeListState) {
-                AnimeCardBox2(
-                    animeItem = it,
-                    navController = navController,
-                    viewModelProvider = viewModelProvider
-                )
-            }
-        }
-
-    }
-
-}
-
-
-@Composable
-fun AnimeListPlanned(
-    dao: Dao,
-    navController: NavController,
-    viewModelProvider: ViewModelProvider,
-    scrollState: LazyGridState
-) {
-    val animeListState by dao.getPlannedAnime()
-        .collectAsStateWithLifecycle(initialValue = emptyList())
-
-    // Отображение списка аниме
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(9f / 10f)
-    ) {
-        LazyVerticalGrid(columns = GridCells.Adaptive(140.dp), state = scrollState) {
-            items(animeListState) {
-                AnimeCardBox2(
-                    animeItem = it,
-                    navController = navController,
-                    viewModelProvider = viewModelProvider
-                )
-            }
-        }
+        Text(text = listType.name, maxLines = 1)
     }
 }
 
-
 @Composable
-fun AnimeListWatched(
+fun AnimeList(
     dao: Dao,
+    category: String,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
     scrollState: LazyGridState
 ) {
-    val animeListState by dao.getWatchedAnime()
+    val animeListState by dao.getAnimeInCategory(category)
         .collectAsStateWithLifecycle(initialValue = emptyList())
 
-    // Отображение списка аниме
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(9f / 10f)
     ) {
         LazyVerticalGrid(columns = GridCells.Adaptive(140.dp), state = scrollState) {
-            items(animeListState) {
-                AnimeCardBox2(
-                    animeItem = it,
+            items(animeListState) { animeItem ->
+                FavoriteScreenCardBox(
+                    animeItem = animeItem,
                     navController = navController,
                     viewModelProvider = viewModelProvider
                 )
             }
         }
-
-    }
-}
-
-
-@Composable
-fun AnimeListDropped(
-    dao: Dao,
-    navController: NavController,
-    viewModelProvider: ViewModelProvider,
-    scrollState: LazyGridState
-) {
-    val animeListState by dao.getDroppedAnime()
-        .collectAsStateWithLifecycle(initialValue = emptyList())
-
-    // Отображение списка аниме
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(9f / 10f)
-    ) {
-        LazyVerticalGrid(columns = GridCells.Adaptive(140.dp), state = scrollState) {
-            items(animeListState) {
-                AnimeCardBox2(
-                    animeItem = it,
-                    navController = navController,
-                    viewModelProvider = viewModelProvider
-                )
-            }
-        }
-
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AnimeCardBox2(
-    animeItem: AnimeItem, navController: NavController, viewModelProvider: ViewModelProvider
+fun FavoriteScreenCardBox(
+    animeItem: AnimeItem,
+    navController: NavController,
+    viewModelProvider: ViewModelProvider
 ) {
     val viewModel = viewModelProvider[IdViewModel::class.java]
-//    var isVisible by remember { mutableStateOf(false) }
     val painter = rememberAsyncImagePainter(model = animeItem.animeImage)
-
 
     Card(
         modifier = Modifier
@@ -305,73 +217,24 @@ fun AnimeCardBox2(
             .clickable {
                 animeItem.id?.let { viewModel.setId(it) }
                 animeItem.id?.let {
-                    navigateToDetailScreen(
-                        navController, it
-                    )
+                    navigateToDetailScreen(navController, it)
                 }
             },
         colors = CardDefaults.cardColors(containerColor = LightYellow),
-        shape = RectangleShape,
+        shape = RectangleShape
     ) {
         Box {
-            // Coil image loader
             Image(
                 painter = painter,
-                contentDescription = "Images for each Anime",
+                contentDescription = "Images for anime: ${animeItem.anime}",
                 modifier = Modifier.aspectRatio(9f / 11f),
                 contentScale = ContentScale.FillBounds
             )
 
-            Column(
-                modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
-            ) {
-                Box(
-                    modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Filled.Star,
-                        contentDescription = "Score ${animeItem.score}",
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(45.dp)
-                    )
-                    Text(
-                        text = animeItem.score,
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-
-                        )
-                }
-                Box(
-                    modifier = Modifier
-                        .width(45.dp)
-                        .height(50.dp),
-
-                    ) {
-
-                    Icon(
-                        Icons.Filled.Person,
-                        contentDescription = "Scored by ${animeItem.scored_by}",
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier
-                            .width(45.dp)
-                            .height(50.dp)
-                    )
-                    Text(
-                        textAlign = TextAlign.Center,
-                        text = animeItem.scored_by,
-                        color = Color.White,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(
-                                Alignment.BottomEnd
-                            )
-                    )
-                }
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))) {
+                ScoreIcon(score = animeItem.score)
+                ScoredByIcon(scoredBy = animeItem.scored_by)
             }
-
         }
 
         Text(
@@ -385,14 +248,52 @@ fun AnimeCardBox2(
                     initialDelayMillis = 2000,
                     velocity = 50.dp
                 )
-                .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
+                .padding(16.dp),
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight(1000),
             overflow = TextOverflow.Ellipsis,
             maxLines = 1
         )
-
-
     }
-
 }
+
+@Composable
+fun ScoreIcon(score: String) {
+    Box(modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center) {
+        Icon(
+            Icons.Filled.Star,
+            contentDescription = "Score $score",
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.size(45.dp)
+        )
+        Text(
+            text = score,
+            color = Color.White,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
+fun ScoredByIcon(scoredBy: String) {
+    Box(modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center) {
+        Icon(
+            Icons.Filled.Person,
+            contentDescription = "Scored by $scoredBy",
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.size(45.dp)
+        )
+        Text(
+            textAlign = TextAlign.Center,
+            text = scoredBy,
+            color = Color.White,
+            fontSize = 8.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomEnd)
+        )
+    }
+}
+

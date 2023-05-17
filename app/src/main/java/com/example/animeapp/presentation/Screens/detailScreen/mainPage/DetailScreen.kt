@@ -225,6 +225,8 @@ fun ActivateDetailScreen(
                     Text(text = it.title)
                 }
 
+                Spacer(modifier = Modifier.size(60.dp))
+
             }
 
 

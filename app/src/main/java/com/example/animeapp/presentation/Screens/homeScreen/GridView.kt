@@ -3,10 +3,6 @@ package com.example.animeapp.presentation.Screens.homeScreen
 
 import HomeScreenViewModel
 import android.content.Context
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -54,11 +50,13 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.R
 import com.example.animeapp.dao.AnimeItem
+import com.example.animeapp.dao.Dao
 import com.example.animeapp.dao.MainDb
 import com.example.animeapp.domain.models.searchModel.Data
 import com.example.animeapp.presentation.theme.LightYellow
 import com.example.animeapp.domain.viewModel.IdViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -94,127 +92,127 @@ fun AnimeCardBox(
     anime: Data, navController: NavController, viewModelProvider: ViewModelProvider
 ) {
     val viewModel = viewModelProvider[IdViewModel::class.java]
-    var isVisible by remember { mutableStateOf(false) }
+//    var isVisible by remember { mutableStateOf(false) }
     val painter = rememberAsyncImagePainter(model = anime.images.webp.image_url)
 
-    AnimatedVisibility(
-        visible = isVisible, enter = fadeIn(
-            initialAlpha = 0.0f, animationSpec = TweenSpec(durationMillis = 500)
-        ), exit = fadeOut(
-            animationSpec = TweenSpec(durationMillis = 500)
-
-        )
-    ) {
-        Card(
-            modifier = Modifier
-                .clip(RoundedCornerShape(6.dp))
-                .clickable {
-                    viewModel.setId(anime.mal_id)
-                    navigateToDetailScreen(
-                        navController, anime.mal_id
-                    )
-                },
-            colors = CardDefaults.cardColors(containerColor = LightYellow),
-            shape = RectangleShape,
-        ) {
-            Box {
-                // Coil image loader
-                Image(
-                    painter = painter,
-                    contentDescription = "Images for each Anime",
-                    modifier = Modifier.aspectRatio(9f / 11f),
-                    contentScale = ContentScale.FillBounds
+//    AnimatedVisibility(
+//        visible = isVisible, enter = fadeIn(
+//            initialAlpha = 0.0f, animationSpec = TweenSpec(durationMillis = 500)
+//        ), exit = fadeOut(
+//            animationSpec = TweenSpec(durationMillis = 500)
+//
+//        )
+//    ) {
+    Card(
+        modifier = Modifier
+            .clip(RoundedCornerShape(6.dp))
+            .clickable {
+                viewModel.setId(anime.mal_id)
+                navigateToDetailScreen(
+                    navController, anime.mal_id
                 )
+            },
+        colors = CardDefaults.cardColors(containerColor = LightYellow),
+        shape = RectangleShape,
+    ) {
+        Box {
+            // Coil image loader
+            Image(
+                painter = painter,
+                contentDescription = "Images for each Anime",
+                modifier = Modifier.aspectRatio(9f / 11f),
+                contentScale = ContentScale.FillBounds
+            )
 
-                Column(
-                    modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
+            Column(
+                modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
+            ) {
+                Box(
+                    modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Filled.Star,
-                            contentDescription = "Score ${anime.score}",
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(45.dp)
-                        )
-                        Text(
-                            text = formatScore(anime.score),
-                            color = Color.White,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
+                    Icon(
+                        Icons.Filled.Star,
+                        contentDescription = "Score ${anime.score}",
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(45.dp)
+                    )
+                    Text(
+                        text = formatScore(anime.score),
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
 
-                            )
-                    }
-                    Box(
+                        )
+                }
+                Box(
+                    modifier = Modifier
+                        .width(45.dp)
+                        .height(50.dp),
+
+                    ) {
+
+                    Icon(
+                        Icons.Filled.Person,
+                        contentDescription = "Scored by ${anime.scored_by}",
+                        tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier
                             .width(45.dp)
-                            .height(50.dp),
-
-                        ) {
-
-                        Icon(
-                            Icons.Filled.Person,
-                            contentDescription = "Scored by ${anime.scored_by}",
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier
-                                .width(45.dp)
-                                .height(50.dp)
-                        )
-                        Text(
-                            textAlign = TextAlign.Center,
-                            text = formatScoredBy(anime.scored_by),
-                            color = Color.White,
-                            fontSize = 8.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(
-                                    Alignment.BottomEnd
-                                )
-                        )
-                    }
+                            .height(50.dp)
+                    )
+                    Text(
+                        textAlign = TextAlign.Center,
+                        text = formatScoredBy(anime.scored_by),
+                        color = Color.White,
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(
+                                Alignment.BottomEnd
+                            )
+                    )
                 }
-
-                AddFavorites(
-                    mal_id = anime.mal_id,
-                    anime = anime.title,
-                    score = formatScore(anime.score),
-                    scoredBy = formatScoredBy(anime.scored_by),
-                    animeImage = anime.images.jpg.image_url,
-                    context = LocalContext.current
-                )
-
-
             }
 
-            Text(
-                text = anime.title,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .basicMarquee(
-                        iterations = Int.MAX_VALUE,
-                        delayMillis = 2000,
-                        initialDelayMillis = 2000,
-                        velocity = 50.dp
-                    )
-                    .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight(1000),
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
+            AddFavorites(
+                mal_id = anime.mal_id,
+                anime = anime.title,
+                score = formatScore(anime.score),
+                scoredBy = formatScoredBy(anime.scored_by),
+                animeImage = anime.images.jpg.image_url,
+                context = LocalContext.current
             )
 
 
         }
 
+        Text(
+            text = anime.title,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .basicMarquee(
+                    iterations = Int.MAX_VALUE,
+                    delayMillis = 2000,
+                    initialDelayMillis = 2000,
+                    velocity = 50.dp
+                )
+                .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight(1000),
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
+        )
+
 
     }
 
-    LaunchedEffect(anime) {
-        isVisible = true
-    }
+
+//    }
+
+//    LaunchedEffect(anime) {
+//        isVisible = true
+//    }
 }
 
 
@@ -253,7 +251,15 @@ fun AddFavorites(
     val coroutineScope = rememberCoroutineScope()
 
     var expanded by remember { mutableStateOf(false) }
-    val items = listOf("Planned", "Watching", "Watched", "Dropped")
+    val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
+    val dao = MainDb.getDb(context).getDao()
+    if (checkIdInDataBase(
+            dao = dao,
+            id = mal_id
+        ).collectAsStateWithLifecycle(initialValue = false).value
+    ) {
+        items.add(4, "Delete")
+    }
 
     // Keep track of the selected item
     var selectedItem by remember { mutableStateOf("") }
@@ -262,17 +268,21 @@ fun AddFavorites(
     LaunchedEffect(selectedItem) {
         if (selectedItem.isNotEmpty()) {
             coroutineScope.launch(Dispatchers.IO) {
-                val dao = MainDb.getDb(context).getDao()
-                dao.addToCategory(
-                    AnimeItem(
-                        mal_id,
-                        anime = anime,
-                        score = score,
-                        scored_by = scoredBy,
-                        animeImage = animeImage,
-                        category = selectedItem
+//                val dao = MainDb.getDb(context).getDao()
+                if (selectedItem == "Delete") {
+                    dao.removeFromDataBase(mal_id)
+                } else {
+                    dao.addToCategory(
+                        AnimeItem(
+                            mal_id,
+                            anime = anime,
+                            score = score,
+                            scored_by = scoredBy,
+                            animeImage = animeImage,
+                            category = selectedItem
+                        )
                     )
-                )
+                }
             }
         }
     }
@@ -295,7 +305,8 @@ fun AddFavorites(
                 DropdownMenuItem(onClick = {
                     selectedItem = item
                     expanded = false
-                }, text = { Text(text = item) })
+                },
+                    text = { Text(text = item) })
 
 
             }
@@ -303,6 +314,12 @@ fun AddFavorites(
     }
 }
 
+@Composable
+fun checkIdInDataBase(
+    dao: Dao, id: Int
+): Flow<Boolean> {
+    return dao.containsInDataBase(id)
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showSystemUi = true)

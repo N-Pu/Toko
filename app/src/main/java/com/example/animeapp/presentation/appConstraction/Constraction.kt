@@ -1,5 +1,6 @@
 package com.example.animeapp.presentation.appConstraction
 
+
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -39,7 +40,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.animeapp.presentation.navigation.CharacterDetail
 import com.example.animeapp.presentation.navigation.Nothing
 import com.example.animeapp.presentation.navigation.Screen
 import com.example.animeapp.presentation.navigation.SetupNavGraph
@@ -75,9 +75,8 @@ fun TokoAppActivator(
             navController = navController, idViewModel = viewModelProvider[IdViewModel::class.java]
         )
     }, floatingActionButton = {
-//        if (showButton) {
-        MyFloatingButton(navController = navController, showButton = showButton)
-//        }
+
+        MyFloatingButton(navController = navController, showButton = showButton, viewModelProvider = viewModelProvider)
 
     }, floatingActionButtonPosition = FabPosition.Center, content = { padding ->
         padding.calculateTopPadding()
@@ -95,7 +94,11 @@ fun TokoAppActivator(
 
 
 @Composable
-fun MyFloatingButton(navController: NavController, showButton: Boolean) {
+fun MyFloatingButton(navController: NavController, showButton: Boolean, viewModelProvider: ViewModelProvider) {
+//    val context = LocalContext.current
+
+//    val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
+
     AnimatedVisibility(
         visible = showButton, enter = slideInVertically(
             initialOffsetY = { -it }, // отрицательное значение для появления сверху вниз
@@ -106,11 +109,23 @@ fun MyFloatingButton(navController: NavController, showButton: Boolean) {
         ) + fadeOut(animationSpec = tween(durationMillis = 500))
     ) {
         FloatingActionButton(
-            onClick = { }, containerColor = MaterialTheme.colorScheme.secondary
+            onClick = {
+
+            }, containerColor = MaterialTheme.colorScheme.secondary
         ) {
             Icon(Icons.Filled.Add, "Localized description")
         }
     }
+//    detailScreenState.value?.let {data ->
+//        AddFavoritesDetailScreen(
+//            mal_id = data.mal_id,
+//            anime = data.title,
+//            score = formatScore(data.score),
+//            scoredBy = formatScoredBy(data.scored_by),
+//            animeImage = data.images.jpg.large_image_url,
+//            context = context
+//        )
+//    }
 }
 
 @Composable
@@ -334,3 +349,78 @@ fun Prev() {
     }
 }
 
+
+//@Composable
+//fun AddFavoritesDetailScreen(
+//    mal_id: Int,
+//    anime: String,
+//    score: String,
+//    scoredBy: String,
+//    animeImage: String,
+//    context: Context
+//) {
+//    val coroutineScope = rememberCoroutineScope()
+//
+//    var expanded by remember { mutableStateOf(false) }
+//    val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
+//    val dao = MainDb.getDb(context).getDao()
+//    if (CheckIdInDataBase(
+//            dao = dao,
+//            id = mal_id
+//        ).collectAsStateWithLifecycle(initialValue = false).value
+//    ) {
+//        items.add(4, "Delete")
+//    }
+//
+//    // Keep track of the selected item
+//    var selectedItem by remember { mutableStateOf("") }
+//
+//    // Fetch data when the button is clicked on a specific item
+//    LaunchedEffect(selectedItem) {
+//        if (selectedItem.isNotEmpty()) {
+//            coroutineScope.launch(Dispatchers.IO) {
+////                val dao = MainDb.getDb(context).getDao()
+//                if (selectedItem == "Delete") {
+//                    dao.removeFromDataBase(mal_id)
+//                } else {
+//                    dao.addToCategory(
+//                        AnimeItem(
+//                            mal_id,
+//                            anime = anime,
+//                            score = score,
+//                            scored_by = scoredBy,
+//                            animeImage = animeImage,
+//                            category = selectedItem
+//                        )
+//                    )
+//                }
+//            }
+//        }
+//    }
+//
+//    Box(modifier = Modifier.offset(130.dp, 170.dp)) {
+//        IconButton(onClick = { expanded = true }, modifier = Modifier.align(Alignment.BottomEnd)) {
+//            Icon(
+//                Icons.Default.AddCircle,
+//                contentDescription = null,
+//                tint = MaterialTheme.colorScheme.inversePrimary
+//            )
+//        }
+//
+//        DropdownMenu(
+//            expanded = expanded,
+//            onDismissRequest = { expanded = false },
+//            modifier = Modifier.background(LightYellow)
+//        ) {
+//            items.forEach { item ->
+//                DropdownMenuItem(onClick = {
+//                    selectedItem = item
+//                    expanded = false
+//                },
+//                    text = { Text(text = item) })
+//
+//
+//            }
+//        }
+//    }
+//}
