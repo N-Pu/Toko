@@ -96,7 +96,6 @@ fun TokoAppActivator(
 @Composable
 fun MyFloatingButton( showButton: Boolean, ) {
 //    val context = LocalContext.current
-
 //    val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
 
     AnimatedVisibility(
