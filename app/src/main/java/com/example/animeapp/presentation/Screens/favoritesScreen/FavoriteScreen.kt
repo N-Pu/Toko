@@ -53,6 +53,7 @@ import com.example.animeapp.dao.AnimeItem
 import com.example.animeapp.dao.Dao
 import com.example.animeapp.dao.MainDb
 import com.example.animeapp.domain.viewModel.IdViewModel
+import com.example.animeapp.presentation.Screens.addToFavorite.AddFavorites
 import com.example.animeapp.presentation.Screens.homeScreen.navigateToDetailScreen
 import com.example.animeapp.presentation.theme.LightYellow
 
@@ -200,7 +201,6 @@ fun AnimeList(
         }
     }
 }
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FavoriteScreenCardBox(
@@ -223,39 +223,125 @@ fun FavoriteScreenCardBox(
         colors = CardDefaults.cardColors(containerColor = LightYellow),
         shape = RectangleShape
     ) {
-        Box {
-            Image(
-                painter = painter,
-                contentDescription = "Images for anime: ${animeItem.anime}",
-                modifier = Modifier.aspectRatio(9f / 11f),
-                contentScale = ContentScale.FillBounds
-            )
+        Column(modifier = Modifier) {
+            Box {
+                Image(
+                    painter = painter,
+                    contentDescription = "Images for anime: ${animeItem.anime}",
+                    modifier = Modifier.aspectRatio(9f / 11f),
+                    contentScale = ContentScale.FillBounds
+                )
 
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))) {
-                ScoreIcon(score = animeItem.score)
-                ScoredByIcon(scoredBy = animeItem.scored_by)
+                Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))) {
+                    ScoreIcon(score = animeItem.score)
+                    ScoredByIcon(scoredBy = animeItem.scored_by)
+                }
+            }
+
+            Box(modifier = Modifier.padding(end = 16.dp)) {
+                AddFavorites(
+                    mal_id = animeItem.id ?: 0,
+                    anime = animeItem.anime,
+                    score = animeItem.score,
+                    scoredBy = animeItem.scored_by,
+                    animeImage = animeItem.animeImage,
+                    context = LocalContext.current
+                )
+
+                Text(
+                    text = animeItem.anime,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .basicMarquee(
+                            iterations = Int.MAX_VALUE,
+                            delayMillis = 2000,
+                            initialDelayMillis = 2000,
+                            velocity = 50.dp
+                        )
+                        .padding(16.dp),
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight(1000),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
             }
         }
-
-        Text(
-            text = animeItem.anime,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .basicMarquee(
-                    iterations = Int.MAX_VALUE,
-                    delayMillis = 2000,
-                    initialDelayMillis = 2000,
-                    velocity = 50.dp
-                )
-                .padding(16.dp),
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight(1000),
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1
-        )
     }
 }
+//@OptIn(ExperimentalFoundationApi::class)
+//@Composable
+//fun FavoriteScreenCardBox(
+//    animeItem: AnimeItem,
+//    navController: NavController,
+//    viewModelProvider: ViewModelProvider
+//) {
+//    val viewModel = viewModelProvider[IdViewModel::class.java]
+//    val painter = rememberAsyncImagePainter(model = animeItem.animeImage)
+//
+//    Card(
+//        modifier = Modifier
+//            .clip(RoundedCornerShape(6.dp))
+//            .clickable {
+//                animeItem.id?.let { viewModel.setId(it) }
+//                animeItem.id?.let {
+//                    navigateToDetailScreen(navController, it)
+//                }
+//            },
+//        colors = CardDefaults.cardColors(containerColor = LightYellow),
+//        shape = RectangleShape
+//    ) {
+//        Column(
+//            modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
+//        ) {
+//        Box {
+//            Image(
+//                painter = painter,
+//                contentDescription = "Images for anime: ${animeItem.anime}",
+//                modifier = Modifier.aspectRatio(9f / 11f),
+//                contentScale = ContentScale.FillBounds
+//            )
+//
+//            Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))) {
+//                ScoreIcon(score = animeItem.score)
+//                ScoredByIcon(scoredBy = animeItem.scored_by)
+//            }
+//        }
+//
+//            animeItem.id?.let {
+//                AddFavorites(
+//                    mal_id = it,
+//                    anime = animeItem.anime,
+//                    score = animeItem.score,
+//                    scoredBy = animeItem.scored_by,
+//                    animeImage = animeItem.animeImage,
+//                    context = LocalContext.current
+//                )
+//            }}
+//
+//        Text(
+//            text = animeItem.anime,
+//            textAlign = TextAlign.Center,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .basicMarquee(
+//                    iterations = Int.MAX_VALUE,
+//                    delayMillis = 2000,
+//                    initialDelayMillis = 2000,
+//                    velocity = 50.dp
+//                )
+//                .padding(16.dp),
+//            fontFamily = FontFamily.Monospace,
+//            fontWeight = FontWeight(1000),
+//            overflow = TextOverflow.Ellipsis,
+//            maxLines = 1
+//        )
+//
+//
+//
+//
+//    }
+//}
 
 @Composable
 fun ScoreIcon(score: String) {

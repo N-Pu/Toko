@@ -1,6 +1,7 @@
 package com.example.animeapp.presentation.appConstraction
 
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -10,16 +11,24 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -27,24 +36,37 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.animeapp.dao.AnimeItem
+import com.example.animeapp.dao.MainDb
+import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.navigation.Nothing
 import com.example.animeapp.presentation.navigation.Screen
 import com.example.animeapp.presentation.navigation.SetupNavGraph
 import com.example.animeapp.domain.viewModel.IdViewModel
+import com.example.animeapp.presentation.Screens.homeScreen.checkIdInDataBase
+import com.example.animeapp.presentation.Screens.homeScreen.formatScore
+import com.example.animeapp.presentation.Screens.homeScreen.formatScoredBy
 import com.example.animeapp.presentation.theme.LightYellow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import androidx.compose.material3.BottomAppBar as BottomAppBar
 
 
@@ -58,7 +80,7 @@ fun TokoAppActivator(
 
 
     var showButton by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     //check if destination matches needed route -> show button
     navController.addOnDestinationChangedListener { _, destination, _ ->
         showButton = when (destination.route) {
@@ -76,9 +98,11 @@ fun TokoAppActivator(
         )
     }, floatingActionButton = {
 
-        MyFloatingButton( showButton = showButton)
+        MyFloatingButton( showButton = showButton, context = context, viewModelProvider = viewModelProvider)
 
-    }, floatingActionButtonPosition = FabPosition.Center, content = { padding ->
+    }, floatingActionButtonPosition = FabPosition.Center,
+
+        content = { padding ->
         padding.calculateTopPadding()
         SetupNavGraph(
             navController, viewModelProvider
@@ -93,40 +117,7 @@ fun TokoAppActivator(
 }
 
 
-@Composable
-fun MyFloatingButton( showButton: Boolean, ) {
-//    val context = LocalContext.current
 
-//    val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
-
-    AnimatedVisibility(
-        visible = showButton, enter = slideInVertically(
-            initialOffsetY = { -it }, // отрицательное значение для появления сверху вниз
-            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
-        ) + fadeIn(animationSpec = tween(durationMillis = 500)), exit = slideOutVertically(
-            targetOffsetY = { -it },
-            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
-        ) + fadeOut(animationSpec = tween(durationMillis = 500))
-    ) {
-        FloatingActionButton(
-            onClick = {
-
-            }, containerColor = MaterialTheme.colorScheme.secondary
-        ) {
-            Icon(Icons.Filled.Add, "Localized description")
-        }
-    }
-//    detailScreenState.value?.let {data ->
-//        AddFavoritesDetailScreen(
-//            mal_id = data.mal_id,
-//            anime = data.title,
-//            score = formatScore(data.score),
-//            scoredBy = formatScoredBy(data.scored_by),
-//            animeImage = data.images.jpg.large_image_url,
-//            context = context
-//        )
-//    }
-}
 
 
 @Composable
@@ -277,6 +268,97 @@ fun BottomNavigationBar(
     }
 }
 
+@Composable
+fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, context: Context) {
+    val coroutineScope = rememberCoroutineScope()
+
+    val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
+
+    val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
+    val dao = MainDb.getDb(context).getDao()
+    if (checkIdInDataBase(dao = dao, id = detailScreenState.value?.mal_id ?: 0).collectAsStateWithLifecycle(initialValue = false).value) {
+        items.add(4, "Delete")
+    }
+
+    var expanded by remember { mutableStateOf(false) }
+    val selectedItem = remember { mutableStateOf("") }
+
+    // Fetch data when the button is clicked on a specific item
+    LaunchedEffect(selectedItem.value) {
+        if (selectedItem.value.isNotEmpty()) {
+            coroutineScope.launch(Dispatchers.IO) {
+                if (selectedItem.value == "Delete") {
+                    detailScreenState.value?.let { data ->
+                        dao.removeFromDataBase(data.mal_id)
+                    }
+                } else {
+                    detailScreenState.value?.let { data ->
+                        dao.addToCategory(
+                            AnimeItem(
+                                data.mal_id,
+                                anime = data.title,
+                                score = formatScore(data.score),
+                                scored_by = formatScoredBy(data.scored_by),
+                                animeImage = data.images.jpg.large_image_url,
+                                category = selectedItem.value
+                            )
+                        )
+                    }
+                }
+            }
+        }
+        expanded = false // Collapse the menu after an item is selected
+    }
+
+    AnimatedVisibility(
+        visible = showButton,
+        enter = slideInVertically(
+            initialOffsetY = { -it },
+            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+        ) + fadeIn(animationSpec = tween(durationMillis = 500)),
+        exit = slideOutVertically(
+            targetOffsetY = { -it },
+            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+        ) + fadeOut(animationSpec = tween(durationMillis = 500))
+    ) {
+        FloatingActionButton(
+            onClick = { expanded = !expanded },
+            containerColor = MaterialTheme.colorScheme.secondary
+        ) {
+            if (expanded) {
+                Icon(Icons.Filled.Close, "Localized description")
+            } else {
+                Icon(Icons.Filled.Add, "Localized description")
+            }
+        }
+    }
+
+    if (expanded) {
+        Box(
+            modifier = Modifier
+                .width(IntrinsicSize.Min)
+                .wrapContentHeight()
+                .offset(y = (-16).dp) // Сдвигает меню вверх на 16dp, чтобы не перекрывать кнопку
+                .padding(end = 16.dp, bottom = 16.dp),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            DropdownMenu(
+                expanded = true,
+                onDismissRequest = { expanded = false }
+            ) {
+                items.forEach { item ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedItem.value = item
+                        },
+                   text =  {
+                            Text(text = item)
+                        } )
+                }
+            }
+        }
+    }
+}
 
 @Preview
 @Composable
@@ -349,79 +431,3 @@ fun Prev() {
 
     }
 }
-
-
-//@Composable
-//fun AddFavoritesDetailScreen(
-//    mal_id: Int,
-//    anime: String,
-//    score: String,
-//    scoredBy: String,
-//    animeImage: String,
-//    context: Context
-//) {
-//    val coroutineScope = rememberCoroutineScope()
-//
-//    var expanded by remember { mutableStateOf(false) }
-//    val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
-//    val dao = MainDb.getDb(context).getDao()
-//    if (CheckIdInDataBase(
-//            dao = dao,
-//            id = mal_id
-//        ).collectAsStateWithLifecycle(initialValue = false).value
-//    ) {
-//        items.add(4, "Delete")
-//    }
-//
-//    // Keep track of the selected item
-//    var selectedItem by remember { mutableStateOf("") }
-//
-//    // Fetch data when the button is clicked on a specific item
-//    LaunchedEffect(selectedItem) {
-//        if (selectedItem.isNotEmpty()) {
-//            coroutineScope.launch(Dispatchers.IO) {
-////                val dao = MainDb.getDb(context).getDao()
-//                if (selectedItem == "Delete") {
-//                    dao.removeFromDataBase(mal_id)
-//                } else {
-//                    dao.addToCategory(
-//                        AnimeItem(
-//                            mal_id,
-//                            anime = anime,
-//                            score = score,
-//                            scored_by = scoredBy,
-//                            animeImage = animeImage,
-//                            category = selectedItem
-//                        )
-//                    )
-//                }
-//            }
-//        }
-//    }
-//
-//    Box(modifier = Modifier.offset(130.dp, 170.dp)) {
-//        IconButton(onClick = { expanded = true }, modifier = Modifier.align(Alignment.BottomEnd)) {
-//            Icon(
-//                Icons.Default.AddCircle,
-//                contentDescription = null,
-//                tint = MaterialTheme.colorScheme.inversePrimary
-//            )
-//        }
-//
-//        DropdownMenu(
-//            expanded = expanded,
-//            onDismissRequest = { expanded = false },
-//            modifier = Modifier.background(LightYellow)
-//        ) {
-//            items.forEach { item ->
-//                DropdownMenuItem(onClick = {
-//                    selectedItem = item
-//                    expanded = false
-//                },
-//                    text = { Text(text = item) })
-//
-//
-//            }
-//        }
-//    }
-//}
