@@ -9,15 +9,15 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.animeapp.presentation.Screens.favoritesScreen.Fav
-import com.example.animeapp.presentation.Screens.homeScreen.MainScreen
-import com.example.animeapp.presentation.Screens.newsScreen.News
-import com.example.animeapp.presentation.Screens.noId.NoId
-import com.example.animeapp.presentation.detailScreen.DetailScreen
-import com.example.animeapp.presentation.Screens.detailScreen.sideContent.castList.ShowWholeCast
+import com.example.animeapp.presentation.screens.favoritesScreen.Fav
+import com.example.animeapp.presentation.screens.homeScreen.MainScreen
+import com.example.animeapp.presentation.screens.randomAnimeAndManga.ShowRandomScreen
+import com.example.animeapp.presentation.screens.noId.NoId
+import com.example.animeapp.presentation.screens.detailScreen.mainPage.DetailScreen
+import com.example.animeapp.presentation.screens.detailScreen.sideContent.castList.ShowWholeCast
 import com.example.animeapp.presentation.detailScreen.castList.ShowWholeStaff
-import com.example.animeapp.presentation.Screens.detailScreen.sideContent.characterFull.DisplayCharacterFromId
-import com.example.animeapp.presentation.Screens.detailScreen.sideContent.staffMemberFull.DisplayStaffMemberFromId
+import com.example.animeapp.presentation.screens.detailScreen.sideContent.characterFull.DisplayCharacterFromId
+import com.example.animeapp.presentation.screens.detailScreen.sideContent.staffMemberFull.DisplayStaffMemberFromId
 
 
 //@Composable
@@ -108,7 +108,7 @@ fun SetupNavGraph(navController: NavHostController, viewModelProvider: ViewModel
                 viewModelProvider = viewModelProvider
             )
         }
-        composable(route = Screen.News.route) { News(navController) }
+        composable(route = Screen.RandomAnimeOrManga.route) { ShowRandomScreen(navController, viewModelProvider) }
         composable(route = Nothing.value) { NoId(navController) }
         composable(route = DetailOnCast.value) {
             ShowWholeCast(navController, viewModelProvider)

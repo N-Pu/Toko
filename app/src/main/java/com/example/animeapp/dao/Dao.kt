@@ -14,8 +14,6 @@ interface Dao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addToCategory(animeItem: AnimeItem)
 
-
-
     // Функция для получения всех аниме в определенной категории
     @Query("SELECT * FROM animeItems WHERE category = :category")
     fun getAnimeInCategory(category: String): Flow<List<AnimeItem>>

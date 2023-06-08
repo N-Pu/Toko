@@ -6,7 +6,7 @@ import com.example.animeapp.domain.models.castModel.CastModel
 import com.example.animeapp.domain.models.characterModel.CharacterFullModel
 import com.example.animeapp.domain.models.characterPictures.CharacterPicturesModel
 import com.example.animeapp.domain.models.detailModel.AnimeDetailModel
-import com.example.animeapp.domain.models.searchModel.AnimeSearchModel
+import com.example.animeapp.domain.models.newAnimeSearchModel.NewAnimeSearchModel
 import com.example.animeapp.domain.models.staffMemberFullModel.StaffMemberFullModel
 import com.example.animeapp.domain.models.staffModel.StaffModel
 import kotlinx.coroutines.delay
@@ -30,11 +30,23 @@ private const val GET_DETAILS_URL = "https://api.jikan.moe/v4/anime/"
 interface MalApiService {
 
 
-    @GET("${BASE_URL}v4/anime")    // (в конце добавить лимит limit=20)
-    suspend fun getAnimeSearchByName(@Query("q") nameOfAnime: String): Response<AnimeSearchModel>
+    @GET("${BASE_URL}v4/anime")
+    suspend fun getAnimeSearchByName(
+        @Query("page") page: Int,
+        @Query("q") nameOfAnime: String
+    ): Response<NewAnimeSearchModel>
 
+//    @GET("${BASE_URL}v4/anime")
+//    suspend fun getAnimeSearchByName(
+//        @Query("page") page: Int,
+//        @Query("q") nameOfAnime: String,
+//        @Header("Cache-Control") cacheControl: CacheControl // Add cache control header
+//    ): Response<NewAnimeSearchModel>
     @GET("$GET_DETAILS_URL{id}/full")
     suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<AnimeDetailModel>
+
+    @GET("${BASE_URL}v4/random/anime")
+    suspend fun getRandomAnime(): Response<AnimeDetailModel>
 
     @GET("$GET_DETAILS_URL{id}/characters")
     suspend fun getCharactersFromId(@Path("id") id: Int): Response<CastModel> {
@@ -94,9 +106,9 @@ interface MalApiService {
         private val logging = HttpLoggingInterceptor()
             .setLevel(HttpLoggingInterceptor.Level.BODY)
 
-
         private val httpClient = OkHttpClient
             .Builder()
+
             .connectTimeout(40, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .addInterceptor(logging)
@@ -115,74 +127,3 @@ interface MalApiService {
     }
 
 }
-
-
-//package com.example.animeapp.repository
-//
-//import android.util.Log
-//import com.example.animeapp.domain.models.castModel.CastModel
-//import com.example.animeapp.domain.models.characterModel.CharacterFullModel
-//import com.example.animeapp.domain.models.characterPictures.CharacterPicturesModel
-//import com.example.animeapp.domain.models.detailModel.AnimeDetailModel
-//import com.example.animeapp.domain.models.searchModel.AnimeSearchModel
-//import com.example.animeapp.domain.models.staffMemberFullModel.StaffMemberFullModel
-//import com.example.animeapp.domain.models.staffModel.StaffModel
-//import kotlinx.coroutines.delay
-//import okhttp3.OkHttpClient
-//import okhttp3.logging.HttpLoggingInterceptor
-//import retrofit2.HttpException
-//import retrofit2.Response
-//import retrofit2.Retrofit
-//import retrofit2.converter.gson.GsonConverterFactory
-//import retrofit2.http.GET
-//import retrofit2.http.Path
-//import retrofit2.http.Query
-//import java.net.SocketTimeoutException
-//import java.util.concurrent.TimeUnit
-//
-//private const val BASE_URL = "https://api.jikan.moe/"
-//private const val BASE_URL_FOR_CHARACTER = "https://api.jikan.moe/v4/"
-//private const val GET_DETAILS_URL = "https://api.jikan.moe/v4/anime/"
-//
-//interface MalApiService {
-//    @GET("${BASE_URL}v4/anime")
-//    suspend fun getAnimeSearchByName(@Query("q") nameOfAnime: String): AnimeSearchModel
-//
-//    @GET("$GET_DETAILS_URL{id}/full")
-//    suspend fun getDetailsFromAnime(@Path("id") id: Int): AnimeDetailModel
-//
-//    @GET("$GET_DETAILS_URL{id}/characters")
-//    suspend fun getCharactersFromId(@Path("id") id: Int): CastModel
-//
-//    @GET("${BASE_URL_FOR_CHARACTER}characters/{id}/full")
-//    suspend fun getCharacterFullFromId(@Path("id") id: Int): CharacterFullModel
-//
-//    @GET("${BASE_URL_FOR_CHARACTER}characters/{id}/pictures")
-//    suspend fun getCharacterFullPictures(@Path("id") id: Int): CharacterPicturesModel
-//
-//    @GET("$GET_DETAILS_URL{id}/staff")
-//    suspend fun getStaffFromId(@Path("id") id: Int): StaffModel
-//
-//    @GET("${BASE_URL_FOR_CHARACTER}people/{id}/full")
-//    suspend fun getStaffFullFromId(@Path("id") id: Int): StaffMemberFullModel
-//
-//    companion object {
-//        private val loggingInterceptor = HttpLoggingInterceptor()
-//            .setLevel(HttpLoggingInterceptor.Level.BODY)
-//
-//        private val httpClient = OkHttpClient.Builder()
-//            .connectTimeout(20, TimeUnit.SECONDS)
-//            .readTimeout(30, TimeUnit.SECONDS)
-//            .addInterceptor(loggingInterceptor)
-//            .build()
-//
-//        val api: MalApiService by lazy {
-//            Retrofit.Builder()
-//                .baseUrl(BASE_URL)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .client(httpClient)
-//                .build()
-//                .create(MalApiService::class.java)
-//        }
-//    }
-//}

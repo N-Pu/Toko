@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class StaffFullByIdViewModel(malApiService: MalApiService.Companion) : ViewModel() {
-    private val animeRepository = malApiService.api
+class StaffFullByIdViewModel(malApiService: MalApiService) : ViewModel() {
+    private val animeRepository = malApiService
     private val _staffFull = MutableStateFlow<Data?>(null)
-    private val staffCache = mutableMapOf<Int,Data?>()
+    private val staffCache = mutableMapOf<Int, Data?>()
     val staffFull = _staffFull.asStateFlow()
 
     private val _isSearching = MutableStateFlow(false)

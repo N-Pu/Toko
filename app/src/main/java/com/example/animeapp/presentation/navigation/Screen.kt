@@ -11,7 +11,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 sealed class Screen(val route: String, val icon: ImageVector, val contentDescription: String) {
     object Home : Screen("home_screen", Icons.Filled.Search, "Search Anime")
     object Detail : Screen("detail_screen/{id}", Icons.Filled.List, "Details on Anime")
-    object News : Screen("news_screen", Icons.Filled.ShoppingCart, "Current News on Anime")
+    object RandomAnimeOrManga :
+        Screen("random_anime_or_manga_screen", Icons.Filled.ShoppingCart, "Current News on Anime")
+
     object Favorites : Screen("favorites_screen", Icons.Filled.FavoriteBorder, "Favorite anime")
 
 }
@@ -20,17 +22,18 @@ object Nothing {
     const val value = "no_id"
 }
 
-object DetailOnCast{
+object DetailOnCast {
     const val value = "detail_on_cast"
 }
-object DetailOnStaff{
+
+object DetailOnStaff {
     const val value = "detail_on_staff"
 }
 
-object CharacterDetail{
+object CharacterDetail {
     const val value = "detail_on_character/{id}"
 }
 
-object StaffDetail{
+object StaffDetail {
     const val value = "detail_on_staff/{id}"
 }

@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     installSplashScreen() // Custom Splash Screen
                     navController = rememberNavController()
 
-                    val myViewModelFactory = MyViewModelFactory(MalApiService)
+                    val myViewModelFactory = MyViewModelFactory(MalApiService.api)
                     val viewModel = ViewModelProvider(this, myViewModelFactory)
 
                     TokoAppActivator(navController = navController, viewModelProvider = viewModel)

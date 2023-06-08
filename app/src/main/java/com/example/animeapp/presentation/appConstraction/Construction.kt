@@ -61,9 +61,9 @@ import com.example.animeapp.presentation.navigation.Nothing
 import com.example.animeapp.presentation.navigation.Screen
 import com.example.animeapp.presentation.navigation.SetupNavGraph
 import com.example.animeapp.domain.viewModel.IdViewModel
-import com.example.animeapp.presentation.Screens.homeScreen.checkIdInDataBase
-import com.example.animeapp.presentation.Screens.homeScreen.formatScore
-import com.example.animeapp.presentation.Screens.homeScreen.formatScoredBy
+import com.example.animeapp.presentation.screens.homeScreen.checkIdInDataBase
+import com.example.animeapp.presentation.screens.homeScreen.formatScore
+import com.example.animeapp.presentation.screens.homeScreen.formatScoredBy
 import com.example.animeapp.presentation.theme.LightYellow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -126,7 +126,7 @@ fun BottomNavigationBar(
 ) {
 
     val items = listOf(
-        Screen.Home, Screen.Detail, Screen.News, Screen.Favorites
+        Screen.Home, Screen.Detail, Screen.RandomAnimeOrManga, Screen.Favorites
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
