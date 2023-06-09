@@ -187,6 +187,7 @@ import com.example.animeapp.domain.models.newAnimeSearchModel.Items
 import com.example.animeapp.repository.MalApiService
 import com.example.animeapp.domain.models.newAnimeSearchModel.NewAnimeSearchModel
 import com.example.animeapp.domain.models.newAnimeSearchModel.Pagination
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -221,7 +222,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     private val searchDebouncer = MutableSharedFlow<String>()
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             searchDebouncer
                 .debounce(500L)
                 .distinctUntilChanged()
@@ -238,7 +239,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (!isPerformingSearch.value) {
                 searchDebouncer.emit(text)
             }
@@ -268,7 +269,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val nextPage = currentPage.value + 1
                 val response = malApiRepository.getAnimeSearchByName(nameOfAnime = query, page = nextPage).body()

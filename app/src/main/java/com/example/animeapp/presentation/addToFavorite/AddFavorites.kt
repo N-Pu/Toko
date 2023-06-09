@@ -1,4 +1,4 @@
-package com.example.animeapp.presentation.screens.addToFavorite
+package com.example.animeapp.presentation.addToFavorite
 
 import android.content.Context
 import androidx.compose.foundation.background

@@ -23,7 +23,7 @@ class DetailScreenViewModel(private val malApiService: MalApiService) : ViewMode
 
     fun onTapAnime(id: Int) {
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
 
             val cachedAnime = animeCache[id]
             if (cachedAnime != null) {

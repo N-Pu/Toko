@@ -11,7 +11,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.animeapp.domain.models.detailModel.Genre
@@ -20,11 +19,13 @@ import kotlin.random.Random
 
 @Composable
 fun RandomColorBox(
-    text: String, color: Color, modifier: Modifier = Modifier
+    text: String, color: String, modifier: Modifier = Modifier
 ) {
+    val backgroundColor = Color(android.graphics.Color.parseColor(color))
+
     Box(
         modifier = modifier
-            .background(color, shape = MaterialTheme.shapes.small)
+            .background(backgroundColor, shape = MaterialTheme.shapes.small)
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
@@ -41,7 +42,8 @@ fun RandomColorBox(
 fun DisplayCustomGenreBoxes(genres: List<Genre>) {
     val colors = rememberSaveable {
         List(genres.size) {
-            Color(Random.nextFloat(), Random.nextFloat(), Random.nextFloat(), 1f)
+            val randomColor = String.format("#%06x", Random.nextInt(0xffffff + 1))
+            randomColor
         }
     }
 
@@ -56,14 +58,5 @@ fun DisplayCustomGenreBoxes(genres: List<Genre>) {
             RandomColorBox(text = genres[index].name, color = color)
         }
     }
-
-
 }
 
-
-//@Preview
-//@Composable
-//fun PrevDisplayCustomGenreBoxes() {
-//    val genres = listOf("Action", "Comedy", "Drama", "Horror", "Sci-Fi", "Thriller")
-//    DisplayCustomGenreBoxes(genres = genres)
-//}

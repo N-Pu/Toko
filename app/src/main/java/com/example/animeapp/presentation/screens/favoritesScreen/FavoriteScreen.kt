@@ -53,7 +53,7 @@ import com.example.animeapp.dao.AnimeItem
 import com.example.animeapp.dao.Dao
 import com.example.animeapp.dao.MainDb
 import com.example.animeapp.domain.viewModel.IdViewModel
-import com.example.animeapp.presentation.screens.addToFavorite.AddFavorites
+import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import com.example.animeapp.presentation.screens.homeScreen.navigateToDetailScreen
 import com.example.animeapp.presentation.theme.LightYellow
 

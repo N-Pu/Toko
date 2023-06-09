@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class CharacterFullByIdViewModel(private val malApiService: MalApiService) : ViewModel() {
     private val charactersCache = mutableMapOf<Int, Data?>()
@@ -26,8 +25,8 @@ class CharacterFullByIdViewModel(private val malApiService: MalApiService) : Vie
             return
         }
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
+
                 try {
                     _isSearching.value = true
                     val response = malApiService.getCharacterFullFromId(malId)
@@ -43,5 +42,5 @@ class CharacterFullByIdViewModel(private val malApiService: MalApiService) : Vie
                 }
             }
         }
-    }
+
 }

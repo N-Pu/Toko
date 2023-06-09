@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class StaffInDetailScreenViewModel(malApiService: MalApiService) : ViewModel() {
 
@@ -21,7 +20,7 @@ class StaffInDetailScreenViewModel(malApiService: MalApiService) : ViewModel() {
     val staffList = _staffList.asStateFlow()
 
     fun addStaffFromId(id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val cachedStaff = staffCache[id]
             if (cachedStaff != null) {
                 _staffList.value = cachedStaff
@@ -29,7 +28,8 @@ class StaffInDetailScreenViewModel(malApiService: MalApiService) : ViewModel() {
             }
 
             try {
-                withContext(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
+//                withContext(Dispatchers.IO) {
                     val response = animeRepository.getStaffFromId(id)
                     if (response.isSuccessful) {
                         val staff = response.body()?.data ?: emptyList()

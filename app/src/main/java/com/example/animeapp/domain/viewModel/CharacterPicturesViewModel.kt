@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class CharacterPicturesViewModel(private val malApiService: MalApiService) : ViewModel() {
     private val picturesCache = mutableMapOf<Int, List<Data>>()
@@ -24,8 +23,8 @@ class CharacterPicturesViewModel(private val malApiService: MalApiService) : Vie
             return
         }
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
+        viewModelScope.launch (Dispatchers.IO){
+
                 try {
                     val response = malApiService.getCharacterFullPictures(id)
                     if (response.isSuccessful) {
@@ -39,4 +38,4 @@ class CharacterPicturesViewModel(private val malApiService: MalApiService) : Vie
             }
         }
     }
-}
+

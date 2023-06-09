@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.animeapp.domain.models.detailModel.Data
 import com.example.animeapp.repository.MalApiService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ class RandomAnimeViewModel(private val malApiService: MalApiService) : ViewModel
     fun onTapRandomAnime() {
         if (isSearching) return
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 isSearching = true
                 val response = malApiService.getRandomAnime()

@@ -83,12 +83,12 @@ fun DisplayStaffMemberFromId(
                     staffFullState.value?.let {
                         itemsIndexed(it.anime) { _, anime ->
 
-                            val painter =
+                            val painterRoles =
                                 rememberAsyncImagePainter(model = anime.anime.images.jpg.large_image_url)
 
                             DisplayProjectsRelated(
                                 anime = anime,
-                                painter = painter,
+                                painter = painterRoles,
                                 navController = navController,
                                 viewModelProvider = viewModelProvider
                             )
@@ -149,6 +149,51 @@ fun DisplayStaffMemberFromId(
 
 }
 
+@Composable
+fun DisplayProjectsRelated(
+    anime: Anime,
+    painter: AsyncImagePainter,
+    navController: NavController,
+    viewModelProvider: ViewModelProvider
+) {
+    Card(modifier = Modifier
+        .clickable {
+            viewModelProvider[IdViewModel::class.java].setId(anime.anime.mal_id)
+            navController.navigate("detail_screen/${anime.anime.mal_id}")
+
+//            navigateToDetailScreen(navController = navController, mal_id = anime.anime.mal_id)
+        }
+        .fillMaxSize()
+        .padding(PaddingValues(0.dp))) {
+
+        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+            Image(
+                painter = painter,
+                contentDescription = anime.anime.title,
+                modifier = Modifier.size(200.dp)
+            )
+            Text(
+                text = anime.anime.title,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp) // Добавляем горизонтальный отступ для центрирования текста
+            )
+            Spacer(
+                modifier = Modifier
+                    .height(1.dp)
+                    .fillMaxWidth()
+                    .background(Color.Black)
+            )
+            Text(
+                text = anime.position,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center // Центрируем текст по горизонтали
+            )
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -200,50 +245,6 @@ fun PreviewBottomSheet() {
 }
 
 
-@Composable
-fun DisplayProjectsRelated(
-    anime: Anime,
-    painter: AsyncImagePainter,
-    navController: NavController,
-    viewModelProvider: ViewModelProvider
-) {
-    Card(modifier = Modifier
-        .clickable {
-            viewModelProvider[IdViewModel::class.java].setId(anime.anime.mal_id)
-            navController.navigate("detail_screen/${anime.anime.mal_id}")
-
-//            navigateToDetailScreen(navController = navController, mal_id = anime.anime.mal_id)
-        }
-        .fillMaxSize()
-        .padding(PaddingValues(0.dp))) {
-
-        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-            Image(
-                painter = painter,
-                contentDescription = anime.anime.title,
-                modifier = Modifier.size(200.dp)
-            )
-            Text(
-                text = anime.anime.title,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp) // Добавляем горизонтальный отступ для центрирования текста
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(1.dp)
-                    .fillMaxWidth()
-                    .background(Color.Black)
-            )
-            Text(
-                text = anime.position,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center // Центрируем текст по горизонтали
-            )
-        }
-    }
-}
 
 
 

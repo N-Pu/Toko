@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.animeapp.domain.models.staffMemberFullModel.Data
 import com.example.animeapp.repository.MalApiService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -19,7 +20,7 @@ class StaffFullByIdViewModel(malApiService: MalApiService) : ViewModel() {
     val isSearching = _isSearching.asStateFlow()
 
     fun getStaffFromId(mal_id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val cachedStaff = staffCache[mal_id]
             if (cachedStaff != null) {
                 _staffFull.value = cachedStaff

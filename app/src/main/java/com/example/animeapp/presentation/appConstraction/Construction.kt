@@ -100,9 +100,7 @@ fun TokoAppActivator(
 
         MyFloatingButton( showButton = showButton, context = context, viewModelProvider = viewModelProvider)
 
-    }, floatingActionButtonPosition = FabPosition.Center,
-
-        content = { padding ->
+    }, floatingActionButtonPosition = FabPosition.Center, content = { padding ->
         padding.calculateTopPadding()
         SetupNavGraph(
             navController, viewModelProvider

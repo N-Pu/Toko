@@ -41,7 +41,7 @@ import com.example.animeapp.R
 import com.example.animeapp.dao.Dao
 import com.example.animeapp.presentation.theme.LightYellow
 import com.example.animeapp.domain.viewModel.IdViewModel
-import com.example.animeapp.presentation.screens.addToFavorite.AddFavorites
+import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import kotlinx.coroutines.flow.Flow
 import java.util.Locale
 
