@@ -196,7 +196,12 @@ fun FavoriteAnimeList(
             .fillMaxWidth()
             .fillMaxHeight(9f / 10f)
     ) {
-        LazyVerticalGrid(columns = GridCells.Adaptive(140.dp), state = scrollState) {
+        LazyVerticalGrid(columns = GridCells.Adaptive(140.dp), state = scrollState,
+
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(5.dp)) {
             items(animeListState) { animeItem ->
                 FavoriteScreenCardBox(
                     animeItem = animeItem,

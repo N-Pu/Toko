@@ -5,7 +5,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
@@ -40,10 +39,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImagePainter
 import com.example.animeapp.R
+import com.example.animeapp.domain.models.characterModel.Anime
 import com.example.animeapp.domain.viewModel.IdViewModel
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.presentation.theme.LightYellow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 
@@ -56,7 +57,9 @@ fun DisplayCharacterFromId(
 
     LaunchedEffect(mal_id) {
         withContext(Dispatchers.IO) {
+            delay(300L)
             viewModelProvider[CharacterFullByIdViewModel::class.java].getCharacterFromId(mal_id)
+            delay(300L)
             viewModelProvider[CharacterPicturesViewModel::class.java].getPicturesFromId(mal_id)
         }
 
@@ -122,7 +125,7 @@ fun DisplayCharacterFromId(
 
 
 
-                Spacer(modifier = Modifier.size(28.dp))
+                Spacer(modifier = Modifier.size(8.dp))
                 characterFullState.value?.let { data ->
                     DisplayKanjiAndEnglishName(data = data)
 
@@ -203,29 +206,40 @@ fun DisplayCharacterFromId(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DisplayHorizontalPagerWithIndicator(painterList: List<com.example.animeapp.domain.models.characterPictures.Data>) {
-    val pagerState = rememberPagerState(initialPage = painterList.size)
+
+    val pagerState = rememberPagerState(initialPage = 0)
+
+    Spacer(
+        modifier = Modifier
+            .height(40.dp)
+    )
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.size(400.dp),
         pageCount = painterList.size,
-        reverseLayout = true
+        reverseLayout = false
     ) { page ->
         val painter = rememberAsyncImagePainter(model = painterList[page].jpg.image_url)
-        Log.d("pic", painterList[page].jpg.image_url)
+        Log.d("Picture #${page}", painterList[page].jpg.image_url)
         Image(
             painter = painter,
             contentDescription = null,
             modifier = Modifier
-                .size(400.dp)
-                .aspectRatio(9 / 11f),
+                .size(400.dp),
+//                .aspectRatio(9 / 11f)
         )
     }
 
-    Spacer(modifier  = Modifier.fillMaxWidth().height(30.dp))
+    Spacer(
+        modifier = Modifier
+            .height(10.dp)
+    )
     // Dot indicators
     Row(
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth()
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .fillMaxWidth()
     ) {
         repeat(painterList.size) { index ->
             val color = if (index == pagerState.currentPage) Color.DarkGray else LightYellow
@@ -286,7 +300,7 @@ fun ImagePager() {
 //same functions contains in PersonFullScreen.kt
 @Composable
 fun DisplayProjectsRelated(
-    anime: com.example.animeapp.domain.models.characterModel.Anime,
+    anime: Anime,
     painter: AsyncImagePainter,
     navController: NavController,
     viewModelProvider: ViewModelProvider

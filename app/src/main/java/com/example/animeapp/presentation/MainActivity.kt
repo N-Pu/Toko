@@ -21,7 +21,7 @@ import com.example.animeapp.presentation.theme.LightYellow
 import com.example.animeapp.domain.viewModel.viewModelFactory.MyViewModelFactory
 
 
-
+//@HiltAndroidApp
 class MainActivity : ComponentActivity() {
 
 
@@ -63,8 +63,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
     private fun noTitleBarAndSplashScreenActivator() {
         window.navigationBarColor = LightYellow.toArgb()
         requestWindowFeature(Window.FEATURE_NO_TITLE) // Undo topBar

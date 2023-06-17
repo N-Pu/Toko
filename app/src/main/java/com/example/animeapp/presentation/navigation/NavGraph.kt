@@ -108,7 +108,12 @@ fun SetupNavGraph(navController: NavHostController, viewModelProvider: ViewModel
                 viewModelProvider = viewModelProvider
             )
         }
-        composable(route = Screen.RandomAnimeOrManga.route) { ShowRandomScreen(navController, viewModelProvider) }
+        composable(route = Screen.RandomAnimeOrManga.route) {
+            ShowRandomScreen(
+                navController,
+                viewModelProvider
+            )
+        }
         composable(route = Nothing.value) { NoId(navController) }
         composable(route = DetailOnCast.value) {
             ShowWholeCast(navController, viewModelProvider)

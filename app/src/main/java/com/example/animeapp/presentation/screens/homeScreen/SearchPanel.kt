@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -82,6 +81,7 @@ fun DropDownGenres() {
     var isDropdownVisible by remember { mutableStateOf(false) }
     val verticalScrollState = rememberScrollState()
     val genreStates = remember { mutableStateListOf<MutableState<Boolean>>() }
+    val genres = getGenres()
 
     IconButton(onClick = { isDropdownVisible = true }, modifier = Modifier.size(65.dp)) {
         Icon(
@@ -95,7 +95,7 @@ fun DropDownGenres() {
         expanded = isDropdownVisible,
         onDismissRequest = { isDropdownVisible = false },
     ) {
-        Box(Modifier.size(400.dp)) {
+        Box(Modifier.size(570.dp)) {
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -104,7 +104,7 @@ fun DropDownGenres() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 content = {
-                    val genres = getGenres()
+
                     if (genreStates.size != genres.size) {
                         genreStates.clear()
                         genreStates.addAll(genres.map { mutableStateOf(false) })
@@ -152,12 +152,6 @@ fun GenreButton(genre: String, onClick: () -> Unit, isTouched: Boolean) {
 }
 
 
-@Preview
-@Composable
-fun PreviewGenreButton() {
-//    GenreButton(genre = "Drama", onClick = {
-//    })
-}
 
 data class Genre(val name: String, val number: Int)
 

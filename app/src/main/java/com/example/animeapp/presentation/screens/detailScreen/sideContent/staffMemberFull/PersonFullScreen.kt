@@ -51,7 +51,6 @@ fun DisplayStaffMemberFromId(
     LaunchedEffect(mal_id) {
         withContext(Dispatchers.IO) {
             viewModelProvider[StaffFullByIdViewModel::class.java].getStaffFromId(mal_id)
-
         }
     }
 

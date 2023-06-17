@@ -43,6 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
+
 @Composable
 fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
@@ -53,7 +54,7 @@ fun ActivateDetailScreen(
     val id by viewModelProvider[IdViewModel::class.java].mal_id.collectAsStateWithLifecycle()
     val isSearching by viewModelProvider[DetailScreenViewModel::class.java].isSearching.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = id) {
+    LaunchedEffect(id) {
         withContext(Dispatchers.IO) {
             viewModelProvider[DetailScreenViewModel::class.java].onTapAnime(id)
             delay(300)
@@ -76,24 +77,27 @@ fun ActivateDetailScreen(
     val collectCastData =
         viewModelProvider[CastInDetailScreenViewModel::class.java].castList.collectAsStateWithLifecycle()
     val castData = collectCastData.value
+    val painter =
+        rememberAsyncImagePainter(model = detailData?.images?.jpg?.large_image_url)
 
-
-    if (isSearching.not()) {
-        if (detailData != null) {
-            val painterState =
-                rememberAsyncImagePainter(model = detailData.images.jpg.large_image_url)
+    if (isSearching.not() && detailData != null) {
 
             Column(
                 modifier = Modifier
 
-                    .fillMaxWidth()
+//                    .fillMaxWidth()
                     .verticalScroll(rememberScrollState()),
 
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
 
-                DisplayPicture(painter = painterState)
+                Row(modifier = Modifier.size(600.dp)) {
+                    DisplayPicture(painter = painter)
+                }
+             
+
+
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = detailData.title,
@@ -226,7 +230,7 @@ fun ActivateDetailScreen(
             }
 
 
-        }
+
     } else {
         LoadingAnimation()
     }

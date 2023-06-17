@@ -94,8 +94,9 @@ fun GridAdder(
         state = scrollGridState,
         columns = GridCells.Adaptive(minSize = 140.dp),
         modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        contentPadding = PaddingValues(5.dp)
     ) {
         itemsIndexed(listData.data) { index, anime ->
             AnimeCardBox(
@@ -278,6 +279,7 @@ fun checkIdInDataBase(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewGridView() {
+    val painter = rememberAsyncImagePainter(model = R.drawable.kurisu)
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 140.dp),
@@ -295,7 +297,6 @@ fun PreviewGridView() {
                 colors = CardDefaults.cardColors(containerColor = LightYellow),
                 shape = RectangleShape,
             ) {
-                val painter = rememberAsyncImagePainter(model = R.drawable.kurisu)
                 Box(modifier = Modifier.fillMaxSize()) {
                     // Coil image loader
                     Image(

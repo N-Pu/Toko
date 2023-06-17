@@ -248,14 +248,24 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     private suspend fun performSearch(query: String) {
         try {
-            _isPerformingSearch.value = true
+            // This "if" statement is temporary added because
+            // Jikan.Api isn't working properly with query that
+            // contains less then 3 letters.
+            if (query.length >= 3) {
 
-            val response = malApiRepository.getAnimeSearchByName(nameOfAnime = query, page = currentPage.value).body()
+                _isPerformingSearch.value = true
 
-            val anime = response ?: emptyNewAnimeSearchModel
-            _animeSearch.value = anime
+                val response = malApiRepository.getAnimeSearchByName(
+                    nameOfAnime = query,
+                    page = currentPage.value
+                ).body()
 
-            _totalPages.value = anime.pagination.items.total
+                val anime = response ?: emptyNewAnimeSearchModel
+                _animeSearch.value = anime
+
+                _totalPages.value = anime.pagination.items.total
+
+            }
         } catch (e: Exception) {
             Log.e("HomeScreenViewModel", "Failed to perform search: ${e.message}")
         } finally {
@@ -287,5 +297,8 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
             }
         }
     }
+
+
+
 }
 

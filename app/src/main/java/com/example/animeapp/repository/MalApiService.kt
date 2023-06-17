@@ -32,11 +32,21 @@ interface MalApiService {
 
     @GET("${BASE_URL}v4/anime")
     suspend fun getAnimeSearchByName(
-        @Query("page") page: Int,
-        @Query("q") nameOfAnime: String
+        @Query("Sfw") sfw: Boolean = true,
+        @Query("page") page: Int = 1,
+        @Query("q") nameOfAnime: String,
+//        @Query("type") type: String,
+//        @Query("min_score") min_score: Float,
+//        @Query("max_score") max_score: Float,
+//        @Query("rating") rating: String,
+//        @Query("sfw") sfw: Boolean,
+//        @Query("genres") genres: String,
+//        @Query("sort") sort: String,
+//        @Query("start_date") start_date: String,
+//        @Query("end_date") end_date: String,
     ): Response<NewAnimeSearchModel>
 
-//    @GET("${BASE_URL}v4/anime")
+    //    @GET("${BASE_URL}v4/anime")
 //    suspend fun getAnimeSearchByName(
 //        @Query("page") page: Int,
 //        @Query("q") nameOfAnime: String,
@@ -87,8 +97,7 @@ interface MalApiService {
             } catch (e: Exception) {
                 // обрабатываем ошибки
                 when (e) {
-                    is SocketTimeoutException,
-                    is HttpException -> {
+                    is SocketTimeoutException, is HttpException -> {
                         retryCount++
                         Log.e("MalApiService", "Error occurred: ${e.message}")
                         delay(10000) // задержка на 10 секунд перед повторным запросом
@@ -103,26 +112,18 @@ interface MalApiService {
 
     companion object {
 
-        private val logging = HttpLoggingInterceptor()
-            .setLevel(HttpLoggingInterceptor.Level.BODY)
+        private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
 
-        private val httpClient = OkHttpClient
-            .Builder()
+        private val httpClient = OkHttpClient.Builder()
 
-            .connectTimeout(40, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .addInterceptor(logging)
-            .build()
+            .connectTimeout(40, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS)
+            .addInterceptor(logging).build()
 
 
         val api: MalApiService by lazy {
 
-            Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(httpClient)
-                .build()
-                .create(MalApiService::class.java)
+            Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient).build().create(MalApiService::class.java)
         }
     }
 

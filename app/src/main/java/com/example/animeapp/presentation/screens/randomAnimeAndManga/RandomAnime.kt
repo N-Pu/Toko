@@ -44,7 +44,7 @@ fun ShowRandomScreen(navController: NavController, viewModelProvider: ViewModelP
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+//            .fillMaxSize()
     ) {
 
         ShowRandomAnime(navController, viewModelProvider)
@@ -62,27 +62,29 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
     val coroutineScope = rememberCoroutineScope()
     var clicked by remember { mutableStateOf(false) }
 
+    val painter =
+        rememberAsyncImagePainter(model = state.value?.images?.jpg?.large_image_url)
+
+    val clickableModifier = Modifier.clickable {
+        state.value?.let { animeData ->
+            idViewModel.setId(animeData.mal_id)
+            navController.navigate(route = "detail_screen/${animeData.mal_id}") {
+                launchSingleTop = true
+                popUpTo(Screen.Home.route) {
+                    saveState = true
+                }
+                restoreState = true
+            }
+        }
+    }
+
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.8f)
+            .fillMaxHeight(0.84f)
     ) {
-        Card(modifier = Modifier.size(600.dp)) {
-            val painter =
-                rememberAsyncImagePainter(model = state.value?.images?.jpg?.large_image_url)
-            val clickableModifier = Modifier.clickable {
-                state.value?.let { animeData ->
-                    idViewModel.setId(animeData.mal_id)
-                    navController.navigate(route = "detail_screen/${animeData.mal_id}") {
-                        launchSingleTop = true
-                        popUpTo(Screen.Home.route) {
-                            saveState = true
-                        }
-                        restoreState = true
-                    }
-                }
-            }
+        Card(modifier = Modifier.size(800.dp)) {
             Image(
                 painter = painter,
                 contentDescription = "Anime ${state.value?.title}",
