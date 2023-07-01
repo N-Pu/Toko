@@ -1,7 +1,11 @@
 package com.example.animeapp.presentation.screens.homeScreen
 
-
 import HomeScreenViewModel
+import android.util.Log
+import android.view.MotionEvent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,33 +18,39 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.example.animeapp.domain.models.linkChangeModel.Score
+import com.example.animeapp.domain.models.linkChangeModel.getStateScore
 import com.example.animeapp.presentation.animations.LoadingAnimation
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun MainScreen(
     navController: NavHostController, viewModelProvider: ViewModelProvider
 ) {
-
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
-    val searchText by remember { viewModel.searchText }.collectAsStateWithLifecycle()
-    val isSearching by remember { viewModel.isPerformingSearch }.collectAsStateWithLifecycle()
-    val coroutineScope = rememberCoroutineScope()
+    val searchText = viewModel.searchText.collectAsStateWithLifecycle()
+    val isSearching = viewModel.isPerformingSearch.collectAsStateWithLifecycle()
 
     Column {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
-                value = searchText,
+                value = searchText.value,
                 onValueChange = viewModel::onSearchTextChange,
                 modifier = Modifier.weight(1f), // Изменено на использование weight для занимания доступного пространства
                 label = {
@@ -52,38 +62,37 @@ fun MainScreen(
                     Text(text = "Searching anime...")
                 },
                 trailingIcon = {
-                    DropDownGenres()
+                    DropDownMenuWithIconButton(viewModel)
                 }
             )
         }
 
-        if (!isSearching) {
+        if (!isSearching.value) {
             GridAdder(
-                navController = navController, viewModelProvider = viewModelProvider
+                navController = navController,
+                viewModel = viewModel,
+                viewModelProvider = viewModelProvider
             )
-        } else{
+        } else {
             LoadingAnimation()
         }
 
-
-
-        LaunchedEffect(key1 = searchText) {
-            coroutineScope.launch {
-                viewModel.onSearchTextChange(searchText)
-            }
-        }
     }
 }
 
+
+// Need to fix it later
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DropDownGenres() {
-    var isDropdownVisible by remember { mutableStateOf(false) }
-    val verticalScrollState = rememberScrollState()
-    val genreStates = remember { mutableStateListOf<MutableState<Boolean>>() }
-    val genres = getGenres()
+fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel) {
+    val isDropdownVisible = remember { mutableStateOf(false) }
+    IconButton(onClick = {
 
-    IconButton(onClick = { isDropdownVisible = true }, modifier = Modifier.size(65.dp)) {
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
+            isDropdownVisible.value = true
+        }
+
+    }, modifier = Modifier.size(65.dp)) {
         Icon(
             imageVector = Icons.Filled.MoreVert,
             contentDescription = "GenreButton",
@@ -92,40 +101,128 @@ fun DropDownGenres() {
     }
 
     DropdownMenu(
-        expanded = isDropdownVisible,
-        onDismissRequest = { isDropdownVisible = false },
+        expanded = isDropdownVisible.value,
+        onDismissRequest = { isDropdownVisible.value = false },
     ) {
-        Box(Modifier.size(570.dp)) {
+        Box(Modifier.size(400.dp)) {
+
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .verticalScroll(verticalScrollState)
+                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 content = {
 
-                    if (genreStates.size != genres.size) {
-                        genreStates.clear()
-                        genreStates.addAll(genres.map { mutableStateOf(false) })
-                    }
+                    ShowGenres(viewModel)
+                    ShowRating(viewModel)
+                    ShowTypes(viewModel)
+                    ShowOrderBy(viewModel)
+//                    ScrollMe()
+                    ScoreBar(viewModel = viewModel)
+                    SafeFowWorkSwitch(viewModel)
 
-                    genres.forEachIndexed { index, genre ->
-                        GenreButton(
-                            genre = genre.name,
-                            onClick = {
-                                genreStates[index].value = !genreStates[index].value
+                })
+        }
+        AddAllButton(viewModel, isDropdownVisible)
+    }
 
-                            },
-                            isTouched = genreStates[index].value
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .width(8.dp)
-                                .height(50.dp)
-                        )
-                    }
-                }
+}
+
+@Composable
+fun SafeFowWorkSwitch(viewModel: HomeScreenViewModel) {
+
+//    var sfw1  by remember {
+//        mutableStateOf(false)
+//    }
+    var sfw by viewModel.safeForWork
+    Box(contentAlignment = Alignment.Center) {
+        Divider(thickness = 25.dp)
+        Text(text = "SFW content", textAlign = TextAlign.Center)
+    }
+    Box {
+        Switch(checked = sfw, onCheckedChange = {
+            sfw = it
+//            sfw.value = it
+        })
+    }
+}
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun ScoreBar(
+    modifier: Modifier = Modifier,
+    viewModel: HomeScreenViewModel
+) {
+    var ratingState by viewModel.scoreState
+    var selected by viewModel.selectedMinMax
+    val size by animateDpAsState(
+        targetValue = if (selected) 30.dp else 34.dp,
+        spring(Spring.DampingRatioMediumBouncy)
+    )
+
+    Box(contentAlignment = Alignment.Center) {
+        Divider(thickness = 25.dp)
+        Text(text = "min - max score", textAlign = TextAlign.Center)
+    }
+
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        for (i in 1..10) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = "star",
+                modifier = modifier
+                    .width(size)
+                    .height(size)
+                    .pointerInteropFilter {
+                        when (it.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                if (i == ratingState) {
+                                    // Повторное нажатие на звезду
+                                    selected = false
+                                    ratingState = 0
+
+                                    viewModel.setSelectedMinScore(Score(getStateScore(ratingState).minScore))
+                                    viewModel.setSelectedMaxScore(Score(getStateScore(ratingState).maxScore))
+//                                    viewModel.min_score = getStateScore(ratingState).minScore
+//                                    viewModel.max_score = getStateScore(ratingState).maxScore
+
+                                    Log.d(
+                                        "SCORES",
+                                        "MIN->" + getStateScore(ratingState).minScore + " MAX->" + getStateScore(
+                                            ratingState
+                                        ).maxScore
+                                    )
+                                } else {
+                                    selected = true
+                                    ratingState = i
+
+//                                    viewModel.min_score = getStateScore(ratingState).minScore
+//                                    viewModel.max_score = getStateScore(ratingState).maxScore
+                                    viewModel.setSelectedMinScore(Score(getStateScore(ratingState).minScore))
+                                    viewModel.setSelectedMaxScore(Score(getStateScore(ratingState).maxScore))
+                                    Log.d(
+                                        "SCORES",
+                                        "MIN->" + getStateScore(ratingState).minScore + " MAX->" + getStateScore(
+                                            ratingState
+                                        ).maxScore
+                                    )
+                                }
+                            }
+
+                            MotionEvent.ACTION_UP -> {
+                                selected = false
+                            }
+                        }
+                        true
+                    },
+                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
             )
         }
     }
@@ -133,16 +230,58 @@ fun DropDownGenres() {
 
 
 @Composable
-fun GenreButton(genre: String, onClick: () -> Unit, isTouched: Boolean) {
+fun ShowGenres(
+    viewModel: HomeScreenViewModel
+) {
+    val selectedGenre by viewModel.selectedGenre.collectAsStateWithLifecycle()
+
+    Box(contentAlignment = Alignment.TopCenter) {
+        Divider(thickness = 25.dp)
+        Text(text = "Genres", textAlign = TextAlign.Center)
+
+    }
+
+    selectedGenre.forEach { genreForUI ->
+        ButtonCreator(
+            text = genreForUI.name,
+            isTouched = genreForUI.isSelected.value,
+            onClick = {
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    genreForUI.isSelected.value = !genreForUI.isSelected.value
+                    viewModel.tappingOnGenre(genreForUI.id)
+                }
+            }
+        )
+        Spacer(
+            modifier = Modifier
+                .width(8.dp)
+                .height(50.dp)
+        )
+    }
+}
+
+
+@Composable
+fun ButtonCreator(
+    text: String,
+    onClick: () -> Unit,
+    isTouched: Boolean,
+) {
     Box(
         modifier = Modifier
             .clip(CircleShape)
-            .background(if (isTouched) Color.Red else Color.Cyan)
+            .background(
+                if (isTouched) {
+                    Color.Red
+                } else {
+                    Color.Cyan
+                }
+            )
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
         content = {
             Text(
-                text = genre,
+                text = text,
                 color = Color.White,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(8.dp)
@@ -151,88 +290,103 @@ fun GenreButton(genre: String, onClick: () -> Unit, isTouched: Boolean) {
     )
 }
 
+@Composable
+fun ShowRating(viewModel: HomeScreenViewModel) {
+    val ratingList by viewModel.ratingList.collectAsStateWithLifecycle()
+    val selectedRating by viewModel.selectedRating.collectAsStateWithLifecycle()
 
+    Box(contentAlignment = Alignment.Center) {
+        Divider(thickness = 25.dp)
+        Text(text = "Rating", textAlign = TextAlign.Center)
+    }
 
-data class Genre(val name: String, val number: Int)
+    ratingList.forEach { rating ->
+        ButtonCreator(
+            isTouched = rating == selectedRating,
+            onClick = {
+                viewModel.setSelectedRating(rating)
+            },
+            text = rating.ratingName
+        )
+        Spacer(
+            modifier = Modifier
+                .width(8.dp)
+                .height(50.dp)
+        )
+    }
+}
 
+@Composable
+fun ShowTypes(viewModel: HomeScreenViewModel) {
+    val typeList by viewModel.typeList.collectAsStateWithLifecycle()
+    val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
 
-fun getGenres(): List<Genre> {
-    return listOf(
-        Genre("Action", 1),
-        Genre("Adventure", 2),
-        Genre("Racing", 3),
-        Genre("Comedy", 4),
-        Genre("Avant Garde", 5),
-        Genre("Mythology", 6),
-        Genre("Mystery", 7),
-        Genre("Drama", 8),
-        Genre("Ecchi", 9),
-        Genre("Fantasy", 10),
-        Genre("Strategy Game", 11),
-        Genre("Hentai", 12),
-        Genre("Historical", 13),
-        Genre("Horror", 14),
-        Genre("Kids", 15),
-        Genre("Martial Arts", 17),
-        Genre("Mecha", 18),
-        Genre("Music", 19),
-        Genre("Parody", 20),
-        Genre("Samurai", 21),
-        Genre("Romance", 22),
-        Genre("School", 23),
-        Genre("Sci-Fi", 24),
-        Genre("Shoujo", 25),
-        Genre("Girls Love", 26),
-        Genre("Shounen", 27),
-        Genre("Boys Love", 28),
-        Genre("Space", 29),
-        Genre("Sports", 30),
-        Genre("Super Power", 31),
-        Genre("Vampire", 32),
-        Genre("Harem", 35),
-        Genre("Slice of Life", 36),
-        Genre("Supernatural", 37),
-        Genre("Military", 38),
-        Genre("Detective", 39),
-        Genre("Psychological", 40),
-        Genre("Suspense", 41),
-        Genre("Seinen", 42),
-        Genre("Josei", 43),
-        Genre("Award Winning", 46),
-        Genre("Gourmet", 47),
-        Genre("Workplace", 48),
-        Genre("Erotica", 49),
-        Genre("Adult Cast", 50),
-        Genre("Anthropomorphic", 51),
-        Genre("CGDCT", 52),
-        Genre("Childcare", 53),
-        Genre("Combat Sports", 54),
-        Genre("Delinquents", 55),
-        Genre("Educational", 56),
-        Genre("Gag Humor", 57),
-        Genre("Gore", 58),
-        Genre("High Stakes Game", 59),
-        Genre("Idols (Female)", 60),
-        Genre("Idols (Male)", 61),
-        Genre("Isekai", 62),
-        Genre("Iyashikei", 63),
-        Genre("Love Polygon", 64),
-        Genre("Magical Sex Shift", 65),
-        Genre("Mahou Shoujo", 66),
-        Genre("Medical", 67),
-        Genre("Organized Crime", 68),
-        Genre("Otaku Culture", 69),
-        Genre("Performing Arts", 70),
-        Genre("Pets", 71),
-        Genre("Reincarnation", 72),
-        Genre("Reverse Harem", 73),
-        Genre("Romantic Subtext", 74),
-        Genre("Showbiz", 75),
-        Genre("Survival", 76),
-        Genre("Team Sports", 77),
-        Genre("Time Travel", 78),
-        Genre("Video Game", 79),
-        Genre("Visual Arts", 80),
-        Genre("Crossdressing", 81)
-    )
+    Box(contentAlignment = Alignment.Center) {
+        Divider(thickness = 25.dp)
+        Text(text = "Type", textAlign = TextAlign.Center)
+    }
+
+    typeList.forEach { type ->
+        ButtonCreator(
+            isTouched = type == selectedType,
+            onClick = {
+                viewModel.setSelectedType(type)
+            },
+            text = type.typeName
+        )
+        Spacer(
+            modifier = Modifier
+                .width(8.dp)
+                .height(50.dp)
+        )
+    }
+}
+
+@Composable
+fun ShowOrderBy(viewModel: HomeScreenViewModel) {
+    val orderByList by viewModel.orderByList.collectAsStateWithLifecycle()
+    val selectedOrderBy by viewModel.selectedOrderBy.collectAsStateWithLifecycle()
+
+    Box(contentAlignment = Alignment.Center) {
+        Divider(thickness = 25.dp)
+        Text(text = "Order by", textAlign = TextAlign.Center)
+    }
+
+    orderByList.forEach { orderBy ->
+        ButtonCreator(
+            isTouched = orderBy == selectedOrderBy,
+            onClick = {
+                viewModel.setSelectedOrderBy(orderBy)
+            },
+            text = orderBy.orderBy
+        )
+        Spacer(
+            modifier = Modifier
+                .width(8.dp)
+                .height(50.dp)
+        )
+    }
+}
+
+@Composable
+fun AddAllButton(
+    viewModel: HomeScreenViewModel,
+    isDropdownVisible: MutableState<Boolean>
+) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = {
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+
+                    viewModel.addAllParams()
+                    isDropdownVisible.value = false
+
+                }
+            },
+            modifier = Modifier.align(Alignment.BottomCenter)
+
+        ) {
+            Text(text = "Ok", color = Color.Red)
+        }
+    }
 }

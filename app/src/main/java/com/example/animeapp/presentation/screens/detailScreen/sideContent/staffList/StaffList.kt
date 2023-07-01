@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -29,18 +30,25 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import com.example.animeapp.domain.useCase.firstScreen.IsMoreThenForStaff
+import com.example.animeapp.domain.useCase.cutForStaffAndCharacters.isMoreThenTen
 import com.example.animeapp.presentation.navigation.DetailOnStaff
 import com.example.animeapp.presentation.navigation.Screen
 
 @Composable
-fun DisplayStaff(staffList: List<com.example.animeapp.domain.models.staffModel.Data>, navController: NavController) {
+fun DisplayStaff(
+    staffList: List<com.example.animeapp.domain.models.staffModel.Data>,
+    navController: NavController
+) {
     ListEditor(listData = staffList, navController = navController)
 }
 
 
 @Composable
-fun ListEditor(listData: List<com.example.animeapp.domain.models.staffModel.Data>, navController: NavController) {
+fun ListEditor(
+    listData: List<com.example.animeapp.domain.models.staffModel.Data>,
+    navController: NavController
+) {
+    val trimmedStaff = isMoreThenTen(listData)
     Text(text = "Staff", textDecoration = TextDecoration.Underline)
     Row(
         modifier = Modifier
@@ -49,8 +57,6 @@ fun ListEditor(listData: List<com.example.animeapp.domain.models.staffModel.Data
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
-        val trimmedStaff = IsMoreThenForStaff().isMoreThenTenStaff(listData)
         trimmedStaff.forEach { data ->
             val personPainter =
                 rememberAsyncImagePainter(model = data.person.images.jpg.image_url)
@@ -65,25 +71,26 @@ fun ListEditor(listData: List<com.example.animeapp.domain.models.staffModel.Data
         }
 
     }
+    Box(modifier = Modifier.fillMaxWidth(0.9f)) {
+        Text(
+            text = "More Staff",
+            textAlign = TextAlign.Left,
+            color = Color.Blue,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier.align(Alignment.BottomEnd).clickable {
 
-    Text(
-        text = "Show More",
-        textAlign = TextAlign.Right,
-        color = Color.Blue,
-        textDecoration = TextDecoration.Underline,
-        modifier = Modifier.clickable {
+                navController.navigate(DetailOnStaff.value) {
+                    // Удаление экрана ShowWholeStaff и всех экранов выше его в стеке обратной навигации
+                    popUpTo(Screen.Detail.route) {
+                        inclusive = true
+                    }
 
-            navController.navigate(DetailOnStaff.value) {
-                // Удаление экрана ShowWholeStaff и всех экранов выше его в стеке обратной навигации
-                popUpTo(Screen.Detail.route) {
-                    inclusive = true
+
                 }
 
 
-            }
-
-
-        })
+            })
+    }
 }
 
 

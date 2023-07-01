@@ -13,9 +13,6 @@ import com.example.animeapp.domain.viewModel.RandomAnimeViewModel
 import com.example.animeapp.domain.viewModel.StaffFullByIdViewModel
 import com.example.animeapp.domain.viewModel.StaffInDetailScreenViewModel
 
-
-
-
 @Suppress("UNCHECKED_CAST")
 class MyViewModelFactory(private val malApiRepository: MalApiService) : ViewModelProvider.Factory {
 

@@ -1,4 +1,4 @@
-package com.example.animeapp.presentation.detailScreen.castList
+package com.example.animeapp.presentation.screens.detailScreen.sideContent.staffList
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.TweenSpec
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -44,49 +45,38 @@ import com.example.animeapp.domain.viewModel.StaffInDetailScreenViewModel
 @Composable
 fun ShowWholeStaff(navController: NavController, viewModelProvider: ViewModelProvider) {
 
-
-    val staffState =
-        viewModelProvider[StaffInDetailScreenViewModel::class.java].staffList.collectAsStateWithLifecycle()
-
-//    Surface(modifier = Modifier.fillMaxSize()) {
-
+    val staffState = viewModelProvider[StaffInDetailScreenViewModel::class.java].staffList.collectAsStateWithLifecycle()
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 265.dp),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .fillMaxHeight(),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item { Spacer(modifier = Modifier.size(20.dp)) }
         items(staffState.value) { data ->
-            SingleStaffMember(person = data.person, positions = data.positions, navController = navController)
+            SingleStaffMember(
+                person = data.person,
+                positions = data.positions,
+                navController = navController
+            )
         }
-        item { Spacer(modifier = Modifier.size(50.dp)) }
+        item { Spacer(modifier = Modifier.height(50.dp)) }
 
     }
 
 }
-//}
 
 
 @Composable
 fun SingleStaffMember(person: Person, positions: List<String>, navController: NavController) {
-//    character.name
-//    character.images.jpg
-//    character.mal_id
-//    character.url
 
     var isVisible by remember {
         mutableStateOf(false)
     }
-
+    val painter = rememberAsyncImagePainter(model = person.images.jpg.image_url)
 
     AnimatedVisibility(
         visible = isVisible,
         enter = slideInHorizontally(
-//            initialAlpha = 0.0f,
             animationSpec = TweenSpec(durationMillis = 500)
         ),
         exit = slideOutHorizontally(
@@ -94,9 +84,7 @@ fun SingleStaffMember(person: Person, positions: List<String>, navController: Na
         )
     ) {
 
-        val painter = rememberAsyncImagePainter(model = person.images.jpg.image_url)
         Card(modifier = Modifier
-            .fillMaxSize()
             .clickable {
                 navController.navigate(route = "detail_on_staff/${person.mal_id}") {
 
@@ -130,13 +118,10 @@ fun SingleStaffMember(person: Person, positions: List<String>, navController: Na
 
     }
 
-
-
     LaunchedEffect(person) {
         isVisible = true
     }
 
-    Spacer(modifier = Modifier.size(10.dp))
 
 }
 
@@ -181,3 +166,5 @@ fun PreviewWholeStaff() {
         }
     }
 }
+
+

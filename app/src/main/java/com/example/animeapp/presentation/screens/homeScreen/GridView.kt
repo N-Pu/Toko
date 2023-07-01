@@ -45,45 +45,13 @@ import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import kotlinx.coroutines.flow.Flow
 import java.util.Locale
 
-//@Composable
-//fun GridAdder(
-//
-//    navController: NavHostController, viewModelProvider: ViewModelProvider
-//) {
-//
-//    val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
-//    val listData =
-//        viewModel.animeSearch.collectAsStateWithLifecycle()
-//    val scrollGridState = rememberLazyGridState()
-//
-//
-//// Добавить rememberScrollState
-//    LazyVerticalGrid(
-//        state = scrollGridState, // Использовать scrollState в качестве state
-//        columns = GridCells.Adaptive(minSize = 140.dp),
-//        modifier = Modifier.fillMaxSize(),
-//        horizontalArrangement = Arrangement.spacedBy(16.dp),
-//        verticalArrangement = Arrangement.spacedBy(16.dp)
-//    ) {
-//
-//        itemsIndexed(listData.value.data) { index, anime ->
-//
-//
-//            AnimeCardBox(
-//                anime = anime, navController = navController, viewModelProvider = viewModelProvider
-//            )
-//        }
-//
-//    }
-//}
-
 
 @Composable
 fun GridAdder(
     navController: NavHostController,
+    viewModel: HomeScreenViewModel,
     viewModelProvider: ViewModelProvider
 ) {
-    val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val listData = viewModel.animeSearch.collectAsStateWithLifecycle().value
     val scrollGridState = rememberLazyGridState()
     val isLoading = viewModel.isNextPageLoading.collectAsStateWithLifecycle().value
@@ -98,20 +66,19 @@ fun GridAdder(
         verticalArrangement = Arrangement.spacedBy(6.dp),
         contentPadding = PaddingValues(5.dp)
     ) {
-        itemsIndexed(listData.data) { index, anime ->
-            AnimeCardBox(
-                anime = anime,
-                navController = navController,
-                viewModelProvider = viewModelProvider
-            )
+            itemsIndexed(listData.data) { index, anime ->
+                AnimeCardBox(
+                    anime = anime,
+                    navController = navController,
+                    viewModelProvider = viewModelProvider
+                )
 
-            // Загрузка следующей страницы при достижении конца списка и has_next_page = true
-            if (index == listData.data.lastIndex && isLoading.not() && listData.pagination.has_next_page) {
-//                viewModel.loadNextPage(listData)
-                viewModel.loadNextPage()
+                // Загрузка следующей страницы при достижении конца списка и has_next_page = true
+                if (index == listData.data.lastIndex && isLoading.not() && listData.pagination.has_next_page) {
+                    viewModel.loadNextPage()
+                }
             }
         }
-    }
 }
 
 
@@ -126,17 +93,7 @@ fun AnimeCardBox(
     viewModelProvider: ViewModelProvider
 ) {
     val viewModel = viewModelProvider[IdViewModel::class.java]
-//    var isVisible by remember { mutableStateOf(false) }
     val painter = rememberAsyncImagePainter(model = anime.images.webp.image_url)
-
-//    AnimatedVisibility(
-//        visible = isVisible, enter = fadeIn(
-//            initialAlpha = 0.0f, animationSpec = TweenSpec(durationMillis = 500)
-//        ), exit = fadeOut(
-//            animationSpec = TweenSpec(durationMillis = 500)
-//
-//        )
-//    ) {
 
     Card(
         modifier = Modifier

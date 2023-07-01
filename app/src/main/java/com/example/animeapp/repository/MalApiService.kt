@@ -30,28 +30,50 @@ private const val GET_DETAILS_URL = "https://api.jikan.moe/v4/anime/"
 interface MalApiService {
 
 
-    @GET("${BASE_URL}v4/anime")
+    @GET("${BASE_URL}v4/anime?")
     suspend fun getAnimeSearchByName(
-        @Query("Sfw") sfw: Boolean = true,
+        @Query("sfw") sfw: Boolean,
         @Query("page") page: Int = 1,
         @Query("q") nameOfAnime: String,
-//        @Query("type") type: String,
-//        @Query("min_score") min_score: Float,
-//        @Query("max_score") max_score: Float,
-//        @Query("rating") rating: String,
-//        @Query("sfw") sfw: Boolean,
-//        @Query("genres") genres: String,
-//        @Query("sort") sort: String,
-//        @Query("start_date") start_date: String,
-//        @Query("end_date") end_date: String,
-    ): Response<NewAnimeSearchModel>
+        @Query("type") type: String? = null,
+        @Query("genres") genres: String = "",
+        @Query("min_score") min_score: String? = null,
+        @Query("max_score") max_score: String? = null,
+        @Query("rating") rating: String? = null,
+        @Query("order_by") orderBy: String? = null,
+        @Query("sort") sort: String? = null,
+//        @Query("start_date") start_date: String? = null,
+//        @Query("end_date") end_date: String? = null,
+    ): Response<NewAnimeSearchModel> {
+        val ratingParam = if (rating != null) "rating=$rating" else null
+        val orderByParam = if (orderBy != null) "orderBy=$orderBy" else null
+        val typeParam = if (type != null) "type=$type" else null
+        val sortParam = if (sort != null) "sort=$sort" else null
+        val minParam = if (min_score != null) "minParam=$min_score" else null
+        val maxParam = if (max_score != null) "maxParam=$max_score" else null
+//        val startDateParam = if (start_date != null) "start_date=$start_date" else null
+//        val endDateParam = if (end_date != null) "end_date=$end_date" else null
+        return try {
+            api.getAnimeSearchByName(
+                sfw,
+                page,
+                nameOfAnime,
+                typeParam,
+                genres,
+                minParam,
+                maxParam,
+                ratingParam,
+                orderByParam,
+                sortParam,
+//                startDateParam,
+//                endDateParam
+            )
+        } catch (e: HttpException) {
+            // Handle exceptions
+            throw e
+        }
+    }
 
-    //    @GET("${BASE_URL}v4/anime")
-//    suspend fun getAnimeSearchByName(
-//        @Query("page") page: Int,
-//        @Query("q") nameOfAnime: String,
-//        @Header("Cache-Control") cacheControl: CacheControl // Add cache control header
-//    ): Response<NewAnimeSearchModel>
     @GET("$GET_DETAILS_URL{id}/full")
     suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<AnimeDetailModel>
 
@@ -100,7 +122,7 @@ interface MalApiService {
                     is SocketTimeoutException, is HttpException -> {
                         retryCount++
                         Log.e("MalApiService", "Error occurred: ${e.message}")
-                        delay(10000) // задержка на 10 секунд перед повторным запросом
+                        delay(1000) // задержка на 1 секунд перед повторным запросом
                     }
 
                     else -> throw e // выбрасываем ошибку, которую не умеем обрабатывать
@@ -116,7 +138,7 @@ interface MalApiService {
 
         private val httpClient = OkHttpClient.Builder()
 
-            .connectTimeout(40, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(20, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(logging).build()
 
 

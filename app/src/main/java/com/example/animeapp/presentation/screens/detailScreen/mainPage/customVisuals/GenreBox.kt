@@ -1,9 +1,9 @@
 package com.example.animeapp.presentation.screens.detailScreen.mainPage.customVisuals
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,11 +11,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.animeapp.domain.models.detailModel.Genre
 import kotlin.random.Random
-
 
 @Composable
 fun RandomColorBox(
@@ -47,16 +47,37 @@ fun DisplayCustomGenreBoxes(genres: List<Genre>) {
         }
     }
 
-    LazyRow(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(
+                vertical = 8.dp
+            )
+
+            .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center
     ) {
-        itemsIndexed(colors.take(genres.size)) { index, color ->
+        colors.forEachIndexed { index, color ->
             if (index != 0) Spacer(modifier = Modifier.width(8.dp))
             RandomColorBox(text = genres[index].name, color = color)
         }
     }
 }
 
+
+// Пример использования
+@Preview
+@Composable
+fun ExampleUsage() {
+    val genres = listOf(
+        Genre(name = "Action", mal_id = 1, url = "d", type = "d"),
+        Genre(name = "Action", mal_id = 1, url = "d", type = "d"),
+        Genre(name = "Action", mal_id = 1, url = "d", type = "d"),
+        Genre(name = "Action", mal_id = 1, url = "d", type = "d"),
+        Genre(name = "Action", mal_id = 1, url = "d", type = "d"),
+
+
+        )
+
+    DisplayCustomGenreBoxes(genres)
+}

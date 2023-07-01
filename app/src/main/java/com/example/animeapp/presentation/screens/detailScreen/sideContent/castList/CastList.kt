@@ -1,6 +1,5 @@
 package com.example.animeapp.presentation.screens.detailScreen.sideContent.castList
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,54 +32,54 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.animeapp.domain.useCase.secondScreen.IsMoreForCharacters
+import com.example.animeapp.domain.models.castModel.Data
+import com.example.animeapp.domain.models.castModel.VoiceActor
+import com.example.animeapp.domain.useCase.cutForStaffAndCharacters.isMoreThenTen
 import com.example.animeapp.presentation.navigation.DetailOnCast
 import com.example.animeapp.presentation.navigation.Screen
 
 
 @Composable
 fun DisplayCast(
-    castList: List<com.example.animeapp.domain.models.castModel.Data>,
+    castList: List<Data>,
     navController: NavController,
     viewModelProvider: ViewModelProvider
 ) {
-    Log.d("size", castList.size.toString())
 
-    val trimmedCast = IsMoreForCharacters().isMoreThenTenCharacters(castList)
+    val trimmedCast = isMoreThenTen(castList)
     val castWithJapVoiceActors = hasJapVoiceActor(trimmedCast)
 
     Text(
         text = "Cast",
         textDecoration = TextDecoration.Underline,
-        textAlign = TextAlign.Right
     )
 
     AddCast(castList = castWithJapVoiceActors, navController = navController)
-    Text(
-        text = "Show More",
-        textAlign = TextAlign.Right,
-        color = Color.Blue,
-        textDecoration = TextDecoration.Underline,
-        modifier = Modifier.clickable {
+    Box(modifier = Modifier.fillMaxWidth(0.9f)) {
+        Text(
+            text = "More Cast",
+            textAlign = TextAlign.Left,
+            color = Color.Blue,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier.align(Alignment.BottomEnd).clickable {
 
-            navController.navigate(DetailOnCast.value) {
-                popUpTo(Screen.Detail.route) {
-                    inclusive = true
+                navController.navigate(DetailOnCast.value) {
+                    popUpTo(Screen.Detail.route) {
+                        inclusive = true
+                    }
+
                 }
 
-            }
 
-
-        })
-
+            })
+    }
 
 }
 
 @Composable
-fun AddCast(castList: List<com.example.animeapp.domain.models.castModel.Data>, navController: NavController) {
+fun AddCast(castList: List<Data>, navController: NavController) {
     Row(
         modifier = Modifier
-            .fillMaxHeight()
             .horizontalScroll(rememberScrollState())
     ) {
         castList.forEach { data ->
@@ -90,12 +90,13 @@ fun AddCast(castList: List<com.example.animeapp.domain.models.castModel.Data>, n
             Column {
 
                 Card(modifier = Modifier
-                    .size(123.dp, 150.dp)
+                    .size(123.dp, 150.dp).shadow(
+                        4.dp,
+                        shape = MaterialTheme.shapes.large,
+                        ambientColor = Color.Black.copy(alpha = 0.8f),
+                    )
                     .clickable {
-                        Log.d("character id ->", data.character.mal_id.toString())
-
                         navController.navigate(route = "detail_on_character/${data.character.mal_id}") {
-
                             popUpTo(Screen.Detail.route) {
                                 inclusive = true
                             }
@@ -151,7 +152,6 @@ fun AddCast(castList: List<com.example.animeapp.domain.models.castModel.Data>, n
                                 }
 
                             }
-                            Log.d("person id ->", voiceActor.person.mal_id.toString())
                         }) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -194,11 +194,11 @@ fun AddCast(castList: List<com.example.animeapp.domain.models.castModel.Data>, n
 }
 
 
-fun hasJapVoiceActor(castList: List<com.example.animeapp.domain.models.castModel.Data>): List<com.example.animeapp.domain.models.castModel.Data> {
+fun hasJapVoiceActor(castList: List<Data>): List<Data> {
     return castList.mapNotNull { data ->
         val japOrFirstVoiceActor = getJapOrFirstVoiceActor(data)
         if (japOrFirstVoiceActor != null) {
-            com.example.animeapp.domain.models.castModel.Data(
+       Data(
                 data.character,
                 data.role,
                 listOf(japOrFirstVoiceActor)
@@ -209,7 +209,7 @@ fun hasJapVoiceActor(castList: List<com.example.animeapp.domain.models.castModel
     }
 }
 
-fun getJapOrFirstVoiceActor(data: com.example.animeapp.domain.models.castModel.Data): com.example.animeapp.domain.models.castModel.VoiceActor? {
+fun getJapOrFirstVoiceActor(data:Data): VoiceActor? {
     return data.voice_actors.firstOrNull { it.language == "Japanese" }
         ?: data.voice_actors.firstOrNull()
 }
