@@ -42,7 +42,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -268,9 +268,11 @@ fun BottomNavigationBar(
 
 @Composable
 fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, context: Context) {
-    val coroutineScope = rememberCoroutineScope()
+//    val coroutineScope = rememberCoroutineScope()
 
-    val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
+    val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
+    val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java]
+        .animeDetails.collectAsStateWithLifecycle()
 
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     val dao = MainDb.getDb(context).getDao()
@@ -284,7 +286,8 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
     // Fetch data when the button is clicked on a specific item
     LaunchedEffect(selectedItem.value) {
         if (selectedItem.value.isNotEmpty()) {
-            coroutineScope.launch(Dispatchers.IO) {
+            detailScreenViewModel.viewModelScope.launch(Dispatchers.IO){
+//            coroutineScope.launch(Dispatchers.IO) {
                 if (selectedItem.value == "Delete") {
                     detailScreenState.value?.let { data ->
                         dao.removeFromDataBase(data.mal_id)

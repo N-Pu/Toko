@@ -81,7 +81,7 @@ fun MainScreen(
 }
 
 
-// Need to fix it later
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel) {
@@ -119,7 +119,6 @@ fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel) {
                     ShowRating(viewModel)
                     ShowTypes(viewModel)
                     ShowOrderBy(viewModel)
-//                    ScrollMe()
                     ScoreBar(viewModel = viewModel)
                     SafeFowWorkSwitch(viewModel)
 

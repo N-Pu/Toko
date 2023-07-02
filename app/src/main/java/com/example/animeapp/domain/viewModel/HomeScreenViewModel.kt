@@ -148,7 +148,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     init {
         viewModelScope.launch(Dispatchers.IO) {
             searchDebouncer.debounce(500L).distinctUntilChanged().collectLatest { searchQuery ->
-                if (searchQuery.length >= 3) {
+                if (searchQuery.length >= 2) {
                     performSearch(searchQuery)
                 } else {
                     _animeSearch.value = emptyNewAnimeSearchModel
