@@ -84,7 +84,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     }
 
 
-    private  val pre_min_score = MutableStateFlow<Score?>(null)
+    private val pre_min_score = MutableStateFlow<Score?>(null)
     private val _min_score = MutableStateFlow<Score?>(null)
 
 
@@ -92,7 +92,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
         pre_min_score.value = if (score == pre_min_score.value) null else score
     }
 
-    private  val pre_max_score = MutableStateFlow<Score?>(null)
+    private val pre_max_score = MutableStateFlow<Score?>(null)
     private val _max_score = MutableStateFlow<Score?>(null)
 
     fun setSelectedMaxScore(score: Score) {
@@ -103,8 +103,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     val selectedMinMax: MutableState<Boolean> = preSelectedMinMax
 
     private val _scoreState = mutableStateOf(0)
-     val scoreState = _scoreState
-
+    val scoreState = _scoreState
 
 
     private val _safeForWork = mutableStateOf(false)
@@ -123,11 +122,8 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     private val _typeList = MutableStateFlow(getTypes())
     val typeList: StateFlow<List<Types>> = _typeList
-
-
     private val pre_selectedType = MutableStateFlow<Types?>(null)
     val selectedType: StateFlow<Types?> = pre_selectedType
-
     private val _selectedType = MutableStateFlow<Types?>(null)
     fun setSelectedType(type: Types) {
         pre_selectedType.value = if (type == pre_selectedType.value) null else type
@@ -135,10 +131,8 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     private val _orderByList = MutableStateFlow(getOrderBy())
     val orderByList: StateFlow<List<OrderBy>> = _orderByList
-
     private val pre_selectedOrderBy = MutableStateFlow<OrderBy?>(null)
     val selectedOrderBy: StateFlow<OrderBy?> = pre_selectedOrderBy
-
     private val _selectedOrderBy = MutableStateFlow<OrderBy?>(null)
     fun setSelectedOrderBy(orderBy: OrderBy) {
         pre_selectedOrderBy.value = if (orderBy == pre_selectedOrderBy.value) null else orderBy
@@ -275,7 +269,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
             _selectedRating.value = preSelectedRating.value
         }
         val jobTypes = viewModelScope.async(Dispatchers.IO) {
-            _selectedRating.value = preSelectedRating.value
+            _selectedType.value = pre_selectedType.value
         }
         val jobOrderBy = viewModelScope.async(Dispatchers.IO) {
             _selectedOrderBy.value = pre_selectedOrderBy.value
