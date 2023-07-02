@@ -26,7 +26,7 @@ class MyViewModelFactory(private val malApiRepository: MalApiService) : ViewMode
             modelClass.isAssignableFrom(CharacterFullByIdViewModel::class.java) -> CharacterFullByIdViewModel(malApiRepository) as T
             modelClass.isAssignableFrom(CharacterPicturesViewModel::class.java) -> CharacterPicturesViewModel(malApiRepository) as T
             modelClass.isAssignableFrom(RandomAnimeViewModel::class.java)-> RandomAnimeViewModel(malApiRepository) as T
-            modelClass.isAssignableFrom(IdViewModel::class.java) -> IdViewModel() as T
+            modelClass.isAssignableFrom(IdViewModel::class.java) -> IdViewModel as T
 
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

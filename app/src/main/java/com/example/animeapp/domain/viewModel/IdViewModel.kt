@@ -5,11 +5,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
-class IdViewModel : ViewModel() {
-    //    private val _mal_Id = MutableStateFlow("")
-//    val mal_id = _mal_Id.asStateFlow()
-//
-//
+object IdViewModel : ViewModel() {
+
     private val _mal_id = MutableStateFlow(0)
     val mal_id: StateFlow<Int> = _mal_id
 

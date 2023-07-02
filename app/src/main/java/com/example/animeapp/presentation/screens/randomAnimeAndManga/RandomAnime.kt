@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,22 +37,16 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.viewModel.IdViewModel
 import com.example.animeapp.domain.viewModel.RandomAnimeViewModel
 import com.example.animeapp.presentation.navigation.Screen
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+
 
 @Composable
 fun ShowRandomScreen(navController: NavController, viewModelProvider: ViewModelProvider) {
-//    if (navController.previousBackStackEntry?.destination?.route == DetailOnCast.value){
-//        navController.popBackStack(DetailOnCast.value, inclusive = true)
-//    }
+
 
     Column(
         modifier = Modifier
-//            .fillMaxSize()
     ) {
-
         ShowRandomAnime(navController, viewModelProvider)
-
     }
 
 
@@ -64,9 +57,7 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
     val state =
         viewModelProvider[RandomAnimeViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
     val idViewModel = viewModelProvider[IdViewModel::class.java]
-    val coroutineScope = rememberCoroutineScope()
     var clicked by remember { mutableStateOf(false) }
-
     val painter =
         rememberAsyncImagePainter(model = state.value?.images?.jpg?.large_image_url)
 
@@ -127,10 +118,9 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
 
         RandomizerAnimeButton(
             onClick = {
-                coroutineScope.launch(Dispatchers.IO) {
-                    viewModelProvider[RandomAnimeViewModel::class.java].onTapRandomAnime()
-                    clicked = true
-                }
+                viewModelProvider[RandomAnimeViewModel::class.java].onTapRandomAnime()
+                clicked = true
+
             }
         )
     }
