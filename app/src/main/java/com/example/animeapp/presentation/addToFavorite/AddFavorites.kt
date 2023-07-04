@@ -15,7 +15,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +32,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
+
+
 // Function that starts when you click on
 // button "+" to add anime in 4 different
 // categories and shows dropDownMenu that
@@ -40,7 +41,6 @@ import kotlinx.coroutines.launch
 // dropped, planned, watched). User can
 // tap on them and anime that was selected
 // will be send to data base and placed in
-//
 
 @Composable
 fun AddFavorites(
@@ -53,10 +53,8 @@ fun AddFavorites(
     modifier: Modifier,
     viewModel: ViewModel
 ) {
-//    val coroutineScope = rememberCoroutineScope()
-
-    var expanded by remember { mutableStateOf(false) }
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
+    var expanded by remember { mutableStateOf(false) }
     val dao = MainDb.getDb(context).getDao()
     if (checkIdInDataBase(
             dao = dao, id = mal_id
@@ -69,28 +67,6 @@ fun AddFavorites(
     var selectedItem by remember { mutableStateOf("") }
 
     // Fetch data when the button is clicked on a specific item
-    DisposableEffect(selectedItem) {
-        if (selectedItem.isNotEmpty()) {
-            viewModel.viewModelScope.launch(Dispatchers.IO) {
-                if (selectedItem == "Delete") {
-                    dao.removeFromDataBase(mal_id)
-                } else {
-                    dao.addToCategory(
-                        AnimeItem(
-                            mal_id,
-                            anime = anime,
-                            score = score,
-                            scored_by = scoredBy,
-                            animeImage = animeImage,
-                            category = selectedItem
-                        )
-                    )
-                }
-            }
-        }
-        onDispose { expanded = false }
-    }
-
     BoxWithConstraints(
         modifier = modifier
     ) {
@@ -117,8 +93,28 @@ fun AddFavorites(
         ) {
             items.forEach { item ->
                 DropdownMenuItem(onClick = {
-                    selectedItem = item
-                    expanded = false
+                        viewModel.viewModelScope.launch(Dispatchers.IO) {
+                            selectedItem = item
+                            if (selectedItem == "Delete") {
+                                dao.removeFromDataBase(mal_id)
+                            } else {
+                                dao.addToCategory(
+                                    AnimeItem(
+                                        mal_id,
+                                        anime = anime,
+                                        score = score,
+                                        scored_by = scoredBy,
+                                        animeImage = animeImage,
+                                        category = selectedItem
+                                    )
+                                )
+                            }
+                            // on touched - dropDownMenu cancels
+                            expanded = false
+                        }
+
+
+
                 }, text = { Text(text = item) })
             }
         }

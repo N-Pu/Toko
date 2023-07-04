@@ -268,14 +268,15 @@ fun BottomNavigationBar(
     }
 }
 
+
 @Composable
 fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, context: Context) {
-
+    val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java]
         .animeDetails.collectAsStateWithLifecycle()
 
-    val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
+
     val dao = MainDb.getDb(context).getDao()
     if (checkIdInDataBase(dao = dao, id = detailScreenState.value?.mal_id ?: 0)
             .collectAsStateWithLifecycle(initialValue = false).value
@@ -286,31 +287,6 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
     var expanded by remember { mutableStateOf(false) }
     val selectedItem = remember { mutableStateOf("") }
 
-    // Fetch data when the button is clicked on a specific item
-//    DisposableEffect(selectedItem.value) {
-//            detailScreenViewModel.viewModelScope.launch(Dispatchers.IO){
-//                if (selectedItem.value == "Delete") {
-//                    detailScreenState.value?.let { data ->
-//                        dao.removeFromDataBase(data.mal_id)
-//                    }
-//                } else {
-//                    detailScreenState.value?.let { data ->
-//                        dao.addToCategory(
-//                            AnimeItem(
-//                                data.mal_id,
-//                                anime = data.title,
-//                                score = formatScore(data.score),
-//                                scored_by = formatScoredBy(data.scored_by),
-//                                animeImage = data.images.jpg.large_image_url,
-//                                category = selectedItem.value
-//                            )
-//                        )
-//                    }
-//                }
-//            }
-//       onDispose {expanded = false // Collapse the menu after an item is selected
-//    }
-//}
     AnimatedVisibility(
         visible = showButton,
         enter = slideInVertically(
@@ -339,7 +315,6 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
         }
     }
 
-    if (expanded) {
         Box(
             modifier = Modifier
                 .width(IntrinsicSize.Min)
@@ -349,7 +324,7 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
             contentAlignment = Alignment.BottomEnd
         ) {
             DropdownMenu(
-                expanded = true,
+                expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
                 items.forEach { item ->
@@ -375,6 +350,8 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
                                         )
                                     }
                                 }
+                                // on touched - dropDownMenu cancels
+                                expanded = false
                             }
                         },
                         text = {
@@ -383,7 +360,7 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
                 }
             }
         }
-    }
+
 }
 
 @Preview
