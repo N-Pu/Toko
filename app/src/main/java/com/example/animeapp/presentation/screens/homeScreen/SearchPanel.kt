@@ -132,9 +132,6 @@ fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel) {
 @Composable
 fun SafeFowWorkSwitch(viewModel: HomeScreenViewModel) {
 
-//    var sfw1  by remember {
-//        mutableStateOf(false)
-//    }
     var sfw by viewModel.safeForWork
     Box(contentAlignment = Alignment.Center) {
         Divider(thickness = 25.dp)
@@ -143,7 +140,6 @@ fun SafeFowWorkSwitch(viewModel: HomeScreenViewModel) {
     Box {
         Switch(checked = sfw, onCheckedChange = {
             sfw = it
-//            sfw.value = it
         })
     }
 }
@@ -189,9 +185,6 @@ fun ScoreBar(
 
                                     viewModel.setSelectedMinScore(Score(getStateScore(ratingState).minScore))
                                     viewModel.setSelectedMaxScore(Score(getStateScore(ratingState).maxScore))
-//                                    viewModel.min_score = getStateScore(ratingState).minScore
-//                                    viewModel.max_score = getStateScore(ratingState).maxScore
-
                                     Log.d(
                                         "SCORES",
                                         "MIN->" + getStateScore(ratingState).minScore + " MAX->" + getStateScore(
@@ -201,9 +194,6 @@ fun ScoreBar(
                                 } else {
                                     selected = true
                                     ratingState = i
-
-//                                    viewModel.min_score = getStateScore(ratingState).minScore
-//                                    viewModel.max_score = getStateScore(ratingState).maxScore
                                     viewModel.setSelectedMinScore(Score(getStateScore(ratingState).minScore))
                                     viewModel.setSelectedMaxScore(Score(getStateScore(ratingState).maxScore))
                                     Log.d(
@@ -303,7 +293,9 @@ fun ShowRating(viewModel: HomeScreenViewModel) {
         ButtonCreator(
             isTouched = rating == selectedRating,
             onClick = {
-                viewModel.setSelectedRating(rating)
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    viewModel.setSelectedRating(rating)
+                }
             },
             text = rating.ratingName
         )
@@ -329,7 +321,9 @@ fun ShowTypes(viewModel: HomeScreenViewModel) {
         ButtonCreator(
             isTouched = type == selectedType,
             onClick = {
-                viewModel.setSelectedType(type)
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    viewModel.setSelectedType(type)
+                }
             },
             text = type.typeName
         )
@@ -355,7 +349,9 @@ fun ShowOrderBy(viewModel: HomeScreenViewModel) {
         ButtonCreator(
             isTouched = orderBy == selectedOrderBy,
             onClick = {
-                viewModel.setSelectedOrderBy(orderBy)
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    viewModel.setSelectedOrderBy(orderBy)
+                }
             },
             text = orderBy.orderBy
         )

@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -42,7 +43,9 @@ import com.example.animeapp.dao.Dao
 import com.example.animeapp.presentation.theme.LightYellow
 import com.example.animeapp.domain.viewModel.IdViewModel
 import com.example.animeapp.presentation.addToFavorite.AddFavorites
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 
@@ -66,23 +69,20 @@ fun GridAdder(
         verticalArrangement = Arrangement.spacedBy(6.dp),
         contentPadding = PaddingValues(5.dp)
     ) {
-            itemsIndexed(listData.data) { index, anime ->
-                AnimeCardBox(
-                    anime = anime,
-                    navController = navController,
-                    viewModelProvider = viewModelProvider
-                )
+        itemsIndexed(listData.data) { index, anime ->
+            AnimeCardBox(
+                anime = anime,
+                navController = navController,
+                viewModelProvider = viewModelProvider
+            )
 
-                // Загрузка следующей страницы при достижении конца списка и has_next_page = true
-                if (index == listData.data.lastIndex && isLoading.not() && listData.pagination.has_next_page) {
-                    viewModel.loadNextPage()
-                }
+            // Загрузка следующей страницы при достижении конца списка и has_next_page = true
+            if (index == listData.data.lastIndex && isLoading.not() && listData.pagination.has_next_page) {
+                viewModel.loadNextPage()
             }
         }
+    }
 }
-
-
-
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -99,10 +99,12 @@ fun AnimeCardBox(
         modifier = Modifier
             .clip(RoundedCornerShape(6.dp))
             .clickable {
-                viewModel.setId(anime.mal_id)
-                navigateToDetailScreen(
-                    navController, anime.mal_id
-                )
+                viewModel.viewModelScope.launch(Dispatchers.Main) {
+                    viewModel.setId(anime.mal_id)
+                    navigateToDetailScreen(
+                        navController, anime.mal_id
+                    )
+                }
             },
         colors = CardDefaults.cardColors(containerColor = LightYellow),
         shape = RectangleShape,
