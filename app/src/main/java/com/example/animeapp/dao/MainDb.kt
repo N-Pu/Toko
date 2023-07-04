@@ -25,7 +25,7 @@ abstract class MainDb : RoomDatabase() {
                         context.applicationContext,
                         MainDb::class.java,
                         "MainDb.db"
-                    ).build()
+                    ).fallbackToDestructiveMigration().build()
                 }
 
                 val dbPath = context.getDatabasePath("MainDb.db").absolutePath

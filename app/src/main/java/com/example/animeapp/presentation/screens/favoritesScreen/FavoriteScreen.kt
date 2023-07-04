@@ -258,7 +258,8 @@ fun FavoriteScreenCardBox(
                     context = LocalContext.current,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(end = 6.dp, top = 180.dp)
+                        .padding(end = 6.dp, top = 180.dp),
+                    viewModel = viewModel
                 )
             }
             Text(

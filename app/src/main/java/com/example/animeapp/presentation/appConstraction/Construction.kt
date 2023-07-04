@@ -88,6 +88,7 @@ fun TokoAppActivator(
 //            CharacterDetail.value,
 //            StaffDetail.value
             -> true
+
             else -> false
         }
     }
@@ -98,7 +99,11 @@ fun TokoAppActivator(
         )
     }, floatingActionButton = {
 
-        MyFloatingButton( showButton = showButton, context = context, viewModelProvider = viewModelProvider)
+        MyFloatingButton(
+            showButton = showButton,
+            context = context,
+            viewModelProvider = viewModelProvider
+        )
 
     }, floatingActionButtonPosition = FabPosition.Center, content = { padding ->
         padding.calculateTopPadding()
@@ -113,9 +118,6 @@ fun TokoAppActivator(
     }
 
 }
-
-
-
 
 
 @Composable
@@ -268,7 +270,6 @@ fun BottomNavigationBar(
 
 @Composable
 fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, context: Context) {
-//    val coroutineScope = rememberCoroutineScope()
 
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java]
@@ -276,7 +277,9 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
 
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     val dao = MainDb.getDb(context).getDao()
-    if (checkIdInDataBase(dao = dao, id = detailScreenState.value?.mal_id ?: 0).collectAsStateWithLifecycle(initialValue = false).value) {
+    if (checkIdInDataBase(dao = dao, id = detailScreenState.value?.mal_id ?: 0)
+            .collectAsStateWithLifecycle(initialValue = false).value
+    ) {
         items.add(4, "Delete")
     }
 
@@ -284,33 +287,30 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
     val selectedItem = remember { mutableStateOf("") }
 
     // Fetch data when the button is clicked on a specific item
-    LaunchedEffect(selectedItem.value) {
-        if (selectedItem.value.isNotEmpty()) {
-            detailScreenViewModel.viewModelScope.launch(Dispatchers.IO){
-//            coroutineScope.launch(Dispatchers.IO) {
-                if (selectedItem.value == "Delete") {
-                    detailScreenState.value?.let { data ->
-                        dao.removeFromDataBase(data.mal_id)
-                    }
-                } else {
-                    detailScreenState.value?.let { data ->
-                        dao.addToCategory(
-                            AnimeItem(
-                                data.mal_id,
-                                anime = data.title,
-                                score = formatScore(data.score),
-                                scored_by = formatScoredBy(data.scored_by),
-                                animeImage = data.images.jpg.large_image_url,
-                                category = selectedItem.value
-                            )
-                        )
-                    }
-                }
-            }
-        }
-        expanded = false // Collapse the menu after an item is selected
-    }
-
+//    DisposableEffect(selectedItem.value) {
+//            detailScreenViewModel.viewModelScope.launch(Dispatchers.IO){
+//                if (selectedItem.value == "Delete") {
+//                    detailScreenState.value?.let { data ->
+//                        dao.removeFromDataBase(data.mal_id)
+//                    }
+//                } else {
+//                    detailScreenState.value?.let { data ->
+//                        dao.addToCategory(
+//                            AnimeItem(
+//                                data.mal_id,
+//                                anime = data.title,
+//                                score = formatScore(data.score),
+//                                scored_by = formatScoredBy(data.scored_by),
+//                                animeImage = data.images.jpg.large_image_url,
+//                                category = selectedItem.value
+//                            )
+//                        )
+//                    }
+//                }
+//            }
+//       onDispose {expanded = false // Collapse the menu after an item is selected
+//    }
+//}
     AnimatedVisibility(
         visible = showButton,
         enter = slideInVertically(
@@ -323,7 +323,12 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
         ) + fadeOut(animationSpec = tween(durationMillis = 500))
     ) {
         FloatingActionButton(
-            onClick = { expanded = !expanded },
+            onClick = {
+                detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                    expanded = !expanded
+                }
+
+            },
             containerColor = MaterialTheme.colorScheme.secondary
         ) {
             if (expanded) {
@@ -350,11 +355,31 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
                 items.forEach { item ->
                     DropdownMenuItem(
                         onClick = {
-                            selectedItem.value = item
+                            detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                selectedItem.value = item
+                                if (selectedItem.value == "Delete") {
+                                    detailScreenState.value?.let { data ->
+                                        dao.removeFromDataBase(data.mal_id)
+                                    }
+                                } else {
+                                    detailScreenState.value?.let { data ->
+                                        dao.addToCategory(
+                                            AnimeItem(
+                                                data.mal_id,
+                                                anime = data.title,
+                                                score = formatScore(data.score),
+                                                scored_by = formatScoredBy(data.scored_by),
+                                                animeImage = data.images.jpg.large_image_url,
+                                                category = selectedItem.value
+                                            )
+                                        )
+                                    }
+                                }
+                            }
                         },
-                   text =  {
+                        text = {
                             Text(text = item)
-                        } )
+                        })
                 }
             }
         }

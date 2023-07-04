@@ -174,7 +174,8 @@ fun AnimeCardBox(
                 animeImage = anime.images.jpg.image_url,
                 context = LocalContext.current,
                 modifier = Modifier
-                    .padding(end = 6.dp, top = 140.dp)
+                    .padding(end = 6.dp, top = 140.dp),
+                viewModel = viewModel
             )
 
 

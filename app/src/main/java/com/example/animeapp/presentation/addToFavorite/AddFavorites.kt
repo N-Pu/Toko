@@ -15,15 +15,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import com.example.animeapp.dao.AnimeItem
 import com.example.animeapp.dao.MainDb
 import com.example.animeapp.presentation.screens.homeScreen.checkIdInDataBase
@@ -49,9 +50,10 @@ fun AddFavorites(
     scoredBy: String,
     animeImage: String,
     context: Context,
-    modifier: Modifier
+    modifier: Modifier,
+    viewModel: ViewModel
 ) {
-    val coroutineScope = rememberCoroutineScope()
+//    val coroutineScope = rememberCoroutineScope()
 
     var expanded by remember { mutableStateOf(false) }
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
@@ -67,9 +69,9 @@ fun AddFavorites(
     var selectedItem by remember { mutableStateOf("") }
 
     // Fetch data when the button is clicked on a specific item
-    LaunchedEffect(selectedItem) {
+    DisposableEffect(selectedItem) {
         if (selectedItem.isNotEmpty()) {
-            coroutineScope.launch(Dispatchers.IO) {
+            viewModel.viewModelScope.launch(Dispatchers.IO) {
                 if (selectedItem == "Delete") {
                     dao.removeFromDataBase(mal_id)
                 } else {
@@ -86,6 +88,7 @@ fun AddFavorites(
                 }
             }
         }
+        onDispose { expanded = false }
     }
 
     BoxWithConstraints(
