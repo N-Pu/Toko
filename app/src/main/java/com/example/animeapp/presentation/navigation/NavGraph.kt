@@ -9,15 +9,15 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.animeapp.presentation.screens.favoritesScreen.Fav
+import com.example.animeapp.presentation.screens.detailScreen.mainPage.ActivateDetailScreen
 import com.example.animeapp.presentation.screens.homeScreen.MainScreen
 import com.example.animeapp.presentation.screens.randomAnimeAndManga.ShowRandomScreen
 import com.example.animeapp.presentation.screens.noId.NoId
-import com.example.animeapp.presentation.screens.detailScreen.mainPage.DetailScreen
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.castList.ShowWholeCast
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.staffList.ShowWholeStaff
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.characterFull.DisplayCharacterFromId
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.staffMemberFull.DisplayStaffMemberFromId
+import com.example.animeapp.presentation.screens.favoritesScreen.FavoriteScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController, viewModelProvider: ViewModelProvider) {
@@ -32,11 +32,14 @@ fun SetupNavGraph(navController: NavHostController, viewModelProvider: ViewModel
             })
         ) { backStackEntry ->
             val id = backStackEntry.arguments!!.getInt("id")
-            DetailScreen(navController = navController, viewModelProvider = viewModelProvider)
+            ActivateDetailScreen(
+                navController = navController,
+                viewModelProvider = viewModelProvider
+            )
             Log.d("CATCHED ID = ", id.toString())
         }
         composable(route = Screen.Favorites.route) {
-            Fav(
+            FavoriteScreen(
                 navController = navController,
                 viewModelProvider = viewModelProvider
             )

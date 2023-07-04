@@ -3,6 +3,7 @@ package com.example.animeapp.presentation.screens.detailScreen.mainPage
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
@@ -53,8 +55,7 @@ import java.lang.IllegalStateException
 @Composable
 fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
-    navController: NavController,
-
+    navController: NavController
     ) {
 
     val id by viewModelProvider[IdViewModel::class.java].mal_id.collectAsStateWithLifecycle()
@@ -316,5 +317,22 @@ fun Title(title: String) {
             fontWeight = FontWeight.Bold,
             color = Color.Black
         ), textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+fun DisplayPicture(painter: AsyncImagePainter, height: Float
+) {
+
+    Image(
+        painter = painter,
+        contentDescription = "Big anime picture",
+
+        contentScale = ContentScale.Fit,
+        modifier = Modifier.fillMaxWidth().height(height.dp)
+//            .defaultMinSize(minWidth = 800.dp, minHeight = 250.dp)
+//            .size(height = height, width = width)
+        ,
+        alignment = Alignment.TopCenter,
     )
 }

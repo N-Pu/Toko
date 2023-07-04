@@ -57,11 +57,6 @@ import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import com.example.animeapp.presentation.screens.homeScreen.navigateToDetailScreen
 import com.example.animeapp.presentation.theme.LightYellow
 
-@Composable
-fun Fav(navController: NavController, viewModelProvider: ViewModelProvider) {
-    AnimeListScreen(navController = navController, viewModelProvider = viewModelProvider)
-}
-
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewFavoriteScreen() {
@@ -75,7 +70,7 @@ enum class AnimeListType {
 // Function that creates 4 grid sections
 // - watching, planned, watched, dropped
 @Composable
-fun AnimeListScreen(navController: NavController, viewModelProvider: ViewModelProvider) {
+fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelProvider) {
     var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
     val dao = MainDb.getDb(LocalContext.current).getDao()
     val scrollState = rememberLazyGridState()
@@ -228,7 +223,9 @@ fun FavoriteScreenCardBox(
         modifier = Modifier
             .clip(RoundedCornerShape(6.dp))
             .clickable {
-                animeItem.id?.let { viewModel.setId(it) }
+                animeItem.id?.let {
+                    viewModel.setId(it)
+                }
                 animeItem.id?.let {
                     navigateToDetailScreen(navController, it)
                 }
