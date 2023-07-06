@@ -13,6 +13,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DetailScreenViewModel(private val malApiService: MalApiService) : ViewModel() {
+
+    //detailData
     private val _animeDetails = MutableStateFlow<Data?>(null)
     val animeDetails: StateFlow<Data?> get() = _animeDetails
     private val loadedIds = mutableSetOf<Int>()
@@ -21,7 +23,7 @@ class DetailScreenViewModel(private val malApiService: MalApiService) : ViewMode
     private val _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
 
-    fun onTapAnime(id: Int) {
+    suspend fun onTapAnime(id: Int) {
 
         viewModelScope.launch(Dispatchers.IO) {
 
@@ -51,6 +53,76 @@ class DetailScreenViewModel(private val malApiService: MalApiService) : ViewMode
                 Log.e("DetailScreenViewModel", e.message.toString())
             } finally {
                 _isSearching.value = false
+            }
+        }
+    }
+
+
+
+
+    //staff
+    private val staffCache = mutableMapOf<Int, List<com.example.animeapp.domain.models.staffModel.Data>>()
+    private val _staffList = MutableStateFlow<List<com.example.animeapp.domain.models.staffModel.Data>>(emptyList())
+    val staffList = _staffList.asStateFlow()
+
+   suspend fun addStaffFromId(id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val cachedStaff = staffCache[id]
+            if (cachedStaff != null) {
+                _staffList.value = cachedStaff
+                return@launch
+            }
+
+            try {
+                viewModelScope.launch(Dispatchers.IO) {
+//                withContext(Dispatchers.IO) {
+                    val response = malApiService.getStaffFromId(id)
+                    if (response.isSuccessful) {
+                        val staff = response.body()?.data ?: emptyList()
+                        staffCache[id] = staff
+                        _staffList.value = staff
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("StaffViewModel", e.message.toString())
+            } finally {
+                if (_staffList.value.isEmpty()) {
+                    _staffList.value = emptyList()
+                }
+            }
+        }
+    }
+
+
+    // cast
+    private val castCache = mutableMapOf<Int, List<com.example.animeapp.domain.models.castModel.Data>>()
+    private val _castList = MutableStateFlow<List<com.example.animeapp.domain.models.castModel.Data>>(emptyList())
+    val castList = _castList.asStateFlow()
+
+    suspend fun addCastFromId(id: Int) {
+        val cachedCharacters = castCache[id]
+        if (cachedCharacters != null) {
+            _castList.value = cachedCharacters
+            return
+        }
+
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val response = malApiService.getCharactersFromId(id)
+                    if (response.isSuccessful) {
+                        val characters = response.body()?.data ?: emptyList()
+                        castCache[id] = characters
+                        _castList.value = characters
+                    } else if (response.code() == 404) {
+                        // если получен ответ 404, присваиваем пустой список
+                        _castList.value = emptyList()
+                    }
+                } catch (e: Exception) {
+                    Log.e("CastInDetailScreenViewModel", e.message.toString())
+                    // если произошла ошибка, присваиваем пустой список
+                    _castList.value = emptyList()
+                }
             }
         }
     }

@@ -38,14 +38,13 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.example.animeapp.domain.models.detailModel.Genre
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.castList.DisplayCast
 import com.example.animeapp.presentation.screens.detailScreen.mainPage.customVisuals.DisplayCustomGenreBoxes
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.staffList.DisplayStaff
-import com.example.animeapp.domain.viewModel.CastInDetailScreenViewModel
 import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.domain.viewModel.IdViewModel
-import com.example.animeapp.domain.viewModel.StaffInDetailScreenViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -56,32 +55,28 @@ import java.lang.IllegalStateException
 fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
     navController: NavController
-    ) {
-
+) {
+    val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val id by viewModelProvider[IdViewModel::class.java].mal_id.collectAsStateWithLifecycle()
-    val isSearching by viewModelProvider[DetailScreenViewModel::class.java].isSearching.collectAsStateWithLifecycle()
-    val collectDetailData =
-        viewModelProvider[DetailScreenViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
-    val detailData = collectDetailData.value
 
-    val collectStaffData =
-        viewModelProvider[StaffInDetailScreenViewModel::class.java].staffList.collectAsStateWithLifecycle()
-    val staffData = collectStaffData.value
+    val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
 
-    val collectCastData =
-        viewModelProvider[CastInDetailScreenViewModel::class.java].castList.collectAsStateWithLifecycle()
-    val castData = collectCastData.value
+    val detailData by
+    viewModel.animeDetails.collectAsStateWithLifecycle()
+
+    val castData by viewModel.castList.collectAsStateWithLifecycle()
+    val staffData by viewModel.staffList.collectAsStateWithLifecycle()
 
 
     var maxHeight1: Float
 
     LaunchedEffect(id) {
         withContext(Dispatchers.IO) {
-            viewModelProvider[DetailScreenViewModel::class.java].onTapAnime(id)
+            viewModel.onTapAnime(id)
             delay(300)
-            viewModelProvider[StaffInDetailScreenViewModel::class.java].addStaffFromId(id)
+            viewModel.addStaffFromId(id)
             delay(300)
-            viewModelProvider[CastInDetailScreenViewModel::class.java].addCastFromId(id)
+            viewModel.addCastFromId(id)
 
         }
     }
@@ -105,7 +100,8 @@ fun ActivateDetailScreen(
         ) {
 
 
-            BoxWithConstraints( modifier = Modifier.fillMaxWidth(),
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.TopCenter
             ) {
 
@@ -118,15 +114,16 @@ fun ActivateDetailScreen(
                     600f
                 }
 
-                DisplayPicture(painter = painter, height = maxHeight1
+                DisplayPicture(
+                    painter = painter, height = maxHeight1
                 )
 
             }
 
-            Title(title = detailData.title)
-            DisplayCustomGenreBoxes(genres = detailData.genres)
+            Title(title = detailData?.title ?: "Nothing")
+            DisplayCustomGenreBoxes(genres = detailData?.genres ?: listOf(Genre(mal_id = 0,"Nothing","None", "None")))
 
-            ExpandableText(text = detailData.synopsis ?: "")
+            ExpandableText(text = detailData?.synopsis ?: "Nothing")
 
 
             if (castData.isNotEmpty()) {
@@ -146,93 +143,93 @@ fun ActivateDetailScreen(
 
             // ДОБАВИТЬ КАРТИНКУ СТУДИИ И ПЕРЕХОД НА ЭЭЭ ИХ ДАННЫЕ mal_id
             Text(text = "STUDIOS:")
-            detailData.studios.forEach {
+            detailData?.studios?.forEach {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = it.name + it.mal_id)
-                
+
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "background: " + detailData.background)
+            Text(text = "background: " + (detailData?.background ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "broadcast: " + detailData.broadcast.string)
+            Text(text = "broadcast: " + (detailData?.broadcast?.string ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "duration: " + detailData.duration)
+            Text(text = "duration: " + detailData?.duration)
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "episodes: " + detailData.episodes.toString())
+            Text(text = "episodes: " + detailData?.episodes.toString())
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "favorites: " + detailData.favorites.toString())
+            Text(text = "favorites: " + detailData?.favorites.toString())
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "members: " + detailData.members.toString())
+            Text(text = "members: " + detailData?.members.toString())
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "popularity: " + detailData.popularity.toString())
+            Text(text = "popularity: " + detailData?.popularity.toString())
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "rank: " + detailData.rank.toString())
+            Text(text = "rank: " + detailData?.rank.toString())
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "rating: " + detailData.rating)
+            Text(text = "rating: " + (detailData?.rating ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "season: " + detailData.season)
+            Text(text = "season: " + (detailData?.season ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "source: " + detailData.source)
+            Text(text = "source: " + (detailData?.source ?: "None" ))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "status: " + detailData.status)
+            Text(text = "status: " + (detailData?.status ?:"None" ))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "title: " + detailData.title)
+            Text(text = "title: " + (detailData?.title ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "english title: " + detailData.title_english)
+            Text(text = "english title: " + (detailData?.title_english ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "jap title: " + detailData.title_japanese)
+            Text(text = "jap title: " + (detailData?.title_japanese ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "trailer url =" + detailData.trailer.url +
-                        "id " + detailData.trailer.youtube_id
+                text = "trailer url =" + (detailData?.trailer?.url ?: "None") +
+                        "id " + (detailData?.trailer?.youtube_id ?: "None")
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "approved :" + detailData.type)
+            Text(text = "approved :" + (detailData?.type ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "url :" + detailData.url)
+            Text(text = "url :" + (detailData?.url ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "year :" + detailData.year.toString())
+            Text(text = "year :" + detailData?.year.toString())
             Spacer(modifier = Modifier.height(16.dp))
 
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "title_synonyms", textDecoration = TextDecoration.Underline)
-            detailData.title_synonyms.forEach { // well, okay
+            detailData?.title_synonyms?.forEach { // well, okay
                 Text(text = it)
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "demographics", textDecoration = TextDecoration.Underline)
-            detailData.demographics.forEach { // idk
+            detailData?.demographics?.forEach { // idk
                 Text(text = it.name)
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "licensors", textDecoration = TextDecoration.Underline)
-            detailData.licensors.forEach { Text(text = it.name) } //  companies that produce this animes on english television
+            detailData?.licensors?.forEach { Text(text = it.name) } //  companies that produce this animes on english television
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "producers", textDecoration = TextDecoration.Underline)
-            detailData.producers.forEach { // producer companies
+            detailData?.producers?.forEach { // producer companies
                 Text(text = it.name)
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "studios", textDecoration = TextDecoration.Underline)
-            detailData.studios.forEach { //студии
+            detailData?.studios?.forEach { //студии
                 Text(text = it.name)
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "explicit_genres", textDecoration = TextDecoration.Underline)
-            detailData.explicit_genres.forEach {
+            detailData?.explicit_genres?.forEach {
                 Text(text = it.name)
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "themes", textDecoration = TextDecoration.Underline)
-            detailData.themes.forEach {
+            detailData?.themes?.forEach {
                 Text(text = it.name)
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "titles", textDecoration = TextDecoration.Underline)
-            detailData.titles.forEach {
+            detailData?.titles?.forEach {
                 Text(text = it.title)
             }
 
@@ -302,8 +299,6 @@ fun ExpandableText(text: String) {
 }
 
 
-
-
 @Composable
 fun Title(title: String) {
     Text(
@@ -321,7 +316,8 @@ fun Title(title: String) {
 }
 
 @Composable
-fun DisplayPicture(painter: AsyncImagePainter, height: Float
+fun DisplayPicture(
+    painter: AsyncImagePainter, height: Float
 ) {
 
     Image(
@@ -329,10 +325,11 @@ fun DisplayPicture(painter: AsyncImagePainter, height: Float
         contentDescription = "Big anime picture",
 
         contentScale = ContentScale.Fit,
-        modifier = Modifier.fillMaxWidth().height(height.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height.dp),
 //            .defaultMinSize(minWidth = 800.dp, minHeight = 250.dp)
 //            .size(height = height, width = width)
-        ,
         alignment = Alignment.TopCenter,
     )
 }

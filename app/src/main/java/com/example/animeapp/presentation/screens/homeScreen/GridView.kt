@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,9 +56,9 @@ fun GridAdder(
     viewModel: HomeScreenViewModel,
     viewModelProvider: ViewModelProvider
 ) {
-    val listData = viewModel.animeSearch.collectAsStateWithLifecycle().value
+    val listData by viewModel.animeSearch.collectAsStateWithLifecycle()
     val scrollGridState = rememberLazyGridState()
-    val isLoading = viewModel.isNextPageLoading.collectAsStateWithLifecycle().value
+    val isLoading by viewModel.isNextPageLoading.collectAsStateWithLifecycle()
 
 
 
@@ -73,7 +74,8 @@ fun GridAdder(
             AnimeCardBox(
                 anime = anime,
                 navController = navController,
-                viewModelProvider = viewModelProvider
+//                viewModelProvider = viewModelProvider,
+                viewModel = viewModelProvider[IdViewModel::class.java]
             )
 
             // Загрузка следующей страницы при достижении конца списка и has_next_page = true
@@ -90,9 +92,9 @@ fun GridAdder(
 fun AnimeCardBox(
     anime: com.example.animeapp.domain.models.newAnimeSearchModel.Data,
     navController: NavController,
-    viewModelProvider: ViewModelProvider
+    viewModel: IdViewModel
 ) {
-    val viewModel = viewModelProvider[IdViewModel::class.java]
+//    val viewModel = viewModelProvider[IdViewModel::class.java]
     val painter = rememberAsyncImagePainter(model = anime.images.webp.image_url)
 
     Card(

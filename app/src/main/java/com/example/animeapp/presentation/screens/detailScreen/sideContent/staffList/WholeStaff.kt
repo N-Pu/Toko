@@ -32,27 +32,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.R
 import com.example.animeapp.domain.models.staffModel.Person
+import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.navigation.Screen
-import com.example.animeapp.domain.viewModel.StaffInDetailScreenViewModel
 
 
 @Composable
-fun ShowWholeStaff(navController: NavController, viewModelProvider: ViewModelProvider) {
+fun ShowWholeStaff(navController: NavController, viewModel: DetailScreenViewModel) {
 
-    val staffState = viewModelProvider[StaffInDetailScreenViewModel::class.java].staffList.collectAsStateWithLifecycle()
+    val staffState by viewModel.staffList.collectAsStateWithLifecycle()
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 265.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(staffState.value) { data ->
+        items(staffState) { data ->
             SingleStaffMember(
                 person = data.person,
                 positions = data.positions,

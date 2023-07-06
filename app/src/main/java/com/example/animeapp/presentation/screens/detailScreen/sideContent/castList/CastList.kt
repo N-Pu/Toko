@@ -61,17 +61,17 @@ fun DisplayCast(
             textAlign = TextAlign.Left,
             color = Color.Blue,
             textDecoration = TextDecoration.Underline,
-            modifier = Modifier.align(Alignment.BottomEnd).clickable {
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .clickable {
 
-                navController.navigate(DetailOnCast.value) {
-                    popUpTo(Screen.Detail.route) {
-                        inclusive = true
+                    navController.navigate(DetailOnCast.value) {
+                        popUpTo(Screen.Detail.route) {
+                            inclusive = true
+                        }
                     }
 
-                }
-
-
-            })
+                })
     }
 
 }
@@ -90,7 +90,8 @@ fun AddCast(castList: List<Data>, navController: NavController) {
             Column {
 
                 Card(modifier = Modifier
-                    .size(123.dp, 150.dp).shadow(
+                    .size(123.dp, 150.dp)
+                    .shadow(
                         4.dp,
                         shape = MaterialTheme.shapes.large,
                         ambientColor = Color.Black.copy(alpha = 0.8f),
@@ -198,7 +199,7 @@ fun hasJapVoiceActor(castList: List<Data>): List<Data> {
     return castList.mapNotNull { data ->
         val japOrFirstVoiceActor = getJapOrFirstVoiceActor(data)
         if (japOrFirstVoiceActor != null) {
-       Data(
+            Data(
                 data.character,
                 data.role,
                 listOf(japOrFirstVoiceActor)
@@ -209,7 +210,7 @@ fun hasJapVoiceActor(castList: List<Data>): List<Data> {
     }
 }
 
-fun getJapOrFirstVoiceActor(data:Data): VoiceActor? {
+fun getJapOrFirstVoiceActor(data: Data): VoiceActor? {
     return data.voice_actors.firstOrNull { it.language == "Japanese" }
         ?: data.voice_actors.firstOrNull()
 }

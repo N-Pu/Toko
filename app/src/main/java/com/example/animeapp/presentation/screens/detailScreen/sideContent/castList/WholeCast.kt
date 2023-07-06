@@ -23,6 +23,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -30,26 +31,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.models.castModel.Character
 import com.example.animeapp.domain.models.castModel.Person
+import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.navigation.DetailOnCast
 import com.example.animeapp.presentation.navigation.Screen
-import com.example.animeapp.domain.viewModel.CastInDetailScreenViewModel
 import com.example.animeapp.presentation.theme.LightYellow
 
 
 @Composable
-fun ShowWholeCast(navController: NavController, viewModelProvider: ViewModelProvider) {
+fun ShowWholeCast(navController: NavController, viewModel: DetailScreenViewModel) {
 
-    val castList =
-        viewModelProvider[CastInDetailScreenViewModel::class.java].castList.collectAsStateWithLifecycle()
+    val castList by
+        viewModel.castList.collectAsStateWithLifecycle()
 
     LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        itemsIndexed(castList.value) { _, data ->
+        itemsIndexed(castList) { _, data ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SingleCharacterMember(
                     character = data.character,

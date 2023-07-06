@@ -63,6 +63,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        navController.popBackStack()
+//        println("STACK IS POPED")
+//    }
     private fun noTitleBarAndSplashScreenActivator() {
         window.navigationBarColor = LightYellow.toArgb()
         requestWindowFeature(Window.FEATURE_NO_TITLE) // Undo topBar

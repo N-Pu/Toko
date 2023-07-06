@@ -13,3 +13,6 @@ fun <T>isMoreThenTen(staffList: List<T>): List<T> {
     }
 
 
+//fun <T>isMoreThenTen(staffList: List<T>): Boolean {
+//    return staffList.size >= 10
+//}

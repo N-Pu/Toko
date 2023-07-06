@@ -9,6 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.screens.detailScreen.mainPage.ActivateDetailScreen
 import com.example.animeapp.presentation.screens.homeScreen.MainScreen
 import com.example.animeapp.presentation.screens.randomAnimeAndManga.ShowRandomScreen
@@ -52,10 +53,10 @@ fun SetupNavGraph(navController: NavHostController, viewModelProvider: ViewModel
         }
         composable(route = Nothing.value) { NoId(navController) }
         composable(route = DetailOnCast.value) {
-            ShowWholeCast(navController, viewModelProvider)
+            ShowWholeCast(navController,  viewModelProvider[DetailScreenViewModel::class.java])
         }
         composable(route = DetailOnStaff.value) {
-            ShowWholeStaff(navController, viewModelProvider)
+            ShowWholeStaff(navController, viewModelProvider[DetailScreenViewModel::class.java])
         }
         composable(
             route = CharacterDetail.value,

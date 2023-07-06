@@ -225,10 +225,11 @@ fun FavoriteScreenCardBox(
             .clickable {
                 animeItem.id?.let {
                     viewModel.setId(it)
-                }
-                animeItem.id?.let {
                     navigateToDetailScreen(navController, it)
                 }
+//                animeItem.id?.let {
+
+//                }
             },
         colors = CardDefaults.cardColors(containerColor = LightYellow),
         shape = RectangleShape
