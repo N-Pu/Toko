@@ -18,7 +18,7 @@ class CharacterFullByIdViewModel(private val malApiService: MalApiService) : Vie
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
-    fun getCharacterFromId(malId: Int) {
+   suspend fun getCharacterFromId(malId: Int) {
         val cachedCharacter = charactersCache[malId]
         if (cachedCharacter != null) {
             _characterFull.value = cachedCharacter
@@ -42,5 +42,33 @@ class CharacterFullByIdViewModel(private val malApiService: MalApiService) : Vie
                 }
             }
         }
+
+
+    //character album
+    private val picturesCache = mutableMapOf<Int, List<com.example.animeapp.domain.models.characterPictures.Data>>()
+    private val _picturesList = MutableStateFlow<List<com.example.animeapp.domain.models.characterPictures.Data>>(emptyList())
+    val picturesList = _picturesList.asStateFlow()
+
+    suspend  fun getPicturesFromId(id: Int) {
+        val cachedPictures = picturesCache[id]
+        if (cachedPictures != null) {
+            _picturesList.value = cachedPictures
+            return
+        }
+
+        viewModelScope.launch (Dispatchers.IO){
+
+            try {
+                val response = malApiService.getCharacterFullPictures(id)
+                if (response.isSuccessful) {
+                    val pictures = response.body()?.data ?: emptyList()
+                    picturesCache[id] = pictures
+                    _picturesList.value = pictures
+                }
+            } catch (e: Exception) {
+                Log.e("CharacterPicturesViewModel", e.message.toString())
+            }
+        }
+    }
 
 }

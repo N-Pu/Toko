@@ -23,7 +23,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.viewModel.CharacterFullByIdViewModel
-import com.example.animeapp.domain.viewModel.CharacterPicturesViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -54,24 +53,25 @@ fun DisplayCharacterFromId(
     mal_id: Int, navController: NavController, viewModelProvider: ViewModelProvider
 ) {
 
+    val viewModel = viewModelProvider[CharacterFullByIdViewModel::class.java]
 
     LaunchedEffect(mal_id) {
         withContext(Dispatchers.IO) {
             delay(300L)
-            viewModelProvider[CharacterFullByIdViewModel::class.java].getCharacterFromId(mal_id)
+            viewModel.getCharacterFromId(mal_id)
             delay(300L)
-            viewModelProvider[CharacterPicturesViewModel::class.java].getPicturesFromId(mal_id)
+            viewModel.getPicturesFromId(mal_id)
         }
 
 
     }
 
 
-    val isSearching by viewModelProvider[CharacterFullByIdViewModel::class.java].isSearching.collectAsStateWithLifecycle()
-    val characterFullState =
-        viewModelProvider[CharacterFullByIdViewModel::class.java].characterFull.collectAsStateWithLifecycle()
-    val characterPicturesState =
-        viewModelProvider[CharacterPicturesViewModel::class.java].picturesList.collectAsStateWithLifecycle()
+    val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
+    val characterFullState by
+        viewModel.characterFull.collectAsStateWithLifecycle()
+    val characterPicturesState by
+        viewModel.picturesList.collectAsStateWithLifecycle()
 
 
     if (isSearching.not()) {
@@ -82,7 +82,7 @@ fun DisplayCharacterFromId(
             sheetContent = {
 
                 Text(
-                    text = "${characterFullState.value?.name} roles",
+                    text = "${characterFullState?.name} roles",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 36.sp
@@ -95,7 +95,7 @@ fun DisplayCharacterFromId(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalItemSpacing = 8.dp
                 ) {
-                    characterFullState.value?.anime?.let {
+                    characterFullState?.anime?.let {
                         itemsIndexed(it) { _, anime ->
                             val painter =
                                 rememberAsyncImagePainter(model = anime.anime.images.jpg.large_image_url)
@@ -120,19 +120,19 @@ fun DisplayCharacterFromId(
             ) {
 
                 DisplayHorizontalPagerWithIndicator(
-                    painterList = characterPicturesState.value
+                    painterList = characterPicturesState
                 )
 
 
 
                 Spacer(modifier = Modifier.size(8.dp))
-                characterFullState.value?.let { data ->
+                characterFullState?.let { data ->
                     DisplayKanjiAndEnglishName(data = data)
 
                 }
 
                 // writes null in ui if there's no "about" data
-                characterFullState.value?.about?.let { about ->
+                characterFullState?.about?.let { about ->
                     Text(
                         text = about, textAlign = TextAlign.Center
                     )
@@ -145,58 +145,6 @@ fun DisplayCharacterFromId(
 
     } else
         LoadingAnimation()
-
-
-//    if (isSearching.not()) {
-//
-//        Card(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .verticalScroll(rememberScrollState())
-//        ) {
-//
-//            DisplayAlbumHorizontally(
-//                painterList = characterPicturesState.value
-//            )
-//
-//
-//
-//            Spacer(modifier = Modifier.size(28.dp))
-//            characterFullState.value?.let { data ->
-//                DisplayKanjiAndEnglishName(data = data)
-//
-//            }
-//
-//            // writes null in ui if there's no "about" data
-//            characterFullState.value?.about?.let { about ->
-//                Text(
-//                    text = about, textAlign = TextAlign.Center
-//                )
-//            }
-//
-////            Text(text = "Also known as:")
-////            characterFullState.value?.nicknames?.forEach {
-////                Text(text = it, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-////            }
-//
-//            characterFullState.value?.anime?.forEach { anime ->
-//                Text(
-//                    text = anime.anime.title,
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 20.sp,
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//                Text(
-//                    text = anime.role,
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 20.sp,
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//            }
-//        }
-//    } else {
-//        LoadingAnimation()
-//    }
 }
 
 

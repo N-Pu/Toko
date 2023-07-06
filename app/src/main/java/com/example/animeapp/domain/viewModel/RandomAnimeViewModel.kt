@@ -3,7 +3,7 @@ package com.example.animeapp.domain.viewModel
 import androidx.lifecycle.ViewModel
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.animeapp.domain.models.detailModel.Data
+import com.example.animeapp.domain.models.newAnimeSearchModel.Data
 import com.example.animeapp.repository.MalApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -38,7 +38,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
-import com.example.animeapp.domain.models.detailModel.Genre
+import com.example.animeapp.domain.models.newAnimeSearchModel.Genre
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.castList.DisplayCast
 import com.example.animeapp.presentation.screens.detailScreen.mainPage.customVisuals.DisplayCustomGenreBoxes
