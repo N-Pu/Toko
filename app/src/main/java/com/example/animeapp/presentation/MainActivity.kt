@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
@@ -45,11 +46,15 @@ class MainActivity : ComponentActivity() {
                     installSplashScreen() // Custom Splash Screen
                     navController = rememberNavController()
 
+                    val context = LocalContext.current
                     val myViewModelFactory = MyViewModelFactory(MalApiService.api)
-                    val viewModel = ViewModelProvider(this, myViewModelFactory)
+                    val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
 
-                    TokoAppActivator(navController = navController, viewModelProvider = viewModel)
-
+                    TokoAppActivator(
+                        navController = navController,
+                        viewModelProvider = viewModelProvider,
+                        context = context,
+                    )
 
 
 //                    System.setProperty("webdriver.ie.driver", "IEDriverServer.exe")
@@ -64,7 +69,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-//    override fun onDestroy() {
+    //    override fun onDestroy() {
 //        super.onDestroy()
 //        navController.popBackStack()
 //        println("STACK IS POPED")

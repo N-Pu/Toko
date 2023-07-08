@@ -33,7 +33,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImagePainter
 import com.example.animeapp.domain.models.staffMemberFullModel.Anime
-import com.example.animeapp.domain.viewModel.IdViewModel
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.domain.viewModel.StaffFullByIdViewModel
 import com.example.animeapp.presentation.theme.LightYellow
@@ -89,7 +88,7 @@ fun DisplayStaffMemberFromId(
                                 anime = anime,
                                 painter = painterRoles,
                                 navController = navController,
-                                viewModelProvider = viewModelProvider
+//                                viewModelProvider = viewModelProvider
                             )
 
                         }
@@ -153,14 +152,10 @@ fun DisplayProjectsRelated(
     anime: Anime,
     painter: AsyncImagePainter,
     navController: NavController,
-    viewModelProvider: ViewModelProvider
 ) {
     Card(modifier = Modifier
         .clickable {
-            viewModelProvider[IdViewModel::class.java].setId(anime.anime.mal_id)
             navController.navigate("detail_screen/${anime.anime.mal_id}")
-
-//            navigateToDetailScreen(navController = navController, mal_id = anime.anime.mal_id)
         }
         .fillMaxSize()
         .padding(PaddingValues(0.dp))) {

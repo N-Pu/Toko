@@ -35,15 +35,21 @@ fun SetupNavGraph(navController: NavHostController, viewModelProvider: ViewModel
             val id = backStackEntry.arguments!!.getInt("id")
             ActivateDetailScreen(
                 navController = navController,
-                viewModelProvider = viewModelProvider
+                viewModelProvider = viewModelProvider,
+                id = id
             )
             Log.d("CATCHED ID = ", id.toString())
+        }
+
+        composable(route = Nothing.value) {
+            NoId()
         }
         composable(route = Screen.Favorites.route) {
             FavoriteScreen(
                 navController = navController,
-                viewModelProvider = viewModelProvider
-            )
+                viewModelProvider = viewModelProvider,
+
+                )
         }
         composable(route = Screen.RandomAnimeOrManga.route) {
             ShowRandomScreen(
@@ -51,9 +57,8 @@ fun SetupNavGraph(navController: NavHostController, viewModelProvider: ViewModel
                 viewModelProvider
             )
         }
-        composable(route = Nothing.value) { NoId(navController) }
         composable(route = DetailOnCast.value) {
-            ShowWholeCast(navController,  viewModelProvider[DetailScreenViewModel::class.java])
+            ShowWholeCast(navController, viewModelProvider[DetailScreenViewModel::class.java])
         }
         composable(route = DetailOnStaff.value) {
             ShowWholeStaff(navController, viewModelProvider[DetailScreenViewModel::class.java])

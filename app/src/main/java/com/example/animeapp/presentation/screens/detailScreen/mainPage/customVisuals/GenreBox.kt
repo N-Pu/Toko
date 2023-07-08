@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -15,13 +14,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.animeapp.domain.models.newAnimeSearchModel.Genre
-import kotlin.random.Random
 
 @Composable
 fun RandomColorBox(
-    text: String, color: String, modifier: Modifier = Modifier
+    text: String,
+    modifier: Modifier = Modifier
 ) {
-    val backgroundColor = Color(android.graphics.Color.parseColor(color))
+    val backgroundColor = Color(android.graphics.Color.BLUE)
 
     Box(
         modifier = modifier
@@ -37,29 +36,21 @@ fun RandomColorBox(
         )
     }
 }
-
 @Composable
 fun DisplayCustomGenreBoxes(genres: List<Genre>) {
-    val colors = rememberSaveable {
-        List(genres.size) {
-            val randomColor = String.format("#%06x", Random.nextInt(0xffffff + 1))
-            randomColor
-        }
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(
-                vertical = 8.dp
-            )
-
+            .padding(vertical = 8.dp)
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center
     ) {
-        colors.forEachIndexed { index, color ->
-            if (index != 0) Spacer(modifier = Modifier.width(8.dp))
-            RandomColorBox(text = genres[index].name, color = color)
+        genres.forEachIndexed { index, genre ->
+            if (index != 0) {
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+                RandomColorBox(text = genre.name,
+                )
         }
     }
 }

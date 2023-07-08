@@ -39,7 +39,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImagePainter
 import com.example.animeapp.R
 import com.example.animeapp.domain.models.characterModel.Anime
-import com.example.animeapp.domain.viewModel.IdViewModel
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.presentation.theme.LightYellow
 import kotlinx.coroutines.Dispatchers
@@ -104,7 +103,7 @@ fun DisplayCharacterFromId(
                                 anime = anime,
                                 painter = painter,
                                 navController = navController,
-                                viewModelProvider = viewModelProvider
+//                                viewModelProvider = viewModelProvider
                             )
                         }
                     }
@@ -251,14 +250,11 @@ fun DisplayProjectsRelated(
     anime: Anime,
     painter: AsyncImagePainter,
     navController: NavController,
-    viewModelProvider: ViewModelProvider
+//    viewModelProvider: ViewModelProvider
 ) {
     Card(modifier = Modifier
         .clickable {
-            viewModelProvider[IdViewModel::class.java].setId(anime.anime.mal_id)
             navController.navigate("detail_screen/${anime.anime.mal_id}")
-
-//            navigateToDetailScreen(navController = navController, mal_id = anime.anime.mal_id)
         }
         .fillMaxSize()
         .padding(PaddingValues(0.dp))) {

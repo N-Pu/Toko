@@ -8,10 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.navigation.NavController
 
 @Composable
-fun NoId(navController: NavController) {
+fun NoId() {
 
     Box(
         modifier = Modifier
@@ -20,7 +19,7 @@ fun NoId(navController: NavController) {
     ) {
 
         Text(
-            text = "No ID MAN",
+            text = "No ID, MAN",
             modifier = Modifier.fillMaxSize(),
             textAlign = TextAlign.Center,
 

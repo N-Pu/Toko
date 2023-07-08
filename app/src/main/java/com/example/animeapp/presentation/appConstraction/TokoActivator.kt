@@ -45,7 +45,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -60,7 +59,6 @@ import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.navigation.Nothing
 import com.example.animeapp.presentation.navigation.Screen
 import com.example.animeapp.presentation.navigation.SetupNavGraph
-import com.example.animeapp.domain.viewModel.IdViewModel
 import com.example.animeapp.presentation.screens.homeScreen.checkIdInDataBase
 import com.example.animeapp.presentation.screens.homeScreen.formatScore
 import com.example.animeapp.presentation.screens.homeScreen.formatScoredBy
@@ -74,20 +72,18 @@ import androidx.compose.material3.BottomAppBar as BottomAppBar
 fun TokoAppActivator(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
-//    savedAnimeViewModel: SavedAnimeViewModel,
-
+    context: Context
 ) {
 
-
+    var currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedIds
     var showButton by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    //check if destination matches needed route -> show button
-    navController.addOnDestinationChangedListener { _, destination, _ ->
+
+    navController.addOnDestinationChangedListener { _, destination, arguments ->
         showButton = when (destination.route) {
-            Screen.Detail.route,
-//            CharacterDetail.value,
-//            StaffDetail.value
-            -> true
+            Screen.Detail.route -> {
+                currentDetailScreenId = { arguments?.getInt("id") ?: 0 }
+                true
+            }
 
             else -> false
         }
@@ -95,7 +91,8 @@ fun TokoAppActivator(
 
     Scaffold(bottomBar = {
         BottomNavigationBar(
-            navController = navController, idViewModel = viewModelProvider[IdViewModel::class.java]
+            navController = navController,
+            currentDetailScreenId = currentDetailScreenId
         )
     }, floatingActionButton = {
 
@@ -122,8 +119,11 @@ fun TokoAppActivator(
 
 @Composable
 fun BottomNavigationBar(
-    navController: NavController, idViewModel: IdViewModel
+    navController: NavController,
+    currentDetailScreenId: () -> Int
 ) {
+
+
 
     val items = listOf(
         Screen.Home, Screen.Detail, Screen.RandomAnimeOrManga, Screen.Favorites
@@ -150,14 +150,8 @@ fun BottomNavigationBar(
                 navController.navigate(items[0].route) {
                     // Avoid multiple copies of the same destination when
                     // reselecting the same item
-                    launchSingleTop = true
-
                     navController.graph.startDestinationRoute?.let { route ->
-                        popUpTo(route) {
-                            saveState = true
-//                                    inclusive = true
-                        }
-                        restoreState = true
+                        launchSingleTop = true
                         // Restore state when reselecting a previously selected item
                     }
 
@@ -175,25 +169,16 @@ fun BottomNavigationBar(
             )
         }, selected = currentRoute == items[1].route, onClick = {
             try {
-                if (idViewModel.getId() == 0) {
-                    navController.navigate(Nothing.value) {
+
+                if (currentDetailScreenId.invoke() != 0) {
+                    navController.navigate("detail_screen/${currentDetailScreenId.invoke()}") {
                         navController.graph.startDestinationRoute?.let { route ->
                             launchSingleTop = true
-                            popUpTo(route) {
-                                saveState = true
-                            }
-                            restoreState = true
                         }
                     }
                 } else {
-                    navController.navigate("detail_screen/${idViewModel.getId()}") {
-                        launchSingleTop = true
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
-                            }
-                        }
-                        restoreState = true
+                    navController.navigate(Nothing.value) {
+                            launchSingleTop = true
                     }
                 }
 
@@ -210,22 +195,7 @@ fun BottomNavigationBar(
 
             try {
                 navController.navigate(items[2].route) {
-                    // Avoid multiple copies of the same destination when
-                    // reselecting the same item
                     launchSingleTop = true
-                    navController.graph.startDestinationRoute?.let { route ->
-                        Log.d(
-                            " navController.graph.startDestinationRoute ",
-                            navController.graph.startDestinationRoute!!
-                        )
-                        popUpTo(route) {
-                            saveState = true
-//                                    inclusive = true
-                        }
-                    }
-
-                    // Restore state when reselecting a previously selected item
-                    restoreState = true
                 }
             } catch (e: IllegalArgumentException) {
 
@@ -244,19 +214,6 @@ fun BottomNavigationBar(
                     // Avoid multiple copies of the same destination when
                     // reselecting the same item
                     launchSingleTop = true
-                    navController.graph.startDestinationRoute?.let { route ->
-                        Log.d(
-                            " navController.graph.startDestinationRoute ",
-                            navController.graph.startDestinationRoute!!
-                        )
-                        popUpTo(route) {
-                            saveState = true
-//                                    inclusive = true
-                        }
-                    }
-
-                    // Restore state when reselecting a previously selected item
-                    restoreState = true
                 }
             } catch (e: IllegalArgumentException) {
 
@@ -315,51 +272,51 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
         }
     }
 
-        Box(
-            modifier = Modifier
-                .width(IntrinsicSize.Min)
-                .wrapContentHeight()
-                .offset(y = (-16).dp) // Сдвигает меню вверх на 16dp, чтобы не перекрывать кнопку
-                .padding(end = 16.dp, bottom = 16.dp),
-            contentAlignment = Alignment.BottomEnd
+    Box(
+        modifier = Modifier
+            .width(IntrinsicSize.Min)
+            .wrapContentHeight()
+            .offset(y = (-16).dp) // Сдвигает меню вверх на 16dp, чтобы не перекрывать кнопку
+            .padding(end = 16.dp, bottom = 16.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
         ) {
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                items.forEach { item ->
-                    DropdownMenuItem(
-                        onClick = {
-                            detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                selectedItem.value = item
-                                if (selectedItem.value == "Delete") {
-                                    detailScreenState.value?.let { data ->
-                                        dao.removeFromDataBase(data.mal_id)
-                                    }
-                                } else {
-                                    detailScreenState.value?.let { data ->
-                                        dao.addToCategory(
-                                            AnimeItem(
-                                                data.mal_id,
-                                                anime = data.title,
-                                                score = formatScore(data.score),
-                                                scored_by = formatScoredBy(data.scored_by),
-                                                animeImage = data.images.jpg.large_image_url,
-                                                category = selectedItem.value
-                                            )
-                                        )
-                                    }
+            items.forEach { item ->
+                DropdownMenuItem(
+                    onClick = {
+                        detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                            selectedItem.value = item
+                            if (selectedItem.value == "Delete") {
+                                detailScreenState.value?.let { data ->
+                                    dao.removeFromDataBase(data.mal_id)
                                 }
-                                // on touched - dropDownMenu cancels
-                                expanded = false
+                            } else {
+                                detailScreenState.value?.let { data ->
+                                    dao.addToCategory(
+                                        AnimeItem(
+                                            data.mal_id,
+                                            anime = data.title,
+                                            score = formatScore(data.score),
+                                            scored_by = formatScoredBy(data.scored_by),
+                                            animeImage = data.images.jpg.large_image_url,
+                                            category = selectedItem.value
+                                        )
+                                    )
+                                }
                             }
-                        },
-                        text = {
-                            Text(text = item)
-                        })
-                }
+                            // on touched - dropDownMenu cancels
+                            expanded = false
+                        }
+                    },
+                    text = {
+                        Text(text = item)
+                    })
             }
         }
+    }
 
 }
 
@@ -403,30 +360,6 @@ fun Prev() {
 
 
             }
-
-
-//            BottomAppBar(modifier = Modifier) {
-//                NavigationBarItem(icon = {
-//                    Icon(
-//                        imageVector = Icons.Filled.Add, contentDescription = ""
-//                    )
-//                }, onClick = {}, selected = false)
-//                NavigationBarItem(icon = {
-//                    Icon(
-//                        imageVector = Icons.Filled.Add, contentDescription = ""
-//                    )
-//                }, onClick = {}, selected = false)
-//                NavigationBarItem(icon = {
-//                    Icon(
-//                        imageVector = Icons.Filled.Add, contentDescription = ""
-//                    )
-//                }, onClick = {}, selected = false)
-//                NavigationBarItem(icon = {
-//                    Icon(
-//                        imageVector = Icons.Filled.Add, contentDescription = ""
-//                    )
-//                }, onClick = {}, selected = false)
-//            }
         }
     ) {
         it.calculateBottomPadding()

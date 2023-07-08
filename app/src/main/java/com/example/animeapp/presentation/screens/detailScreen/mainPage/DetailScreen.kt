@@ -44,7 +44,6 @@ import com.example.animeapp.presentation.screens.detailScreen.sideContent.castLi
 import com.example.animeapp.presentation.screens.detailScreen.mainPage.customVisuals.DisplayCustomGenreBoxes
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.staffList.DisplayStaff
 import com.example.animeapp.domain.viewModel.DetailScreenViewModel
-import com.example.animeapp.domain.viewModel.IdViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -54,11 +53,10 @@ import java.lang.IllegalStateException
 @Composable
 fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
-    navController: NavController
+    navController: NavController,
+    id: Int
 ) {
     val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
-    val id by viewModelProvider[IdViewModel::class.java].mal_id.collectAsStateWithLifecycle()
-
     val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
 
     val detailData by
@@ -121,7 +119,20 @@ fun ActivateDetailScreen(
             }
 
             Title(title = detailData?.title ?: "Nothing")
-            DisplayCustomGenreBoxes(genres = detailData?.genres ?: listOf(Genre(mal_id = 0,"Nothing","None", "None")))
+            if (detailData
+                    ?.genres
+                    ?.isNotEmpty() == true) {
+                DisplayCustomGenreBoxes(
+                    genres = detailData?.genres ?: listOf(
+                        Genre(
+                            mal_id = 0,
+                            "Nothing",
+                            "None",
+                            "None"
+                        )
+                    )
+                )
+            }
 
             ExpandableText(text = detailData?.synopsis ?: "Nothing")
 

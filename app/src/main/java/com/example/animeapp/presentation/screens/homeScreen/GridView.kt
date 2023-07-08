@@ -42,7 +42,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.R
 import com.example.animeapp.dao.Dao
 import com.example.animeapp.presentation.theme.LightYellow
-import com.example.animeapp.domain.viewModel.IdViewModel
 import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -75,7 +74,7 @@ fun GridAdder(
                 anime = anime,
                 navController = navController,
 //                viewModelProvider = viewModelProvider,
-                viewModel = viewModelProvider[IdViewModel::class.java]
+                viewModel = viewModelProvider[HomeScreenViewModel::class.java]
             )
 
             // Загрузка следующей страницы при достижении конца списка и has_next_page = true
@@ -92,9 +91,8 @@ fun GridAdder(
 fun AnimeCardBox(
     anime: com.example.animeapp.domain.models.newAnimeSearchModel.Data,
     navController: NavController,
-    viewModel: IdViewModel
+    viewModel: HomeScreenViewModel
 ) {
-//    val viewModel = viewModelProvider[IdViewModel::class.java]
     val painter = rememberAsyncImagePainter(model = anime.images.webp.image_url)
 
     Card(
@@ -102,7 +100,6 @@ fun AnimeCardBox(
             .clip(RoundedCornerShape(6.dp))
             .clickable {
                 viewModel.viewModelScope.launch(Dispatchers.Main) {
-                    viewModel.setId(anime.mal_id)
                     navigateToDetailScreen(
                         navController, anime.mal_id
                     )
@@ -323,7 +320,6 @@ fun PreviewGridView() {
 
                     }
 
-//                    AddFavorites()
 
                 }
 

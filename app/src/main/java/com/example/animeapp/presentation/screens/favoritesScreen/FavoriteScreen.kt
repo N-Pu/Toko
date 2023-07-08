@@ -52,7 +52,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.dao.AnimeItem
 import com.example.animeapp.dao.Dao
 import com.example.animeapp.dao.MainDb
-import com.example.animeapp.domain.viewModel.IdViewModel
+import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import com.example.animeapp.presentation.screens.homeScreen.navigateToDetailScreen
 import com.example.animeapp.presentation.theme.LightYellow
@@ -214,9 +214,10 @@ fun FavoriteAnimeList(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FavoriteScreenCardBox(
-    animeItem: AnimeItem, navController: NavController, viewModelProvider: ViewModelProvider
+    animeItem: AnimeItem, navController: NavController,
+    viewModelProvider: ViewModelProvider
 ) {
-    val viewModel = viewModelProvider[IdViewModel::class.java]
+    val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val painter = rememberAsyncImagePainter(model = animeItem.animeImage)
 
     Card(
@@ -224,7 +225,7 @@ fun FavoriteScreenCardBox(
             .clip(RoundedCornerShape(6.dp))
             .clickable {
                 animeItem.id?.let {
-                    viewModel.setId(it)
+//                    viewModel.setId(it)
                     navigateToDetailScreen(navController, it)
                 }
 //                animeItem.id?.let {

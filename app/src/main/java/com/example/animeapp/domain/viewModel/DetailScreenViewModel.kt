@@ -17,7 +17,13 @@ class DetailScreenViewModel(private val malApiService: MalApiService) : ViewMode
     //detailData
     private val _animeDetails = MutableStateFlow<Data?>(null)
     val animeDetails: StateFlow<Data?> get() = _animeDetails
-    private val loadedIds = mutableSetOf<Int>()
+    private val _loadedIds = mutableSetOf<Int>()
+    val loadedIds = {
+        if (_loadedIds.isNotEmpty())
+            _loadedIds.last()
+        else
+            0
+    }
     val animeCache = mutableMapOf<Int, Data>()
 
     private val _isSearching = MutableStateFlow(false)
@@ -32,7 +38,7 @@ class DetailScreenViewModel(private val malApiService: MalApiService) : ViewMode
                 _animeDetails.value = cachedAnime
                 return@launch
             }
-            if (loadedIds.contains(id)) {
+            if (_loadedIds.contains(id)) {
                 return@launch
             }
 
@@ -44,7 +50,7 @@ class DetailScreenViewModel(private val malApiService: MalApiService) : ViewMode
                     if (data != null) {
                         withContext(Dispatchers.Main) {
                             _animeDetails.value = data
-                            loadedIds.add(id)
+                            _loadedIds.add(id)
                             animeCache[id] = data
                         }
                     }
@@ -58,14 +64,14 @@ class DetailScreenViewModel(private val malApiService: MalApiService) : ViewMode
     }
 
 
-
-
     //staff
-    private val staffCache = mutableMapOf<Int, List<com.example.animeapp.domain.models.staffModel.Data>>()
-    private val _staffList = MutableStateFlow<List<com.example.animeapp.domain.models.staffModel.Data>>(emptyList())
+    private val staffCache =
+        mutableMapOf<Int, List<com.example.animeapp.domain.models.staffModel.Data>>()
+    private val _staffList =
+        MutableStateFlow<List<com.example.animeapp.domain.models.staffModel.Data>>(emptyList())
     val staffList = _staffList.asStateFlow()
 
-   suspend fun addStaffFromId(id: Int) {
+    suspend fun addStaffFromId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val cachedStaff = staffCache[id]
             if (cachedStaff != null) {
@@ -95,8 +101,10 @@ class DetailScreenViewModel(private val malApiService: MalApiService) : ViewMode
 
 
     // cast
-    private val castCache = mutableMapOf<Int, List<com.example.animeapp.domain.models.castModel.Data>>()
-    private val _castList = MutableStateFlow<List<com.example.animeapp.domain.models.castModel.Data>>(emptyList())
+    private val castCache =
+        mutableMapOf<Int, List<com.example.animeapp.domain.models.castModel.Data>>()
+    private val _castList =
+        MutableStateFlow<List<com.example.animeapp.domain.models.castModel.Data>>(emptyList())
     val castList = _castList.asStateFlow()
 
     suspend fun addCastFromId(id: Int) {

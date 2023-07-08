@@ -32,45 +32,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.animeapp.domain.viewModel.IdViewModel
 import com.example.animeapp.domain.viewModel.RandomAnimeViewModel
-import com.example.animeapp.presentation.navigation.Screen
+import com.example.animeapp.presentation.screens.homeScreen.navigateToDetailScreen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun ShowRandomScreen(navController: NavController, viewModelProvider: ViewModelProvider) {
-
-
     Column(
         modifier = Modifier
     ) {
         ShowRandomAnime(navController, viewModelProvider)
     }
-
-
 }
 
 @Composable
 fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelProvider) {
-    val state =
-        viewModelProvider[RandomAnimeViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
-    val idViewModel = viewModelProvider[IdViewModel::class.java]
+    val viewModel =
+        viewModelProvider[RandomAnimeViewModel::class.java]
+    val state by viewModel.animeDetails.collectAsStateWithLifecycle()
     var clicked by remember { mutableStateOf(false) }
     val painter =
-        rememberAsyncImagePainter(model = state.value?.images?.jpg?.large_image_url)
+        rememberAsyncImagePainter(model = state?.images?.jpg?.large_image_url)
 
     val clickableModifier = Modifier.clickable {
-        state.value?.let { animeData ->
-            idViewModel.setId(animeData.mal_id)
-            navController.navigate(route = "detail_screen/${animeData.mal_id}") {
-                launchSingleTop = true
-                popUpTo(Screen.Home.route) {
-                    saveState = true
-                }
-                restoreState = true
-            }
+        state?.let { animeData ->
+            navigateToDetailScreen(navController, animeData.mal_id)
         }
     }
 
@@ -84,7 +75,7 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
             Card(modifier = Modifier.size(450.dp)) {
                 Image(
                     painter = painter,
-                    contentDescription = "Anime ${state.value?.title}",
+                    contentDescription = "Anime ${state?.title}",
                     modifier = Modifier
                         .fillMaxSize()
                         .then(clickableModifier)
@@ -92,7 +83,7 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
 
             }
             Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxHeight()) {
-                state.value?.let {
+                state?.let {
                     Text(
                         modifier = Modifier.shadow(115.dp, shape = AbsoluteCutCornerShape(40.dp)),
                         text = it.title,
@@ -118,8 +109,11 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
 
         RandomizerAnimeButton(
             onClick = {
-                viewModelProvider[RandomAnimeViewModel::class.java].onTapRandomAnime()
-                clicked = true
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    viewModelProvider[RandomAnimeViewModel::class.java].onTapRandomAnime()
+                    clicked = true
+                }
+
 
             }
         )
