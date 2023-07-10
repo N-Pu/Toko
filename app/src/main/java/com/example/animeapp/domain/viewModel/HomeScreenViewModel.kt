@@ -36,8 +36,8 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     private val _currentPage = MutableStateFlow(1)
     val currentPage = _currentPage.asStateFlow()
 
-    private val _totalPages = MutableStateFlow(0)
-    val totalPages = _totalPages.asStateFlow()
+//    private val _totalPages = MutableStateFlow(0)
+//    val totalPages = _totalPages.asStateFlow()
 
     private val _isNextPageLoading = MutableStateFlow(false)
     val isNextPageLoading = _isNextPageLoading.asStateFlow()
@@ -49,6 +49,8 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     val animeSearch = _animeSearch.asStateFlow()
 
     private val searchDebouncer = MutableSharedFlow<String>()
+
+    private var hasNextPage = MutableStateFlow(true)
 
 
     // _____________________________________________________________________ //
@@ -141,13 +143,16 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            searchDebouncer.debounce(500L).distinctUntilChanged().collectLatest { searchQuery ->
-                if (searchQuery.length >= 2) {
-                    performSearch(searchQuery)
-                } else {
-                    _animeSearch.value = emptyNewAnimeSearchModel
+            searchDebouncer
+                .debounce(500L)
+                .distinctUntilChanged()
+                .collectLatest { searchQuery ->
+                    if (searchQuery.isNotEmpty()) {
+                        performSearch(searchQuery)
+                    } else {
+                        _animeSearch.value = emptyNewAnimeSearchModel
+                    }
                 }
-            }
         }
     }
 
@@ -183,10 +188,11 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
             ).body()
 
-            val anime = response ?: emptyNewAnimeSearchModel
+            if (response != null) {
+                hasNextPage.value = response.pagination.has_next_page
+                _animeSearch.value = response
+            }
 
-            _animeSearch.value = anime
-            _totalPages.value = anime.pagination.items.total
 
         } catch (e: Exception) {
             Log.e("HomeScreenViewModel", "Failed to perform search: ${e.message}")
@@ -197,7 +203,10 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     fun loadNextPage() {
         val query = searchText.value
-        if (isNextPageLoading.value || currentPage.value >= totalPages.value) {
+        if (
+//            isNextPageLoading.value ||
+
+            !hasNextPage.value) {
             return
         }
 
@@ -218,13 +227,23 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
                     ).body()
 
+
+//                viewModelScope.async {
+                if (response != null) {
+                    hasNextPage.value = response.pagination.has_next_page
+
+                }
+//                }.await()
+
+//                viewModelScope.async {
                 response?.let { newAnimeSearchModel ->
                     _animeSearch.value =
                         _animeSearch.value.copy(data = _animeSearch.value.data + newAnimeSearchModel.data)
                     _currentPage.value = nextPage
                     _isNextPageLoading.value = newAnimeSearchModel.pagination.has_next_page
-                    _totalPages.value = newAnimeSearchModel.pagination.items.total
                 }
+//                }.await()
+
             } catch (e: Exception) {
                 Log.e("HomeScreenViewModel", "Failed to load next page: ${e.message}")
             } finally {
@@ -278,11 +297,18 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
             _min_score.value = pre_min_score.value
             _max_score.value = pre_max_score.value
         }
-        jobGenres.await()
-        jobRating.await()
-        jobTypes.await()
-        jobOrderBy.await()
-        jobMinMaxScore.await()
+
+        jobGenres.join()
+        jobRating.join()
+        jobTypes.join()
+        jobOrderBy.join()
+        jobMinMaxScore.join()
+
+//        jobGenres.await()
+//        jobRating.await()
+//        jobTypes.await()
+//        jobOrderBy.await()
+//        jobMinMaxScore.await()
         performSearch(searchText.value)
 
     }

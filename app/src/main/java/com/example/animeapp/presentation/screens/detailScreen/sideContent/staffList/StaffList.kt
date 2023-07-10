@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import com.example.animeapp.domain.useCase.cutForStaffAndCharacters.isMoreThenTen
 import com.example.animeapp.presentation.navigation.DetailOnStaff
 import com.example.animeapp.presentation.navigation.Screen
 
@@ -48,7 +47,7 @@ fun ListEditor(
     listData: List<com.example.animeapp.domain.models.staffModel.Data>,
     navController: NavController
 ) {
-    val trimmedStaff = isMoreThenTen(listData)
+//    val trimmedStaff = isMoreThenTen(listData)
     Text(text = "Staff", textDecoration = TextDecoration.Underline)
     Row(
         modifier = Modifier
@@ -57,7 +56,7 @@ fun ListEditor(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        trimmedStaff.forEach { data ->
+        listData.take(10).forEach { data ->
             val personPainter =
                 rememberAsyncImagePainter(model = data.person.images.jpg.image_url)
 

@@ -34,7 +34,6 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.models.castModel.Data
 import com.example.animeapp.domain.models.castModel.VoiceActor
-import com.example.animeapp.domain.useCase.cutForStaffAndCharacters.isMoreThenTen
 import com.example.animeapp.presentation.navigation.DetailOnCast
 import com.example.animeapp.presentation.navigation.Screen
 
@@ -45,9 +44,7 @@ fun DisplayCast(
     navController: NavController,
     viewModelProvider: ViewModelProvider
 ) {
-
-    val trimmedCast = isMoreThenTen(castList)
-    val castWithJapVoiceActors = hasJapVoiceActor(trimmedCast)
+    val castWithJapVoiceActors = hasJapVoiceActor(castList)
 
     Text(
         text = "Cast",
@@ -64,7 +61,6 @@ fun DisplayCast(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .clickable {
-
                     navController.navigate(DetailOnCast.value) {
                         popUpTo(Screen.Detail.route) {
                             inclusive = true
@@ -82,11 +78,10 @@ fun AddCast(castList: List<Data>, navController: NavController) {
         modifier = Modifier
             .horizontalScroll(rememberScrollState())
     ) {
-        castList.forEach { data ->
+
+        castList.take(10).forEach { data ->
             val characterPainter =
                 rememberAsyncImagePainter(model = data.character.images.webp.image_url)
-
-
             Column {
 
                 Card(modifier = Modifier
