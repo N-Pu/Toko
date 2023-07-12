@@ -40,7 +40,7 @@ import coil.compose.AsyncImagePainter
 import com.example.animeapp.R
 import com.example.animeapp.domain.models.characterModel.Anime
 import com.example.animeapp.presentation.animations.LoadingAnimation
-import com.example.animeapp.presentation.theme.LightYellow
+import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -76,7 +76,7 @@ fun DisplayCharacterFromId(
     if (isSearching.not()) {
 
         BottomSheetScaffold(
-            sheetContainerColor = LightYellow,
+            sheetContainerColor = LightGreen,
             sheetPeekHeight = 65.dp,
             sheetContent = {
 
@@ -189,7 +189,7 @@ fun DisplayHorizontalPagerWithIndicator(painterList: List<com.example.animeapp.d
             .fillMaxWidth()
     ) {
         repeat(painterList.size) { index ->
-            val color = if (index == pagerState.currentPage) Color.DarkGray else LightYellow
+            val color = if (index == pagerState.currentPage) Color.DarkGray else LightGreen
             Box(
                 modifier = Modifier
                     .size(15.dp)

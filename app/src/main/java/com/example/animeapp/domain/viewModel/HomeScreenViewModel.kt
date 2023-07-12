@@ -1,6 +1,8 @@
 import android.util.Log
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.animeapp.domain.models.linkChangeModel.Genre
@@ -314,6 +316,41 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     }
 
 
+    //------------------------------------------------------
+    var isDialogShown by mutableStateOf(false)
+        private set
+
+//    fun onDialogLongClick() {
+//        viewModelScope.launch {
+//            isDialogShown = true
+//        }
+//    }
+//
+//     fun onDialogLongDismiss() {
+//         viewModelScope.launch {
+//             isDialogShown = false
+//         }
+//    }
+
+
+    private val _selectedAnimeId = MutableStateFlow<Int?>(null)
+    val selectedAnimeId: StateFlow<Int?> = _selectedAnimeId.asStateFlow()
+
+    // ...
+
+    fun onDialogLongClick(animeId: Int) {
+        viewModelScope.launch {
+            _selectedAnimeId.value = animeId
+            isDialogShown = true
+        }
+    }
+
+    fun onDialogDismiss() {
+        viewModelScope.launch {
+            _selectedAnimeId.value = null
+            isDialogShown = false
+        }
+    }
 }
 
 

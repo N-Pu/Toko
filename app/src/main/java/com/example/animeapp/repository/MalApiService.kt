@@ -7,7 +7,8 @@ import com.example.animeapp.domain.models.characterModel.CharacterFullModel
 import com.example.animeapp.domain.models.characterPictures.CharacterPicturesModel
 import com.example.animeapp.domain.models.detailModel.AnimeDetailModel
 import com.example.animeapp.domain.models.newAnimeSearchModel.NewAnimeSearchModel
-import com.example.animeapp.domain.models.staffMemberFullModel.StaffMemberFullModel
+import com.example.animeapp.domain.models.personFullModel.PersonFullModel
+import com.example.animeapp.domain.models.producerModel.ProducerFullModel
 import com.example.animeapp.domain.models.staffModel.StaffModel
 import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
@@ -111,11 +112,34 @@ interface MalApiService {
     }
 
     @GET("${BASE_URL_FOR_CHARACTER}people/{id}/full")
-    suspend fun getStaffFullFromId(@Path("id") id: Int): Response<StaffMemberFullModel> {
+    suspend fun getPersonFullFromId(@Path("id") id: Int): Response<PersonFullModel> {
         var retryCount = 0
         while (retryCount < 3) { // повторяем запрос не более 3 раз
             try {
-                return api.getStaffFullFromId(id)
+                return api.getPersonFullFromId(id)
+            } catch (e: Exception) {
+                // обрабатываем ошибки
+                when (e) {
+                    is SocketTimeoutException, is HttpException -> {
+                        retryCount++
+                        Log.e("MalApiService", "Error occurred: ${e.message}")
+                        delay(1000) // задержка на 1 секунд перед повторным запросом
+                    }
+
+                    else -> throw e // выбрасываем ошибку, которую не умеем обрабатывать
+                }
+            }
+        }
+        throw Exception("Failed to get response after $retryCount retries")
+    }
+
+
+    @GET("${BASE_URL_FOR_CHARACTER}producers/{id}/full")
+    suspend fun getProducerFullFromId(@Path("id") id: Int): Response<ProducerFullModel> {
+        var retryCount = 0
+        while (retryCount < 3) { // повторяем запрос не более 3 раз
+            try {
+                return api.getProducerFullFromId(id)
             } catch (e: Exception) {
                 // обрабатываем ошибки
                 when (e) {

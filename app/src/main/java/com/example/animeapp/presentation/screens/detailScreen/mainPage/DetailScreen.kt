@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -88,6 +89,7 @@ fun ActivateDetailScreen(
     val painter =
         rememberAsyncImagePainter(model = model, contentScale = ContentScale.Fit)
 
+
     if (isSearching.not() && detailData != null) {
 
         Column(
@@ -121,7 +123,8 @@ fun ActivateDetailScreen(
             Title(title = detailData?.title ?: "Nothing")
             if (detailData
                     ?.genres
-                    ?.isNotEmpty() == true) {
+                    ?.isNotEmpty() == true
+            ) {
                 DisplayCustomGenreBoxes(
                     genres = detailData?.genres ?: listOf(
                         Genre(
@@ -154,11 +157,32 @@ fun ActivateDetailScreen(
 
             // ДОБАВИТЬ КАРТИНКУ СТУДИИ И ПЕРЕХОД НА ЭЭЭ ИХ ДАННЫЕ mal_id
             Text(text = "STUDIOS:")
+
+
+
             detailData?.studios?.forEach {
+
+                println(it.url)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = it.name + it.mal_id)
+                Text(
+                    text = it.name,
+                    fontSize = 40.sp,
+                    color = Color.Blue,
+                    fontStyle = FontStyle.Italic,
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable {
+                        println("detail_on_producer/${it.mal_id}/${it.name}")
+                        navController.navigate(
+                            "detail_on_producer/${it.mal_id}/${it.name}"
+                        ){
+                           launchSingleTop = true
+                        }
+                    }
+                )
 
             }
+
+
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "background: " + (detailData?.background ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
@@ -180,9 +204,9 @@ fun ActivateDetailScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "season: " + (detailData?.season ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "source: " + (detailData?.source ?: "None" ))
+            Text(text = "source: " + (detailData?.source ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "status: " + (detailData?.status ?:"None" ))
+            Text(text = "status: " + (detailData?.status ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "title: " + (detailData?.title ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))

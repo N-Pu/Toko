@@ -27,7 +27,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.animeapp.dao.AnimeItem
 import com.example.animeapp.dao.MainDb
 import com.example.animeapp.presentation.screens.homeScreen.checkIdInDataBase
-import com.example.animeapp.presentation.theme.LightYellow
+import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -88,7 +88,7 @@ fun AddFavorites(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                .background(LightYellow)
+                .background(LightGreen)
                 .align(Alignment.BottomEnd)
         ) {
             items.forEach { item ->

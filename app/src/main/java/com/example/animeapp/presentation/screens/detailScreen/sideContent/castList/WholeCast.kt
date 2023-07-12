@@ -39,7 +39,7 @@ import com.example.animeapp.domain.models.castModel.Person
 import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.navigation.DetailOnCast
 import com.example.animeapp.presentation.navigation.Screen
-import com.example.animeapp.presentation.theme.LightYellow
+import com.example.animeapp.presentation.theme.LightGreen
 
 
 @Composable
@@ -102,9 +102,9 @@ fun SingleCharacterMember(character: Character, role: String, navController: Nav
                     }
                     restoreState = true
                 }
-            }, border = BorderStroke(width = 2.dp, LightYellow)
+            }, border = BorderStroke(width = 2.dp, LightGreen)
     ) {
-        Box(modifier = Modifier.background(LightYellow)) {
+        Box(modifier = Modifier.background(LightGreen)) {
             Image(
                 painter = rememberAsyncImagePainter(character.images.jpg.image_url),
                 contentDescription = "Character name: ${character.name}",

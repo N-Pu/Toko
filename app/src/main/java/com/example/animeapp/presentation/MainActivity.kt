@@ -17,7 +17,7 @@ import com.example.animeapp.repository.MalApiService
 import com.example.animeapp.presentation.appConstraction.TokoAppActivator
 import com.example.animeapp.presentation.theme.AnimeAppTheme
 import com.example.animeapp.presentation.theme.MainBackgroundColor
-import com.example.animeapp.presentation.theme.LightYellow
+import com.example.animeapp.presentation.theme.LightGreen
 
 import com.example.animeapp.domain.viewModel.viewModelFactory.MyViewModelFactory
 
@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
 //        println("STACK IS POPED")
 //    }
     private fun noTitleBarAndSplashScreenActivator() {
-        window.navigationBarColor = LightYellow.toArgb()
+        window.navigationBarColor = LightGreen.toArgb()
         requestWindowFeature(Window.FEATURE_NO_TITLE) // Undo topBar
         installSplashScreen() // Custom Splash Screen
     }

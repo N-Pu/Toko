@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.animeapp.presentation.theme.LightYellow
+import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.delay
 
 
@@ -22,7 +22,7 @@ import kotlinx.coroutines.delay
 fun LoadingAnimation(
     modifier: Modifier = Modifier,
     circleSize: Dp = 25.dp,
-    circleColor: Color = LightYellow,
+    circleColor: Color = LightGreen,
     spaceBetween: Dp = 10.dp,
     travelDistance: Dp = 20.dp
 ) {

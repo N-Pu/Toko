@@ -45,6 +45,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -62,7 +66,6 @@ import com.example.animeapp.presentation.navigation.SetupNavGraph
 import com.example.animeapp.presentation.screens.homeScreen.checkIdInDataBase
 import com.example.animeapp.presentation.screens.homeScreen.formatScore
 import com.example.animeapp.presentation.screens.homeScreen.formatScoredBy
-import com.example.animeapp.presentation.theme.LightYellow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.material3.BottomAppBar as BottomAppBar
@@ -132,96 +135,112 @@ fun BottomNavigationBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    BottomAppBar(
-        modifier = Modifier.height(36.dp), containerColor = LightYellow
+    val brush = Brush.verticalGradient(
+        colors = listOf(Color.Transparent, Color.White),
+        startY = 0.0f,
+        endY = 200.0f
+    )
+    val blurRadius = 200.dp
+
+    Box(
+        modifier = Modifier
+            .height(56.dp)
+            .background(brush)
+            .clip(RoundedCornerShape(18.dp))
+            .then(Modifier.blur(blurRadius))
     ) {
-        NavigationBarItem(icon = {
-            Icon(
-                imageVector = items[0].icon, contentDescription = items[0].contentDescription
-            )
-        }, selected = currentRoute == items[0].route, onClick = {
+        BottomAppBar(
+            modifier = Modifier.height(36.dp), containerColor = Color.Transparent,
+            contentColor = Color.White,
+        ) {
+            NavigationBarItem(icon = {
+                Icon(
+                    imageVector = items[0].icon, contentDescription = items[0].contentDescription
+                )
+            }, selected = currentRoute == items[0].route, onClick = {
 
-            if (currentRoute != null) {
-                Log.d("currentRoute", currentRoute + "==" + items[0].route)
-
-            }
-
-            try {
-                navController.navigate(items[0].route) {
-                    // Avoid multiple copies of the same destination when
-                    // reselecting the same item
-                    navController.graph.startDestinationRoute?.let { route ->
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                    }
+                if (currentRoute != null) {
+                    Log.d("currentRoute", currentRoute + "==" + items[0].route)
 
                 }
-            } catch (e: IllegalArgumentException) {
 
-                Log.e("CATCH", items[0].route + " " + e.message.toString())
-
-            }
-        })
-
-        NavigationBarItem(icon = {
-            Icon(
-                imageVector = items[1].icon, contentDescription = items[1].contentDescription
-            )
-        }, selected = currentRoute == items[1].route, onClick = {
-            try {
-
-                if (currentDetailScreenId.invoke() != 0) {
-                    navController.navigate("detail_screen/${currentDetailScreenId.invoke()}") {
+                try {
+                    navController.navigate(items[0].route) {
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
                         navController.graph.startDestinationRoute?.let { route ->
+                            launchSingleTop = true
+                            // Restore state when reselecting a previously selected item
+                        }
+
+                    }
+                } catch (e: IllegalArgumentException) {
+
+                    Log.e("CATCH", items[0].route + " " + e.message.toString())
+
+                }
+            })
+
+            NavigationBarItem(icon = {
+                Icon(
+                    imageVector = items[1].icon, contentDescription = items[1].contentDescription
+                )
+            }, selected = currentRoute == items[1].route, onClick = {
+                try {
+
+                    if (currentDetailScreenId.invoke() != 0) {
+                        navController.navigate("detail_screen/${currentDetailScreenId.invoke()}") {
+                            navController.graph.startDestinationRoute?.let { route ->
+                                launchSingleTop = true
+                            }
+                        }
+                    } else {
+                        navController.navigate(Nothing.value) {
                             launchSingleTop = true
                         }
                     }
-                } else {
-                    navController.navigate(Nothing.value) {
-                            launchSingleTop = true
+
+                } catch (e: IllegalArgumentException) {
+                    Log.e("CATCH", items[1].route + " " + e.message.toString())
+                }
+            })
+
+            NavigationBarItem(icon = {
+                Icon(
+                    imageVector = items[2].icon, contentDescription = items[2].contentDescription
+                )
+            }, selected = currentRoute == items[2].route, onClick = {
+
+                try {
+                    navController.navigate(items[2].route) {
+                        launchSingleTop = true
                     }
+                } catch (e: IllegalArgumentException) {
+
+                    Log.e("CATCH", items[2].route + " " + e.message.toString())
+
                 }
+            })
 
-            } catch (e: IllegalArgumentException) {
-                Log.e("CATCH", items[1].route + " " + e.message.toString())
-            }
-        })
+            NavigationBarItem(icon = {
+                Icon(
+                    imageVector = items[3].icon, contentDescription = items[3].contentDescription
+                )
+            }, selected = currentRoute == items[3].route, onClick = {
+                try {
+                    navController.navigate(items[3].route) {
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                    }
+                } catch (e: IllegalArgumentException) {
 
-        NavigationBarItem(icon = {
-            Icon(
-                imageVector = items[2].icon, contentDescription = items[2].contentDescription
-            )
-        }, selected = currentRoute == items[2].route, onClick = {
+                    Log.e("CATCH", items[3].route + " " + e.message.toString())
 
-            try {
-                navController.navigate(items[2].route) {
-                    launchSingleTop = true
                 }
-            } catch (e: IllegalArgumentException) {
+            })
 
-                Log.e("CATCH", items[2].route + " " + e.message.toString())
-
-            }
-        })
-
-        NavigationBarItem(icon = {
-            Icon(
-                imageVector = items[3].icon, contentDescription = items[3].contentDescription
-            )
-        }, selected = currentRoute == items[3].route, onClick = {
-            try {
-                navController.navigate(items[3].route) {
-                    // Avoid multiple copies of the same destination when
-                    // reselecting the same item
-                    launchSingleTop = true
-                }
-            } catch (e: IllegalArgumentException) {
-
-                Log.e("CATCH", items[3].route + " " + e.message.toString())
-
-            }
-        })
-
+        }
     }
 }
 
@@ -230,12 +249,12 @@ fun BottomNavigationBar(
 fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, context: Context) {
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
-    val detailScreenState = viewModelProvider[DetailScreenViewModel::class.java]
+    val detailScreenState by viewModelProvider[DetailScreenViewModel::class.java]
         .animeDetails.collectAsStateWithLifecycle()
 
 
     val dao = MainDb.getDb(context).getDao()
-    if (checkIdInDataBase(dao = dao, id = detailScreenState.value?.mal_id ?: 0)
+    if (checkIdInDataBase(dao = dao, id = detailScreenState?.mal_id ?: 0)
             .collectAsStateWithLifecycle(initialValue = false).value
     ) {
         items.add(4, "Delete")
@@ -290,11 +309,11 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
                         detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
                             selectedItem.value = item
                             if (selectedItem.value == "Delete") {
-                                detailScreenState.value?.let { data ->
+                                detailScreenState?.let { data ->
                                     dao.removeFromDataBase(data.mal_id)
                                 }
                             } else {
-                                detailScreenState.value?.let { data ->
+                                detailScreenState?.let { data ->
                                     dao.addToCategory(
                                         AnimeItem(
                                             data.mal_id,

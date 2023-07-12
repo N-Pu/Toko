@@ -32,10 +32,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImagePainter
-import com.example.animeapp.domain.models.staffMemberFullModel.Anime
+import com.example.animeapp.domain.models.personFullModel.Anime
 import com.example.animeapp.presentation.animations.LoadingAnimation
-import com.example.animeapp.domain.viewModel.StaffFullByIdViewModel
-import com.example.animeapp.presentation.theme.LightYellow
+import com.example.animeapp.domain.viewModel.PersonByIdViewModel
+import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -49,23 +49,23 @@ fun DisplayStaffMemberFromId(
 
     LaunchedEffect(mal_id) {
         withContext(Dispatchers.IO) {
-            viewModelProvider[StaffFullByIdViewModel::class.java].getStaffFromId(mal_id)
+            viewModelProvider[PersonByIdViewModel::class.java].getPersonFromId(mal_id)
         }
     }
 
 
-    val isSearching by viewModelProvider[StaffFullByIdViewModel::class.java].isSearching.collectAsStateWithLifecycle()
-    val staffFullState =
-        viewModelProvider[StaffFullByIdViewModel::class.java].staffFull.collectAsStateWithLifecycle()
+    val isSearching by viewModelProvider[PersonByIdViewModel::class.java].isSearching.collectAsStateWithLifecycle()
+    val staffFullState by
+        viewModelProvider[PersonByIdViewModel::class.java].personFull.collectAsStateWithLifecycle()
     val painter =
-        rememberAsyncImagePainter(model = staffFullState.value?.images?.jpg?.image_url)
+        rememberAsyncImagePainter(model = staffFullState?.images?.jpg?.image_url)
     if (isSearching.not()) {
         BottomSheetScaffold(
-            sheetContainerColor = LightYellow,
+            sheetContainerColor = LightGreen,
             sheetPeekHeight = 65.dp,
             sheetContent = {
                 Text(
-                    text = "${staffFullState.value?.name} roles",
+                    text = "${staffFullState?.name} roles",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 36.sp
@@ -78,7 +78,7 @@ fun DisplayStaffMemberFromId(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalItemSpacing = 8.dp
                 ) {
-                    staffFullState.value?.let {
+                    staffFullState?.let {
                         itemsIndexed(it.anime) { _, anime ->
 
                             val painterRoles =
@@ -107,7 +107,7 @@ fun DisplayStaffMemberFromId(
 
                         Image(
                             painter = painter,
-                            contentDescription = "Character name: ${staffFullState.value?.name}",
+                            contentDescription = "Character name: ${staffFullState?.name}",
                             modifier = Modifier
                                 .size(400.dp)
                                 .aspectRatio(9 / 11f)
@@ -120,7 +120,7 @@ fun DisplayStaffMemberFromId(
                 }
 
                 item {
-                    staffFullState.value?.let {
+                    staffFullState?.let {
                         Text(
                             text = it.name,
                             textAlign = TextAlign.Center,
@@ -130,7 +130,7 @@ fun DisplayStaffMemberFromId(
                         )
                     }
                     // writes null in ui if there's no "about" data
-                    staffFullState.value?.about?.let { about ->
+                    staffFullState?.about?.let { about ->
                         Text(
                             text = about,
                             textAlign = TextAlign.Center,

@@ -55,7 +55,7 @@ import com.example.animeapp.dao.MainDb
 import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import com.example.animeapp.presentation.screens.homeScreen.navigateToDetailScreen
-import com.example.animeapp.presentation.theme.LightYellow
+import com.example.animeapp.presentation.theme.LightGreen
 
 @Preview(showSystemUi = true)
 @Composable
@@ -232,7 +232,7 @@ fun FavoriteScreenCardBox(
 
 //                }
             },
-        colors = CardDefaults.cardColors(containerColor = LightYellow),
+        colors = CardDefaults.cardColors(containerColor = LightGreen),
         shape = RectangleShape
     ) {
         Column(modifier = Modifier) {

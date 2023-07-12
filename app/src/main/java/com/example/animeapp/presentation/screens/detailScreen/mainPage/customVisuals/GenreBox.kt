@@ -14,17 +14,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.animeapp.domain.models.newAnimeSearchModel.Genre
+import com.example.animeapp.presentation.theme.LightGreen
 
 @Composable
-fun RandomColorBox(
+private fun ColorBox(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = Color(android.graphics.Color.BLUE)
 
     Box(
         modifier = modifier
-            .background(backgroundColor, shape = MaterialTheme.shapes.small)
+            .background(LightGreen, shape = MaterialTheme.shapes.small)
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
@@ -41,7 +41,6 @@ fun DisplayCustomGenreBoxes(genres: List<Genre>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center
     ) {
@@ -49,7 +48,7 @@ fun DisplayCustomGenreBoxes(genres: List<Genre>) {
             if (index != 0) {
                 Spacer(modifier = Modifier.width(8.dp))
             }
-                RandomColorBox(text = genre.name,
+                ColorBox(text = genre.name,
                 )
         }
     }

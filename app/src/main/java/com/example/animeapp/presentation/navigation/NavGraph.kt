@@ -17,6 +17,7 @@ import com.example.animeapp.presentation.screens.noId.NoId
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.castList.ShowWholeCast
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.staffList.ShowWholeStaff
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.characterFull.DisplayCharacterFromId
+import com.example.animeapp.presentation.screens.detailScreen.sideContent.producerFull.ShowScreen
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.staffMemberFull.DisplayStaffMemberFromId
 import com.example.animeapp.presentation.screens.favoritesScreen.FavoriteScreen
 
@@ -89,5 +90,19 @@ fun SetupNavGraph(navController: NavHostController, viewModelProvider: ViewModel
                 viewModelProvider = viewModelProvider
             )
         }
+
+        composable(
+            route = ProducerDetail.value,
+            arguments = listOf(navArgument("id") {
+                type = NavType.IntType
+            }, navArgument("studio_name"){
+                type = NavType.StringType
+            })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments!!.getInt("id")
+            val studio_name = backStackEntry.arguments!!.getString("studio_name")!!
+       ShowScreen(id = id, viewModelProvider = viewModelProvider, studio_name = studio_name)
+        }
+
     }
 }

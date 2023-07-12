@@ -44,13 +44,13 @@ fun MainScreen(
     navController: NavHostController, viewModelProvider: ViewModelProvider
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
-    val searchText = viewModel.searchText.collectAsStateWithLifecycle()
-    val isSearching = viewModel.isPerformingSearch.collectAsStateWithLifecycle()
+    val searchText by viewModel.searchText.collectAsStateWithLifecycle()
+    val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
 
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
-                value = searchText.value,
+                value = searchText,
                 onValueChange = viewModel::onSearchTextChange,
                 modifier = Modifier.weight(1f), // Изменено на использование weight для занимания доступного пространства
                 label = {
@@ -67,7 +67,7 @@ fun MainScreen(
             )
         }
 
-        if (!isSearching.value) {
+        if (!isSearching) {
             GridAdder(
                 navController = navController,
                 viewModel = viewModel,

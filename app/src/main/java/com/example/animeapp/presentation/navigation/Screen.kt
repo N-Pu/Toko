@@ -37,3 +37,7 @@ object CharacterDetail {
 object StaffDetail {
     const val value = "detail_on_staff/{id}"
 }
+
+object ProducerDetail {
+    const val value = "detail_on_producer/{id}/{studio_name}"
+}
