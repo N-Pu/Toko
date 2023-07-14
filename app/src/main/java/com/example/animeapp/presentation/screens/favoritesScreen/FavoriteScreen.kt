@@ -57,11 +57,7 @@ import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import com.example.animeapp.presentation.screens.homeScreen.navigateToDetailScreen
 import com.example.animeapp.presentation.theme.LightGreen
 
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewFavoriteScreen() {
-    // TODO: Implement preview
-}
+
 
 enum class AnimeListType {
     WATCHING, PLANNED, WATCHED, DROPPED
@@ -70,7 +66,7 @@ enum class AnimeListType {
 // Function that creates 4 grid sections
 // - watching, planned, watched, dropped
 @Composable
-fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelProvider) {
+fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelProvider, modifier: Modifier) {
     var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
     val dao = MainDb.getDb(LocalContext.current).getDao()
     val scrollState = rememberLazyGridState()
@@ -80,12 +76,12 @@ fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelPro
             .fillMaxSize()
             .background(Color.White)
     ) {
-        Row(modifier = Modifier.weight(2f / 10)) {
+        Row(modifier = modifier.weight(2f / 10)) {
             FavoriteAnimeListButton(
                 listType = AnimeListType.WATCHING,
                 selectedListType = selectedListType,
                 onClick = { selectedListType = AnimeListType.WATCHING },
-                modifier = Modifier
+                modifier = modifier
                     .weight(1f)
                     .fillMaxWidth()
             )
@@ -93,7 +89,7 @@ fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelPro
                 listType = AnimeListType.PLANNED,
                 selectedListType = selectedListType,
                 onClick = { selectedListType = AnimeListType.PLANNED },
-                modifier = Modifier
+                modifier = modifier
                     .weight(1f)
                     .fillMaxWidth()
             )
@@ -101,7 +97,7 @@ fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelPro
                 listType = AnimeListType.WATCHED,
                 selectedListType = selectedListType,
                 onClick = { selectedListType = AnimeListType.WATCHED },
-                modifier = Modifier
+                modifier = modifier
                     .weight(1f)
                     .fillMaxWidth()
             )
@@ -109,7 +105,7 @@ fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelPro
                 listType = AnimeListType.DROPPED,
                 selectedListType = selectedListType,
                 onClick = { selectedListType = AnimeListType.DROPPED },
-                modifier = Modifier
+                modifier = modifier
                     .weight(1f)
                     .fillMaxWidth()
             )
@@ -121,7 +117,8 @@ fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelPro
                 category = "Watching",
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                scrollState = scrollState
+                scrollState = scrollState,
+                modifier = modifier
             )
 
             AnimeListType.PLANNED -> FavoriteAnimeList(
@@ -129,7 +126,8 @@ fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelPro
                 category = "Planned",
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                scrollState = scrollState
+                scrollState = scrollState,
+                modifier = modifier
             )
 
             AnimeListType.WATCHED -> FavoriteAnimeList(
@@ -137,7 +135,8 @@ fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelPro
                 category = "Watched",
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                scrollState = scrollState
+                scrollState = scrollState,
+                modifier = modifier
             )
 
             AnimeListType.DROPPED -> FavoriteAnimeList(
@@ -145,7 +144,8 @@ fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelPro
                 category = "Dropped",
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                scrollState = scrollState
+                scrollState = scrollState,
+                modifier = modifier
             )
         }
 
@@ -181,19 +181,20 @@ fun FavoriteAnimeList(
     category: String,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    scrollState: LazyGridState
+    scrollState: LazyGridState,
+    modifier: Modifier
 ) {
     val animeListState by dao.getAnimeInCategory(category)
         .collectAsStateWithLifecycle(initialValue = emptyList())
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight(9f / 10f)
     ) {
         LazyVerticalGrid(columns = GridCells.Adaptive(140.dp), state = scrollState,
 
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
             contentPadding = PaddingValues(5.dp)) {
@@ -201,7 +202,8 @@ fun FavoriteAnimeList(
                 FavoriteScreenCardBox(
                     animeItem = animeItem,
                     navController = navController,
-                    viewModelProvider = viewModelProvider
+                    viewModelProvider = viewModelProvider,
+                    modifier = modifier
                 )
             }
         }
@@ -215,13 +217,13 @@ fun FavoriteAnimeList(
 @Composable
 fun FavoriteScreenCardBox(
     animeItem: AnimeItem, navController: NavController,
-    viewModelProvider: ViewModelProvider
+    viewModelProvider: ViewModelProvider, modifier: Modifier
 ) {
     val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val painter = rememberAsyncImagePainter(model = animeItem.animeImage)
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(6.dp))
             .clickable {
                 animeItem.id?.let {
@@ -235,18 +237,18 @@ fun FavoriteScreenCardBox(
         colors = CardDefaults.cardColors(containerColor = LightGreen),
         shape = RectangleShape
     ) {
-        Column(modifier = Modifier) {
+        Column(modifier = modifier) {
             Box {
                 Image(
                     painter = painter,
                     contentDescription = "Images for anime: ${animeItem.anime}",
-                    modifier = Modifier.aspectRatio(9f / 11f),
+                    modifier = modifier.aspectRatio(9f / 11f),
                     contentScale = ContentScale.FillBounds
                 )
 
-                Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))) {
-                    ScoreIcon(score = animeItem.score)
-                    ScoredByIcon(scoredBy = animeItem.scored_by)
+                Column(modifier = modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))) {
+                    ScoreIcon(score = animeItem.score, modifier)
+                    ScoredByIcon(scoredBy = animeItem.scored_by, modifier)
                 }
                 AddFavorites(
                     mal_id = animeItem.id ?: 0,
@@ -255,7 +257,7 @@ fun FavoriteScreenCardBox(
                     scoredBy = animeItem.scored_by,
                     animeImage = animeItem.animeImage,
                     context = LocalContext.current,
-                    modifier = Modifier
+                    modifier = modifier
                         .fillMaxSize()
                         .padding(end = 6.dp, top = 180.dp),
                     viewModel = viewModel
@@ -264,7 +266,7 @@ fun FavoriteScreenCardBox(
             Text(
                 text = animeItem.anime,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .basicMarquee(
                         iterations = Int.MAX_VALUE,
@@ -285,13 +287,13 @@ fun FavoriteScreenCardBox(
 // Icon that placed in FavoriteScreenCardBox
 // that shows score
 @Composable
-fun ScoreIcon(score: String) {
-    Box(modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center) {
+fun ScoreIcon(score: String, modifier: Modifier) {
+    Box(modifier = modifier.size(45.dp), contentAlignment = Alignment.Center) {
         Icon(
             Icons.Filled.Star,
             contentDescription = "Score $score",
             tint = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.size(45.dp)
+            modifier = modifier.size(45.dp)
         )
         Text(
             text = score,
@@ -305,13 +307,13 @@ fun ScoreIcon(score: String) {
 // Icon that placed in FavoriteScreenCardBox
 // that shows score by users of MyAnimeList.com
 @Composable
-fun ScoredByIcon(scoredBy: String) {
-    Box(modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center) {
+fun ScoredByIcon(scoredBy: String, modifier: Modifier) {
+    Box(modifier = modifier.size(45.dp), contentAlignment = Alignment.Center) {
         Icon(
             Icons.Filled.Person,
             contentDescription = "Scored by $scoredBy",
             tint = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.size(45.dp)
+            modifier = modifier.size(45.dp)
         )
         Text(
             textAlign = TextAlign.Center,
@@ -319,7 +321,7 @@ fun ScoredByIcon(scoredBy: String) {
             color = Color.White,
             fontSize = 8.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomEnd)
         )

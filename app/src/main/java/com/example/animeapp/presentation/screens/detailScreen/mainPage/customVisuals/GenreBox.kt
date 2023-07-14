@@ -19,7 +19,7 @@ import com.example.animeapp.presentation.theme.LightGreen
 @Composable
 private fun ColorBox(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier
 ) {
 
     Box(
@@ -32,24 +32,27 @@ private fun ColorBox(
             color = Color.White,
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(4.dp)
+            modifier = modifier.padding(4.dp)
         )
     }
 }
+
 @Composable
-fun DisplayCustomGenreBoxes(genres: List<Genre>) {
+fun DisplayCustomGenreBoxes(genres: List<Genre>, modifier: Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center
     ) {
         genres.forEachIndexed { index, genre ->
             if (index != 0) {
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = modifier.width(8.dp))
             }
-                ColorBox(text = genre.name,
-                )
+            ColorBox(
+                text = genre.name,
+                modifier
+            )
         }
     }
 }
@@ -69,5 +72,5 @@ fun ExampleUsage() {
 
         )
 
-    DisplayCustomGenreBoxes(genres)
+//    DisplayCustomGenreBoxes(genres)
 }

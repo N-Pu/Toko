@@ -49,7 +49,10 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DisplayCharacterFromId(
-    mal_id: Int, navController: NavController, viewModelProvider: ViewModelProvider
+    mal_id: Int,
+    navController: NavController,
+    viewModelProvider: ViewModelProvider,
+    modifier: Modifier
 ) {
 
     val viewModel = viewModelProvider[CharacterFullByIdViewModel::class.java]
@@ -68,9 +71,9 @@ fun DisplayCharacterFromId(
 
     val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
     val characterFullState by
-        viewModel.characterFull.collectAsStateWithLifecycle()
+    viewModel.characterFull.collectAsStateWithLifecycle()
     val characterPicturesState by
-        viewModel.picturesList.collectAsStateWithLifecycle()
+    viewModel.picturesList.collectAsStateWithLifecycle()
 
 
     if (isSearching.not()) {
@@ -83,12 +86,12 @@ fun DisplayCharacterFromId(
                 Text(
                     text = "${characterFullState?.name} roles",
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = modifier.fillMaxWidth(),
                     fontSize = 36.sp
                 )
 
                 LazyVerticalStaggeredGrid(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = modifier.fillMaxSize(),
                     columns = StaggeredGridCells.Adaptive(120.dp),
                     contentPadding = PaddingValues(0.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -103,6 +106,7 @@ fun DisplayCharacterFromId(
                                 anime = anime,
                                 painter = painter,
                                 navController = navController,
+                                modifier = modifier
 //                                viewModelProvider = viewModelProvider
                             )
                         }
@@ -112,21 +116,22 @@ fun DisplayCharacterFromId(
 
 
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
 
             ) {
 
                 DisplayHorizontalPagerWithIndicator(
-                    painterList = characterPicturesState
+                    painterList = characterPicturesState,
+                    modifier = modifier
                 )
 
 
 
-                Spacer(modifier = Modifier.size(8.dp))
+                Spacer(modifier = modifier.size(8.dp))
                 characterFullState?.let { data ->
-                    DisplayKanjiAndEnglishName(data = data)
+                    DisplayKanjiAndEnglishName(data = data, modifier = modifier)
 
                 }
 
@@ -136,7 +141,7 @@ fun DisplayCharacterFromId(
                         text = about, textAlign = TextAlign.Center
                     )
                 }
-                Spacer(modifier = Modifier.size(28.dp))
+                Spacer(modifier = modifier.size(28.dp))
             }
 
         }
@@ -152,17 +157,20 @@ fun DisplayCharacterFromId(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DisplayHorizontalPagerWithIndicator(painterList: List<com.example.animeapp.domain.models.characterPictures.Data>) {
+fun DisplayHorizontalPagerWithIndicator(
+    painterList: List<com.example.animeapp.domain.models.characterPictures.Data>,
+    modifier: Modifier
+) {
 
     val pagerState = rememberPagerState(initialPage = 0)
 
     Spacer(
-        modifier = Modifier
+        modifier = modifier
             .height(40.dp)
     )
     HorizontalPager(
         state = pagerState,
-        modifier = Modifier.size(400.dp),
+        modifier = modifier.size(400.dp),
         pageCount = painterList.size,
         reverseLayout = false
     ) { page ->
@@ -171,27 +179,27 @@ fun DisplayHorizontalPagerWithIndicator(painterList: List<com.example.animeapp.d
         Image(
             painter = painter,
             contentDescription = null,
-            modifier = Modifier
+            modifier = modifier
                 .size(400.dp),
 //                .aspectRatio(9 / 11f)
         )
     }
 
     Spacer(
-        modifier = Modifier
+        modifier = modifier
             .height(10.dp)
     )
     // Dot indicators
     Row(
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 8.dp)
             .fillMaxWidth()
     ) {
         repeat(painterList.size) { index ->
             val color = if (index == pagerState.currentPage) Color.DarkGray else LightGreen
             Box(
-                modifier = Modifier
+                modifier = modifier
                     .size(15.dp)
                     .padding(2.dp)
                     .clip(CircleShape)
@@ -203,20 +211,23 @@ fun DisplayHorizontalPagerWithIndicator(painterList: List<com.example.animeapp.d
 
 
 @Composable
-fun DisplayKanjiAndEnglishName(data: com.example.animeapp.domain.models.characterModel.Data) {
+fun DisplayKanjiAndEnglishName(
+    data: com.example.animeapp.domain.models.characterModel.Data,
+    modifier: Modifier
+) {
     Text(
         text = data.name,
         textAlign = TextAlign.Center,
         fontSize = 40.sp,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         maxLines = 1
     )
-    Spacer(modifier = Modifier.size(5.dp))
+    Spacer(modifier = modifier.size(5.dp))
     Text(
         text = "Kanji: " + data.name_kanji,
         textAlign = TextAlign.Center,
         fontSize = 20.sp,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         maxLines = 1
     )
 
@@ -225,7 +236,7 @@ fun DisplayKanjiAndEnglishName(data: com.example.animeapp.domain.models.characte
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showSystemUi = true)
 @Composable
-fun ImagePager() {
+fun PreviewImagePager() {
     val painter1 = rememberAsyncImagePainter(model = R.drawable.kurisu)
     val painter2 = rememberAsyncImagePainter(model = R.drawable.kurisu)
     val painterList = listOf(painter1, painter2)
@@ -250,37 +261,38 @@ fun DisplayProjectsRelated(
     anime: Anime,
     painter: AsyncImagePainter,
     navController: NavController,
+    modifier: Modifier
 //    viewModelProvider: ViewModelProvider
 ) {
-    Card(modifier = Modifier
+    Card(modifier = modifier
         .clickable {
             navController.navigate("detail_screen/${anime.anime.mal_id}")
         }
         .fillMaxSize()
         .padding(PaddingValues(0.dp))) {
 
-        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
             Image(
                 painter = painter,
                 contentDescription = anime.anime.title,
-                modifier = Modifier.size(200.dp)
+                modifier = modifier.size(200.dp)
             )
             Text(
                 text = anime.anime.title,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp) // Добавляем горизонтальный отступ для центрирования текста
             )
             Spacer(
-                modifier = Modifier
+                modifier = modifier
                     .height(1.dp)
                     .fillMaxWidth()
                     .background(Color.Black)
             )
             Text(
                 text = anime.role,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center // Центрируем текст по горизонтали
             )
         }

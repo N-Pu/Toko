@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -55,7 +56,8 @@ import java.lang.IllegalStateException
 fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
     navController: NavController,
-    id: Int
+    id: Int,
+    modifier: Modifier
 ) {
     val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
@@ -93,7 +95,7 @@ fun ActivateDetailScreen(
     if (isSearching.not() && detailData != null) {
 
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .verticalScroll(rememberScrollState()),
 
             horizontalAlignment = Alignment.CenterHorizontally
@@ -101,7 +103,7 @@ fun ActivateDetailScreen(
 
 
             BoxWithConstraints(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 contentAlignment = Alignment.TopCenter
             ) {
 
@@ -115,12 +117,12 @@ fun ActivateDetailScreen(
                 }
 
                 DisplayPicture(
-                    painter = painter, height = maxHeight1
+                    painter = painter, height = maxHeight1, modifier = modifier
                 )
 
             }
 
-            Title(title = detailData?.title ?: "Nothing")
+            Title(title = detailData?.title ?: "Nothing", modifier)
             if (detailData
                     ?.genres
                     ?.isNotEmpty() == true
@@ -133,11 +135,12 @@ fun ActivateDetailScreen(
                             "None",
                             "None"
                         )
-                    )
+                    ),
+                    modifier = modifier
                 )
             }
 
-            ExpandableText(text = detailData?.synopsis ?: "Nothing")
+            ExpandableText(text = detailData?.synopsis ?: "Nothing", modifier)
 
 
             if (castData.isNotEmpty()) {
@@ -280,7 +283,7 @@ fun ActivateDetailScreen(
 
 
 @Composable
-fun ExpandableText(text: String) {
+fun ExpandableText(text: String, modifier: Modifier) {
     val wordCount = text.split(" ").count()
 
     if (wordCount <= 20) {
@@ -298,7 +301,7 @@ fun ExpandableText(text: String) {
             text = text,
             maxLines = maxLines,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
+            modifier = modifier
                 .clickable(onClick = toggleExpanded)
                 .animateContentSize(
                     animationSpec = spring(
@@ -314,7 +317,7 @@ fun ExpandableText(text: String) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowUp,
                     contentDescription = null,
-                    modifier = Modifier
+                    modifier = modifier
                         .clickable(onClick = toggleExpanded)
                         .align(Alignment.CenterVertically)
                         .fillMaxWidth()
@@ -323,7 +326,7 @@ fun ExpandableText(text: String) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowDown,
                     contentDescription = null,
-                    modifier = Modifier
+                    modifier = modifier
                         .clickable(onClick = toggleExpanded)
                         .align(Alignment.CenterVertically)
                         .fillMaxWidth()
@@ -335,12 +338,12 @@ fun ExpandableText(text: String) {
 
 
 @Composable
-fun Title(title: String) {
+fun Title(title: String, modifier: Modifier) {
     Text(
         text = title,
 
         fontSize = 50.sp,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         fontWeight = FontWeight.SemiBold,
         style = TextStyle(
             fontSize = 24.sp,
@@ -352,7 +355,7 @@ fun Title(title: String) {
 
 @Composable
 fun DisplayPicture(
-    painter: AsyncImagePainter, height: Float
+    painter: AsyncImagePainter, height: Float, modifier: Modifier
 ) {
 
     Image(
@@ -360,7 +363,7 @@ fun DisplayPicture(
         contentDescription = "Big anime picture",
 
         contentScale = ContentScale.Fit,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(height.dp),
 //            .defaultMinSize(minWidth = 800.dp, minHeight = 250.dp)

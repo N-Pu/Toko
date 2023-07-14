@@ -75,7 +75,8 @@ import androidx.compose.material3.BottomAppBar as BottomAppBar
 fun TokoAppActivator(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
-    context: Context
+    context: Context,
+    modifier: Modifier
 ) {
 
     var currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedIds
@@ -95,20 +96,23 @@ fun TokoAppActivator(
     Scaffold(bottomBar = {
         BottomNavigationBar(
             navController = navController,
-            currentDetailScreenId = currentDetailScreenId
+            currentDetailScreenId = currentDetailScreenId,
+            modifier = modifier
         )
     }, floatingActionButton = {
 
         MyFloatingButton(
             showButton = showButton,
             context = context,
-            viewModelProvider = viewModelProvider
+            viewModelProvider = viewModelProvider,
+            modifier = modifier
         )
 
     }, floatingActionButtonPosition = FabPosition.Center, content = { padding ->
         padding.calculateTopPadding()
         SetupNavGraph(
-            navController, viewModelProvider
+            navController, viewModelProvider,
+            modifier = modifier
         )
     })
 
@@ -123,7 +127,8 @@ fun TokoAppActivator(
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
-    currentDetailScreenId: () -> Int
+    currentDetailScreenId: () -> Int,
+    modifier: Modifier
 ) {
 
 
@@ -136,21 +141,23 @@ fun BottomNavigationBar(
     val currentRoute = navBackStackEntry?.destination?.route
 
     val brush = Brush.verticalGradient(
-        colors = listOf(Color.Transparent, Color.White),
+        colors = listOf(Color.Transparent,
+            Color.White
+        ),
         startY = 0.0f,
         endY = 200.0f
     )
     val blurRadius = 200.dp
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .height(56.dp)
             .background(brush)
             .clip(RoundedCornerShape(18.dp))
-            .then(Modifier.blur(blurRadius))
+            .then(modifier.blur(blurRadius))
     ) {
         BottomAppBar(
-            modifier = Modifier.height(36.dp), containerColor = Color.Transparent,
+            modifier = modifier.height(36.dp), containerColor = Color.Transparent,
             contentColor = Color.White,
         ) {
             NavigationBarItem(icon = {
@@ -246,7 +253,7 @@ fun BottomNavigationBar(
 
 
 @Composable
-fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, context: Context) {
+fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, context: Context, modifier: Modifier) {
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val detailScreenState by viewModelProvider[DetailScreenViewModel::class.java]
@@ -261,7 +268,7 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
     }
 
     var expanded by remember { mutableStateOf(false) }
-    val selectedItem = remember { mutableStateOf("") }
+    var selectedItem by remember { mutableStateOf("") }
 
     AnimatedVisibility(
         visible = showButton,
@@ -292,7 +299,7 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .width(IntrinsicSize.Min)
             .wrapContentHeight()
             .offset(y = (-16).dp) // Сдвигает меню вверх на 16dp, чтобы не перекрывать кнопку
@@ -307,8 +314,8 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
                 DropdownMenuItem(
                     onClick = {
                         detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                            selectedItem.value = item
-                            if (selectedItem.value == "Delete") {
+                            selectedItem = item
+                            if (selectedItem == "Delete") {
                                 detailScreenState?.let { data ->
                                     dao.removeFromDataBase(data.mal_id)
                                 }
@@ -321,7 +328,7 @@ fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, 
                                             score = formatScore(data.score),
                                             scored_by = formatScoredBy(data.scored_by),
                                             animeImage = data.images.jpg.large_image_url,
-                                            category = selectedItem.value
+                                            category = selectedItem
                                         )
                                     )
                                 }

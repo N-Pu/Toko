@@ -43,10 +43,14 @@ import com.example.animeapp.presentation.theme.LightGreen
 
 
 @Composable
-fun ShowWholeCast(navController: NavController, viewModel: DetailScreenViewModel) {
+fun ShowWholeCast(
+    navController: NavController,
+    viewModel: DetailScreenViewModel,
+    modifier: Modifier
+) {
 
     val castList by
-        viewModel.castList.collectAsStateWithLifecycle()
+    viewModel.castList.collectAsStateWithLifecycle()
 
     LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         itemsIndexed(castList) { _, data ->
@@ -54,11 +58,12 @@ fun ShowWholeCast(navController: NavController, viewModel: DetailScreenViewModel
                 SingleCharacterMember(
                     character = data.character,
                     role = data.role,
-                    navController = navController
+                    navController = navController,
+                    modifier = modifier
                 )
-                Divider(modifier = Modifier.size(10.dp))
+                Divider(modifier = modifier.size(10.dp))
                 Row(
-                    modifier = Modifier
+                    modifier = modifier
                         .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
@@ -66,17 +71,18 @@ fun ShowWholeCast(navController: NavController, viewModel: DetailScreenViewModel
                         SinglePersonMember(
                             person = voiceActor.person,
                             language = voiceActor.language,
-                            navController = navController
+                            navController = navController,
+                            modifier = modifier
                         )
                     }
                 }
             }
             Divider(
-                modifier = Modifier
+                modifier = modifier
                     .height(5.dp)
             )
             Divider(
-                modifier = Modifier
+                modifier = modifier
                     .height(5.dp)
             )
         }
@@ -84,9 +90,14 @@ fun ShowWholeCast(navController: NavController, viewModel: DetailScreenViewModel
 }
 
 @Composable
-fun SingleCharacterMember(character: Character, role: String, navController: NavController) {
+fun SingleCharacterMember(
+    character: Character,
+    role: String,
+    navController: NavController,
+    modifier: Modifier
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .size(123.dp, 150.dp)
             .shadow(
                 elevation = 25.dp,
@@ -104,15 +115,15 @@ fun SingleCharacterMember(character: Character, role: String, navController: Nav
                 }
             }, border = BorderStroke(width = 2.dp, LightGreen)
     ) {
-        Box(modifier = Modifier.background(LightGreen)) {
+        Box(modifier = modifier.background(LightGreen)) {
             Image(
                 painter = rememberAsyncImagePainter(character.images.jpg.image_url),
                 contentDescription = "Character name: ${character.name}",
-                modifier = Modifier.aspectRatio(9f / 11f),
+                modifier = modifier.aspectRatio(9f / 11f),
                 contentScale = ContentScale.Crop
             )
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .align(Alignment.TopStart)
                     .padding(bottom = 16.dp)
             ) {
@@ -120,7 +131,7 @@ fun SingleCharacterMember(character: Character, role: String, navController: Nav
                 Text(text = role, textAlign = TextAlign.Center, color = Color.White)
             }
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 16.dp)
             ) {
@@ -132,9 +143,14 @@ fun SingleCharacterMember(character: Character, role: String, navController: Nav
 }
 
 @Composable
-fun SinglePersonMember(person: Person, language: String, navController: NavController) {
+fun SinglePersonMember(
+    person: Person,
+    language: String,
+    navController: NavController,
+    modifier: Modifier
+) {
 
-    Card(modifier = Modifier
+    Card(modifier = modifier
         .size(123.dp, 150.dp)
         .clickable {
             navController.navigate("detail_on_staff/${person.mal_id}") {
@@ -147,11 +163,11 @@ fun SinglePersonMember(person: Person, language: String, navController: NavContr
             Image(
                 painter = rememberAsyncImagePainter(person.images.jpg.image_url),
                 contentDescription = "Character name: ${person.name}",
-                modifier = Modifier.aspectRatio(9f / 11f),
+                modifier = modifier.aspectRatio(9f / 11f),
                 contentScale = ContentScale.Crop
             )
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .align(Alignment.TopStart)
                     .padding(bottom = 16.dp)
             ) {
@@ -160,7 +176,7 @@ fun SinglePersonMember(person: Person, language: String, navController: NavContr
                     text = language,
                     textAlign = TextAlign.Center,
                     color = Color.White,
-                    modifier = Modifier
+                    modifier = modifier
                         .shadow(
                             4.dp,
                             shape = MaterialTheme.shapes.large,
@@ -170,16 +186,16 @@ fun SinglePersonMember(person: Person, language: String, navController: NavContr
             }
 
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 16.dp)
             ) {
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = modifier.weight(1f))
                 Text(
                     text = person.name,
                     textAlign = TextAlign.Center,
                     color = Color.White,
-                    modifier = Modifier
+                    modifier = modifier
                         .shadow(
                             4.dp,
                             shape = MaterialTheme.shapes.large,

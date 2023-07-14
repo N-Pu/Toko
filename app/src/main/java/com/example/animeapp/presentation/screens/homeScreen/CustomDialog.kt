@@ -26,22 +26,22 @@ import com.example.animeapp.presentation.screens.detailScreen.mainPage.customVis
 
 @Composable
 fun CustomDialog(
-    onDismiss: () -> Unit, data: Data, navController: NavController, painter: AsyncImagePainter
+    onDismiss: () -> Unit, data: Data, navController: NavController, painter: AsyncImagePainter, modifier: Modifier
 ) {
     Dialog(onDismissRequest = {
         onDismiss.invoke()
     }) {
-        Card(modifier = Modifier.size(550.dp)) {
+        Card(modifier = modifier.size(550.dp)) {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .height(300.dp)
                     .fillMaxWidth()
             ) {
-                DisplayDialogPicture(painter, 400f, data.mal_id, navController)
+                DisplayDialogPicture(painter, 400f, data.mal_id, navController, modifier = modifier)
 
             }
             LazyColumn(
-                modifier = Modifier
+                modifier = modifier
                     .verticalScroll(rememberScrollState())
                     .height(300.dp)
                     .fillMaxWidth()
@@ -57,7 +57,7 @@ fun CustomDialog(
                     Text(text = "Season: " + data.season)
                     Text(text = "Type: " + data.type)
                     Box(
-                        modifier = Modifier
+                        modifier = modifier
                             .height(
                                 20.dp
                             )
@@ -71,7 +71,7 @@ fun CustomDialog(
                     Text(text = "Episodes: " + data.episodes)
                     Text(text = "Status: " + data.status)
                     Text(text = "Rating: " + data.rating)
-                    DisplayCustomGenreBoxes(genres = data.genres)
+                    DisplayCustomGenreBoxes(genres = data.genres, modifier = modifier)
                 }
                 item {
                     Box(
@@ -96,7 +96,7 @@ fun CustomDialog(
 
 @Composable
 fun DisplayDialogPicture(
-    painter: AsyncImagePainter, height: Float, mal_id: Int, navController: NavController
+    painter: AsyncImagePainter, height: Float, mal_id: Int, navController: NavController, modifier: Modifier
 ) {
 
     Image(
@@ -104,7 +104,7 @@ fun DisplayDialogPicture(
         contentDescription = "Big anime picture",
 
         contentScale = ContentScale.Fit,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(height.dp)
             .clickable {

@@ -43,7 +43,8 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DisplayStaffMemberFromId(
-    mal_id: Int, navController: NavController, viewModelProvider: ViewModelProvider
+    mal_id: Int, navController: NavController, viewModelProvider: ViewModelProvider,
+    modifier: Modifier
 ) {
 
 
@@ -56,7 +57,7 @@ fun DisplayStaffMemberFromId(
 
     val isSearching by viewModelProvider[PersonByIdViewModel::class.java].isSearching.collectAsStateWithLifecycle()
     val staffFullState by
-        viewModelProvider[PersonByIdViewModel::class.java].personFull.collectAsStateWithLifecycle()
+    viewModelProvider[PersonByIdViewModel::class.java].personFull.collectAsStateWithLifecycle()
     val painter =
         rememberAsyncImagePainter(model = staffFullState?.images?.jpg?.image_url)
     if (isSearching.not()) {
@@ -67,11 +68,11 @@ fun DisplayStaffMemberFromId(
                 Text(
                     text = "${staffFullState?.name} roles",
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = modifier.fillMaxWidth(),
                     fontSize = 36.sp
                 )
                 LazyVerticalStaggeredGrid(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = modifier.fillMaxSize(),
                     columns = StaggeredGridCells.Adaptive(120.dp),
                     contentPadding = PaddingValues(0.dp),
 
@@ -88,6 +89,7 @@ fun DisplayStaffMemberFromId(
                                 anime = anime,
                                 painter = painterRoles,
                                 navController = navController,
+                                modifier = modifier
 //                                viewModelProvider = viewModelProvider
                             )
 
@@ -97,10 +99,10 @@ fun DisplayStaffMemberFromId(
             }) {
 
 
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(modifier = modifier.fillMaxSize()) {
                 item {
                     Card(
-                        modifier = Modifier
+                        modifier = modifier
                             .fillMaxSize()
                     ) {
 
@@ -108,14 +110,14 @@ fun DisplayStaffMemberFromId(
                         Image(
                             painter = painter,
                             contentDescription = "Character name: ${staffFullState?.name}",
-                            modifier = Modifier
+                            modifier = modifier
                                 .size(400.dp)
                                 .aspectRatio(9 / 11f)
                         )
                     }
 
 
-                    Spacer(modifier = Modifier.size(28.dp))
+                    Spacer(modifier = modifier.size(28.dp))
 
                 }
 
@@ -125,7 +127,7 @@ fun DisplayStaffMemberFromId(
                             text = it.name,
                             textAlign = TextAlign.Center,
                             fontSize = 40.sp,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = modifier.fillMaxWidth(),
                             maxLines = 1
                         )
                     }
@@ -134,7 +136,7 @@ fun DisplayStaffMemberFromId(
                         Text(
                             text = about,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = modifier.fillMaxWidth()
                         )
                     }
                 }
@@ -152,36 +154,37 @@ fun DisplayProjectsRelated(
     anime: Anime,
     painter: AsyncImagePainter,
     navController: NavController,
+    modifier: Modifier
 ) {
-    Card(modifier = Modifier
+    Card(modifier = modifier
         .clickable {
             navController.navigate("detail_screen/${anime.anime.mal_id}")
         }
         .fillMaxSize()
         .padding(PaddingValues(0.dp))) {
 
-        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
             Image(
                 painter = painter,
                 contentDescription = anime.anime.title,
-                modifier = Modifier.size(200.dp)
+                modifier = modifier.size(200.dp)
             )
             Text(
                 text = anime.anime.title,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp) // Добавляем горизонтальный отступ для центрирования текста
             )
             Spacer(
-                modifier = Modifier
+                modifier = modifier
                     .height(1.dp)
                     .fillMaxWidth()
                     .background(Color.Black)
             )
             Text(
                 text = anime.position,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center // Центрируем текст по горизонтали
             )
         }

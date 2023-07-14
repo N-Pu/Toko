@@ -1,14 +1,16 @@
 package com.example.animeapp.presentation
 
+
 import android.os.Bundle
 import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
@@ -16,10 +18,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.animeapp.repository.MalApiService
 import com.example.animeapp.presentation.appConstraction.TokoAppActivator
 import com.example.animeapp.presentation.theme.AnimeAppTheme
-import com.example.animeapp.presentation.theme.MainBackgroundColor
 import com.example.animeapp.presentation.theme.LightGreen
-
 import com.example.animeapp.domain.viewModel.viewModelFactory.MyViewModelFactory
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 
 //@HiltAndroidApp
@@ -27,33 +29,36 @@ class MainActivity : ComponentActivity() {
 
 
     private lateinit var navController: NavHostController
+    private var modifier: Modifier = Modifier
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
+        super.onCreate(savedInstanceState)
         noTitleBarAndSplashScreenActivator()
 
+
         setContent {
+            changeStatusBarColor()
+            val myViewModelFactory = MyViewModelFactory(MalApiService.api)
+            val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
+
             AnimeAppTheme {
 
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MainBackgroundColor
+                    modifier = modifier.fillMaxSize(),
+//                    color = MainBackgroundColor
 
 
                 ) {
-                    installSplashScreen() // Custom Splash Screen
-                    navController = rememberNavController()
 
-                    val context = LocalContext.current
-                    val myViewModelFactory = MyViewModelFactory(MalApiService.api)
-                    val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
+                    navController = rememberNavController()
 
                     TokoAppActivator(
                         navController = navController,
                         viewModelProvider = viewModelProvider,
-                        context = context,
+                        context = this,
+                        modifier = modifier
                     )
 
 
@@ -76,8 +81,18 @@ class MainActivity : ComponentActivity() {
 //    }
     private fun noTitleBarAndSplashScreenActivator() {
         window.navigationBarColor = LightGreen.toArgb()
+        window.statusBarColor = LightGreen.toArgb()
         requestWindowFeature(Window.FEATURE_NO_TITLE) // Undo topBar
         installSplashScreen() // Custom Splash Screen
+    }
+
+    @Composable
+    private fun changeStatusBarColor() {
+        SideEffect {
+            MainScope().launch {
+                window.statusBarColor = LightGreen.toArgb()
+            }
+        }
     }
 }
 

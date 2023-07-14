@@ -2,6 +2,12 @@ package com.example.animeapp.presentation.screens.homeScreen
 
 
 import HomeScreenViewModel
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -21,12 +27,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -50,6 +60,7 @@ import com.example.animeapp.domain.models.newAnimeSearchModel.Data
 import com.example.animeapp.presentation.theme.LightGreen
 import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -60,7 +71,8 @@ import java.util.Locale
 fun GridAdder(
     navController: NavHostController,
     viewModel: HomeScreenViewModel,
-    viewModelProvider: ViewModelProvider
+    viewModelProvider: ViewModelProvider,
+    modifier: Modifier
 ) {
     val listData by viewModel.animeSearch.collectAsStateWithLifecycle()
     val scrollGridState = rememberLazyStaggeredGridState()
@@ -73,18 +85,18 @@ fun GridAdder(
     LazyVerticalStaggeredGrid(
         state = scrollGridState,
         columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.spacedBy(22.dp),
         verticalItemSpacing = 20.dp,
         contentPadding = PaddingValues(10.dp)
     ) {
         item {
-            Spacer(modifier = Modifier.height(1.dp))
+            Spacer(modifier = modifier.height(1.dp))
 
         }
 
         item {
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = modifier.height(50.dp))
         }
         itemsIndexed(listData.data) { index, data ->
 
@@ -92,7 +104,8 @@ fun GridAdder(
             AnimeCardBox(
                 data = data,
                 navController = navController,
-                viewModel = viewModelProvider[HomeScreenViewModel::class.java]
+                viewModel = viewModelProvider[HomeScreenViewModel::class.java],
+                modifier = modifier
             )
 
             // Загрузка следующей страницы при достижении конца списка и has_next_page = true
@@ -121,7 +134,8 @@ fun GridAdder(
                 onDismiss = {
                     viewModel.onDialogDismiss()
                 },
-                painter = rememberAsyncImagePainter(model = model)
+                painter = rememberAsyncImagePainter(model = model),
+                modifier = modifier
             )
         }
     }
@@ -134,24 +148,50 @@ fun GridAdder(
 fun AnimeCardBox(
     data: Data,
     navController: NavController,
-    viewModel: HomeScreenViewModel
+    viewModel: HomeScreenViewModel,
+    modifier: Modifier
 ) {
     val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
+    var isCardClicked by remember { mutableStateOf(false) }
+
+    val value by rememberInfiniteTransition().animateFloat(
+        initialValue = if (isCardClicked) 0.99f else 1f, // Изменяем значение в зависимости от нажатия на Card
+        targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 600,
+                easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .shadow(20.dp)
+            .then(if (isCardClicked) {
+                modifier.graphicsLayer {
+                    scaleX = value
+                    scaleY = value
+                }
+            } else {
+                modifier
+            })
             .clip(RoundedCornerShape(16.dp))
             .combinedClickable(onLongClick = {
                 viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    isCardClicked = true
                     viewModel.onDialogLongClick(data.mal_id)
+                    delay(3000L)
+                    isCardClicked = false
                 }
+
             }) {
-                viewModel.viewModelScope.launch(Dispatchers.Main) {
-                    navigateToDetailScreen(
-                        navController, data.mal_id
-                    )
-                }
+
+                navigateToDetailScreen(
+                    navController, data.mal_id
+                )
+
             },
         colors = CardDefaults.cardColors(containerColor = LightGreen),
         shape = RectangleShape,
@@ -161,23 +201,23 @@ fun AnimeCardBox(
             Image(
                 painter = painter,
                 contentDescription = "Images for each Anime",
-                modifier = Modifier
+                modifier = modifier
                     .aspectRatio(9f / 11f)
                     .clip(RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.FillBounds
             )
 
             Column(
-                modifier = Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
+                modifier = modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
             ) {
                 Box(
-                    modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
+                    modifier = modifier.size(45.dp), contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Filled.Star,
                         contentDescription = "Score ${data.score}",
                         tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(45.dp)
+                        modifier = modifier.size(45.dp)
                     )
                     Text(
                         text = formatScore(data.score),
@@ -188,7 +228,7 @@ fun AnimeCardBox(
                         )
                 }
                 Box(
-                    modifier = Modifier
+                    modifier = modifier
                         .width(45.dp)
                         .height(50.dp),
 
@@ -198,7 +238,7 @@ fun AnimeCardBox(
                         Icons.Filled.Person,
                         contentDescription = "Scored by ${data.scored_by}",
                         tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier
+                        modifier = modifier
                             .width(45.dp)
                             .height(50.dp)
                     )
@@ -208,7 +248,7 @@ fun AnimeCardBox(
                         color = Color.White,
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier
+                        modifier = modifier
                             .fillMaxWidth()
                             .align(
                                 Alignment.BottomEnd
@@ -224,7 +264,7 @@ fun AnimeCardBox(
                 scoredBy = formatScoredBy(data.scored_by),
                 animeImage = data.images.jpg.image_url,
                 context = LocalContext.current,
-                modifier = Modifier
+                modifier = modifier
                     .padding(end = 6.dp, top = 140.dp),
                 viewModel = viewModel
             )
@@ -235,7 +275,7 @@ fun AnimeCardBox(
         Text(
             text = data.title,
             textAlign = TextAlign.Center,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .basicMarquee(
                     iterations = Int.MAX_VALUE,
@@ -250,10 +290,10 @@ fun AnimeCardBox(
             maxLines = 1
         )
 
-        Row(modifier = Modifier.width(130.dp), horizontalArrangement = Arrangement.SpaceAround) {
+        Row(modifier = modifier.width(130.dp), horizontalArrangement = Arrangement.SpaceAround) {
             Text(text = "Status: " + data.status, fontSize = 10.sp, textAlign = TextAlign.Left)
         }
-        Row(modifier = Modifier.width(60.dp), horizontalArrangement = Arrangement.SpaceAround) {
+        Row(modifier = modifier.width(60.dp), horizontalArrangement = Arrangement.SpaceAround) {
             Text(text = "Type: " + data.type, fontSize = 10.sp, textAlign = TextAlign.Left)
         }
 

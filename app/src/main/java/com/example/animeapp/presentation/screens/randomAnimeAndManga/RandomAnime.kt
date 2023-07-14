@@ -42,16 +42,16 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun ShowRandomScreen(navController: NavController, viewModelProvider: ViewModelProvider) {
+fun ShowRandomScreen(navController: NavController, viewModelProvider: ViewModelProvider, modifier: Modifier) {
     Column(
-        modifier = Modifier
+        modifier = modifier
     ) {
-        ShowRandomAnime(navController, viewModelProvider)
+        ShowRandomAnime(navController, viewModelProvider, modifier)
     }
 }
 
 @Composable
-fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelProvider) {
+fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelProvider, modifier: Modifier) {
     val viewModel =
         viewModelProvider[RandomAnimeViewModel::class.java]
     val state by viewModel.animeDetails.collectAsStateWithLifecycle()
@@ -59,7 +59,7 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
     val painter =
         rememberAsyncImagePainter(model = state?.images?.jpg?.large_image_url)
 
-    val clickableModifier = Modifier.clickable {
+    val clickableModifier = modifier.clickable {
         state?.let { animeData ->
             navigateToDetailScreen(navController, animeData.mal_id)
         }
@@ -67,25 +67,25 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
 
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight(0.84f)
     ) {
         Box {
-            Card(modifier = Modifier.size(450.dp)) {
+            Card(modifier = modifier.size(450.dp)) {
                 Image(
                     painter = painter,
                     contentDescription = "Anime ${state?.title}",
-                    modifier = Modifier
+                    modifier = modifier
                         .fillMaxSize()
                         .then(clickableModifier)
                 )
 
             }
-            Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxHeight()) {
+            Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.fillMaxHeight()) {
                 state?.let {
                     Text(
-                        modifier = Modifier.shadow(115.dp, shape = AbsoluteCutCornerShape(40.dp)),
+                        modifier = modifier.shadow(115.dp, shape = AbsoluteCutCornerShape(40.dp)),
                         text = it.title,
                         textAlign = TextAlign.Center,
                         fontSize = 40.sp,
@@ -100,7 +100,7 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
 
     }
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight(0.4f),
         verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center
@@ -113,15 +113,13 @@ fun ShowRandomAnime(navController: NavController, viewModelProvider: ViewModelPr
                     viewModelProvider[RandomAnimeViewModel::class.java].onTapRandomAnime()
                     clicked = true
                 }
-
-
-            }
+            }, modifier = modifier
         )
     }
 }
 
 @Composable
-fun RandomizerAnimeButton(onClick: () -> Unit) {
+fun RandomizerAnimeButton(onClick: () -> Unit, modifier: Modifier) {
     Button(
         onClick = {
             onClick()
@@ -129,7 +127,7 @@ fun RandomizerAnimeButton(onClick: () -> Unit) {
         colors = ButtonDefaults.buttonColors(
             contentColor = Color.Blue,
             containerColor = Color.Gray
-        ), modifier = Modifier
+        ), modifier = modifier
             .height(200.dp)
             .width(114.dp)
     ) {

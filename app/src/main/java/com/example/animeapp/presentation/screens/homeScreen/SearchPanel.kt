@@ -35,35 +35,63 @@ import androidx.navigation.NavHostController
 import com.example.animeapp.domain.models.linkChangeModel.Score
 import com.example.animeapp.domain.models.linkChangeModel.getStateScore
 import com.example.animeapp.presentation.animations.LoadingAnimation
+import com.example.animeapp.presentation.theme.LightGreen
+import com.example.animeapp.presentation.theme.SoftGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    navController: NavHostController, viewModelProvider: ViewModelProvider
+    navController: NavHostController, viewModelProvider: ViewModelProvider,
+    modifier: Modifier
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
 
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(
+    Column(modifier = modifier.fillMaxWidth(1f)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = modifier
+                .background(
+                    LightGreen
+                )
+                .padding(start = 20.dp, end = 20.dp, top = 15.dp, bottom = 15.dp)
+
+        ) {
+          OutlinedTextField(
                 value = searchText,
                 onValueChange = viewModel::onSearchTextChange,
-                modifier = Modifier.weight(1f), // Изменено на использование weight для занимания доступного пространства
-                label = {
+                modifier = modifier
+                    .weight(0.9f),
+                prefix = {
                     Icon(Icons.Filled.Search, "Search Icon")
                 },
-                shape = RoundedCornerShape(36.dp),
+//                label = {
+//                    Icon(Icons.Filled.Search, "Search Icon")
+//                },
+//                shape = RoundedCornerShape(36.dp),
                 singleLine = true,
-                placeholder = {
-                    Text(text = "Searching anime...")
-                },
+//                placeholder = {
+//                    Text(text = "Searching anime...")
+//                },
                 trailingIcon = {
-                    DropDownMenuWithIconButton(viewModel)
-                }
+                    DropDownMenuWithIconButton(viewModel, modifier)
+                },
+                colors = TextFieldDefaults.
+
+                outlinedTextFieldColors(
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.White,
+                    focusedTextColor = LightGreen,
+                    focusedTrailingIconColor = LightGreen,
+                    focusedPrefixColor = LightGreen,
+                    containerColor = Color.White
+//                    focusedPlaceholderColor = Color.White,
+                )
             )
         }
 
@@ -71,7 +99,8 @@ fun MainScreen(
             GridAdder(
                 navController = navController,
                 viewModel = viewModel,
-                viewModelProvider = viewModelProvider
+                viewModelProvider = viewModelProvider,
+                modifier = modifier
             )
         } else {
             LoadingAnimation()
@@ -81,10 +110,9 @@ fun MainScreen(
 }
 
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel) {
+fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val isDropdownVisible = remember { mutableStateOf(false) }
     IconButton(onClick = {
 
@@ -92,11 +120,11 @@ fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel) {
             isDropdownVisible.value = true
         }
 
-    }, modifier = Modifier.size(65.dp)) {
+    }, modifier = modifier.size(65.dp)) {
         Icon(
             imageVector = Icons.Filled.MoreVert,
             contentDescription = "GenreButton",
-            modifier = Modifier.size(30.dp)
+            modifier = modifier.size(30.dp)
         )
     }
 
@@ -104,10 +132,10 @@ fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel) {
         expanded = isDropdownVisible.value,
         onDismissRequest = { isDropdownVisible.value = false },
     ) {
-        Box(Modifier.size(400.dp)) {
+        Box(modifier.size(400.dp)) {
 
             FlowRow(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 8.dp, vertical = 8.dp),
@@ -115,16 +143,16 @@ fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel) {
                 horizontalArrangement = Arrangement.Center,
                 content = {
 
-                    ShowGenres(viewModel)
-                    ShowRating(viewModel)
-                    ShowTypes(viewModel)
-                    ShowOrderBy(viewModel)
-                    ScoreBar(viewModel = viewModel)
+                    ShowGenres(viewModel, modifier)
+                    ShowRating(viewModel, modifier)
+                    ShowTypes(viewModel, modifier)
+                    ShowOrderBy(viewModel, modifier)
+                    ScoreBar(viewModel = viewModel, modifier = modifier)
                     SafeFowWorkSwitch(viewModel)
 
                 })
         }
-        AddAllButton(viewModel, isDropdownVisible)
+        AddAllButton(viewModel, isDropdownVisible, modifier = modifier)
     }
 
 }
@@ -148,7 +176,7 @@ fun SafeFowWorkSwitch(viewModel: HomeScreenViewModel) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ScoreBar(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     viewModel: HomeScreenViewModel
 ) {
     var ratingState by viewModel.scoreState
@@ -164,7 +192,7 @@ fun ScoreBar(
     }
 
     Row(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -220,7 +248,8 @@ fun ScoreBar(
 
 @Composable
 fun ShowGenres(
-    viewModel: HomeScreenViewModel
+    viewModel: HomeScreenViewModel,
+    modifier: Modifier
 ) {
     val selectedGenre by viewModel.selectedGenre.collectAsStateWithLifecycle()
 
@@ -239,10 +268,11 @@ fun ShowGenres(
                     genreForUI.isSelected.value = !genreForUI.isSelected.value
                     viewModel.tappingOnGenre(genreForUI.id)
                 }
-            }
+            },
+            modifier = modifier
         )
         Spacer(
-            modifier = Modifier
+            modifier = modifier
                 .width(8.dp)
                 .height(50.dp)
         )
@@ -255,15 +285,16 @@ fun ButtonCreator(
     text: String,
     onClick: () -> Unit,
     isTouched: Boolean,
+    modifier: Modifier
 ) {
     Box(
         modifier = Modifier
             .clip(CircleShape)
             .background(
                 if (isTouched) {
-                    Color.Red
+                    LightGreen
                 } else {
-                    Color.Cyan
+                    SoftGreen
                 }
             )
             .clickable(onClick = onClick),
@@ -273,14 +304,14 @@ fun ButtonCreator(
                 text = text,
                 color = Color.White,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(8.dp)
+                modifier = modifier.padding(8.dp)
             )
         }
     )
 }
 
 @Composable
-fun ShowRating(viewModel: HomeScreenViewModel) {
+fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val ratingList by viewModel.ratingList.collectAsStateWithLifecycle()
     val selectedRating by viewModel.selectedRating.collectAsStateWithLifecycle()
 
@@ -297,10 +328,11 @@ fun ShowRating(viewModel: HomeScreenViewModel) {
                     viewModel.setSelectedRating(rating)
                 }
             },
-            text = rating.ratingName
+            text = rating.ratingName,
+            modifier = modifier
         )
         Spacer(
-            modifier = Modifier
+            modifier = modifier
                 .width(8.dp)
                 .height(50.dp)
         )
@@ -308,7 +340,7 @@ fun ShowRating(viewModel: HomeScreenViewModel) {
 }
 
 @Composable
-fun ShowTypes(viewModel: HomeScreenViewModel) {
+fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val typeList by viewModel.typeList.collectAsStateWithLifecycle()
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
 
@@ -325,10 +357,11 @@ fun ShowTypes(viewModel: HomeScreenViewModel) {
                     viewModel.setSelectedType(type)
                 }
             },
-            text = type.typeName
+            text = type.typeName,
+            modifier = modifier
         )
         Spacer(
-            modifier = Modifier
+            modifier = modifier
                 .width(8.dp)
                 .height(50.dp)
         )
@@ -336,7 +369,7 @@ fun ShowTypes(viewModel: HomeScreenViewModel) {
 }
 
 @Composable
-fun ShowOrderBy(viewModel: HomeScreenViewModel) {
+fun ShowOrderBy(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val orderByList by viewModel.orderByList.collectAsStateWithLifecycle()
     val selectedOrderBy by viewModel.selectedOrderBy.collectAsStateWithLifecycle()
 
@@ -353,10 +386,11 @@ fun ShowOrderBy(viewModel: HomeScreenViewModel) {
                     viewModel.setSelectedOrderBy(orderBy)
                 }
             },
-            text = orderBy.orderBy
+            text = orderBy.orderBy,
+            modifier = modifier
         )
         Spacer(
-            modifier = Modifier
+            modifier = modifier
                 .width(8.dp)
                 .height(50.dp)
         )
@@ -366,9 +400,10 @@ fun ShowOrderBy(viewModel: HomeScreenViewModel) {
 @Composable
 fun AddAllButton(
     viewModel: HomeScreenViewModel,
-    isDropdownVisible: MutableState<Boolean>
+    isDropdownVisible: MutableState<Boolean>,
+    modifier: Modifier
 ) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         Button(
             onClick = {
                 viewModel.viewModelScope.launch(Dispatchers.IO) {
@@ -378,7 +413,7 @@ fun AddAllButton(
 
                 }
             },
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = modifier.align(Alignment.BottomCenter)
 
         ) {
             Text(text = "Ok", color = Color.Red)

@@ -25,13 +25,13 @@ import androidx.core.view.ViewCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = MainBackgroundColor,
-    secondary = Brown,
+    secondary = SoftGreen,
     tertiary = LightGreen
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = MainBackgroundColor,
-    secondary = Brown,
+    secondary = SoftGreen,
     tertiary = LightGreen
 
     /* Other default colors to override

@@ -36,7 +36,12 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun ShowScreen(id: Int, viewModelProvider: ViewModelProvider, studio_name: String) {
+fun ShowScreen(
+    id: Int,
+    viewModelProvider: ViewModelProvider,
+    studio_name: String,
+    modifier: Modifier
+) {
 
     LaunchedEffect(id) {
         withContext(Dispatchers.IO) {
@@ -58,11 +63,11 @@ fun ShowScreen(id: Int, viewModelProvider: ViewModelProvider, studio_name: Strin
                 Text(
                     text = "${producerState?.url} roles",
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = modifier.fillMaxWidth(),
                     fontSize = 36.sp
                 )
                 LazyVerticalStaggeredGrid(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = modifier.fillMaxSize(),
                     columns = StaggeredGridCells.Adaptive(120.dp),
                     contentPadding = PaddingValues(0.dp),
 
@@ -80,10 +85,10 @@ fun ShowScreen(id: Int, viewModelProvider: ViewModelProvider, studio_name: Strin
             }) {
 
 
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(modifier = modifier.fillMaxSize()) {
                 item {
                     Card(
-                        modifier = Modifier
+                        modifier = modifier
                             .fillMaxSize()
                     ) {
 
@@ -98,7 +103,7 @@ fun ShowScreen(id: Int, viewModelProvider: ViewModelProvider, studio_name: Strin
                     }
 
 
-                    Spacer(modifier = Modifier.size(28.dp))
+                    Spacer(modifier = modifier.size(28.dp))
 
                 }
 
@@ -108,7 +113,7 @@ fun ShowScreen(id: Int, viewModelProvider: ViewModelProvider, studio_name: Strin
                             text = studio_name,
                             textAlign = TextAlign.Center,
                             fontSize = 40.sp,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = modifier.fillMaxWidth(),
                             maxLines = 2
                         )
                     }
@@ -117,7 +122,7 @@ fun ShowScreen(id: Int, viewModelProvider: ViewModelProvider, studio_name: Strin
                         Text(
                             text = about,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = modifier.fillMaxWidth()
                         )
                     }
                 }

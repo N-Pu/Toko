@@ -42,7 +42,7 @@ import com.example.animeapp.presentation.navigation.Screen
 
 
 @Composable
-fun ShowWholeStaff(navController: NavController, viewModel: DetailScreenViewModel) {
+fun ShowWholeStaff(navController: NavController, viewModel: DetailScreenViewModel, modifier: Modifier) {
 
     val staffState by viewModel.staffList.collectAsStateWithLifecycle()
 
@@ -55,10 +55,10 @@ fun ShowWholeStaff(navController: NavController, viewModel: DetailScreenViewMode
             SingleStaffMember(
                 person = data.person,
                 positions = data.positions,
-                navController = navController
+                navController = navController, modifier = modifier
             )
         }
-        item { Spacer(modifier = Modifier.height(50.dp)) }
+        item { Spacer(modifier = modifier.height(50.dp)) }
 
     }
 
@@ -66,7 +66,7 @@ fun ShowWholeStaff(navController: NavController, viewModel: DetailScreenViewMode
 
 
 @Composable
-fun SingleStaffMember(person: Person, positions: List<String>, navController: NavController) {
+fun SingleStaffMember(person: Person, positions: List<String>, navController: NavController, modifier: Modifier) {
 
     var isVisible by remember {
         mutableStateOf(false)
@@ -83,7 +83,7 @@ fun SingleStaffMember(person: Person, positions: List<String>, navController: Na
         )
     ) {
 
-        Card(modifier = Modifier
+        Card(modifier = modifier
             .clickable {
                 navController.navigate(route = "detail_on_staff/${person.mal_id}") {
 
@@ -98,12 +98,12 @@ fun SingleStaffMember(person: Person, positions: List<String>, navController: Na
                     Image(
                         painter = painter,
                         contentDescription = person.name,
-                        modifier = Modifier.size(123.dp, 150.dp)
+                        modifier = modifier.size(123.dp, 150.dp)
                     )
                     Text(
                         text = person.name,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.width(100.dp)
+                        modifier = modifier.width(100.dp)
                     )
                 }
                 Column {
