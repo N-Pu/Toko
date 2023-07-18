@@ -173,4 +173,27 @@ interface MalApiService {
         }
     }
 
+//    companion object {
+//        val api: MalApiService by lazy {
+//            val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+//
+//            val moshi = Moshi.Builder()
+//                .addLast(KotlinJsonAdapterFactory())
+//                .build()
+//
+//            val httpClient = OkHttpClient.Builder()
+//                .connectTimeout(20, TimeUnit.SECONDS)
+//                .readTimeout(30, TimeUnit.SECONDS)
+//                .addInterceptor(logging)
+//                .build()
+//
+//            Retrofit.Builder()
+//                .baseUrl(BASE_URL)
+//                .addConverterFactory(MoshiConverterFactory.create(moshi))
+//                .client(httpClient)
+//                .build()
+//                .create(MalApiService::class.java)
+//        }
+//    }
+
 }

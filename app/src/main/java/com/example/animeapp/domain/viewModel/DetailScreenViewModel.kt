@@ -1,8 +1,10 @@
 package com.example.animeapp.domain.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.animeapp.domain.models.cache.DataCacheSingleton
 import com.example.animeapp.domain.models.newAnimeSearchModel.Data
 import com.example.animeapp.repository.MalApiService
 import kotlinx.coroutines.Dispatchers
@@ -12,20 +14,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DetailScreenViewModel(private val malApiService: MalApiService) : ViewModel() {
+class DetailScreenViewModel(private val malApiService: MalApiService) :
+    ViewModel() {
 
     //detailData
     private val _animeDetails = MutableStateFlow<Data?>(null)
     val animeDetails: StateFlow<Data?> get() = _animeDetails
-    private val _loadedIds = mutableSetOf<Int>()
-    val loadedIds = {
-        if (_loadedIds.isNotEmpty())
-            _loadedIds.last()
-        else
-            0
-    }
-    val animeCache = mutableMapOf<Int, Data>()
-
+    private val _loadedId = mutableStateOf(0)
+    val loadedId = _loadedId
+    private val animeCache = DataCacheSingleton.dataCache
     private val _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
 
@@ -33,25 +30,20 @@ class DetailScreenViewModel(private val malApiService: MalApiService) : ViewMode
 
         viewModelScope.launch(Dispatchers.IO) {
 
-            val cachedAnime = animeCache[id]
-            if (cachedAnime != null) {
-                _animeDetails.value = cachedAnime
+            if (animeCache.containsId(id)) {
+                _animeDetails.value = animeCache.getData(id)
                 return@launch
             }
-            if (_loadedIds.contains(id)) {
-                return@launch
-            }
-
             try {
                 _isSearching.value = true
                 val response = malApiService.getDetailsFromAnime(id)
                 if (response.isSuccessful) {
                     val data = response.body()?.data
+                    _loadedId.value = id
                     if (data != null) {
                         withContext(Dispatchers.Main) {
                             _animeDetails.value = data
-                            _loadedIds.add(id)
-                            animeCache[id] = data
+                            animeCache.setData(id, data)
                         }
                     }
                 }

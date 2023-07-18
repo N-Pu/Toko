@@ -19,7 +19,7 @@ fun NoId() {
     ) {
 
         Text(
-            text = "No ID, MAN",
+            text = "No ID",
             modifier = Modifier.fillMaxSize(),
             textAlign = TextAlign.Center,
 

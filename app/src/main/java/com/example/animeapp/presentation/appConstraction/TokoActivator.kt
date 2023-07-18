@@ -39,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,13 +80,14 @@ fun TokoAppActivator(
     modifier: Modifier
 ) {
 
-    var currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedIds
+    val currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedId
     var showButton by remember { mutableStateOf(false) }
 
     navController.addOnDestinationChangedListener { _, destination, arguments ->
         showButton = when (destination.route) {
             Screen.Detail.route -> {
-                currentDetailScreenId = { arguments?.getInt("id") ?: 0 }
+                currentDetailScreenId.value = arguments?.getInt("id") ?: 0
+
                 true
             }
 
@@ -111,8 +113,8 @@ fun TokoAppActivator(
     }, floatingActionButtonPosition = FabPosition.Center, content = { padding ->
         padding.calculateTopPadding()
         SetupNavGraph(
-            navController, viewModelProvider,
-            modifier = modifier
+            navController = navController, viewModelProvider = viewModelProvider,
+            modifier = modifier,
         )
     })
 
@@ -127,10 +129,9 @@ fun TokoAppActivator(
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
-    currentDetailScreenId: () -> Int,
+    currentDetailScreenId: MutableState<Int>,
     modifier: Modifier
 ) {
-
 
 
     val items = listOf(
@@ -141,7 +142,8 @@ fun BottomNavigationBar(
     val currentRoute = navBackStackEntry?.destination?.route
 
     val brush = Brush.verticalGradient(
-        colors = listOf(Color.Transparent,
+        colors = listOf(
+            Color.Transparent,
             Color.White
         ),
         startY = 0.0f,
@@ -195,8 +197,8 @@ fun BottomNavigationBar(
             }, selected = currentRoute == items[1].route, onClick = {
                 try {
 
-                    if (currentDetailScreenId.invoke() != 0) {
-                        navController.navigate("detail_screen/${currentDetailScreenId.invoke()}") {
+                    if (currentDetailScreenId.value != 0) {
+                        navController.navigate("detail_screen/${currentDetailScreenId.value}") {
                             navController.graph.startDestinationRoute?.let { route ->
                                 launchSingleTop = true
                             }
@@ -253,7 +255,12 @@ fun BottomNavigationBar(
 
 
 @Composable
-fun MyFloatingButton(showButton: Boolean, viewModelProvider: ViewModelProvider, context: Context, modifier: Modifier) {
+fun MyFloatingButton(
+    showButton: Boolean,
+    viewModelProvider: ViewModelProvider,
+    context: Context,
+    modifier: Modifier
+) {
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val detailScreenState by viewModelProvider[DetailScreenViewModel::class.java]

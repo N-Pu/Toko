@@ -26,9 +26,11 @@ import com.example.animeapp.presentation.screens.favoritesScreen.FavoriteScreen
 fun SetupNavGraph(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier,
+
 ) {
     NavHost(navController = navController, startDestination = Screen.Home.route) {
+
         composable(route = Screen.Home.route) {
             MainScreen(
                 navController = navController,

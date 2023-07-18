@@ -15,6 +15,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.animeapp.domain.models.cache.DataCacheSingleton
 import com.example.animeapp.repository.MalApiService
 import com.example.animeapp.presentation.appConstraction.TokoAppActivator
 import com.example.animeapp.presentation.theme.AnimeAppTheme
@@ -38,8 +39,9 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            changeStatusBarColor()
-            val myViewModelFactory = MyViewModelFactory(MalApiService.api)
+            ChangeStatusBarColor()
+            val myViewModelFactory =
+                MyViewModelFactory(malApiRepository = MalApiService.api)
             val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
 
             AnimeAppTheme {
@@ -87,14 +89,20 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun changeStatusBarColor() {
+    private fun ChangeStatusBarColor() {
         SideEffect {
             MainScope().launch {
                 window.statusBarColor = LightGreen.toArgb()
             }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        DataCacheSingleton.dataCache.clear()
+    }
 }
+
 
 
 

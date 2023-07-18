@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.animeapp.domain.models.cache.DataCacheSingleton
 import com.example.animeapp.domain.models.linkChangeModel.Genre
 import com.example.animeapp.domain.models.linkChangeModel.OrderBy
 import com.example.animeapp.domain.models.linkChangeModel.Rating
@@ -14,6 +15,7 @@ import com.example.animeapp.domain.models.linkChangeModel.getGenres
 import com.example.animeapp.domain.models.linkChangeModel.getOrderBy
 import com.example.animeapp.domain.models.linkChangeModel.getRating
 import com.example.animeapp.domain.models.linkChangeModel.getTypes
+import com.example.animeapp.domain.models.newAnimeSearchModel.Data
 import com.example.animeapp.domain.models.newAnimeSearchModel.Items
 import com.example.animeapp.repository.MalApiService
 import com.example.animeapp.domain.models.newAnimeSearchModel.NewAnimeSearchModel
@@ -26,6 +28,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
 class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewModel() {
+
+
+    private val animeCache = DataCacheSingleton.dataCache
 
     private val emptyItem = Items(0, 0, 0)
     private val emptyNewAnimeSearchModel = NewAnimeSearchModel(
@@ -191,6 +196,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
             ).body()
 
             if (response != null) {
+                homeScreenCaching(response.data)
                 hasNextPage.value = response.pagination.has_next_page
                 _animeSearch.value = response
             }
@@ -232,6 +238,8 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
 //                viewModelScope.async {
                 if (response != null) {
+                    homeScreenCaching(response.data)
+
                     hasNextPage.value = response.pagination.has_next_page
 
                 }
@@ -349,6 +357,15 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
         viewModelScope.launch {
             _selectedAnimeId.value = null
             isDialogShown = false
+        }
+    }
+
+
+    private fun homeScreenCaching(list: List<Data>){
+        list.forEachIndexed { _, data ->
+            if (animeCache.containsId(data.mal_id).not()) {
+                animeCache.setData(data.mal_id, data)
+            }
         }
     }
 }

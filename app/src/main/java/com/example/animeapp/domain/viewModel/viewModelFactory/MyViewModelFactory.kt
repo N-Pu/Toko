@@ -11,7 +11,10 @@ import com.example.animeapp.domain.viewModel.PersonByIdViewModel
 import com.example.animeapp.domain.viewModel.ProducerFullViewModel
 
 @Suppress("UNCHECKED_CAST")
-class MyViewModelFactory(private val malApiRepository: MalApiService) : ViewModelProvider.Factory {
+class MyViewModelFactory(
+    private val malApiRepository: MalApiService,
+) : ViewModelProvider.Factory {
+
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
