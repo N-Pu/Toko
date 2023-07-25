@@ -28,16 +28,18 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImagePainter
 import com.example.animeapp.domain.models.personFullModel.Anime
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.domain.viewModel.PersonByIdViewModel
 import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -46,21 +48,22 @@ fun DisplayStaffMemberFromId(
     mal_id: Int, navController: NavController, viewModelProvider: ViewModelProvider,
     modifier: Modifier
 ) {
-
+    val viewModel = viewModelProvider[PersonByIdViewModel::class.java]
 
     LaunchedEffect(mal_id) {
-        withContext(Dispatchers.IO) {
-            viewModelProvider[PersonByIdViewModel::class.java].getPersonFromId(mal_id)
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
+            viewModel.getPersonFromId(mal_id)
         }
     }
 
 
-    val isSearching by viewModelProvider[PersonByIdViewModel::class.java].isSearching.collectAsStateWithLifecycle()
+    val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
     val staffFullState by
-    viewModelProvider[PersonByIdViewModel::class.java].personFull.collectAsStateWithLifecycle()
+    viewModel.personFull.collectAsStateWithLifecycle()
     val painter =
         rememberAsyncImagePainter(model = staffFullState?.images?.jpg?.image_url)
     if (isSearching.not()) {
+
         BottomSheetScaffold(
             sheetContainerColor = LightGreen,
             sheetPeekHeight = 65.dp,
@@ -90,7 +93,6 @@ fun DisplayStaffMemberFromId(
                                 painter = painterRoles,
                                 navController = navController,
                                 modifier = modifier
-//                                viewModelProvider = viewModelProvider
                             )
 
                         }
@@ -98,27 +100,31 @@ fun DisplayStaffMemberFromId(
                 }
             }) {
 
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.912f),
+                horizontalAlignment = Alignment.CenterHorizontally
 
-            LazyColumn(modifier = modifier.fillMaxSize()) {
+            ) {
                 item {
-                    Card(
+
+                    BoxWithConstraints(
                         modifier = modifier
-                            .fillMaxSize()
+                            .padding(20.dp)
+                            .aspectRatio(9/11f)
+                            .wrapContentSize()
+
                     ) {
-
-
                         Image(
                             painter = painter,
-                            contentDescription = "Character name: ${staffFullState?.name}",
-                            modifier = modifier
-                                .size(400.dp)
-                                .aspectRatio(9 / 11f)
+                            contentDescription = "Person's name: ${staffFullState?.name}",
+                            modifier = Modifier
+                                .fillMaxHeight(1f)
+                                .fillMaxWidth(1f)
+
                         )
                     }
-
-
-                    Spacer(modifier = modifier.size(28.dp))
-
                 }
 
                 item {

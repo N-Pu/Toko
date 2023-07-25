@@ -36,6 +36,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImagePainter
 import com.example.animeapp.R
 import com.example.animeapp.domain.models.characterModel.Anime
@@ -43,7 +44,7 @@ import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -58,7 +59,7 @@ fun DisplayCharacterFromId(
     val viewModel = viewModelProvider[CharacterFullByIdViewModel::class.java]
 
     LaunchedEffect(mal_id) {
-        withContext(Dispatchers.IO) {
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
             delay(300L)
             viewModel.getCharacterFromId(mal_id)
             delay(300L)
@@ -107,7 +108,6 @@ fun DisplayCharacterFromId(
                                 painter = painter,
                                 navController = navController,
                                 modifier = modifier
-//                                viewModelProvider = viewModelProvider
                             )
                         }
                     }
@@ -117,7 +117,8 @@ fun DisplayCharacterFromId(
 
             Column(
                 modifier = modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.912f)
                     .verticalScroll(rememberScrollState())
 
             ) {
@@ -141,7 +142,6 @@ fun DisplayCharacterFromId(
                         text = about, textAlign = TextAlign.Center
                     )
                 }
-                Spacer(modifier = modifier.size(28.dp))
             }
 
         }

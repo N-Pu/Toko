@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme.AnimeApp.Splash" parent="Theme.SplashScreen" >
 
-    <item name="windowSplashScreenBackground">#009688</item>
+    <item name="windowSplashScreenBackground">@color/light_green</item>
     <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
 
         <item name="android:navigationBarColor">@color/light_green</item>

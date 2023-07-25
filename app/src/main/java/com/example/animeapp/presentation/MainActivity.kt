@@ -1,8 +1,10 @@
 package com.example.animeapp.presentation
 
 
+import android.os.Build
 import android.os.Bundle
 import android.view.Window
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -10,8 +12,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -39,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            ChangeStatusBarColor()
+            HideStatusBar()
             val myViewModelFactory =
                 MyViewModelFactory(malApiRepository = MalApiService.api)
             val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
@@ -89,19 +95,35 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun ChangeStatusBarColor() {
+    private fun HideStatusBar() {
         SideEffect {
             MainScope().launch {
-                window.statusBarColor = LightGreen.toArgb()
+                window.statusBarColor = Color.Transparent.toArgb()
             }
         }
-    }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        DataCacheSingleton.dataCache.clear()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+
+            window.decorView.doOnLayout {
+                // Установим поведение системных окон
+                WindowCompat.setDecorFitsSystemWindows(window, false)
+                // Скрыть статус-бар
+                windowInsetsController?.hide(WindowInsetsCompat.Type.statusBars())
+            }
+        } else {
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+            )
+        }
     }
-}
+        override fun onDestroy() {
+            super.onDestroy()
+            DataCacheSingleton.dataCache.clear()
+        }
+
+    }
 
 
 

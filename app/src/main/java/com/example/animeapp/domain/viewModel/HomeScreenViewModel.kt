@@ -29,6 +29,8 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class)
 class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewModel() {
 
+    private var _isDropdownVisible = mutableStateOf(false)
+    var isDropdownMenuVisible = _isDropdownVisible
 
     private val animeCache = DataCacheSingleton.dataCache
 
@@ -347,21 +349,21 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     // ...
 
     fun onDialogLongClick(animeId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _selectedAnimeId.value = animeId
             isDialogShown = true
         }
     }
 
     fun onDialogDismiss() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _selectedAnimeId.value = null
             isDialogShown = false
         }
     }
 
 
-    private fun homeScreenCaching(list: List<Data>){
+    private fun homeScreenCaching(list: List<Data>) {
         list.forEachIndexed { _, data ->
             if (animeCache.containsId(data.mal_id).not()) {
                 animeCache.setData(data.mal_id, data)

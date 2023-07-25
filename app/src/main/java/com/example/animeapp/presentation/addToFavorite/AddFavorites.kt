@@ -1,18 +1,16 @@
 package com.example.animeapp.presentation.addToFavorite
 
-import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,17 +19,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.example.animeapp.dao.AnimeItem
-import com.example.animeapp.dao.MainDb
+import com.example.animeapp.dao.Dao
 import com.example.animeapp.presentation.screens.homeScreen.checkIdInDataBase
 import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
-
 
 
 // Function that starts when you click on
@@ -49,13 +48,12 @@ fun AddFavorites(
     score: String,
     scoredBy: String,
     animeImage: String,
-    context: Context,
     modifier: Modifier,
-    viewModel: ViewModel
+    viewModel: ViewModel,
+    dao: Dao
 ) {
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     var expanded by remember { mutableStateOf(false) }
-    val dao = MainDb.getDb(context).getDao()
     if (checkIdInDataBase(
             dao = dao, id = mal_id
         ).collectAsStateWithLifecycle(initialValue = false).value
@@ -71,15 +69,17 @@ fun AddFavorites(
         modifier = modifier
     ) {
         Column(
-            verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.End,
-            modifier = Modifier.fillMaxSize()
+            modifier = modifier
+                .fillMaxWidth()
         ) {
-            IconButton(onClick = { expanded = true }) {
+            IconButton(
+                onClick = { expanded = true },
+            ) {
                 Icon(
                     Icons.Default.AddCircle,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.inversePrimary
+                    tint = LightGreen
                 )
             }
         }
@@ -89,33 +89,35 @@ fun AddFavorites(
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .background(LightGreen)
-                .align(Alignment.BottomEnd)
+                .align(Alignment.BottomEnd),
+            offset = DpOffset((40).dp, (-30).dp)
         ) {
             items.forEach { item ->
                 DropdownMenuItem(onClick = {
-                        viewModel.viewModelScope.launch(Dispatchers.IO) {
-                            selectedItem = item
-                            if (selectedItem == "Delete") {
-                                dao.removeFromDataBase(mal_id)
-                            } else {
-                                dao.addToCategory(
-                                    AnimeItem(
-                                        mal_id,
-                                        anime = anime,
-                                        score = score,
-                                        scored_by = scoredBy,
-                                        animeImage = animeImage,
-                                        category = selectedItem
-                                    )
+                    viewModel.viewModelScope.launch(Dispatchers.IO) {
+                        selectedItem = item
+                        if (selectedItem == "Delete") {
+                            dao.removeFromDataBase(mal_id)
+                        } else {
+                            dao.addToCategory(
+                                AnimeItem(
+                                    mal_id,
+                                    anime = anime,
+                                    score = score,
+                                    scored_by = scoredBy,
+                                    animeImage = animeImage,
+                                    category = selectedItem
                                 )
-                            }
-                            // on touched - dropDownMenu cancels
-                            expanded = false
+                            )
                         }
+                        // on touched - dropDownMenu cancels
+                        expanded = false
+                    }
 
 
-
-                }, text = { Text(text = item) })
+                },
+                    colors = MenuDefaults.itemColors(textColor = Color.White),
+                    text = { Text(text = item) })
             }
         }
     }

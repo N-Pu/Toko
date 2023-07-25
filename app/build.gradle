@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.animeapp"
-        minSdk 29
+        minSdk 21
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -93,7 +93,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:' + http_version
 
     def cor_version = '1.6.4'
-//    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + cor_version
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + cor_version
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:' + cor_version
 
     //ViewModel for Compose

@@ -26,12 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.viewModel.ProducerFullViewModel
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -42,17 +43,19 @@ fun ShowScreen(
     studio_name: String,
     modifier: Modifier
 ) {
-
+    val viewModel = viewModelProvider[ProducerFullViewModel::class.java]
     LaunchedEffect(id) {
-        withContext(Dispatchers.IO) {
-            viewModelProvider[ProducerFullViewModel::class.java].getProducerFromId(id)
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
+            viewModel.getProducerFromId(id)
         }
+
+
     }
 
 
-    val isSearching by viewModelProvider[ProducerFullViewModel::class.java].isSearching.collectAsStateWithLifecycle()
+    val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
     val producerState by
-    viewModelProvider[ProducerFullViewModel::class.java].producerFull.collectAsStateWithLifecycle()
+    viewModel.producerFull.collectAsStateWithLifecycle()
     val painter =
         rememberAsyncImagePainter(model = producerState?.images?.jpg?.image_url)
     if (isSearching.not()) {

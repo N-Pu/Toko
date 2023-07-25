@@ -11,9 +11,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +33,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.example.animeapp.dao.Dao
 import com.example.animeapp.domain.models.linkChangeModel.Score
 import com.example.animeapp.domain.models.linkChangeModel.getStateScore
 import com.example.animeapp.presentation.animations.LoadingAnimation
@@ -41,56 +43,51 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavHostController, viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier, dao: Dao
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
 
-    Column(modifier = modifier.fillMaxWidth(1f)) {
+    Column(modifier = modifier
+        .fillMaxWidth(1f)
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = modifier
+                .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
+                .shadow(20.dp)
+                .fillMaxWidth(1f)
                 .background(
                     LightGreen
                 )
-                .padding(start = 20.dp, end = 20.dp, top = 15.dp, bottom = 15.dp)
-
+                .padding(start = 20.dp, end = 20.dp, top = 35.dp, bottom = 15.dp)
         ) {
-          OutlinedTextField(
+            OutlinedTextField(
                 value = searchText,
                 onValueChange = viewModel::onSearchTextChange,
-                modifier = modifier
-                    .weight(0.9f),
+                modifier = modifier.fillMaxWidth(1f),
                 prefix = {
                     Icon(Icons.Filled.Search, "Search Icon")
                 },
-//                label = {
-//                    Icon(Icons.Filled.Search, "Search Icon")
-//                },
-//                shape = RoundedCornerShape(36.dp),
                 singleLine = true,
-//                placeholder = {
-//                    Text(text = "Searching anime...")
-//                },
                 trailingIcon = {
                     DropDownMenuWithIconButton(viewModel, modifier)
                 },
-                colors = TextFieldDefaults.
-
-                outlinedTextFieldColors(
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = LightGreen,
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    disabledContainerColor = Color.White,
                     focusedBorderColor = Color.White,
                     unfocusedBorderColor = Color.White,
-                    focusedTextColor = LightGreen,
                     focusedTrailingIconColor = LightGreen,
+                    focusedPlaceholderColor = LightGreen,
                     focusedPrefixColor = LightGreen,
-                    containerColor = Color.White
-//                    focusedPlaceholderColor = Color.White,
                 )
             )
         }
@@ -100,7 +97,8 @@ fun MainScreen(
                 navController = navController,
                 viewModel = viewModel,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier
+                modifier = modifier,
+                dao = dao
             )
         } else {
             LoadingAnimation()
@@ -113,7 +111,8 @@ fun MainScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel, modifier: Modifier) {
-    val isDropdownVisible = remember { mutableStateOf(false) }
+    val isDropdownVisible = viewModel.isDropdownMenuVisible
+
     IconButton(onClick = {
 
         viewModel.viewModelScope.launch(Dispatchers.IO) {

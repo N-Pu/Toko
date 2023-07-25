@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -49,7 +48,6 @@ import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import java.lang.IllegalStateException
 
 
 @Composable
@@ -69,8 +67,6 @@ fun ActivateDetailScreen(
     val staffData by viewModel.staffList.collectAsStateWithLifecycle()
 
 
-    var maxHeight1: Float
-
     LaunchedEffect(id) {
         withContext(Dispatchers.IO) {
             viewModel.onTapAnime(id)
@@ -82,6 +78,7 @@ fun ActivateDetailScreen(
         }
     }
 
+
     val model = ImageRequest.Builder(LocalContext.current)
         .data(detailData?.images?.jpg?.large_image_url)
         .size(Size.ORIGINAL)
@@ -89,7 +86,9 @@ fun ActivateDetailScreen(
         .build()
 
     val painter =
-        rememberAsyncImagePainter(model = model, contentScale = ContentScale.Fit)
+        rememberAsyncImagePainter(
+            model
+        )
 
 
     if (isSearching.not() && detailData != null) {
@@ -97,30 +96,18 @@ fun ActivateDetailScreen(
         Column(
             modifier = modifier
                 .verticalScroll(rememberScrollState()),
-
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-
-
             BoxWithConstraints(
-                modifier = modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopCenter
+                modifier = modifier,
+                contentAlignment = Alignment.TopStart,
             ) {
-
-                maxHeight1 = try {
-                    val maxWidth1 = constraints.maxWidth.toFloat().coerceAtMost(400f)
-                    maxWidth1 * painter.intrinsicSize.height /
-                            painter.intrinsicSize.width
-
-                } catch (e: IllegalStateException) {
-                    600f
-                }
-
                 DisplayPicture(
-                    painter = painter, height = maxHeight1, modifier = modifier
+                    painter = painter, modifier = modifier
                 )
-
             }
+
 
             Title(title = detailData?.title ?: "Nothing", modifier)
             if (detailData
@@ -177,8 +164,8 @@ fun ActivateDetailScreen(
                         println("detail_on_producer/${it.mal_id}/${it.name}")
                         navController.navigate(
                             "detail_on_producer/${it.mal_id}/${it.name}"
-                        ){
-                           launchSingleTop = true
+                        ) {
+                            launchSingleTop = true
                         }
                     }
                 )
@@ -355,19 +342,15 @@ fun Title(title: String, modifier: Modifier) {
 
 @Composable
 fun DisplayPicture(
-    painter: AsyncImagePainter, height: Float, modifier: Modifier
+    painter: AsyncImagePainter, modifier: Modifier
 ) {
 
     Image(
         painter = painter,
         contentDescription = "Big anime picture",
-
-        contentScale = ContentScale.Fit,
+        contentScale = ContentScale.FillWidth,
         modifier = modifier
-            .fillMaxWidth()
-            .height(height.dp),
-//            .defaultMinSize(minWidth = 800.dp, minHeight = 250.dp)
-//            .size(height = height, width = width)
-        alignment = Alignment.TopCenter,
-    )
+            .fillMaxWidth(1f),
+
+        )
 }

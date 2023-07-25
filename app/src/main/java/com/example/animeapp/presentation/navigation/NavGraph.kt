@@ -4,12 +4,14 @@ package com.example.animeapp.presentation.navigation
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.animeapp.dao.MainDb
 import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.screens.detailScreen.mainPage.ActivateDetailScreen
 import com.example.animeapp.presentation.screens.homeScreen.MainScreen
@@ -28,14 +30,15 @@ fun SetupNavGraph(
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
 
-) {
+    ) {
+    val dao = MainDb.getDb(LocalContext.current).getDao()
     NavHost(navController = navController, startDestination = Screen.Home.route) {
-
         composable(route = Screen.Home.route) {
             MainScreen(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier
+                modifier = modifier,
+                dao = dao
             )
         }
         composable(
@@ -61,14 +64,16 @@ fun SetupNavGraph(
             FavoriteScreen(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier
+                modifier = modifier,
+                dao = dao
             )
         }
         composable(route = Screen.RandomAnimeOrManga.route) {
             ShowRandomScreen(
                 navController,
                 viewModelProvider,
-                modifier = modifier
+                modifier = modifier,
+                dao = dao
             )
         }
         composable(route = DetailOnCast.value) {

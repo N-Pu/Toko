@@ -11,9 +11,15 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -34,7 +40,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,9 +51,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,9 +70,9 @@ import com.example.animeapp.presentation.navigation.SetupNavGraph
 import com.example.animeapp.presentation.screens.homeScreen.checkIdInDataBase
 import com.example.animeapp.presentation.screens.homeScreen.formatScore
 import com.example.animeapp.presentation.screens.homeScreen.formatScoredBy
+import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.compose.material3.BottomAppBar as BottomAppBar
 
 
 @Composable
@@ -110,13 +113,28 @@ fun TokoAppActivator(
             modifier = modifier
         )
 
-    }, floatingActionButtonPosition = FabPosition.Center, content = { padding ->
-        padding.calculateTopPadding()
-        SetupNavGraph(
-            navController = navController, viewModelProvider = viewModelProvider,
-            modifier = modifier,
-        )
-    })
+    },
+        snackbarHost = {
+
+            // нижний бар уведомлений
+//            Snackbar {
+//                Box(
+//                    Modifier
+//                        .fillMaxSize()
+//                        .background(Color.Red)) {
+//                        Text("TEXT")
+//                }
+//            }
+
+        }, floatingActionButtonPosition = FabPosition.Center,
+        content = { padding ->
+            padding.calculateTopPadding()
+            SetupNavGraph(
+                navController = navController, viewModelProvider = viewModelProvider,
+                modifier = modifier,
+            )
+        }
+    )
 
 
     LaunchedEffect(showButton) {
@@ -140,116 +158,150 @@ fun BottomNavigationBar(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-
-    val brush = Brush.verticalGradient(
-        colors = listOf(
-            Color.Transparent,
-            Color.White
-        ),
-        startY = 0.0f,
-        endY = 200.0f
-    )
-    val blurRadius = 200.dp
-
-    Box(
-        modifier = modifier
-            .height(56.dp)
-            .background(brush)
-            .clip(RoundedCornerShape(18.dp))
-            .then(modifier.blur(blurRadius))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(1f)
+            .fillMaxHeight(1f)
+            .padding(bottom = 60.dp),
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.Center
     ) {
-        BottomAppBar(
-            modifier = modifier.height(36.dp), containerColor = Color.Transparent,
-            contentColor = Color.White,
+
+        Row(
+            modifier = modifier
+                .clip(
+                    RoundedCornerShape(20.dp)
+                )
+                .fillMaxWidth(0.5f)
+                .background(LightGreen)
+                .background(Color.Transparent)
+
+                .height(50.dp)
+
+                .padding(horizontal = 0.dp, vertical = 0.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            NavigationBarItem(icon = {
+
+            if (currentRoute != null) {
+                Log.d("currentRoute", currentRoute + "==" + items[0].route)
+
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+            ) {
                 Icon(
-                    imageVector = items[0].icon, contentDescription = items[0].contentDescription
-                )
-            }, selected = currentRoute == items[0].route, onClick = {
+                    imageVector = items[0].icon,
+                    contentDescription = items[0].contentDescription,
+                    modifier = modifier.clickable {
+                        try {
+                            navController.navigate(items[0].route) {
 
-                if (currentRoute != null) {
-                    Log.d("currentRoute", currentRoute + "==" + items[0].route)
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                navController.graph.startDestinationRoute?.let { _ ->
+                                    launchSingleTop = true
+                                    // Restore state when reselecting a previously selected item
+                                }
 
-                }
-
-                try {
-                    navController.navigate(items[0].route) {
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        navController.graph.startDestinationRoute?.let { route ->
-                            launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                        }
-
-                    }
-                } catch (e: IllegalArgumentException) {
-
-                    Log.e("CATCH", items[0].route + " " + e.message.toString())
-
-                }
-            })
-
-            NavigationBarItem(icon = {
-                Icon(
-                    imageVector = items[1].icon, contentDescription = items[1].contentDescription
-                )
-            }, selected = currentRoute == items[1].route, onClick = {
-                try {
-
-                    if (currentDetailScreenId.value != 0) {
-                        navController.navigate("detail_screen/${currentDetailScreenId.value}") {
-                            navController.graph.startDestinationRoute?.let { route ->
-                                launchSingleTop = true
                             }
+                        } catch (e: IllegalArgumentException) {
+
+                            Log.e("CATCH", items[0].route + " " + e.message.toString())
+
                         }
-                    } else {
-                        navController.navigate(Nothing.value) {
-                            launchSingleTop = true
+                    }
+                )
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+            ) {
+                Icon(
+                    imageVector = items[1].icon,
+                    contentDescription = items[1].contentDescription,
+                    modifier = modifier.clickable {
+                        try {
+                            if (currentDetailScreenId.value != 0) {
+                                navController.navigate("detail_screen/${currentDetailScreenId.value}") {
+                                    navController.graph.startDestinationRoute?.let { route ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                            } else {
+                                navController.navigate(Nothing.value) {
+                                    launchSingleTop = true
+                                }
+                            }
+
+                        } catch (e: IllegalArgumentException) {
+                            Log.e("CATCH", items[1].route + " " + e.message.toString())
                         }
                     }
-
-                } catch (e: IllegalArgumentException) {
-                    Log.e("CATCH", items[1].route + " " + e.message.toString())
-                }
-            })
-
-            NavigationBarItem(icon = {
-                Icon(
-                    imageVector = items[2].icon, contentDescription = items[2].contentDescription
                 )
-            }, selected = currentRoute == items[2].route, onClick = {
-
-                try {
-                    navController.navigate(items[2].route) {
-                        launchSingleTop = true
-                    }
-                } catch (e: IllegalArgumentException) {
-
-                    Log.e("CATCH", items[2].route + " " + e.message.toString())
-
-                }
-            })
-
-            NavigationBarItem(icon = {
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+            ) {
                 Icon(
-                    imageVector = items[3].icon, contentDescription = items[3].contentDescription
-                )
-            }, selected = currentRoute == items[3].route, onClick = {
-                try {
-                    navController.navigate(items[3].route) {
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
+                    imageVector = items[2].icon,
+                    contentDescription = items[2].contentDescription,
+                    modifier = modifier.clickable {
+                        try {
+                            navController.navigate(items[2].route) {
+
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                navController.graph.startDestinationRoute?.let { _ ->
+                                    launchSingleTop = true
+                                    // Restore state when reselecting a previously selected item
+                                }
+
+                            }
+                        } catch (e: IllegalArgumentException) {
+
+                            Log.e("CATCH", items[2].route + " " + e.message.toString())
+
+                        }
                     }
-                } catch (e: IllegalArgumentException) {
+                )
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+            ) {
+                Icon(
+                    imageVector = items[3].icon,
+                    contentDescription = items[3].contentDescription,
+                    modifier = modifier.clickable {
+                        try {
+                            navController.navigate(items[3].route) {
 
-                    Log.e("CATCH", items[3].route + " " + e.message.toString())
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                navController.graph.startDestinationRoute?.let { _ ->
+                                    launchSingleTop = true
+                                    // Restore state when reselecting a previously selected item
+                                }
 
-                }
-            })
+                            }
+                        } catch (e: IllegalArgumentException) {
 
+                            Log.e("CATCH", items[3].route + " " + e.message.toString())
+
+                        }
+                    }
+                )
+            }
         }
+
     }
 }
 
@@ -288,19 +340,29 @@ fun MyFloatingButton(
             animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
         ) + fadeOut(animationSpec = tween(durationMillis = 500))
     ) {
-        FloatingActionButton(
-            onClick = {
-                detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    expanded = !expanded
-                }
 
-            },
-            containerColor = MaterialTheme.colorScheme.secondary
+        Column(
+            modifier = Modifier.fillMaxSize(1f)
         ) {
-            if (expanded) {
-                Icon(Icons.Filled.Close, "Localized description")
-            } else {
-                Icon(Icons.Filled.Add, "Localized description")
+
+            FloatingActionButton(
+                onClick = {
+                    detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                        expanded = !expanded
+                    }
+
+                },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                modifier = modifier
+                    .background(Color.Red)
+//                    .size(200.dp)
+//                    .padding(bottom = 30.dp)
+            ) {
+                if (expanded) {
+                    Icon(Icons.Filled.Close, "Localized description")
+                } else {
+                    Icon(Icons.Filled.Add, "Localized description")
+                }
             }
         }
     }

@@ -19,7 +19,7 @@ class RandomAnimeViewModel(private val malApiService: MalApiService) :
     private val _animeDetails = MutableStateFlow<Data?>(null)
     val animeDetails: StateFlow<Data?> get() = _animeDetails
 
-    fun onTapRandomAnime() {
+   suspend fun onTapRandomAnime() {
         if (isSearching) return
 
         viewModelScope.launch(Dispatchers.IO) {

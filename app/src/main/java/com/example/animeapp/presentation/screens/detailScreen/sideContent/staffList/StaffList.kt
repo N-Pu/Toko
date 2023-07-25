@@ -47,7 +47,6 @@ fun ListEditor(
     listData: List<com.example.animeapp.domain.models.staffModel.Data>,
     navController: NavController
 ) {
-//    val trimmedStaff = isMoreThenTen(listData)
     Text(text = "Staff", textDecoration = TextDecoration.Underline)
     Row(
         modifier = Modifier
@@ -76,19 +75,17 @@ fun ListEditor(
             textAlign = TextAlign.Left,
             color = Color.Blue,
             textDecoration = TextDecoration.Underline,
-            modifier = Modifier.align(Alignment.BottomEnd).clickable {
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .clickable {
 
-                navController.navigate(DetailOnStaff.value) {
-                    // Удаление экрана ShowWholeStaff и всех экранов выше его в стеке обратной навигации
-                    popUpTo(Screen.Detail.route) {
-                        inclusive = true
+                    navController.navigate(DetailOnStaff.value) {
+                        // Удаление экрана ShowWholeStaff и всех экранов выше его в стеке обратной навигации
+                        popUpTo(Screen.Detail.route) {
+                            inclusive = true
+                        }
                     }
-
-
-                }
-
-
-            })
+                })
     }
 }
 

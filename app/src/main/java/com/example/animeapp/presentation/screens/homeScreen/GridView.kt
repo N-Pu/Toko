@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,8 +51,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.size.Size
 import com.example.animeapp.R
 import com.example.animeapp.dao.Dao
 import com.example.animeapp.domain.models.newAnimeSearchModel.Data
@@ -72,15 +69,12 @@ fun GridAdder(
     navController: NavHostController,
     viewModel: HomeScreenViewModel,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier,
+    dao: Dao
 ) {
     val listData by viewModel.animeSearch.collectAsStateWithLifecycle()
     val scrollGridState = rememberLazyStaggeredGridState()
     val isLoading by viewModel.isNextPageLoading.collectAsStateWithLifecycle()
-
-
-
-
 
     LazyVerticalStaggeredGrid(
         state = scrollGridState,
@@ -105,7 +99,8 @@ fun GridAdder(
                 data = data,
                 navController = navController,
                 viewModel = viewModelProvider[HomeScreenViewModel::class.java],
-                modifier = modifier
+                modifier = modifier,
+                dao = dao
             )
 
             // Загрузка следующей страницы при достижении конца списка и has_next_page = true
@@ -118,26 +113,26 @@ fun GridAdder(
 
 
     if (viewModel.isDialogShown) {
+
         val selectedAnime = listData.data.find { it.mal_id == viewModel.selectedAnimeId.value }
-        selectedAnime?.let { anime ->
 
-            val model = ImageRequest.Builder(LocalContext.current)
-                .data(anime.images.jpg.large_image_url)
-                .size(Size.ORIGINAL)
-                .crossfade(true)
-                .build()
-
-
+        if (selectedAnime != null) {
             CustomDialog(
-                data = anime,
+                data = selectedAnime,
                 navController = navController,
                 onDismiss = {
-                    viewModel.onDialogDismiss()
+                    viewModel.viewModelScope.launch(Dispatchers.IO) {
+                        viewModel.onDialogDismiss()
+                    }
+
                 },
-                painter = rememberAsyncImagePainter(model = model),
-                modifier = modifier
+//                imageRequest = model,
+                modifier = modifier,
+                dao = dao,
+                viewModel = viewModel
             )
         }
+//        }
     }
 
 }
@@ -149,7 +144,8 @@ fun AnimeCardBox(
     data: Data,
     navController: NavController,
     viewModel: HomeScreenViewModel,
-    modifier: Modifier
+    modifier: Modifier,
+    dao: Dao
 ) {
     val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
     var isCardClicked by remember { mutableStateOf(false) }
@@ -196,7 +192,9 @@ fun AnimeCardBox(
         colors = CardDefaults.cardColors(containerColor = LightGreen),
         shape = RectangleShape,
     ) {
-        Box {
+        Box(modifier = modifier
+            .fillMaxWidth(1f)
+            .fillMaxHeight(1f)) {
             // Coil image loader
             Image(
                 painter = painter,
@@ -263,10 +261,10 @@ fun AnimeCardBox(
                 score = formatScore(data.score),
                 scoredBy = formatScoredBy(data.scored_by),
                 animeImage = data.images.jpg.image_url,
-                context = LocalContext.current,
-                modifier = modifier
-                    .padding(end = 6.dp, top = 140.dp),
-                viewModel = viewModel
+//                context = LocalContext.current,
+                modifier = modifier,
+                viewModel = viewModel,
+                dao = dao
             )
 
 
@@ -274,27 +272,44 @@ fun AnimeCardBox(
 
         Text(
             text = data.title,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             modifier = modifier
                 .fillMaxWidth()
-                .basicMarquee(
-                    iterations = Int.MAX_VALUE,
-                    delayMillis = 2000,
-                    initialDelayMillis = 2000,
-                    velocity = 50.dp
-                )
-                .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight(1000),
+//                .basicMarquee(
+//                    iterations = Int.MAX_VALUE,
+//                    delayMillis = 2000,
+//                    initialDelayMillis = 2000,
+//                    velocity = 50.dp
+//                )
+                .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
+            lineHeight = 16.sp,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 16.sp,
             overflow = TextOverflow.Ellipsis,
-            maxLines = 1
+            minLines = 2,
+            maxLines = 2
         )
 
-        Row(modifier = modifier.width(130.dp), horizontalArrangement = Arrangement.SpaceAround) {
-            Text(text = "Status: " + data.status, fontSize = 10.sp, textAlign = TextAlign.Left)
+        Row(modifier = modifier.fillMaxWidth(1f), horizontalArrangement = Arrangement.Start) {
+            Text(
+                text = "Status: " + data.status,
+                fontSize = 10.sp,
+                textAlign = TextAlign.Left,
+                modifier = modifier.padding(start = 10.dp)
+            )
         }
-        Row(modifier = modifier.width(60.dp), horizontalArrangement = Arrangement.SpaceAround) {
-            Text(text = "Type: " + data.type, fontSize = 10.sp, textAlign = TextAlign.Left)
+        Row(
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .padding(bottom = 10.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = "Type: " + data.type,
+                fontSize = 10.sp,
+                textAlign = TextAlign.Left,
+                modifier = modifier.padding(start = 10.dp)
+            )
         }
 
 

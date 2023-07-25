@@ -8,16 +8,13 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -33,13 +30,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,12 +47,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.dao.AnimeItem
 import com.example.animeapp.dao.Dao
-import com.example.animeapp.dao.MainDb
 import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.addToFavorite.AddFavorites
 import com.example.animeapp.presentation.screens.homeScreen.navigateToDetailScreen
 import com.example.animeapp.presentation.theme.LightGreen
-
+import com.example.animeapp.presentation.theme.SoftGreen
 
 
 enum class AnimeListType {
@@ -66,88 +61,127 @@ enum class AnimeListType {
 // Function that creates 4 grid sections
 // - watching, planned, watched, dropped
 @Composable
-fun FavoriteScreen(navController: NavController, viewModelProvider: ViewModelProvider, modifier: Modifier) {
+fun FavoriteScreen(
+    navController: NavController,
+    viewModelProvider: ViewModelProvider,
+    modifier: Modifier,
+    dao: Dao
+) {
     var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
-    val dao = MainDb.getDb(LocalContext.current).getDao()
     val scrollState = rememberLazyGridState()
 
     Column(
-        Modifier
-            .fillMaxSize()
+        modifier
+            .fillMaxHeight(1f)
+            .fillMaxWidth(1f)
             .background(Color.White)
     ) {
-        Row(modifier = modifier.weight(2f / 10)) {
-            FavoriteAnimeListButton(
-                listType = AnimeListType.WATCHING,
-                selectedListType = selectedListType,
-                onClick = { selectedListType = AnimeListType.WATCHING },
+        Row(
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .height(80.dp)
+                .background(LightGreen),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Column(
+                modifier = modifier
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                FavoriteAnimeListButton(
+                    listType = AnimeListType.WATCHING,
+                    selectedListType = selectedListType,
+                    onClick = { selectedListType = AnimeListType.WATCHING },
+                    modifier = modifier
+                )
+            }
+            Column(
+                modifier = modifier
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                FavoriteAnimeListButton(
+                    listType = AnimeListType.PLANNED,
+                    selectedListType = selectedListType,
+                    onClick = { selectedListType = AnimeListType.PLANNED },
+                    modifier = modifier
+                )
+            }
+            Column(
                 modifier = modifier
                     .weight(1f)
-                    .fillMaxWidth()
-            )
-            FavoriteAnimeListButton(
-                listType = AnimeListType.PLANNED,
-                selectedListType = selectedListType,
-                onClick = { selectedListType = AnimeListType.PLANNED },
+                ,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                FavoriteAnimeListButton(
+                    listType = AnimeListType.WATCHED,
+                    selectedListType = selectedListType,
+                    onClick = { selectedListType = AnimeListType.WATCHED },
+                    modifier = modifier
+                )
+            }
+            Column(
                 modifier = modifier
                     .weight(1f)
-                    .fillMaxWidth()
-            )
-            FavoriteAnimeListButton(
-                listType = AnimeListType.WATCHED,
-                selectedListType = selectedListType,
-                onClick = { selectedListType = AnimeListType.WATCHED },
-                modifier = modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            )
-            FavoriteAnimeListButton(
-                listType = AnimeListType.DROPPED,
-                selectedListType = selectedListType,
-                onClick = { selectedListType = AnimeListType.DROPPED },
-                modifier = modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            )
+                ,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                FavoriteAnimeListButton(
+                    listType = AnimeListType.DROPPED,
+                    selectedListType = selectedListType,
+                    onClick = { selectedListType = AnimeListType.DROPPED },
+                    modifier = modifier
+                )
+            }
+
+        }
+        Row(
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .fillMaxHeight(1f)
+                .background(Color.White)
+        ) {
+            when (selectedListType) {
+                AnimeListType.WATCHING -> FavoriteAnimeList(
+                    dao = dao,
+                    category = "Watching",
+                    navController = navController,
+                    viewModelProvider = viewModelProvider,
+                    scrollState = scrollState,
+                    modifier = modifier
+                )
+
+                AnimeListType.PLANNED -> FavoriteAnimeList(
+                    dao = dao,
+                    category = "Planned",
+                    navController = navController,
+                    viewModelProvider = viewModelProvider,
+                    scrollState = scrollState,
+                    modifier = modifier
+                )
+
+                AnimeListType.WATCHED -> FavoriteAnimeList(
+                    dao = dao,
+                    category = "Watched",
+                    navController = navController,
+                    viewModelProvider = viewModelProvider,
+                    scrollState = scrollState,
+                    modifier = modifier
+                )
+
+                AnimeListType.DROPPED -> FavoriteAnimeList(
+                    dao = dao,
+                    category = "Dropped",
+                    navController = navController,
+                    viewModelProvider = viewModelProvider,
+                    scrollState = scrollState,
+                    modifier = modifier
+                )
+            }
         }
 
-        when (selectedListType) {
-            AnimeListType.WATCHING -> FavoriteAnimeList(
-                dao = dao,
-                category = "Watching",
-                navController = navController,
-                viewModelProvider = viewModelProvider,
-                scrollState = scrollState,
-                modifier = modifier
-            )
-
-            AnimeListType.PLANNED -> FavoriteAnimeList(
-                dao = dao,
-                category = "Planned",
-                navController = navController,
-                viewModelProvider = viewModelProvider,
-                scrollState = scrollState,
-                modifier = modifier
-            )
-
-            AnimeListType.WATCHED -> FavoriteAnimeList(
-                dao = dao,
-                category = "Watched",
-                navController = navController,
-                viewModelProvider = viewModelProvider,
-                scrollState = scrollState,
-                modifier = modifier
-            )
-
-            AnimeListType.DROPPED -> FavoriteAnimeList(
-                dao = dao,
-                category = "Dropped",
-                navController = navController,
-                viewModelProvider = viewModelProvider,
-                scrollState = scrollState,
-                modifier = modifier
-            )
-        }
 
         Spacer(modifier = Modifier.height(35.dp))
     }
@@ -163,12 +197,24 @@ fun FavoriteAnimeListButton(
     onClick: () -> Unit,
     modifier: Modifier
 ) {
-    Button(
-        onClick = onClick, modifier = modifier, colors = ButtonDefaults.buttonColors(
-            containerColor = if (selectedListType == listType) Color.Green else Color.LightGray
-        )
+    BoxWithConstraints(
+        modifier = modifier
+            .padding(10.dp)
+            .height(30.dp)
     ) {
-        Text(text = listType.name, maxLines = 1)
+        TextButton(
+            onClick = onClick, modifier = modifier, colors = ButtonDefaults.buttonColors(
+                containerColor = if (selectedListType == listType) SoftGreen else Color.LightGray
+            ),
+            shape = RoundedCornerShape(5.dp)
+        ) {
+            Text(
+                text = listType.name,
+                maxLines = 1,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
     }
 }
 
@@ -189,21 +235,26 @@ fun FavoriteAnimeList(
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight(9f / 10f)
+            .fillMaxWidth(1f)
+            .fillMaxHeight(0.95f)
     ) {
-        LazyVerticalGrid(columns = GridCells.Adaptive(140.dp), state = scrollState,
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(140.dp), state = scrollState,
 
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .fillMaxHeight(1f),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
-            contentPadding = PaddingValues(5.dp)) {
+            contentPadding = PaddingValues(5.dp)
+        ) {
             items(animeListState) { animeItem ->
                 FavoriteScreenCardBox(
                     animeItem = animeItem,
                     navController = navController,
                     viewModelProvider = viewModelProvider,
-                    modifier = modifier
+                    modifier = modifier,
+                    dao = dao
                 )
             }
         }
@@ -216,29 +267,35 @@ fun FavoriteAnimeList(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FavoriteScreenCardBox(
-    animeItem: AnimeItem, navController: NavController,
-    viewModelProvider: ViewModelProvider, modifier: Modifier
+    animeItem: AnimeItem,
+    navController: NavController,
+    viewModelProvider: ViewModelProvider,
+    modifier: Modifier,
+    dao: Dao
 ) {
     val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val painter = rememberAsyncImagePainter(model = animeItem.animeImage)
 
-    Card(
+    Box(
         modifier = modifier
-            .clip(RoundedCornerShape(6.dp))
-            .clickable {
-                animeItem.id?.let {
-//                    viewModel.setId(it)
-                    navigateToDetailScreen(navController, it)
-                }
-//                animeItem.id?.let {
-
-//                }
-            },
-        colors = CardDefaults.cardColors(containerColor = LightGreen),
-        shape = RectangleShape
     ) {
-        Column(modifier = modifier) {
-            Box {
+        Card(
+            modifier = modifier
+                .clickable {
+                    animeItem.id?.let {
+                        navigateToDetailScreen(navController, it)
+                    }
+                },
+            colors = CardDefaults.cardColors(containerColor = LightGreen),
+            shape = RectangleShape
+        ) {
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(1f)
+            ) {
                 Image(
                     painter = painter,
                     contentDescription = "Images for anime: ${animeItem.anime}",
@@ -246,23 +303,25 @@ fun FavoriteScreenCardBox(
                     contentScale = ContentScale.FillBounds
                 )
 
-                Column(modifier = modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))) {
-                    ScoreIcon(score = animeItem.score, modifier)
-                    ScoredByIcon(scoredBy = animeItem.scored_by, modifier)
-                }
                 AddFavorites(
                     mal_id = animeItem.id ?: 0,
                     anime = animeItem.anime,
                     score = animeItem.score,
                     scoredBy = animeItem.scored_by,
                     animeImage = animeItem.animeImage,
-                    context = LocalContext.current,
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(end = 6.dp, top = 180.dp),
-                    viewModel = viewModel
+                    modifier = modifier,
+                    viewModel = viewModel,
+                    dao = dao
                 )
+
+
+                Column(modifier = modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))) {
+                    ScoreIcon(score = animeItem.score, modifier)
+                    ScoredByIcon(scoredBy = animeItem.scored_by, modifier)
+                }
+
             }
+
             Text(
                 text = animeItem.anime,
                 textAlign = TextAlign.Center,
