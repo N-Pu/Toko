@@ -173,12 +173,11 @@ fun BottomNavigationBar(
                     RoundedCornerShape(20.dp)
                 )
                 .fillMaxWidth(0.5f)
-                .background(LightGreen)
+                .background(LightGreen.copy(alpha = 0.6f))
                 .background(Color.Transparent)
-
                 .height(50.dp)
-
                 .padding(horizontal = 0.dp, vertical = 0.dp),
+
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -228,7 +227,7 @@ fun BottomNavigationBar(
                         try {
                             if (currentDetailScreenId.value != 0) {
                                 navController.navigate("detail_screen/${currentDetailScreenId.value}") {
-                                    navController.graph.startDestinationRoute?.let { route ->
+                                    navController.graph.startDestinationRoute?.let { _ ->
                                         launchSingleTop = true
                                     }
                                 }
