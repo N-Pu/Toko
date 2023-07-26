@@ -15,7 +15,7 @@ import com.example.animeapp.dao.MainDb
 import com.example.animeapp.domain.viewModel.DetailScreenViewModel
 import com.example.animeapp.presentation.screens.detailScreen.mainPage.ActivateDetailScreen
 import com.example.animeapp.presentation.screens.homeScreen.MainScreen
-import com.example.animeapp.presentation.screens.randomAnimeAndManga.ShowRandomScreen
+import com.example.animeapp.presentation.screens.randomAnimeScreen.ShowRandomScreen
 import com.example.animeapp.presentation.screens.noId.NoId
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.castList.ShowWholeCast
 import com.example.animeapp.presentation.screens.detailScreen.sideContent.staffList.ShowWholeStaff

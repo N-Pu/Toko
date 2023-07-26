@@ -1,4 +1,4 @@
-package com.example.animeapp.presentation.screens.randomAnimeAndManga
+package com.example.animeapp.presentation.screens.randomAnimeScreen
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -328,7 +328,6 @@ fun AnimeCard(
     val painter =
         rememberAsyncImagePainter(
             model = model,
-//            contentScale = ContentScale.FillBounds
         )
 
     val scoreRoundedCornerShape = remember { RoundedCornerShape(bottomEnd = 10.dp) }
@@ -518,7 +517,12 @@ fun AnimeCard(
                         ) {
 
 
-                            Row(modifier = modifier.fillMaxWidth()) {
+                            Row(modifier = modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(
+                                    rememberScrollState()
+                                ), horizontalArrangement = Arrangement.Center
+                            ) {
                                 val numbOfGenres = data?.genres?.count()
 
                                 if (numbOfGenres != null) {
@@ -639,7 +643,8 @@ private fun ColoredBox(
 private fun DisplayCustomGenres(genres: List<Genre>, modifier: Modifier) {
     Row(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+        ,
         horizontalArrangement = Arrangement.Center
     ) {
         genres.forEachIndexed { index, genre ->

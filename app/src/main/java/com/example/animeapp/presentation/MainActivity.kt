@@ -49,44 +49,25 @@ class MainActivity : ComponentActivity() {
             val myViewModelFactory =
                 MyViewModelFactory(malApiRepository = MalApiService.api)
             val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
+            navController = rememberNavController()
 
             AnimeAppTheme {
 
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = modifier.fillMaxSize(),
-//                    color = MainBackgroundColor
-
-
                 ) {
-
-                    navController = rememberNavController()
-
                     TokoAppActivator(
                         navController = navController,
                         viewModelProvider = viewModelProvider,
                         context = this,
                         modifier = modifier
                     )
-
-
-//                    System.setProperty("webdriver.ie.driver", "IEDriverServer.exe")
-//                    val driver: WebDriver = ChromeDriver()
-//                    val link = driver.get("https://myanimelist.net/news")
-//                    driver.get("chrome://settings/clearBrowserData")
-//                    Log.d("MAIN-SELENIUM", link.toString())
-
-
                 }
             }
         }
     }
 
-    //    override fun onDestroy() {
-//        super.onDestroy()
-//        navController.popBackStack()
-//        println("STACK IS POPED")
-//    }
     private fun noTitleBarAndSplashScreenActivator() {
         window.navigationBarColor = LightGreen.toArgb()
         window.statusBarColor = LightGreen.toArgb()
@@ -106,9 +87,7 @@ class MainActivity : ComponentActivity() {
             val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
 
             window.decorView.doOnLayout {
-                // Установим поведение системных окон
                 WindowCompat.setDecorFitsSystemWindows(window, false)
-                // Скрыть статус-бар
                 windowInsetsController?.hide(WindowInsetsCompat.Type.statusBars())
             }
         } else {
