@@ -15,16 +15,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -43,7 +40,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -90,7 +87,6 @@ fun TokoAppActivator(
         showButton = when (destination.route) {
             Screen.Detail.route -> {
                 currentDetailScreenId.value = arguments?.getInt("id") ?: 0
-
                 true
             }
 
@@ -99,21 +95,30 @@ fun TokoAppActivator(
     }
 
     Scaffold(bottomBar = {
-        BottomNavigationBar(
-            navController = navController,
-            currentDetailScreenId = currentDetailScreenId,
-            modifier = modifier
-        )
-    }, floatingActionButton = {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .fillMaxHeight(1f)
+                .padding(bottom = 60.dp),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.Center
+        ) {
 
-        MyFloatingButton(
-            showButton = showButton,
-            context = context,
-            viewModelProvider = viewModelProvider,
-            modifier = modifier
-        )
+            BottomNavigationBar(
+                navController = navController,
+                currentDetailScreenId = currentDetailScreenId,
+                modifier = modifier
+            )
 
+            MyFloatingButton(
+                showButton = showButton,
+                context = context,
+                viewModelProvider = viewModelProvider,
+                modifier = modifier
+            )
+        }
     },
+//        floatingActionButton = {},
         snackbarHost = {
 
             // нижний бар уведомлений
@@ -135,12 +140,6 @@ fun TokoAppActivator(
             )
         }
     )
-
-
-    LaunchedEffect(showButton) {
-        showButton = true
-    }
-
 }
 
 
@@ -158,44 +157,39 @@ fun BottomNavigationBar(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
     Row(
-        modifier = Modifier
-            .fillMaxWidth(1f)
-            .fillMaxHeight(1f)
-            .padding(bottom = 60.dp),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.Center
+        modifier = modifier
+            .clip(
+                RoundedCornerShape(10.dp)
+            )
+//            .fillMaxWidth(1f)
+            .width(240.dp)
+//            .shadow(20.dp)
+            .background(LightGreen.copy(alpha = 0.6f))
+            .background(Color.Transparent)
+            .height(50.dp),
+
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Row(
-            modifier = modifier
-                .clip(
-                    RoundedCornerShape(20.dp)
-                )
-                .fillMaxWidth(0.5f)
-                .background(LightGreen.copy(alpha = 0.6f))
-                .background(Color.Transparent)
-                .height(50.dp)
-                .padding(horizontal = 0.dp, vertical = 0.dp),
+        if (currentRoute != null) {
+            Log.d("currentRoute", currentRoute + "==" + items[0].route)
 
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
-
-            if (currentRoute != null) {
-                Log.d("currentRoute", currentRoute + "==" + items[0].route)
-
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
-            ) {
-                Icon(
-                    imageVector = items[0].icon,
-                    contentDescription = items[0].contentDescription,
-                    modifier = modifier.clickable {
+            Icon(
+                imageVector = items[0].icon,
+                contentDescription = items[0].contentDescription,
+                modifier = modifier
+                    .size(30.dp)
+                    .clickable {
                         try {
                             navController.navigate(items[0].route) {
 
@@ -213,17 +207,19 @@ fun BottomNavigationBar(
 
                         }
                     }
-                )
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
-            ) {
-                Icon(
-                    imageVector = items[1].icon,
-                    contentDescription = items[1].contentDescription,
-                    modifier = modifier.clickable {
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+        ) {
+            Icon(
+                imageVector = items[1].icon,
+                contentDescription = items[1].contentDescription,
+                modifier = modifier
+                    .size(30.dp)
+                    .clickable {
                         try {
                             if (currentDetailScreenId.value != 0) {
                                 navController.navigate("detail_screen/${currentDetailScreenId.value}") {
@@ -241,17 +237,19 @@ fun BottomNavigationBar(
                             Log.e("CATCH", items[1].route + " " + e.message.toString())
                         }
                     }
-                )
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
-            ) {
-                Icon(
-                    imageVector = items[2].icon,
-                    contentDescription = items[2].contentDescription,
-                    modifier = modifier.clickable {
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+        ) {
+            Icon(
+                imageVector = items[2].icon,
+                contentDescription = items[2].contentDescription,
+                modifier = modifier
+                    .size(30.dp)
+                    .clickable {
                         try {
                             navController.navigate(items[2].route) {
 
@@ -269,17 +267,19 @@ fun BottomNavigationBar(
 
                         }
                     }
-                )
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
-            ) {
-                Icon(
-                    imageVector = items[3].icon,
-                    contentDescription = items[3].contentDescription,
-                    modifier = modifier.clickable {
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+        ) {
+            Icon(
+                imageVector = items[3].icon,
+                contentDescription = items[3].contentDescription,
+                modifier = modifier
+                    .size(30.dp)
+                    .clickable {
                         try {
                             navController.navigate(items[3].route) {
 
@@ -297,11 +297,11 @@ fun BottomNavigationBar(
 
                         }
                     }
-                )
-            }
+            )
         }
-
     }
+
+//    }
 }
 
 
@@ -312,6 +312,8 @@ fun MyFloatingButton(
     context: Context,
     modifier: Modifier
 ) {
+
+
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val detailScreenState by viewModelProvider[DetailScreenViewModel::class.java]
@@ -340,10 +342,13 @@ fun MyFloatingButton(
         ) + fadeOut(animationSpec = tween(durationMillis = 500))
     ) {
 
-        Column(
-            modifier = Modifier.fillMaxSize(1f)
-        ) {
+        Box(
+            modifier = modifier
 
+                .height(50.dp)
+                .width(70.dp),
+            contentAlignment = Alignment.Center
+        ) {
             FloatingActionButton(
                 onClick = {
                     detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
@@ -351,66 +356,104 @@ fun MyFloatingButton(
                     }
 
                 },
-                containerColor = MaterialTheme.colorScheme.secondary,
+                containerColor = LightGreen.copy(alpha = 0.6f),
                 modifier = modifier
-                    .background(Color.Red)
-//                    .size(200.dp)
-//                    .padding(bottom = 30.dp)
+                    .height(50.dp)
+                    .width(50.dp)
             ) {
                 if (expanded) {
-                    Icon(Icons.Filled.Close, "Localized description")
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Localized description"
+                    )
                 } else {
-                    Icon(Icons.Filled.Add, "Localized description")
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Localized description"
+                    )
                 }
             }
+
+//            Box(modifier = modifier
+//                .shadow(20.dp)
+//                .clip(RoundedCornerShape(10.dp))
+//                .clickable {
+//                    detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+//                        expanded = !expanded
+//                    }
+//                }
+//                .background(LightGreen.copy(alpha = 0.6f))
+//                .height(50.dp)
+//                .width(50.dp),
+//                contentAlignment = Alignment.Center) {
+//
+//            }
+//            if (expanded) {
+//                Icon(
+//                    modifier = Modifier.size(30.dp),
+//                    imageVector = Icons.Filled.Close,
+//                    contentDescription = "Localized description"
+//                )
+//            } else {
+//                Icon(
+//                    modifier = Modifier.size(30.dp),
+//                    imageVector = Icons.Filled.Add,
+//                    contentDescription = "Localized description"
+//                )
+//            }
         }
     }
 
-    Box(
+//    Box(
+//        modifier = modifier
+//            .width(IntrinsicSize.Min)
+//            .wrapContentHeight()
+//            .offset(x = (-110).dp, y = (-100).dp)
+//            .padding(end = 0.dp, bottom = 16.dp),
+//        contentAlignment = Alignment.BottomEnd
+//    ) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
         modifier = modifier
-            .width(IntrinsicSize.Min)
-            .wrapContentHeight()
-            .offset(y = (-16).dp) // Сдвигает меню вверх на 16dp, чтобы не перекрывать кнопку
-            .padding(end = 16.dp, bottom = 16.dp),
-        contentAlignment = Alignment.BottomEnd
+            .background(LightGreen),
+        offset = DpOffset(x = (220).dp, y = (-250).dp)
     ) {
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            items.forEach { item ->
-                DropdownMenuItem(
-                    onClick = {
-                        detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                            selectedItem = item
-                            if (selectedItem == "Delete") {
-                                detailScreenState?.let { data ->
-                                    dao.removeFromDataBase(data.mal_id)
-                                }
-                            } else {
-                                detailScreenState?.let { data ->
-                                    dao.addToCategory(
-                                        AnimeItem(
-                                            data.mal_id,
-                                            anime = data.title,
-                                            score = formatScore(data.score),
-                                            scored_by = formatScoredBy(data.scored_by),
-                                            animeImage = data.images.jpg.large_image_url,
-                                            category = selectedItem
-                                        )
-                                    )
-                                }
+        items.forEach { item ->
+            DropdownMenuItem(
+                onClick = {
+                    detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                        selectedItem = item
+                        if (selectedItem == "Delete") {
+                            detailScreenState?.let { data ->
+                                dao.removeFromDataBase(data.mal_id)
                             }
-                            // on touched - dropDownMenu cancels
-                            expanded = false
+                        } else {
+                            detailScreenState?.let { data ->
+                                dao.addToCategory(
+                                    AnimeItem(
+                                        data.mal_id,
+                                        anime = data.title,
+                                        score = formatScore(data.score),
+                                        scored_by = formatScoredBy(data.scored_by),
+                                        animeImage = data.images.jpg.large_image_url,
+                                        category = selectedItem
+                                    )
+                                )
+                            }
                         }
-                    },
-                    text = {
-                        Text(text = item)
-                    })
-            }
+                        // on touched - dropDownMenu cancels
+                        expanded = false
+                    }
+                },
+                text = {
+                    Text(text = item)
+                })
         }
     }
+//    }
 
 }
 

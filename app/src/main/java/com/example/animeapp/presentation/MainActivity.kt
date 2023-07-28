@@ -80,6 +80,8 @@ class MainActivity : ComponentActivity() {
         SideEffect {
             MainScope().launch {
                 window.statusBarColor = Color.Transparent.toArgb()
+//                window.statusBarColor = Color.Black.copy(alpha = 0.5f).toArgb()
+
             }
         }
 

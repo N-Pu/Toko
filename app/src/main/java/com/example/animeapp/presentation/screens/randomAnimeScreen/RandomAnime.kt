@@ -38,7 +38,7 @@ import com.example.animeapp.domain.models.newAnimeSearchModel.Genre
 import com.example.animeapp.domain.viewModel.RandomAnimeViewModel
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.presentation.screens.homeScreen.navigateToDetailScreen
-import com.example.animeapp.presentation.theme.CustomGray
+import com.example.animeapp.presentation.theme.DialogColor
 import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -220,7 +220,7 @@ fun CardPreview() {
                     modifier = Modifier
                         .width(300.dp)
                         .height(430.dp),
-                    colors = CardDefaults.cardColors(containerColor = CustomGray),
+                    colors = CardDefaults.cardColors(containerColor = DialogColor),
                 ) {
                     Box(
                         modifier = Modifier
@@ -454,8 +454,6 @@ fun AnimeCard(
 
             }
 
-
-
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top,
@@ -487,7 +485,10 @@ fun AnimeCard(
                     ) {
                         Box(
                             modifier = modifier
-                                .background(LightGreen, scoreRoundedCornerShape)
+                                .background(
+                                    scoreColorChanger(data?.score ?: 0.0f),
+                                    scoreRoundedCornerShape
+                                )
                                 .size(75.dp), contentAlignment = Alignment.Center
                         ) {
 
@@ -517,11 +518,12 @@ fun AnimeCard(
                         ) {
 
 
-                            Row(modifier = modifier
-                                .fillMaxWidth()
-                                .horizontalScroll(
-                                    rememberScrollState()
-                                ), horizontalArrangement = Arrangement.Center
+                            Row(
+                                modifier = modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(
+                                        rememberScrollState()
+                                    ), horizontalArrangement = Arrangement.Center
                             ) {
                                 val numbOfGenres = data?.genres?.count()
 
@@ -603,11 +605,11 @@ fun AnimeCard(
 
                     Text(data.season + " " + data.year.toString(), color = LightGreen)
 
-                    Text(" | ", color = CustomGray)
+                    Text(" | ", color = DialogColor)
                 }
                 Text(data?.type ?: "N/A", color = LightGreen)
                 if (!isStudioEmpty) {
-                    Text(" | ", color = CustomGray)
+                    Text(" | ", color = DialogColor)
 
                     Text(data?.studios?.component1()?.name ?: "N/A", color = LightGreen)
                 }
@@ -643,8 +645,7 @@ private fun ColoredBox(
 private fun DisplayCustomGenres(genres: List<Genre>, modifier: Modifier) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
-        ,
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         genres.forEachIndexed { index, genre ->

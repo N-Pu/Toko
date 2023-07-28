@@ -21,7 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Star
@@ -47,11 +47,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -61,6 +63,8 @@ import com.example.animeapp.dao.AnimeItem
 import com.example.animeapp.dao.Dao
 import com.example.animeapp.domain.models.newAnimeSearchModel.Data
 import com.example.animeapp.domain.models.newAnimeSearchModel.Genre
+import com.example.animeapp.presentation.theme.DialogColor
+import com.example.animeapp.presentation.theme.DialogSideColor
 import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -93,7 +97,7 @@ fun CustomDialog(
     }) {
         Card(
             modifier = modifier.size(weight, height()),
-            colors = CardDefaults.cardColors(containerColor = Color(129, 129, 129, 190))
+            colors = CardDefaults.cardColors(containerColor = DialogColor)
         ) {
             Column(
                 modifier = modifier
@@ -103,7 +107,7 @@ fun CustomDialog(
             ) {
                 Text(
                     text = data.title,
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -122,33 +126,31 @@ fun CustomDialog(
             }
             Row(
                 modifier = modifier
-//                    .wrapContentSize()
-                    .padding(15.dp, 0.dp)
-                ,
+                    .padding(15.dp, 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 Column(
                     modifier = modifier
                         .fillMaxWidth(0.55f)
-                        .fillMaxHeight(0.5f)
-                    ,
+                        .fillMaxHeight(0.5f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
 
-                        DisplayDialogPicture(
-                            model,  data.mal_id, navController, modifier = modifier
-                        )
+                    DisplayDialogPicture(
+                        model, data.mal_id, navController, modifier = modifier
+                    )
 
 
                 }
-                Column(modifier = modifier
-                    .fillMaxWidth(1f)
+                Column(
+                    modifier = modifier
+                        .fillMaxWidth(1f)
                 ) {
 
                     ScoreLabel(modifier = modifier)
                     ScoreNumber(modifier = modifier, score = data.score)
-                    ScoreByNumber(modifier = modifier, score_by = data.scored_by)
+                    ScoreByNumber(modifier = modifier, scoreBy = data.scored_by)
 
                     Spacer(modifier = modifier.height(10.dp))
 
@@ -166,12 +168,11 @@ fun CustomDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth(1f)
-                    .padding(15.dp, 0.dp, 0.dp, 0.dp),
+                    .padding(0.dp, 0.dp, 0.dp, 0.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 StatusLine(data.status, modifier)
                 RatingLine(rating = data.rating, modifier = modifier)
-//                DisplayCustomGenres(genres = data.genres, modifier = modifier)
                 CheckGenresSize(
                     numbOfGenres = data.genres.size,
                     genres = data.genres,
@@ -201,7 +202,7 @@ fun ScoreLabel(modifier: Modifier) {
 
     ) {
         Card(
-            modifier = modifier.size(80.dp, 25.dp),
+            modifier = modifier.size(90.dp, 25.dp),
             colors = CardDefaults.cardColors(containerColor = LightGreen),
             shape = RoundedCornerShape(5.dp)
 
@@ -217,7 +218,9 @@ fun ScoreLabel(modifier: Modifier) {
                     text = "SCORE",
                     fontWeight = FontWeight.ExtraBold,
                     textAlign = TextAlign.Center,
-                    color = Color.White
+                    color = Color.White,
+                    fontSize = 16.sp
+
                 )
 
             }
@@ -236,14 +239,14 @@ fun RankedLine(rank: Int, modifier: Modifier) {
         modifier = modifier.horizontalScroll(rememberScrollState())
     ) {
         Text(
-            text = ("       Ranked #"),
+            text = ("       Ranked "),
             fontSize = 12.sp,
-            fontWeight = FontWeight.Thin,
+            fontWeight = FontWeight.ExtraLight,
             color = Color.White
         )
         Text(
-            text = rank.toString(),
-            fontWeight = FontWeight.Bold,
+            text = "#$rank",
+            fontWeight = FontWeight.ExtraBold,
             fontSize = 12.sp,
             color = Color.White
         )
@@ -258,16 +261,16 @@ fun PopularityLine(popularity: Int, modifier: Modifier) {
         modifier = modifier.horizontalScroll(rememberScrollState())
     ) {
         Text(
-            text = ("       Popularity #"),
+            text = ("       Popularity "),
             fontSize = 12.sp,
             fontWeight = FontWeight.Thin,
-            color = Color.White
+            color = Color.White,
         )
         Text(
-            text = popularity.toString(),
+            text = "#$popularity",
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
-            color = Color.White
+            color = Color.White,
         )
     }
 }
@@ -284,13 +287,13 @@ fun MembersLine(members: Int, modifier: Modifier) {
             text = ("       Members "),
             fontSize = 12.sp,
             fontWeight = FontWeight.Thin,
-            color = Color.White
+            color = Color.White,
         )
         Text(
             text = members.toString(),
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
-            color = Color.White
+            color = Color.White,
         )
     }
 }
@@ -309,12 +312,13 @@ fun ScoreNumber(modifier: Modifier, score: Float) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(40.dp), horizontalArrangement = Arrangement.Center
+            .height(35.dp),
+        horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = scoreNumb(),
             color = Color.White,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             fontSize = 30.sp
         )
@@ -322,20 +326,18 @@ fun ScoreNumber(modifier: Modifier, score: Float) {
 }
 
 @Composable
-fun ScoreByNumber(modifier: Modifier, score_by: Float) {
+fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
     val scoreByNumb = {
-        if (score_by == 0.0f) {
+        if (scoreBy == 0.0f) {
             "N/A"
         } else {
-            score_by.toInt().toString()
+            scoreBy.toInt().toString()
         }
 
     }
     Row(
-        modifier = modifier.fillMaxWidth()
-//            .height(10.dp)
-        , horizontalArrangement = Arrangement.Center
+        modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = scoreByNumb() + " users",
@@ -354,7 +356,7 @@ fun YearTypeStudio(data: Data?, modifier: Modifier) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start,
-        modifier = modifier.padding(20.dp, 5.dp, 0.dp, 5.dp)
+        modifier = modifier.padding(25.dp, 5.dp, 0.dp, 5.dp)
     ) {
         val yearSeasonText = buildAnnotatedString {
             if (data?.year != 0 && data?.season != null) {
@@ -375,7 +377,7 @@ fun YearTypeStudio(data: Data?, modifier: Modifier) {
         }
 
         Text(
-            text = yearSeasonText,
+            text = yearSeasonText.toUpperCase(),
             modifier = Modifier.padding(0.dp),
             overflow = TextOverflow.Ellipsis,
             maxLines = 3,
@@ -403,7 +405,7 @@ fun EpisodesLabel(episodes: Int, modifier: Modifier) {
                 .fillMaxWidth(1f)
                 .height(35.dp)
                 .clip(CardDefaults.shape)
-                .background(Color.DarkGray)
+                .background(DialogSideColor)
                 .padding(10.dp, 10.dp, 0.dp, 5.dp),
 
             ) {
@@ -428,16 +430,18 @@ fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: Data, viewModel: HomeSc
 
 
     if (isExpanded) {
+
         DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = {
                 isExpanded = false
             },
             modifier = modifier
-                .background(Color.DarkGray)
+                .background(DialogSideColor)
                 .height(78.dp)
-                .clip(RoundedCornerShape(40.dp)),
+                .clip(RoundedCornerShape(80.dp)),
             offset = DpOffset((-40).dp, (-40).dp),
+            properties = PopupProperties(clippingEnabled = true)
         ) {
 
 
@@ -521,6 +525,8 @@ fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: Data, viewModel: HomeSc
             })
 
         }
+
+
     }
 
     Row(
@@ -530,7 +536,7 @@ fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: Data, viewModel: HomeSc
     ) {
         Column(modifier = modifier.width(10.dp)) {}
         Column(modifier = modifier.fillMaxWidth(0.7f)) {
-            Card(colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+            Card(colors = CardDefaults.cardColors(containerColor = DialogSideColor),
                 modifier = modifier
                     .height(30.dp)
                     .clickable {
@@ -565,7 +571,7 @@ fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: Data, viewModel: HomeSc
                 }
             }
         }
-        Column(modifier = modifier.width(10.dp)) {}
+        Column(modifier = modifier.width(5.dp)) {}
         Column(
             modifier = modifier.fillMaxWidth(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -573,11 +579,11 @@ fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: Data, viewModel: HomeSc
         ) {
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.DarkGray, contentColor = Color.White
+                    containerColor = DialogSideColor, contentColor = Color.White
                 ), modifier = Modifier.size(30.dp)
             ) {
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Icon(imageVector = Icons.Filled.Menu,
+                    Icon(imageVector = Icons.Filled.MoreVert,
                         contentDescription = "Add to favorite button",
                         modifier = Modifier
                             .size(15.dp)
@@ -599,13 +605,14 @@ fun StatusLine(status: String, modifier: Modifier) {
         modifier = modifier
             .horizontalScroll(rememberScrollState())
             .fillMaxWidth(1f)
+            .padding(15.dp, 0.dp, 0.dp, 0.dp)
     ) {
 
         Text(
             text = ("Status: "), fontSize = 12.sp, fontWeight = FontWeight.Thin, color = Color.White
         )
         Text(
-            text = status, fontWeight = FontWeight.Thin, fontSize = 12.sp, color = LightGreen
+            text = status, fontWeight = FontWeight.W400, fontSize = 12.sp, color = LightGreen
         )
     }
 }
@@ -618,12 +625,19 @@ fun RatingLine(rating: String, modifier: Modifier) {
         modifier = modifier
             .horizontalScroll(rememberScrollState())
             .fillMaxWidth(1f)
+            .padding(15.dp, 0.dp, 0.dp, 0.dp)
     ) {
 
         Text(
-            text = ("Rating: $rating"),
+            text = ("Rating: "),
             fontSize = 12.sp,
             fontWeight = FontWeight.Thin,
+            color = Color.White
+        )
+        Text(
+            text = (rating),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.W400,
             color = Color.White
         )
     }
@@ -636,8 +650,8 @@ private fun ColoredBox(
 
     Box(
         modifier = modifier
-            .background(LightGreen, shape = RoundedCornerShape(15.dp))
-            .padding(horizontal = 6.dp, vertical = 6.dp)
+            .background(LightGreen, shape = RoundedCornerShape(10.dp))
+            .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         Text(
             text = text,
@@ -655,7 +669,10 @@ private fun DisplayCustomGenres(genres: List<Genre>, modifier: Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(0.dp, 10.dp, 15.dp, 0.dp),
+            .horizontalScroll(
+                rememberScrollState()
+            )
+            .padding(0.dp, 10.dp, 0.dp, 0.dp),
         horizontalArrangement = Arrangement.Center
     ) {
         genres.forEachIndexed { index, genre ->

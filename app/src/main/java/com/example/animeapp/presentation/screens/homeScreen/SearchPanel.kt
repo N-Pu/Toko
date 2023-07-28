@@ -1,7 +1,6 @@
 package com.example.animeapp.presentation.screens.homeScreen
 
 import HomeScreenViewModel
-import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -29,6 +28,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -39,6 +39,7 @@ import com.example.animeapp.domain.models.linkChangeModel.getStateScore
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.presentation.theme.LightGreen
 import com.example.animeapp.presentation.theme.SoftGreen
+import com.example.animeapp.presentation.theme.ScoreColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -110,7 +111,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel, modifier: Modifier) {
+private fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val isDropdownVisible = viewModel.isDropdownMenuVisible
 
     IconButton(onClick = {
@@ -130,8 +131,9 @@ fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel, modifier: Modifie
     DropdownMenu(
         expanded = isDropdownVisible.value,
         onDismissRequest = { isDropdownVisible.value = false },
+        offset = DpOffset(x =(-270).dp, y = 0.dp)
     ) {
-        Box(modifier.size(400.dp)) {
+        Box(modifier.size(360.dp)) {
 
             FlowRow(
                 modifier = modifier
@@ -157,7 +159,7 @@ fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel, modifier: Modifie
 }
 
 @Composable
-fun SafeFowWorkSwitch(viewModel: HomeScreenViewModel) {
+private fun SafeFowWorkSwitch(viewModel: HomeScreenViewModel) {
 
     var sfw by viewModel.safeForWork
     Box(contentAlignment = Alignment.Center) {
@@ -174,7 +176,7 @@ fun SafeFowWorkSwitch(viewModel: HomeScreenViewModel) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ScoreBar(
+private fun ScoreBar(
     modifier: Modifier,
     viewModel: HomeScreenViewModel
 ) {
@@ -182,8 +184,10 @@ fun ScoreBar(
     var selected by viewModel.selectedMinMax
     val size by animateDpAsState(
         targetValue = if (selected) 30.dp else 34.dp,
-        spring(Spring.DampingRatioMediumBouncy)
+        spring(Spring.DampingRatioMediumBouncy), label = ""
     )
+
+
 
     Box(contentAlignment = Alignment.Center) {
         Divider(thickness = 25.dp)
@@ -212,23 +216,11 @@ fun ScoreBar(
 
                                     viewModel.setSelectedMinScore(Score(getStateScore(ratingState).minScore))
                                     viewModel.setSelectedMaxScore(Score(getStateScore(ratingState).maxScore))
-                                    Log.d(
-                                        "SCORES",
-                                        "MIN->" + getStateScore(ratingState).minScore + " MAX->" + getStateScore(
-                                            ratingState
-                                        ).maxScore
-                                    )
                                 } else {
                                     selected = true
                                     ratingState = i
                                     viewModel.setSelectedMinScore(Score(getStateScore(ratingState).minScore))
                                     viewModel.setSelectedMaxScore(Score(getStateScore(ratingState).maxScore))
-                                    Log.d(
-                                        "SCORES",
-                                        "MIN->" + getStateScore(ratingState).minScore + " MAX->" + getStateScore(
-                                            ratingState
-                                        ).maxScore
-                                    )
                                 }
                             }
 
@@ -238,15 +230,45 @@ fun ScoreBar(
                         }
                         true
                     },
-                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
+                tint = starColorChanger(ratingState, i)
             )
         }
     }
 }
 
 
+
+
+
+private fun starColorChanger(selectedScore: Int, starNumber: Int): Color {
+    return when (selectedScore) {
+        in 1..3 -> {
+            if (starNumber <= selectedScore) {
+                ScoreColors.Red
+            } else {
+                ScoreColors.Blank
+            }
+        }
+        in 4..6 -> {
+            if (starNumber <= selectedScore) {
+                ScoreColors.Yellow
+            } else {
+                ScoreColors.Blank
+            }
+        }
+        in 7..10 -> {
+            if (starNumber <= selectedScore) {
+                ScoreColors.Green
+            } else {
+                ScoreColors.Blank
+            }
+        }
+        else ->   ScoreColors.Blank
+    }
+}
+
 @Composable
-fun ShowGenres(
+private fun ShowGenres(
     viewModel: HomeScreenViewModel,
     modifier: Modifier
 ) {
@@ -280,7 +302,7 @@ fun ShowGenres(
 
 
 @Composable
-fun ButtonCreator(
+private fun ButtonCreator(
     text: String,
     onClick: () -> Unit,
     isTouched: Boolean,
@@ -310,7 +332,7 @@ fun ButtonCreator(
 }
 
 @Composable
-fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier) {
+private fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val ratingList by viewModel.ratingList.collectAsStateWithLifecycle()
     val selectedRating by viewModel.selectedRating.collectAsStateWithLifecycle()
 
@@ -339,7 +361,7 @@ fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier) {
 }
 
 @Composable
-fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier) {
+private fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val typeList by viewModel.typeList.collectAsStateWithLifecycle()
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
 
@@ -368,7 +390,7 @@ fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier) {
 }
 
 @Composable
-fun ShowOrderBy(viewModel: HomeScreenViewModel, modifier: Modifier) {
+private fun ShowOrderBy(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val orderByList by viewModel.orderByList.collectAsStateWithLifecycle()
     val selectedOrderBy by viewModel.selectedOrderBy.collectAsStateWithLifecycle()
 
@@ -397,7 +419,7 @@ fun ShowOrderBy(viewModel: HomeScreenViewModel, modifier: Modifier) {
 }
 
 @Composable
-fun AddAllButton(
+private fun AddAllButton(
     viewModel: HomeScreenViewModel,
     isDropdownVisible: MutableState<Boolean>,
     modifier: Modifier
