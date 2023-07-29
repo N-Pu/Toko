@@ -100,11 +100,10 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
 
     // compose paging 3.0
-    def paging_version = "3.2.0-rc01"
-
-    implementation "androidx.paging:paging-runtime:$paging_version"
-    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    implementation "androidx.paging:paging-compose:$paging_version"
+//    def paging_version = "3.2.0"
+//
+//    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+//    implementation "androidx.paging:paging-compose:$paging_version"
 
 
     //navigation compose
@@ -131,7 +130,6 @@ dependencies {
     implementation 'androidx.room:room-paging:2.5.2'
     annotationProcessor "androidx.room:room-compiler:2.5.2"
 
-    kapt 'androidx.room:room-compiler:2.5.2'
     kapt 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
     kapt 'androidx.lifecycle:lifecycle-common:2.6.1'
     kapt 'androidx.room:room-compiler:2.5.2'
