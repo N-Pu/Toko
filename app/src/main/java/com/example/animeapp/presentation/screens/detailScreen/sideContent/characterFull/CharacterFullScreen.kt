@@ -30,11 +30,18 @@ import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImagePainter
@@ -55,7 +62,7 @@ fun DisplayCharacterFromId(
     viewModelProvider: ViewModelProvider,
     modifier: Modifier
 ) {
-
+    val rememberSheetState = rememberBottomSheetScaffoldState()
     val viewModel = viewModelProvider[CharacterFullByIdViewModel::class.java]
 
     LaunchedEffect(mal_id) {
@@ -65,34 +72,31 @@ fun DisplayCharacterFromId(
             delay(300L)
             viewModel.getPicturesFromId(mal_id)
         }
-
-
     }
 
-
+    val coroutine = rememberCoroutineScope()
     val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
     val characterFullState by
     viewModel.characterFull.collectAsStateWithLifecycle()
     val characterPicturesState by
     viewModel.picturesList.collectAsStateWithLifecycle()
 
-
     if (isSearching.not()) {
-
         BottomSheetScaffold(
             sheetContainerColor = LightGreen,
-            sheetPeekHeight = 65.dp,
+            sheetPeekHeight = 0.dp,
+            scaffoldState = rememberSheetState,
             sheetContent = {
-
                 Text(
                     text = "${characterFullState?.name} roles",
                     textAlign = TextAlign.Center,
                     modifier = modifier.fillMaxWidth(),
                     fontSize = 36.sp
                 )
-
                 LazyVerticalStaggeredGrid(
-                    modifier = modifier.fillMaxSize(),
+                    modifier = modifier
+                        .fillMaxWidth(1f)
+                        .fillMaxHeight(1f),
                     columns = StaggeredGridCells.Adaptive(120.dp),
                     contentPadding = PaddingValues(0.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -113,27 +117,43 @@ fun DisplayCharacterFromId(
                     }
                 }
             }) {
-
-
             Column(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.912f)
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(1f)
                     .verticalScroll(rememberScrollState())
-
             ) {
 
                 DisplayHorizontalPagerWithIndicator(
                     painterList = characterPicturesState,
                     modifier = modifier
                 )
-
-
-
                 Spacer(modifier = modifier.size(8.dp))
                 characterFullState?.let { data ->
-                    DisplayKanjiAndEnglishName(data = data, modifier = modifier)
+                    DisplayKanjiAndEnglishName(
+                        data = data,
+                        modifier = modifier,
+                    )
 
+                }
+                Row(
+                    modifier = modifier.fillMaxWidth(1f),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    FilledIconButton(
+                        colors = IconButtonDefaults.iconButtonColors(containerColor = LightGreen),
+                        onClick = {
+                            coroutine.launch(Dispatchers.IO) {
+                                rememberSheetState.bottomSheetState.expand()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowUp,
+                            contentDescription = "Show more"
+                        )
+                    }
                 }
 
                 // writes null in ui if there's no "about" data
@@ -142,17 +162,11 @@ fun DisplayCharacterFromId(
                         text = about, textAlign = TextAlign.Center
                     )
                 }
+
             }
-
         }
-
-
-    } else
-        LoadingAnimation()
+    } else LoadingAnimation()
 }
-
-
-//}
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -213,23 +227,28 @@ fun DisplayHorizontalPagerWithIndicator(
 @Composable
 fun DisplayKanjiAndEnglishName(
     data: com.example.animeapp.domain.models.characterModel.Data,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
+
     Text(
         text = data.name,
         textAlign = TextAlign.Center,
-        fontSize = 40.sp,
+        fontSize = 45.sp,
         modifier = modifier.fillMaxWidth(),
-        maxLines = 1
+        minLines = 1,
+        fontWeight = FontWeight.ExtraBold,
+        lineHeight = 45.sp
     )
+
     Spacer(modifier = modifier.size(5.dp))
     Text(
         text = "Kanji: " + data.name_kanji,
         textAlign = TextAlign.Center,
         fontSize = 20.sp,
         modifier = modifier.fillMaxWidth(),
-        maxLines = 1
+        minLines = 1
     )
+
 
 }
 
