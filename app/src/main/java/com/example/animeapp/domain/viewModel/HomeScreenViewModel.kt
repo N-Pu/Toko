@@ -1,3 +1,5 @@
+package com.example.animeapp.domain.viewModel
+
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -25,6 +27,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
 
 @OptIn(FlowPreview::class)
 class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewModel() {

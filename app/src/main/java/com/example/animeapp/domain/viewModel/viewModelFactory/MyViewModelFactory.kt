@@ -1,6 +1,6 @@
 package com.example.animeapp.domain.viewModel.viewModelFactory
 
-import HomeScreenViewModel
+import com.example.animeapp.domain.viewModel.HomeScreenViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.animeapp.repository.MalApiService

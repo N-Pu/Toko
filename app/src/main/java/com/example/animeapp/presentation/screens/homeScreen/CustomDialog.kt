@@ -1,6 +1,6 @@
 package com.example.animeapp.presentation.screens.homeScreen
 
-import HomeScreenViewModel
+import com.example.animeapp.domain.viewModel.HomeScreenViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

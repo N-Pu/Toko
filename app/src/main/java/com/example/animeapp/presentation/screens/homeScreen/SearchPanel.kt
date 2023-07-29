@@ -1,6 +1,6 @@
 package com.example.animeapp.presentation.screens.homeScreen
 
-import HomeScreenViewModel
+import com.example.animeapp.domain.viewModel.HomeScreenViewModel
 import android.view.MotionEvent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -53,8 +53,9 @@ fun MainScreen(
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
 
-    Column(modifier = modifier
-        .fillMaxWidth(1f)
+    Column(
+        modifier = modifier
+            .fillMaxWidth(1f)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -131,7 +132,7 @@ private fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel, modifier:
     DropdownMenu(
         expanded = isDropdownVisible.value,
         onDismissRequest = { isDropdownVisible.value = false },
-        offset = DpOffset(x =(-270).dp, y = 0.dp)
+        offset = DpOffset(x = (-270).dp, y = 0.dp)
     ) {
         Box(modifier.size(360.dp)) {
 
@@ -237,9 +238,6 @@ private fun ScoreBar(
 }
 
 
-
-
-
 private fun starColorChanger(selectedScore: Int, starNumber: Int): Color {
     return when (selectedScore) {
         in 1..3 -> {
@@ -249,6 +247,7 @@ private fun starColorChanger(selectedScore: Int, starNumber: Int): Color {
                 ScoreColors.Blank
             }
         }
+
         in 4..6 -> {
             if (starNumber <= selectedScore) {
                 ScoreColors.Yellow
@@ -256,6 +255,7 @@ private fun starColorChanger(selectedScore: Int, starNumber: Int): Color {
                 ScoreColors.Blank
             }
         }
+
         in 7..10 -> {
             if (starNumber <= selectedScore) {
                 ScoreColors.Green
@@ -263,7 +263,8 @@ private fun starColorChanger(selectedScore: Int, starNumber: Int): Color {
                 ScoreColors.Blank
             }
         }
-        else ->   ScoreColors.Blank
+
+        else -> ScoreColors.Blank
     }
 }
 

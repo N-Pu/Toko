@@ -1,7 +1,7 @@
 package com.example.animeapp.presentation.screens.homeScreen
 
 
-import HomeScreenViewModel
+import com.example.animeapp.domain.viewModel.HomeScreenViewModel
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -79,7 +79,7 @@ fun GridAdder(
     LazyVerticalStaggeredGrid(
         state = scrollGridState,
         columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxWidth(1f).fillMaxHeight(1f),
         horizontalArrangement = Arrangement.spacedBy(22.dp),
         verticalItemSpacing = 20.dp,
         contentPadding = PaddingValues(10.dp)
