@@ -9,11 +9,11 @@ kotlin {
     jvmToolchain(17)
 }
 android {
-    namespace 'com.example.animeapp'
+    namespace 'com.project.toko'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.animeapp"
+        applicationId "com.project.toko"
         minSdk 21
         targetSdk 33
         versionCode 1

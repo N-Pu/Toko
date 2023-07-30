@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.example.animeapp",
+  "applicationId": "com.project.toko",
   "variantName": "release",
   "elements": [
     {
