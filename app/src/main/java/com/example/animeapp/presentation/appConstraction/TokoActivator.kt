@@ -49,6 +49,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -95,27 +97,33 @@ fun TokoAppActivator(
     }
 
     Scaffold(bottomBar = {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth(1f)
                 .fillMaxHeight(1f)
-                .padding(bottom = 60.dp),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center
+                .padding(bottom = 45.dp),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Row {
+                MyFloatingButton(
+                    showButton = showButton,
+                    context = context,
+                    viewModelProvider = viewModelProvider,
+                    modifier = modifier
+                )
+            }
 
-            BottomNavigationBar(
-                navController = navController,
-                currentDetailScreenId = currentDetailScreenId,
-                modifier = modifier
-            )
+            Row {
+                BottomNavigationBar(
+                    navController = navController,
+                    currentDetailScreenId = currentDetailScreenId,
+                    modifier = modifier
+                )
 
-            MyFloatingButton(
-                showButton = showButton,
-                context = context,
-                viewModelProvider = viewModelProvider,
-                modifier = modifier
-            )
+            }
+
+
         }
     },
 //        floatingActionButton = {},
@@ -152,7 +160,7 @@ fun BottomNavigationBar(
 
 
     val items = listOf(
-        Screen.Home, Screen.Detail, Screen.RandomAnimeOrManga, Screen.Favorites
+        Screen.Home, Screen.Detail, Screen.Favorites, Screen.RandomAnimeOrManga
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -161,16 +169,16 @@ fun BottomNavigationBar(
     Row(
         modifier = modifier
             .clip(
-                RoundedCornerShape(10.dp)
+                RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp)
             )
-//            .fillMaxWidth(1f)
-            .width(240.dp)
+            .fillMaxWidth(1f)
+//            .width(240.dp)
 //            .shadow(20.dp)
             .background(LightGreen.copy(alpha = 0.6f))
             .background(Color.Transparent)
             .height(50.dp),
 
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -185,7 +193,7 @@ fun BottomNavigationBar(
             modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
             Icon(
-                imageVector = items[0].icon,
+                imageVector = ImageVector.vectorResource(id = items[0].iconId),
                 contentDescription = items[0].contentDescription,
                 modifier = modifier
                     .size(30.dp)
@@ -215,7 +223,7 @@ fun BottomNavigationBar(
             modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
             Icon(
-                imageVector = items[1].icon,
+                imageVector = ImageVector.vectorResource(id = items[1].iconId),
                 contentDescription = items[1].contentDescription,
                 modifier = modifier
                     .size(30.dp)
@@ -245,7 +253,7 @@ fun BottomNavigationBar(
             modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
             Icon(
-                imageVector = items[2].icon,
+                imageVector = ImageVector.vectorResource(id = items[2].iconId),
                 contentDescription = items[2].contentDescription,
                 modifier = modifier
                     .size(30.dp)
@@ -275,7 +283,7 @@ fun BottomNavigationBar(
             modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
             Icon(
-                imageVector = items[3].icon,
+                imageVector = ImageVector.vectorResource(id = items[3].iconId),
                 contentDescription = items[3].contentDescription,
                 modifier = modifier
                     .size(30.dp)
@@ -344,8 +352,7 @@ fun MyFloatingButton(
 
         Box(
             modifier = modifier
-
-                .height(50.dp)
+                .height(70.dp)
                 .width(70.dp),
             contentAlignment = Alignment.Center
         ) {

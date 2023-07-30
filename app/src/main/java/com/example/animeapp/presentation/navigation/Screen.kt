@@ -1,20 +1,16 @@
 package com.example.animeapp.presentation.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.animeapp.R
 
 
-sealed class Screen(val route: String, val icon: ImageVector, val contentDescription: String) {
-    object Home : Screen("home_screen", Icons.Filled.Search, "Search Anime")
-    object Detail : Screen("detail_screen/{id}", Icons.Filled.List, "Details on Anime")
+sealed class Screen(val route: String, val iconId: Int, val contentDescription: String) {
+    object Home : Screen("home_screen", R.drawable.home, "Search Anime")
+    object Detail : Screen("detail_screen/{id}", R.drawable.media, "Details on Anime")
+    object Favorites : Screen("favorites_screen", R.drawable.favorite, "Favorite anime")
     object RandomAnimeOrManga :
-        Screen("random_anime_or_manga_screen", Icons.Filled.ShoppingCart, "Current News on Anime")
+        Screen("random_anime_or_manga_screen", R.drawable.random, "Current News on Anime")
 
-    object Favorites : Screen("favorites_screen", Icons.Filled.FavoriteBorder, "Favorite anime")
+
 
 }
 
