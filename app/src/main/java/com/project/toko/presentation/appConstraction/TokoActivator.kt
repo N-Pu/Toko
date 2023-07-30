@@ -426,7 +426,7 @@ fun MyFloatingButton(
         onDismissRequest = { expanded = false },
         modifier = modifier
             .background(LightGreen),
-        offset = DpOffset(x = (220).dp, y = (-250).dp)
+        offset = DpOffset(x = (20).dp, y = (-250).dp)
     ) {
         items.forEach { item ->
             DropdownMenuItem(
