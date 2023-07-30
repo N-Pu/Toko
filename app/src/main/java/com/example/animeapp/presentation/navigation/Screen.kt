@@ -11,7 +11,6 @@ sealed class Screen(val route: String, val iconId: Int, val contentDescription: 
         Screen("random_anime_or_manga_screen", R.drawable.random, "Current News on Anime")
 
 
-
 }
 
 object Nothing {

@@ -17,9 +17,11 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,7 @@ import androidx.lifecycle.viewModelScope
 import coil.compose.rememberAsyncImagePainter
 import com.example.animeapp.domain.viewModel.ProducerFullViewModel
 import com.example.animeapp.presentation.animations.LoadingAnimation
+import com.example.animeapp.presentation.screens.detailScreen.sideContent.bottomSheetActivatorButton.BottomSheetButton
 import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +46,10 @@ fun ShowScreen(
     studio_name: String,
     modifier: Modifier
 ) {
+
+    val coroutine = rememberCoroutineScope()
+    val rememberSheetState = rememberBottomSheetScaffoldState()
+//    val scaffoldState = rememberBottomSheetScaffoldState()
     val viewModel = viewModelProvider[ProducerFullViewModel::class.java]
     LaunchedEffect(id) {
         viewModel.viewModelScope.launch(Dispatchers.IO) {
@@ -61,7 +68,8 @@ fun ShowScreen(
     if (isSearching.not()) {
         BottomSheetScaffold(
             sheetContainerColor = LightGreen,
-            sheetPeekHeight = 65.dp,
+            sheetPeekHeight = 0.dp,
+            scaffoldState = rememberSheetState,
             sheetContent = {
                 Text(
                     text = "${producerState?.url} roles",
@@ -120,6 +128,11 @@ fun ShowScreen(
                             maxLines = 2
                         )
                     }
+                }
+                item {
+                    BottomSheetButton(modifier, coroutine, rememberSheetState)
+                }
+                item{
                     // writes null in ui if there's no "about" data
                     producerState?.about?.let { about ->
                         Text(

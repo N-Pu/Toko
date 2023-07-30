@@ -30,13 +30,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
@@ -48,6 +43,7 @@ import coil.compose.AsyncImagePainter
 import com.example.animeapp.R
 import com.example.animeapp.domain.models.characterModel.Anime
 import com.example.animeapp.presentation.animations.LoadingAnimation
+import com.example.animeapp.presentation.screens.detailScreen.sideContent.bottomSheetActivatorButton.BottomSheetButton
 import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -136,25 +132,7 @@ fun DisplayCharacterFromId(
                     )
 
                 }
-                Row(
-                    modifier = modifier.fillMaxWidth(1f),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-
-                    FilledIconButton(
-                        colors = IconButtonDefaults.iconButtonColors(containerColor = LightGreen),
-                        onClick = {
-                            coroutine.launch(Dispatchers.IO) {
-                                rememberSheetState.bottomSheetState.expand()
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.KeyboardArrowUp,
-                            contentDescription = "Show more"
-                        )
-                    }
-                }
+                BottomSheetButton(modifier,coroutine, rememberSheetState)
 
                 // writes null in ui if there's no "about" data
                 characterFullState?.about?.let { about ->

@@ -28,6 +28,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -37,6 +39,7 @@ import coil.compose.AsyncImagePainter
 import com.example.animeapp.domain.models.personFullModel.Anime
 import com.example.animeapp.presentation.animations.LoadingAnimation
 import com.example.animeapp.domain.viewModel.PersonByIdViewModel
+import com.example.animeapp.presentation.screens.detailScreen.sideContent.bottomSheetActivatorButton.BottomSheetButton
 import com.example.animeapp.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,7 +59,8 @@ fun DisplayStaffMemberFromId(
         }
     }
 
-
+    val rememberSheetState = rememberBottomSheetScaffoldState()
+    val coroutine = rememberCoroutineScope()
     val isSearching by viewModel.isSearching.collectAsStateWithLifecycle()
     val staffFullState by
     viewModel.personFull.collectAsStateWithLifecycle()
@@ -66,7 +70,8 @@ fun DisplayStaffMemberFromId(
 
         BottomSheetScaffold(
             sheetContainerColor = LightGreen,
-            sheetPeekHeight = 65.dp,
+            sheetPeekHeight = 0.dp,
+            scaffoldState = rememberSheetState,
             sheetContent = {
                 Text(
                     text = "${staffFullState?.name} roles",
@@ -112,7 +117,7 @@ fun DisplayStaffMemberFromId(
                     BoxWithConstraints(
                         modifier = modifier
                             .padding(20.dp)
-                            .aspectRatio(9/11f)
+                            .aspectRatio(9 / 11f)
                             .wrapContentSize()
 
                     ) {
@@ -137,6 +142,11 @@ fun DisplayStaffMemberFromId(
                             maxLines = 1
                         )
                     }
+                }
+                item {
+                    BottomSheetButton(modifier, coroutine, rememberSheetState)
+                }
+                item {
                     // writes null in ui if there's no "about" data
                     staffFullState?.about?.let { about ->
                         Text(
