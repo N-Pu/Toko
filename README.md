@@ -23,14 +23,12 @@ Additionally, Toko introduces a unique feature that lets you discover anime at r
 This exciting function presents you with a wide selection of titles, increasing the chances of finding something that truly resonates with your interests.
 
 ## Features
-
-The android app lets you:
 - Completely ad-free.
 - Needs no special permissions on Android 5.0+.
-- More to be added.
 - Easily add your favorite anime to a dedicated favorites list.
 - Character and Cast Photo Gallery.
 - Regular updates: The Toko app is actively maintained and regularly updated, ensuring you get the latest features, bug fixes, and improvements to enhance your anime-watching experience.
+- More to be added.
 
 ## Screenshots
 
