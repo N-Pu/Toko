@@ -12,7 +12,7 @@ With Toko, your reading experience is enhanced, making it a must-have companion 
 ## Description
 
 Toko is fully powered by the <a href = "https://jikan.moe/">Jikan API</a> service.
-Thanks to <a href = "https://www.coingecko.com/en"><img src = "https://github.com/N-Pu/Toko/assets/40484678/571f2d19-cd0e-49df-bb06-713b14e771dc" align="center"
+Thanks to <a href = "https://github.com/jikan-me/jikan"><img src = "https://github.com/N-Pu/Toko/assets/40484678/571f2d19-cd0e-49df-bb06-713b14e771dc" align="center"
 width="90" hspace="10" vspace="10"></a>
 
 ## About
