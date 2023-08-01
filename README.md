@@ -9,10 +9,13 @@ Toko's unique feature lies in its utilization of data from https://jikan.moe/, e
 With Toko, your reading experience is enhanced, making it a must-have companion for all anime and manga enthusiasts. Enjoy the world of anime at your fingertips with Toko!
 <br />
 <br />
+<br />
+
+
 ## Description
 
 Toko is fully powered by the <a href = "https://jikan.moe/">Jikan API</a> service.
-Thanks to <a href = "https://github.com/jikan-me/jikan"><img src = "https://github.com/N-Pu/Toko/assets/40484678/571f2d19-cd0e-49df-bb06-713b14e771dc" align="center"
+Thanks to <a href = "https://github.com/jikan-me/jikan"><img src = "https://github-production-user-asset-6210df.s3.amazonaws.com/40484678/257327979-571f2d19-cd0e-49df-bb06-713b14e771dc.png" align="center"
 width="90" hspace="10" vspace="10"></a>
 
 ## About
