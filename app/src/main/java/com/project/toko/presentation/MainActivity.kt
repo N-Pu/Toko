@@ -3,7 +3,6 @@ package com.project.toko.presentation
 
 import android.os.Build
 import android.os.Bundle
-import android.view.Window
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,7 +13,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
@@ -41,7 +39,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        noTitleBarAndSplashScreenActivator()
+        navigationBarColorChanger()
 
 
         setContent {
@@ -68,11 +66,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun noTitleBarAndSplashScreenActivator() {
-        window.navigationBarColor = LightGreen.toArgb()
-        window.statusBarColor = LightGreen.toArgb()
-        requestWindowFeature(Window.FEATURE_NO_TITLE) // Undo topBar
-        installSplashScreen() // Custom Splash Screen
+    private fun navigationBarColorChanger() {
+        window.navigationBarColor = LightGreen.copy(alpha =  1f).toArgb()
     }
 
     @Composable
@@ -80,8 +75,6 @@ class MainActivity : ComponentActivity() {
         SideEffect {
             MainScope().launch {
                 window.statusBarColor = Color.Transparent.toArgb()
-//                window.statusBarColor = Color.Black.copy(alpha = 0.5f).toArgb()
-
             }
         }
 
@@ -90,7 +83,7 @@ class MainActivity : ComponentActivity() {
 
             window.decorView.doOnLayout {
                 WindowCompat.setDecorFitsSystemWindows(window, false)
-                windowInsetsController?.hide(WindowInsetsCompat.Type.statusBars())
+                windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
             }
         } else {
             window.setFlags(

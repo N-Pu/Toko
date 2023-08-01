@@ -26,17 +26,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,7 +45,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -126,7 +119,6 @@ fun TokoAppActivator(
 
         }
     },
-//        floatingActionButton = {},
         snackbarHost = {
 
             // нижний бар уведомлений
@@ -169,11 +161,9 @@ fun BottomNavigationBar(
     Row(
         modifier = modifier
             .clip(
-                RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp)
+                RoundedCornerShape(10.dp)
             )
             .fillMaxWidth(1f)
-//            .width(240.dp)
-//            .shadow(20.dp)
             .background(LightGreen.copy(alpha = 0.6f))
             .background(Color.Transparent)
             .height(50.dp),
@@ -190,7 +180,7 @@ fun BottomNavigationBar(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+            modifier = modifier.padding(horizontal = 10.dp, vertical = 10.dp)
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = items[0].iconId),
@@ -309,7 +299,6 @@ fun BottomNavigationBar(
         }
     }
 
-//    }
 }
 
 
@@ -382,45 +371,8 @@ fun MyFloatingButton(
                     )
                 }
             }
-
-//            Box(modifier = modifier
-//                .shadow(20.dp)
-//                .clip(RoundedCornerShape(10.dp))
-//                .clickable {
-//                    detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-//                        expanded = !expanded
-//                    }
-//                }
-//                .background(LightGreen.copy(alpha = 0.6f))
-//                .height(50.dp)
-//                .width(50.dp),
-//                contentAlignment = Alignment.Center) {
-//
-//            }
-//            if (expanded) {
-//                Icon(
-//                    modifier = Modifier.size(30.dp),
-//                    imageVector = Icons.Filled.Close,
-//                    contentDescription = "Localized description"
-//                )
-//            } else {
-//                Icon(
-//                    modifier = Modifier.size(30.dp),
-//                    imageVector = Icons.Filled.Add,
-//                    contentDescription = "Localized description"
-//                )
-//            }
         }
     }
-
-//    Box(
-//        modifier = modifier
-//            .width(IntrinsicSize.Min)
-//            .wrapContentHeight()
-//            .offset(x = (-110).dp, y = (-100).dp)
-//            .padding(end = 0.dp, bottom = 16.dp),
-//        contentAlignment = Alignment.BottomEnd
-//    ) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
@@ -460,54 +412,5 @@ fun MyFloatingButton(
                 })
         }
     }
-//    }
 
-}
-
-@Preview
-@Composable
-fun Prev() {
-
-
-    Scaffold(
-        bottomBar = {
-
-            Row(
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(40.dp)
-                    .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))
-            ) {
-
-
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Filled.Search, contentDescription = ""
-                    )
-                }
-
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Filled.List, contentDescription = ""
-                    )
-                }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Filled.ShoppingCart, contentDescription = ""
-                    )
-                }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Filled.FavoriteBorder, contentDescription = ""
-                    )
-                }
-
-
-            }
-        }
-    ) {
-        it.calculateBottomPadding()
-
-
-    }
 }

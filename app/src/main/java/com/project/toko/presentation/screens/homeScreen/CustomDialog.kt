@@ -84,7 +84,7 @@ fun CustomDialog(
     val height = {
         var currentHeight = 550
         if (data.synopsis.isNullOrEmpty()) {
-            currentHeight -= 150
+            currentHeight -= 160
         }
         if (data.genres.isNullOrEmpty()) {
             currentHeight -= 60

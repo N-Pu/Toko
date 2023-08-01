@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.AnimeApp.Splash" parent="Theme.SplashScreen" >
 
-    <item name="windowSplashScreenBackground">@color/light_green</item>
-    <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+    <style name="Theme.Toko.Splash" parent="Theme.SplashScreen">
+
+        <item name="windowSplashScreenBackground">@color/light_green</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
 
         <item name="android:navigationBarColor">@color/light_green</item>
         <item name="android:statusBarColor">@color/light_green</item>
 
-<!--    <item name="postSplashScreenTheme">@style/Theme.SplashScreen</item>-->
     </style>
 </resources>

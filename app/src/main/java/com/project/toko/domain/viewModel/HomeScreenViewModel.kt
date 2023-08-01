@@ -216,10 +216,8 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     fun loadNextPage() {
         val query = searchText.value
-        if (
-//            isNextPageLoading.value ||
 
-            !hasNextPage.value) {
+        if (!hasNextPage.value) {
             return
         }
 

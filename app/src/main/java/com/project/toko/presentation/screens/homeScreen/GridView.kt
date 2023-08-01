@@ -104,7 +104,8 @@ fun GridAdder(
             )
 
             // Загрузка следующей страницы при достижении конца списка и has_next_page = true
-            if (index == listData.data.lastIndex && isLoading.not() && listData.pagination.has_next_page) {
+            if (index == listData.data.lastIndex - 2  && isLoading.not()
+                && listData.pagination.has_next_page) {
                 viewModel.loadNextPage()
             }
         }

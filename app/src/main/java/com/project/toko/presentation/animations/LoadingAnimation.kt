@@ -50,6 +50,7 @@ fun LoadingAnimation(
         }
     }
 
+
     val circleValues = circles.map { it.value }
     val distance = with(LocalDensity.current) { travelDistance.toPx() }
     Box(
