@@ -4,13 +4,18 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,33 +26,41 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.project.toko.domain.models.newAnimeSearchModel.Data
 import com.project.toko.domain.models.newAnimeSearchModel.Genre
 import com.project.toko.presentation.animations.LoadingAnimation
 import com.project.toko.presentation.screens.detailScreen.sideContent.castList.DisplayCast
 import com.project.toko.presentation.screens.detailScreen.mainPage.customVisuals.DisplayCustomGenreBoxes
 import com.project.toko.presentation.screens.detailScreen.sideContent.staffList.DisplayStaff
 import com.project.toko.domain.viewModel.DetailScreenViewModel
+import com.project.toko.presentation.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -68,7 +81,7 @@ fun ActivateDetailScreen(
 
 
     LaunchedEffect(id) {
-        withContext(Dispatchers.IO) {
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
             viewModel.onTapAnime(id)
             delay(300)
             viewModel.addStaffFromId(id)
@@ -90,26 +103,92 @@ fun ActivateDetailScreen(
             model
         )
 
-
     if (isSearching.not() && detailData != null) {
 
         Column(
             modifier = modifier
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .background(Color(0xFFF4F4F4)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            BoxWithConstraints(
-                modifier = modifier,
-                contentAlignment = Alignment.TopStart,
+            DisplayPicture(
+                painter = painter, modifier = modifier
+            )
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(1f),
+                horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top
             ) {
-                DisplayPicture(
-                    painter = painter, modifier = modifier
+                DisplayTitle(title = detailData?.title ?: "No title name", modifier)
+            }
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(1f),
+                horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = detailData?.title_english ?: "None",
+                    minLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+            }
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier.fillMaxWidth(1f)
+            ) {
+                YearTypeEpisodesTimeStatusStudio(data = detailData, modifier = modifier)
+            }
+
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(1f)
+                    .height(150.dp),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = modifier.size(150.dp)
+                ) {
+
+                    ScoreLabel(modifier = modifier)
+                    ScoreNumber(modifier = modifier, score = detailData?.score ?: 0.0f)
+                    ScoreByNumber(scoreBy = detailData?.scored_by ?: 0.0f, modifier = modifier)
+
+                }
+
+//                Column(modifier = modifier.width(10.dp)) {
+//
+//                }
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = modifier.size(height = 150.dp, width = 150.dp)
+                ) {
+
+                    RankedLine(
+                        rank = detailData?.rank ?: 0,
+                        modifier = modifier
+                    )
+                    PopularityLine(
+                        popularity = detailData?.popularity ?: 0,
+                        modifier = modifier
+                    )
+                    MembersLine(
+                        members = detailData?.members ?: 0,
+                        modifier = modifier
+                    )
+
+                    FavoritesLine(
+                        favorites = detailData?.favorites ?: 0,
+                        modifier = modifier
+                    )
+                }
             }
 
 
-            Title(title = detailData?.title ?: "Nothing", modifier)
             if (detailData
                     ?.genres
                     ?.isNotEmpty() == true
@@ -127,13 +206,14 @@ fun ActivateDetailScreen(
                 )
             }
 
-            ExpandableText(text = detailData?.synopsis ?: "Nothing", modifier)
+            ExpandableText(text = detailData?.synopsis ?: "No Synopsis", modifier)
 
 
             if (castData.isNotEmpty()) {
                 DisplayCast(
                     castList = castData, navController = navController,
-                    viewModelProvider = viewModelProvider
+//                    viewModelProvider = viewModelProvider,
+                    modifier = modifier
                 )
             }
 
@@ -145,14 +225,9 @@ fun ActivateDetailScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ДОБАВИТЬ КАРТИНКУ СТУДИИ И ПЕРЕХОД НА ЭЭЭ ИХ ДАННЫЕ mal_id
+
             Text(text = "STUDIOS:")
-
-
-
             detailData?.studios?.forEach {
-
-                println(it.url)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = it.name,
@@ -270,7 +345,7 @@ fun ActivateDetailScreen(
 
 
 @Composable
-fun ExpandableText(text: String, modifier: Modifier) {
+private fun ExpandableText(text: String, modifier: Modifier) {
     val wordCount = text.split(" ").count()
 
     if (wordCount <= 20) {
@@ -283,7 +358,20 @@ fun ExpandableText(text: String, modifier: Modifier) {
 
     val maxLines = if (expanded) Int.MAX_VALUE else 4
 
-    Column {
+    Column(
+        modifier = modifier
+            .fillMaxWidth(1f)
+            .padding(start = 20.dp, bottom = 25.dp, end = 20.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Text(
+            text = "Synopsis",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+
+        Spacer(modifier = modifier.height(10.dp))
         Text(
             text = text,
             maxLines = maxLines,
@@ -299,7 +387,17 @@ fun ExpandableText(text: String, modifier: Modifier) {
             softWrap = true
         )
 
-        Row(modifier = Modifier) {
+        Row(
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.Top
+        ) {
+            Text(
+                text = "Details",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = modifier.clickable(onClick = toggleExpanded)
+            )
             if (expanded) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowUp,
@@ -307,7 +405,7 @@ fun ExpandableText(text: String, modifier: Modifier) {
                     modifier = modifier
                         .clickable(onClick = toggleExpanded)
                         .align(Alignment.CenterVertically)
-                        .fillMaxWidth()
+
                 )
             } else {
                 Icon(
@@ -316,7 +414,6 @@ fun ExpandableText(text: String, modifier: Modifier) {
                     modifier = modifier
                         .clickable(onClick = toggleExpanded)
                         .align(Alignment.CenterVertically)
-                        .fillMaxWidth()
                 )
             }
         }
@@ -325,23 +422,25 @@ fun ExpandableText(text: String, modifier: Modifier) {
 
 
 @Composable
-fun Title(title: String, modifier: Modifier) {
+private fun DisplayTitle(title: String, modifier: Modifier) {
+
+//    .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp)
     Text(
         text = title,
-
-        fontSize = 50.sp,
+        fontSize = 40.sp,
         modifier = modifier.fillMaxWidth(),
         fontWeight = FontWeight.SemiBold,
         style = TextStyle(
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color.Black,
+            shadow = Shadow(color = Color.Black, offset = Offset(x = 0f, y = 5f), blurRadius = 5f)
         ), textAlign = TextAlign.Center
     )
 }
 
 @Composable
-fun DisplayPicture(
+private fun DisplayPicture(
     painter: AsyncImagePainter, modifier: Modifier
 ) {
 
@@ -351,6 +450,251 @@ fun DisplayPicture(
         contentScale = ContentScale.FillWidth,
         modifier = modifier
             .fillMaxWidth(1f),
+    )
+}
 
+
+@Composable
+private fun ScoreLabel(modifier: Modifier) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.fillMaxWidth(1f)
+
+    ) {
+        Card(
+            modifier = modifier.size(120.dp, 35.dp),
+            colors = CardDefaults.cardColors(containerColor = LightGreen),
+            shape = RoundedCornerShape(5.dp)
+
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Text(
+                    text = "SCORE",
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    fontSize = 23.sp
+
+                )
+
+            }
+
+        }
+    }
+
+}
+
+@Composable
+private fun ScoreNumber(modifier: Modifier, score: Float) {
+
+    val scoreNumb = {
+        if (score == 0.0f) {
+            "N/A"
+        } else {
+            score.toString()
+        }
+
+    }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(40.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = scoreNumb(),
+            color = Color.Black,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center,
+            fontSize = 35.sp
         )
+    }
+}
+
+@Composable
+private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
+
+    val scoreByNumb = {
+        if (scoreBy == 0.0f) {
+            "N/A"
+        } else {
+            scoreBy.toInt().toString()
+        }
+
+    }
+    Row(
+        modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = scoreByNumb() + " users",
+            color = Color.Black,
+            fontWeight = FontWeight.Light,
+            textAlign = TextAlign.Center,
+            fontSize = 10.sp
+        )
+    }
+}
+
+
+@Composable
+private fun RankedLine(rank: Int, modifier: Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.horizontalScroll(rememberScrollState())
+    ) {
+        Text(
+            text = ("Ranked "),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Light,
+            color = Color.Black,
+            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 6f), blurRadius = 5f))
+        )
+        Text(
+            text = "#$rank",
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 14.sp,
+            color = Color.Black,
+            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 0f), blurRadius = 5f))
+        )
+    }
+}
+
+@Composable
+private fun PopularityLine(popularity: Int, modifier: Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.horizontalScroll(rememberScrollState())
+    ) {
+        Text(
+            text = ("Popularity "),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Light,
+            color = Color.Black,
+            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 6f), blurRadius = 5f))
+        )
+        Text(
+            text = "#$popularity",
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            color = Color.Black,
+            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 0f), blurRadius = 5f))
+        )
+    }
+}
+
+@Composable
+private fun MembersLine(members: Int, modifier: Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.horizontalScroll(rememberScrollState())
+    ) {
+
+        Text(
+            text = ("Members "),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Light,
+            color = Color.Black,
+            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 6f), blurRadius = 5f))
+        )
+        Text(
+            text = members.toString(),
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            color = Color.Black,
+            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 0f), blurRadius = 5f))
+        )
+    }
+}
+
+@Composable
+private fun FavoritesLine(favorites: Int, modifier: Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.horizontalScroll(rememberScrollState())
+    ) {
+
+        Text(
+            text = ("Favorites "),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Light,
+            color = Color.Black,
+            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 6f), blurRadius = 5f))
+        )
+        Text(
+            text = favorites.toString(),
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            color = Color.Black,
+            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 0f), blurRadius = 5f))
+        )
+    }
+}
+
+
+@Composable
+private fun YearTypeEpisodesTimeStatusStudio(data: Data?, modifier: Modifier) {
+    val isStudioEmpty = data?.studios.isNullOrEmpty()
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start,
+        modifier = modifier
+            .padding(start = 20.dp, top = 5.dp, bottom = 0.dp, end = 20.dp)
+            .fillMaxWidth(1f)
+    ) {
+        val yearSeasonText = buildAnnotatedString {
+            if (data?.year != 0 && data?.season != null) {
+                withStyle(style = SpanStyle(color = Color.Black)) {
+                    append("${data.season} ${data.year}")
+                }
+                append("/")
+            }
+            withStyle(style = SpanStyle(color = Color.Black)) {
+                append(data?.type ?: "N/A")
+                append("/")
+            }
+
+            if (data?.episodes != 0 && data?.duration != null) {
+                withStyle(style = SpanStyle(color = Color.Black)) {
+                    append("${data.episodes} ep./${data.duration}")
+                }
+                append("/")
+            }
+            withStyle(style = SpanStyle(color = Color.Black)) {
+                append(data?.status ?: "N/A")
+            }
+            if (!isStudioEmpty) {
+                append("/")
+                withStyle(style = SpanStyle(color = Color.Black)) {
+                    append(data?.studios?.component1()?.name ?: "N/A")
+                }
+            }
+        }
+
+        Text(
+            text = yearSeasonText
+//            .toUpperCase()
+            ,
+
+//        overflow = TextOverflow.Ellipsis,
+
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            lineHeight = 20.sp,
+            color = Color.Black,
+            textAlign = TextAlign.Center
+        )
+
+    }
 }

@@ -193,7 +193,7 @@ fun CustomDialog(
 }
 
 @Composable
-fun ScoreLabel(modifier: Modifier) {
+private fun ScoreLabel(modifier: Modifier) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -229,77 +229,8 @@ fun ScoreLabel(modifier: Modifier) {
     }
 
 }
-
-
 @Composable
-fun RankedLine(rank: Int, modifier: Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = modifier.horizontalScroll(rememberScrollState())
-    ) {
-        Text(
-            text = ("       Ranked "),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.ExtraLight,
-            color = Color.White
-        )
-        Text(
-            text = "#$rank",
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 12.sp,
-            color = Color.White
-        )
-    }
-}
-
-@Composable
-fun PopularityLine(popularity: Int, modifier: Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = modifier.horizontalScroll(rememberScrollState())
-    ) {
-        Text(
-            text = ("       Popularity "),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Thin,
-            color = Color.White,
-        )
-        Text(
-            text = "#$popularity",
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
-            color = Color.White,
-        )
-    }
-}
-
-@Composable
-fun MembersLine(members: Int, modifier: Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = modifier.horizontalScroll(rememberScrollState())
-    ) {
-
-        Text(
-            text = ("       Members "),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Thin,
-            color = Color.White,
-        )
-        Text(
-            text = members.toString(),
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
-            color = Color.White,
-        )
-    }
-}
-
-@Composable
-fun ScoreNumber(modifier: Modifier, score: Float) {
+private fun ScoreNumber(modifier: Modifier, score: Float) {
 
     val scoreNumb = {
         if (score == 0.0f) {
@@ -326,7 +257,76 @@ fun ScoreNumber(modifier: Modifier, score: Float) {
 }
 
 @Composable
-fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
+private fun RankedLine(rank: Int, modifier: Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.horizontalScroll(rememberScrollState())
+    ) {
+        Text(
+            text = ("       Ranked "),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.ExtraLight,
+            color = Color.White
+        )
+        Text(
+            text = "#$rank",
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 12.sp,
+            color = Color.White
+        )
+    }
+}
+
+@Composable
+private fun PopularityLine(popularity: Int, modifier: Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.horizontalScroll(rememberScrollState())
+    ) {
+        Text(
+            text = ("       Popularity "),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Thin,
+            color = Color.White,
+        )
+        Text(
+            text = "#$popularity",
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            color = Color.White,
+        )
+    }
+}
+
+@Composable
+private fun MembersLine(members: Int, modifier: Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.horizontalScroll(rememberScrollState())
+    ) {
+
+        Text(
+            text = ("       Members "),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Thin,
+            color = Color.White,
+        )
+        Text(
+            text = members.toString(),
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            color = Color.White,
+        )
+    }
+}
+
+
+
+@Composable
+private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
     val scoreByNumb = {
         if (scoreBy == 0.0f) {
@@ -351,7 +351,7 @@ fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
 
 @Composable
-fun YearTypeStudio(data: Data?, modifier: Modifier) {
+private fun YearTypeStudio(data: Data?, modifier: Modifier) {
     val isStudioEmpty = data?.studios.isNullOrEmpty()
     Column(
         verticalArrangement = Arrangement.Center,
@@ -390,7 +390,7 @@ fun YearTypeStudio(data: Data?, modifier: Modifier) {
 
 
 @Composable
-fun EpisodesLabel(episodes: Int, modifier: Modifier) {
+private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start,
@@ -424,7 +424,7 @@ fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 
 
 @Composable
-fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: Data, viewModel: HomeScreenViewModel) {
+private fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: Data, viewModel: HomeScreenViewModel) {
     Spacer(modifier = modifier.height(10.dp))
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -598,7 +598,7 @@ fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: Data, viewModel: HomeSc
 
 
 @Composable
-fun StatusLine(status: String, modifier: Modifier) {
+private fun StatusLine(status: String, modifier: Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -618,7 +618,7 @@ fun StatusLine(status: String, modifier: Modifier) {
 }
 
 @Composable
-fun RatingLine(rating: String, modifier: Modifier) {
+private fun RatingLine(rating: String, modifier: Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -688,7 +688,7 @@ private fun DisplayCustomGenres(genres: List<Genre>, modifier: Modifier) {
 
 
 @Composable
-fun Synopsis(modifier: Modifier, synopsis: String?) {
+private fun Synopsis(modifier: Modifier, synopsis: String?) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -721,7 +721,7 @@ fun Synopsis(modifier: Modifier, synopsis: String?) {
 }
 
 @Composable
-fun DisplayDialogPicture(
+private fun DisplayDialogPicture(
     imageRequest: ImageRequest,
     mal_id: Int,
     navController: NavController,

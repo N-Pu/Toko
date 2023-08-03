@@ -4,193 +4,258 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.domain.models.castModel.Data
 import com.project.toko.domain.models.castModel.VoiceActor
 import com.project.toko.presentation.navigation.DetailOnCast
 import com.project.toko.presentation.navigation.Screen
+import java.lang.Integer.min
 
 
 @Composable
 fun DisplayCast(
     castList: List<Data>,
     navController: NavController,
-    viewModelProvider: ViewModelProvider
+//    viewModelProvider: ViewModelProvider,
+    modifier: Modifier
 ) {
     val castWithJapVoiceActors = hasJapVoiceActor(castList)
-
-    Text(
-        text = "Cast",
-        textDecoration = TextDecoration.Underline,
-    )
-
-    AddCast(castList = castWithJapVoiceActors, navController = navController)
-    Box(modifier = Modifier.fillMaxWidth(0.9f)) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth(1f)
+            .padding(start = 20.dp, bottom = 25.dp), contentAlignment = Alignment.TopStart
+    ) {
         Text(
-            text = "More Cast",
-            textAlign = TextAlign.Left,
-            color = Color.Blue,
-            textDecoration = TextDecoration.Underline,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
+            text = "Cast",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+    }
+    AddCast(castList = castWithJapVoiceActors, navController = navController, modifier = modifier)
+}
+
+@Composable
+private fun AddCast(castList: List<Data>, navController: NavController, modifier: Modifier) {
+    val numCharacterAndActors = min(12, castList.size) // Количество персонажей для вывода (не более 12)
+    val numCards = (numCharacterAndActors + 2) / 3 // Определение количества карточек
+    Row(
+        modifier = Modifier
+            .horizontalScroll(rememberScrollState())
+    ) {
+        repeat(numCards) { i ->
+            Column(modifier = modifier.width(20.dp)) {
+                // Пустая колонка для выравнивания
+            }
+            Column(
+                modifier
+                    .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
+                    .clip(RoundedCornerShape(10.dp))
+                    .width(360.dp)
+                    .height(460.dp)
+                    .background(Color.White),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                val startIdx = i * 3
+                val endIdx = min(startIdx + 3, numCharacterAndActors)
+                for (j in startIdx until endIdx) {
+                    // Выведите каждого персонажа из текущей карточки с индексом j
+                    CurrentCast(
+                        characterPainter = rememberAsyncImagePainter(model = castList[j].character.images.webp.image_url),
+                        modifier = modifier,
+                        personPainter = rememberAsyncImagePainter(model = castList[j].voice_actors[0].person.images.jpg.image_url),
+                        voiceActor = castList[j].voice_actors[0],
+                        data = castList[j],
+                        navController = navController
+                    )
+                }
+            }
+        }
+        Column(modifier = modifier.width(20.dp)) {
+            // Пустая колонка для выравнивания
+        }
+        Column(
+            modifier
+                .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(5.dp))
+                .width(140.dp)
+                .height(460.dp)
+                .background(Color.White)
                 .clickable {
                     navController.navigate(DetailOnCast.value) {
                         popUpTo(Screen.Detail.route) {
                             inclusive = true
                         }
                     }
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
 
-                })
+            Icon(
+                imageVector = Icons.Filled.ArrowForward,
+                contentDescription = "More cast",
+                modifier = modifier.width(140.dp)
+            )
+            Text(
+                text = "More Cast",
+                textAlign = TextAlign.Left,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp,
+                modifier = modifier
+            )
+        }
+        Column(modifier = modifier.width(20.dp)) {
+            // Пустая колонка для выравнивания
+        }
     }
 
 }
 
 @Composable
-fun AddCast(castList: List<Data>, navController: NavController) {
+private fun CurrentCast(
+    modifier: Modifier,
+    personPainter: AsyncImagePainter,
+    characterPainter: AsyncImagePainter,
+    voiceActor: VoiceActor,
+    data: Data,
+    navController: NavController
+) {
     Row(
-        modifier = Modifier
-            .horizontalScroll(rememberScrollState())
+        modifier = modifier.height(150.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = personPainter,
+                contentDescription = "Voice actor : ${voiceActor.person.name}",
+                modifier = modifier
+                    .size(85.dp, 135.dp)
+                    .clickable {
+                        navController.navigate("detail_on_staff/${voiceActor.person.mal_id}") {
+                            popUpTo(Screen.Detail.route) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                contentScale = ContentScale.FillBounds
+            )
 
-        castList.take(10).forEach { data ->
-            val characterPainter =
-                rememberAsyncImagePainter(model = data.character.images.webp.image_url)
-            Column {
-
-                Card(modifier = Modifier
-                    .size(123.dp, 150.dp)
-                    .shadow(
-                        4.dp,
-                        shape = MaterialTheme.shapes.large,
-                        ambientColor = Color.Black.copy(alpha = 0.8f),
+        }
+        Column(modifier = modifier.width(150.dp)) {
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = modifier
+                    .fillMaxWidth(1f)
+                    .padding(start = 5.dp)
+            ) {
+                Row {
+                    Text(
+                        text = voiceActor.person.name,
+                        modifier = Modifier,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Bold
                     )
+                }
+                Row {
+                    Text(
+                        text = voiceActor.language,
+                        modifier = Modifier,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+            Row(modifier = modifier.height(50.dp)) {}
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = modifier
+                    .fillMaxWidth(1f)
+                    .padding(end = 5.dp)
+            ) {
+                Row {
+                    Text(
+                        text = data.character.name,
+                        modifier = Modifier,
+                        textAlign = TextAlign.End,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Row {
+                    Text(
+                        text = data.role,
+                        modifier = Modifier,
+                        textAlign = TextAlign.End,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier.size(85.dp, 135.dp)
+        ) {
+            Image(
+                painter = characterPainter,
+                contentDescription = "Character name: ${data.character.name}",
+                modifier = Modifier
+                    .size(80.dp, 130.dp)
+//                    .fillMaxWidth() // Занимать доступную ширину в колонке
+//                    .aspectRatio(1f) // Задать соотношение сторон 1:1 (прямоугольник станет квадратом)
                     .clickable {
                         navController.navigate(route = "detail_on_character/${data.character.mal_id}") {
                             popUpTo(Screen.Detail.route) {
                                 inclusive = true
                             }
-
                         }
-                    }) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.BottomStart
-                    ) {
-                        Image(
-                            painter = characterPainter,
-                            contentDescription = "Character name: ${data.character.name}",
-                            modifier = Modifier.aspectRatio(9f / 11f),
-                            contentScale = ContentScale.Crop
-                        )
-                        Spacer(modifier = Modifier.size(10.dp))
-                        Text(
-                            text = data.character.name,
-                            color = Color.White,
-                            modifier = Modifier
-                                .shadow(
-                                    4.dp,
-                                    shape = MaterialTheme.shapes.large,
-                                    ambientColor = Color.Black.copy(alpha = 0.8f),
-                                )
-                                .align(Alignment.BottomStart)
-                        )
-                        Spacer(modifier = Modifier.size(20.dp))
-                        Text(
-                            text = data.role,
-                            color = Color.White,
-                            modifier = Modifier
-                                .shadow(4.dp, shape = MaterialTheme.shapes.small)
-                                .align(Alignment.TopStart)
-                        )
-                    }
-                }
-
-                data.voice_actors.forEach { voiceActor ->
-
-
-                    val personPainter =
-                        rememberAsyncImagePainter(model = voiceActor.person.images.jpg.image_url)
-
-                    Card(modifier = Modifier
-                        .size(123.dp, 150.dp)
-                        .clickable {
-                            navController.navigate(route = "detail_on_staff/${voiceActor.person.mal_id}") {
-
-                                popUpTo(Screen.Detail.route) {
-                                    inclusive = true
-                                }
-
-                            }
-                        }) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.BottomStart
-                        ) {
-
-                            Image(
-                                painter = personPainter,
-                                contentDescription = "Voice actor : ${voiceActor.person.name}",
-                                modifier = Modifier.aspectRatio(9f / 11f),
-                                contentScale = ContentScale.Crop
-                            )
-                            Text(
-                                text = voiceActor.person.name,
-                                modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .padding(start = 8.dp, bottom = 8.dp)
-                                    .shadow(4.dp, shape = MaterialTheme.shapes.small),
-                                color = Color.White
-                            )
-                            Spacer(modifier = Modifier.size(20.dp))
-                            Text(
-                                text = voiceActor.language,
-                                modifier = Modifier
-                                    .align(Alignment.TopStart)
-                                    .padding(end = 8.dp, bottom = 8.dp)
-                                    .shadow(4.dp, shape = MaterialTheme.shapes.small),
-                                color = Color.White
-                            )
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.size(20.dp))
+                    },
+                contentScale = ContentScale.Fit // Масштабирование изображения, чтобы вмещалось в квадрат
+            )
         }
 
     }
-
-
 }
 
-
-fun hasJapVoiceActor(castList: List<Data>): List<Data> {
+private fun hasJapVoiceActor(castList: List<Data>): List<Data> {
     return castList.mapNotNull { data ->
         val japOrFirstVoiceActor = getJapOrFirstVoiceActor(data)
         if (japOrFirstVoiceActor != null) {
@@ -205,97 +270,7 @@ fun hasJapVoiceActor(castList: List<Data>): List<Data> {
     }
 }
 
-fun getJapOrFirstVoiceActor(data: Data): VoiceActor? {
+private fun getJapOrFirstVoiceActor(data: Data): VoiceActor? {
     return data.voice_actors.firstOrNull { it.language == "Japanese" }
         ?: data.voice_actors.firstOrNull()
 }
-
-
-@Preview(showBackground = true)
-@Composable
-fun Prev() {
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize(),
-
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .horizontalScroll(rememberScrollState())
-            ) {
-                Column {
-                    Box(
-                        Modifier
-                            .size(200.dp)
-                            .background(Color.Green)
-                    ) {
-
-                    }
-                    Box(
-                        Modifier
-                            .size(200.dp)
-                            .background(Color.Blue)
-                    ) {
-
-                    }
-
-                }
-                Column {
-                    Box(
-                        Modifier
-                            .size(200.dp)
-                            .background(Color.Red)
-                    ) {
-
-                    }
-                    Box(
-                        Modifier
-                            .size(200.dp)
-                            .background(Color.White)
-                    ) {
-
-                    }
-                }
-                Column {
-                    Box(
-                        Modifier
-                            .size(200.dp)
-                            .background(Color.Green)
-                    ) {
-
-                    }
-                    Box(
-                        Modifier
-                            .size(200.dp)
-                            .background(Color.Blue)
-                    ) {
-
-                    }
-
-                }
-                Column {
-                    Box(
-                        Modifier
-                            .size(200.dp)
-                            .background(Color.Red)
-                    ) {
-
-                    }
-                    Box(
-                        Modifier
-                            .size(200.dp)
-                            .background(Color.White)
-                    ) {
-
-                    }
-                }
-            }
-
-        }
-    }
-}
-

@@ -346,7 +346,7 @@ fun FavoriteScreenCardBox(
 // Icon that placed in FavoriteScreenCardBox
 // that shows score
 @Composable
-fun ScoreIcon(score: String, modifier: Modifier) {
+private fun ScoreIcon(score: String, modifier: Modifier) {
     Box(modifier = modifier.size(45.dp), contentAlignment = Alignment.Center) {
         Icon(
             Icons.Filled.Star,
@@ -366,7 +366,7 @@ fun ScoreIcon(score: String, modifier: Modifier) {
 // Icon that placed in FavoriteScreenCardBox
 // that shows score by users of MyAnimeList.com
 @Composable
-fun ScoredByIcon(scoredBy: String, modifier: Modifier) {
+private fun ScoredByIcon(scoredBy: String, modifier: Modifier) {
     Box(modifier = modifier.size(45.dp), contentAlignment = Alignment.Center) {
         Icon(
             Icons.Filled.Person,
