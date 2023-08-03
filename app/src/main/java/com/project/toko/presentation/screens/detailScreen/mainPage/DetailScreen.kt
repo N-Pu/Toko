@@ -158,10 +158,6 @@ fun ActivateDetailScreen(
                     ScoreByNumber(scoreBy = detailData?.scored_by ?: 0.0f, modifier = modifier)
 
                 }
-
-//                Column(modifier = modifier.width(10.dp)) {
-//
-//                }
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Center,
@@ -217,11 +213,8 @@ fun ActivateDetailScreen(
                 )
             }
 
-
-
-
             if (staffData.isNotEmpty()) {
-                DisplayStaff(staffList = staffData, navController = navController)
+                DisplayStaff(staffList = staffData, navController = navController, modifier = modifier)
             }
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -424,7 +417,6 @@ private fun ExpandableText(text: String, modifier: Modifier) {
 @Composable
 private fun DisplayTitle(title: String, modifier: Modifier) {
 
-//    .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp)
     Text(
         text = title,
         fontSize = 40.sp,
@@ -434,7 +426,11 @@ private fun DisplayTitle(title: String, modifier: Modifier) {
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            shadow = Shadow(color = Color.Black, offset = Offset(x = 0f, y = 5f), blurRadius = 5f)
+            shadow = Shadow(
+                offset = Offset(x = 0f, y = 6f),
+                blurRadius = 5f,
+                color = Color.Black.copy(alpha = 0.5f)
+            )
         ), textAlign = TextAlign.Center
     )
 }
@@ -556,14 +552,26 @@ private fun RankedLine(rank: Int, modifier: Modifier) {
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
             color = Color.Black,
-            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 6f), blurRadius = 5f))
+            style = TextStyle(
+                shadow = Shadow(
+                    offset = Offset(x = 0f, y = 6f),
+                    blurRadius = 5f,
+                    color = Color.Black.copy(alpha = 0.5f)
+                )
+            )
         )
         Text(
             text = "#$rank",
             fontWeight = FontWeight.ExtraBold,
             fontSize = 14.sp,
             color = Color.Black,
-            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 0f), blurRadius = 5f))
+            style = TextStyle(
+                shadow = Shadow(
+                    offset = Offset(x = 0f, y = 6f),
+                    blurRadius = 5f,
+                    color = Color.Black.copy(alpha = 0.5f)
+                )
+            )
         )
     }
 }
@@ -580,14 +588,26 @@ private fun PopularityLine(popularity: Int, modifier: Modifier) {
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
             color = Color.Black,
-            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 6f), blurRadius = 5f))
+            style = TextStyle(
+                shadow = Shadow(
+                    offset = Offset(x = 0f, y = 6f),
+                    blurRadius = 5f,
+                    color = Color.Black.copy(alpha = 0.5f)
+                )
+            )
         )
         Text(
             text = "#$popularity",
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
             color = Color.Black,
-            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 0f), blurRadius = 5f))
+            style = TextStyle(
+                shadow = Shadow(
+                    offset = Offset(x = 0f, y = 6f),
+                    blurRadius = 5f,
+                    color = Color.Black.copy(alpha = 0.5f)
+                )
+            )
         )
     }
 }
@@ -605,14 +625,26 @@ private fun MembersLine(members: Int, modifier: Modifier) {
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
             color = Color.Black,
-            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 6f), blurRadius = 5f))
+            style = TextStyle(
+                shadow = Shadow(
+                    offset = Offset(x = 0f, y = 6f),
+                    blurRadius = 5f,
+                    color = Color.Black.copy(alpha = 0.5f)
+                )
+            )
         )
         Text(
             text = members.toString(),
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
             color = Color.Black,
-            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 0f), blurRadius = 5f))
+            style = TextStyle(
+                shadow = Shadow(
+                    offset = Offset(x = 0f, y = 6f),
+                    blurRadius = 5f,
+                    color = Color.Black.copy(alpha = 0.5f)
+                )
+            )
         )
     }
 }
@@ -630,14 +662,26 @@ private fun FavoritesLine(favorites: Int, modifier: Modifier) {
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
             color = Color.Black,
-            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 6f), blurRadius = 5f))
+            style = TextStyle(
+                shadow = Shadow(
+                    offset = Offset(x = 0f, y = 6f),
+                    blurRadius = 5f,
+                    color = Color.Black.copy(alpha = 0.5f)
+                )
+            )
         )
         Text(
             text = favorites.toString(),
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
             color = Color.Black,
-            style = TextStyle(shadow = Shadow(offset = Offset(x = 0f, y = 0f), blurRadius = 5f))
+            style = TextStyle(
+                shadow = Shadow(
+                    offset = Offset(x = 0f, y = 6f),
+                    blurRadius = 5f,
+                    color = Color.Black.copy(alpha = 0.5f)
+                )
+            )
         )
     }
 }
@@ -667,7 +711,7 @@ private fun YearTypeEpisodesTimeStatusStudio(data: Data?, modifier: Modifier) {
 
             if (data?.episodes != 0 && data?.duration != null) {
                 withStyle(style = SpanStyle(color = Color.Black)) {
-                    append("${data.episodes} ep./${data.duration}")
+                    append("${data.episodes} ep/${data.duration}")
                 }
                 append("/")
             }

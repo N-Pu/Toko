@@ -1,32 +1,38 @@
 package com.project.toko.presentation.screens.detailScreen.sideContent.staffList
 
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -36,18 +42,31 @@ import com.project.toko.presentation.navigation.Screen
 @Composable
 fun DisplayStaff(
     staffList: List<com.project.toko.domain.models.staffModel.Data>,
-    navController: NavController
+    navController: NavController,
+    modifier: Modifier
 ) {
-    ListEditor(listData = staffList, navController = navController)
+    ListEditor(listData = staffList, navController = navController, modifier = modifier)
 }
 
 
 @Composable
-fun ListEditor(
+private fun ListEditor(
     listData: List<com.project.toko.domain.models.staffModel.Data>,
-    navController: NavController
+    navController: NavController,
+    modifier: Modifier
 ) {
-    Text(text = "Staff", textDecoration = TextDecoration.Underline)
+    Box(
+        modifier = modifier
+            .fillMaxWidth(1f)
+            .padding(start = 20.dp, bottom = 15.dp, end = 20.dp, top = 15.dp),
+        contentAlignment = Alignment.TopStart
+    ) {
+        Text(
+            text = "Staff",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+    }
     Row(
         modifier = Modifier
             .fillMaxHeight()
@@ -55,90 +74,136 @@ fun ListEditor(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        listData.take(10).forEach { data ->
-            val personPainter =
-                rememberAsyncImagePainter(model = data.person.images.jpg.image_url)
+        listData.take(12).forEach { data ->
+            val personPainter = rememberAsyncImagePainter(model = data.person.images.jpg.image_url)
+
+            Spacer(modifier = Modifier.size(20.dp))
 
             StaffComponentsCard(
                 data = data,
                 personPainter = personPainter,
-                navController = navController
+                navController = navController,
+                modifier = modifier
             )
-            Spacer(modifier = Modifier.size(20.dp))
-
         }
-
-    }
-    Box(modifier = Modifier.fillMaxWidth(0.9f)) {
-        Text(
-            text = "More Staff",
-            textAlign = TextAlign.Left,
-            color = Color.Blue,
-            textDecoration = TextDecoration.Underline,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
+        Column(modifier = modifier.width(20.dp)) {
+            // Пустая колонка для выравнивания
+        }
+        Column(
+            modifier
+                .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(5.dp))
+                .width(189.dp)
+                .height(247.dp)
+                .background(Color.White)
                 .clickable {
-
                     navController.navigate(DetailOnStaff.value) {
-                        // Удаление экрана ShowWholeStaff и всех экранов выше его в стеке обратной навигации
                         popUpTo(Screen.Detail.route) {
                             inclusive = true
                         }
                     }
-                })
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Icon(
+                imageVector = Icons.Filled.ArrowForward,
+                contentDescription = "More cast",
+                modifier = modifier.width(140.dp)
+            )
+            Text(
+                text = "More Cast",
+                textAlign = TextAlign.Left,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp,
+                modifier = modifier
+            )
+        }
+        Column(modifier = modifier.width(20.dp)) {
+            // Пустая колонка для выравнивания
+        }
     }
 }
 
-
 @Composable
-fun StaffComponentsCard(
+private fun StaffComponentsCard(
+    modifier: Modifier,
     data: com.project.toko.domain.models.staffModel.Data,
     personPainter: AsyncImagePainter,
     navController: NavController
 ) {
-    Card(modifier = Modifier
-        .size(123.dp, 150.dp)
-        .clickable {
-            navController.navigate(route = "detail_on_staff/${data.person.mal_id}") {
 
-                popUpTo(Screen.Detail.route) {
-                    inclusive = true
-                }
 
-            }
-            Log.d("staff id ->", data.person.mal_id.toString())
-        }) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomStart
+    val positions = data.positions.joinToString(separator = ", ")
+
+
+    Row(
+        modifier = modifier
+            .width(457.dp)
+            .height(231.dp)
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color.White),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier.padding(start = 20.dp)
         ) {
-
             Image(
                 painter = personPainter,
-                contentDescription = "Voice actor : ${data.person.name}",
-                modifier = Modifier.aspectRatio(9f / 11f),
-                contentScale = ContentScale.Crop
+                contentDescription = "Staff member: ${data.person.name}",
+                modifier = modifier
+                    .width(100.dp)
+                    .height(157.dp)
+                    .clickable {
+                        navController.navigate("detail_on_staff/${data.person.mal_id}") {
+                            popUpTo(Screen.Detail.route) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                contentScale = ContentScale.FillBounds
             )
-            Text(
-                text = data.person.name,
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(start = 8.dp, bottom = 8.dp)
-                    .shadow(4.dp, shape = MaterialTheme.shapes.small),
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.size(20.dp))
-            data.positions.forEach {
-                Text(
-                    text = it,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(end = 8.dp, bottom = 8.dp)
-                        .shadow(4.dp, shape = MaterialTheme.shapes.small),
-                    color = Color.White
-                )
-            }
 
         }
+
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top,
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .padding(start = 5.dp)
+        ) {
+            Row {
+                Text(
+                    text = data.person.name,
+                    modifier = modifier,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(0.7f)
+            ) {
+
+                Text(
+                    text = positions,
+                    modifier = modifier,
+                    minLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+
+            }
+        }
+
     }
 }

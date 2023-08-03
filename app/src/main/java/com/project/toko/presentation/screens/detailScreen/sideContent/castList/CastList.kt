@@ -52,7 +52,8 @@ fun DisplayCast(
     Box(
         modifier = modifier
             .fillMaxWidth(1f)
-            .padding(start = 20.dp, bottom = 25.dp), contentAlignment = Alignment.TopStart
+            .padding(start = 20.dp, bottom = 15.dp, end = 20.dp),
+        contentAlignment = Alignment.TopStart
     ) {
         Text(
             text = "Cast",
@@ -65,7 +66,8 @@ fun DisplayCast(
 
 @Composable
 private fun AddCast(castList: List<Data>, navController: NavController, modifier: Modifier) {
-    val numCharacterAndActors = min(12, castList.size) // Количество персонажей для вывода (не более 12)
+    val numCharacterAndActors =
+        min(12, castList.size) // Количество персонажей для вывода (не более 12)
     val numCards = (numCharacterAndActors + 2) / 3 // Определение количества карточек
     Row(
         modifier = Modifier
@@ -239,8 +241,6 @@ private fun CurrentCast(
                 contentDescription = "Character name: ${data.character.name}",
                 modifier = Modifier
                     .size(80.dp, 130.dp)
-//                    .fillMaxWidth() // Занимать доступную ширину в колонке
-//                    .aspectRatio(1f) // Задать соотношение сторон 1:1 (прямоугольник станет квадратом)
                     .clickable {
                         navController.navigate(route = "detail_on_character/${data.character.mal_id}") {
                             popUpTo(Screen.Detail.route) {
