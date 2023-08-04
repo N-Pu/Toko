@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,6 +37,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.presentation.navigation.DetailOnStaff
 import com.project.toko.presentation.navigation.Screen
+import java.lang.Integer.min
 
 @Composable
 fun DisplayStaff(
@@ -55,17 +55,28 @@ private fun ListEditor(
     navController: NavController,
     modifier: Modifier
 ) {
-    Box(
+    val minListSize = min(12, listData.size)
+
+    Row(
         modifier = modifier
             .fillMaxWidth(1f)
             .padding(start = 20.dp, bottom = 15.dp, end = 20.dp, top = 15.dp),
-        contentAlignment = Alignment.TopStart
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "Staff",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
+        Column {
+            Text(
+                text = "Staff",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+        Column {
+            Text(
+                text = " $minListSize>",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
     }
     Row(
         modifier = Modifier
@@ -94,7 +105,7 @@ private fun ListEditor(
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(5.dp))
                 .width(189.dp)
-                .height(247.dp)
+                .height(231.dp)
                 .background(Color.White)
                 .clickable {
                     navController.navigate(DetailOnStaff.value) {
@@ -134,11 +145,7 @@ private fun StaffComponentsCard(
     personPainter: AsyncImagePainter,
     navController: NavController
 ) {
-
-
     val positions = data.positions.joinToString(separator = ", ")
-
-
     Row(
         modifier = modifier
             .width(457.dp)
@@ -151,13 +158,16 @@ private fun StaffComponentsCard(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = modifier.padding(start = 20.dp)
+            verticalArrangement = Arrangement.Top,
+            modifier = modifier
+                .padding(start = 22.dp, top = 22.dp)
+                .fillMaxHeight(1f)
         ) {
             Image(
                 painter = personPainter,
                 contentDescription = "Staff member: ${data.person.name}",
                 modifier = modifier
+                    .clip(RoundedCornerShape(5.dp))
                     .width(100.dp)
                     .height(157.dp)
                     .clickable {
@@ -177,28 +187,34 @@ private fun StaffComponentsCard(
             verticalArrangement = Arrangement.Top,
             modifier = modifier
                 .fillMaxWidth(1f)
-                .padding(start = 5.dp)
+                .padding(start = 22.dp)
         ) {
-            Row {
+            Row(
+                modifier = modifier
+                    .padding(top = 24.dp)
+            ) {
                 Text(
                     text = data.person.name,
                     modifier = modifier,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 23.sp
                 )
             }
             Row(
                 modifier = modifier
                     .fillMaxWidth(1f)
-                    .fillMaxHeight(0.7f)
+                    .fillMaxHeight(1f)
+                    .padding(end = 22.dp)
             ) {
 
                 Text(
                     text = positions,
                     modifier = modifier,
                     minLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 16.sp
                 )
 
 

@@ -214,7 +214,11 @@ fun ActivateDetailScreen(
             }
 
             if (staffData.isNotEmpty()) {
-                DisplayStaff(staffList = staffData, navController = navController, modifier = modifier)
+                DisplayStaff(
+                    staffList = staffData,
+                    navController = navController,
+                    modifier = modifier
+                )
             }
             Spacer(modifier = Modifier.height(16.dp))
 

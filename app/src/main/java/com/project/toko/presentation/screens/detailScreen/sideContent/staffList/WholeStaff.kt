@@ -36,7 +36,11 @@ import com.project.toko.presentation.navigation.Screen
 
 
 @Composable
-fun ShowWholeStaff(navController: NavController, viewModel: DetailScreenViewModel, modifier: Modifier) {
+fun ShowWholeStaff(
+    navController: NavController,
+    viewModel: DetailScreenViewModel,
+    modifier: Modifier
+) {
 
     val staffState by viewModel.staffList.collectAsStateWithLifecycle()
 
@@ -60,7 +64,12 @@ fun ShowWholeStaff(navController: NavController, viewModel: DetailScreenViewMode
 
 
 @Composable
-fun SingleStaffMember(person: Person, positions: List<String>, navController: NavController, modifier: Modifier) {
+fun SingleStaffMember(
+    person: Person,
+    positions: List<String>,
+    navController: NavController,
+    modifier: Modifier
+) {
 
     var isVisible by remember {
         mutableStateOf(false)
