@@ -202,7 +202,30 @@ fun ActivateDetailScreen(
                 )
             }
 
-            ExpandableText(text = detailData?.synopsis ?: "No Synopsis", modifier)
+            if (detailData?.synopsis?.isNotEmpty() == true) {
+                ExpandableText(text = detailData?.synopsis ?: "", modifier)
+            }
+
+            if (detailData?.background?.isNotEmpty() == true) {
+
+                Column(modifier = modifier.padding(start = 20.dp, end = 20.dp)) {
+                    Row {
+                        Text(
+                            text = "Background",
+                            color = Color.Black,
+                            fontSize = 22.sp,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row {
+                        Text(text = detailData?.background ?: "")
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
 
 
             if (castData.isNotEmpty()) {
@@ -245,8 +268,7 @@ fun ActivateDetailScreen(
             }
 
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "background: " + (detailData?.background ?: "None"))
+
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "broadcast: " + (detailData?.broadcast?.string ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
