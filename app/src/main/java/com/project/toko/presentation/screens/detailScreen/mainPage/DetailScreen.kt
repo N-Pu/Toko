@@ -3,8 +3,10 @@ package com.project.toko.presentation.screens.detailScreen.mainPage
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -63,6 +65,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
@@ -124,13 +127,37 @@ fun ActivateDetailScreen(
             }
             Row(
                 modifier = modifier
-                    .fillMaxWidth(1f),
+                    .fillMaxWidth(1f)
+                    .height(20.dp)
+                    .basicMarquee(
+                        iterations = Int.MAX_VALUE,
+                        delayMillis = 2000,
+                        initialDelayMillis = 2000,
+                        velocity = 50.dp
+                    )
+                    .padding(start = 20.dp, end = 20.dp),
                 horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top
             ) {
+
+                if (detailData?.title_english?.isNotEmpty() == true) {
+                    Text(
+                        text = detailData?.title_english ?: "",
+                        minLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "/",
+                        minLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
+                }
                 Text(
-                    text = detailData?.title_english ?: "None",
+                    text = detailData?.title_japanese ?: "",
                     minLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
                 )
             }
             Row(
@@ -202,9 +229,15 @@ fun ActivateDetailScreen(
                 )
             }
 
-            if (detailData?.synopsis?.isNotEmpty() == true) {
-                ExpandableText(text = detailData?.synopsis ?: "", modifier)
+//            if (detailData?.synopsis?.isNotBlank() == true) {
+//                ExpandableText(text = detailData?.synopsis ?: "", modifier)
+//            }
+            if (detailData?.synopsis?.isNotBlank() == true) {
+                ExpandableText(text = detailData!!.synopsis, modifier)
             }
+
+
+            ShowMoreInformation(modifier = modifier, detailData = detailData)
 
             if (detailData?.background?.isNotEmpty() == true) {
 
@@ -272,18 +305,6 @@ fun ActivateDetailScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "broadcast: " + (detailData?.broadcast?.string ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "duration: " + detailData?.duration)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "episodes: " + detailData?.episodes.toString())
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "favorites: " + detailData?.favorites.toString())
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "members: " + detailData?.members.toString())
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "popularity: " + detailData?.popularity.toString())
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "rank: " + detailData?.rank.toString())
-            Spacer(modifier = Modifier.height(16.dp))
             Text(text = "rating: " + (detailData?.rating ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "season: " + (detailData?.season ?: "None"))
@@ -291,10 +312,6 @@ fun ActivateDetailScreen(
             Text(text = "source: " + (detailData?.source ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "status: " + (detailData?.status ?: "None"))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "title: " + (detailData?.title ?: "None"))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "english title: " + (detailData?.title_english ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "jap title: " + (detailData?.title_japanese ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
@@ -308,10 +325,6 @@ fun ActivateDetailScreen(
             Text(text = "approved :" + (detailData?.type ?: "None"))
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "url :" + (detailData?.url ?: "None"))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "year :" + detailData?.year.toString())
-            Spacer(modifier = Modifier.height(16.dp))
-
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "title_synonyms", textDecoration = TextDecoration.Underline)
@@ -364,18 +377,95 @@ fun ActivateDetailScreen(
 
 
 @Composable
+private fun ShowMoreInformation(modifier: Modifier, detailData: Data?) {
+
+    val positions = detailData?.demographics?.joinToString(separator = ", ")
+    val licensors = detailData?.licensors?.joinToString(separator = ", ")
+    Column(
+        modifier = modifier
+            .fillMaxWidth(1f)
+            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+
+            Text(
+                text = "More Information",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+
+        }
+        Row(modifier = modifier.height(20.dp), horizontalArrangement = Arrangement.Start) {
+
+        }
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+            Text(text = "Aired: ")
+            Text(text = "from " + detailData?.aired?.from + " to " + detailData?.aired?.to + "| prop " + detailData?.aired?.prop?.string)
+        }
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+            Text(text = "Licensors: ")
+            Text(text = licensors ?: "N/A", minLines = 1)
+        }
+
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+            Text(text = "Studios: ")
+            detailData?.studios?.forEach { Text(text = it.name) }
+        }
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+            Text(text = "Source: ")
+            Text(text = detailData?.source ?: "N/A")
+        }
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+            Text(text = "Demographic: ")
+//            detailData?.demographics?.forEach { Text(text = it.name.ifBlank {
+//                "N/A"
+//            }
+            Text(text = positions ?: "N/A")
+        }
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+            Text(text = "Rating: ")
+            Text(text = detailData?.rating ?: "N/A", minLines = 1)
+        }
+    }
+}
+
+
+@Composable
 private fun ExpandableText(text: String, modifier: Modifier) {
     val wordCount = text.split(" ").count()
-
-    if (wordCount <= 20) {
-        Text(text = text)
-        return
-    }
-
     var expanded by remember { mutableStateOf(false) }
     val toggleExpanded: () -> Unit = { expanded = !expanded }
 
     val maxLines = if (expanded) Int.MAX_VALUE else 4
+
+    if (wordCount <= 20) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .padding(start = 20.dp, bottom = 25.dp, end = 20.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
+        ) {
+            Text(
+                text = "Synopsis",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+
+            Spacer(modifier = modifier.height(10.dp))
+            Text(
+                text = text,
+                maxLines = maxLines,
+                overflow = TextOverflow.Ellipsis,
+                modifier = modifier,
+                softWrap = true
+            )
+        }
+        return
+    }
+
+
 
     Column(
         modifier = modifier
@@ -439,7 +529,6 @@ private fun ExpandableText(text: String, modifier: Modifier) {
     }
 }
 
-
 @Composable
 private fun DisplayTitle(title: String, modifier: Modifier) {
 
@@ -462,9 +551,7 @@ private fun DisplayTitle(title: String, modifier: Modifier) {
 }
 
 @Composable
-private fun DisplayPicture(
-    painter: AsyncImagePainter, modifier: Modifier
-) {
+private fun DisplayPicture(painter: AsyncImagePainter, modifier: Modifier) {
 
     Image(
         painter = painter,
@@ -474,7 +561,6 @@ private fun DisplayPicture(
             .fillMaxWidth(1f),
     )
 }
-
 
 @Composable
 private fun ScoreLabel(modifier: Modifier) {
@@ -564,7 +650,6 @@ private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
         )
     }
 }
-
 
 @Composable
 private fun RankedLine(rank: Int, modifier: Modifier) {
@@ -711,7 +796,6 @@ private fun FavoritesLine(favorites: Int, modifier: Modifier) {
         )
     }
 }
-
 
 @Composable
 private fun YearTypeEpisodesTimeStatusStudio(data: Data?, modifier: Modifier) {
