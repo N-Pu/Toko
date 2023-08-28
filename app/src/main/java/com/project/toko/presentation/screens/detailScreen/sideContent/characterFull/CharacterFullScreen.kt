@@ -37,10 +37,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImagePainter
-import com.project.toko.R
 import com.project.toko.domain.models.characterModel.Anime
 import com.project.toko.presentation.animations.LoadingAnimation
 import com.project.toko.presentation.screens.detailScreen.sideContent.bottomSheetActivatorButton.BottomSheetButton
@@ -230,25 +228,25 @@ fun DisplayKanjiAndEnglishName(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewImagePager() {
-    val painter1 = rememberAsyncImagePainter(model = R.drawable.kurisu)
-    val painter2 = rememberAsyncImagePainter(model = R.drawable.kurisu)
-    val painterList = listOf(painter1, painter2)
-    val pagerState = rememberPagerState(initialPage = painterList.size)
-
-
-    HorizontalPager(
-        state = pagerState, modifier = Modifier.fillMaxSize(), pageCount = painterList.size
-    ) { page ->
-        val painter = painterList[page]
-        Image(
-            painter = painter, contentDescription = null, modifier = Modifier.fillMaxSize()
-        )
-    }
-}
+//@OptIn(ExperimentalFoundationApi::class)
+//@Preview(showSystemUi = true)
+//@Composable
+//fun PreviewImagePager() {
+//    val painter1 = rememberAsyncImagePainter(model = R.drawable.kurisu)
+//    val painter2 = rememberAsyncImagePainter(model = R.drawable.kurisu)
+//    val painterList = listOf(painter1, painter2)
+//    val pagerState = rememberPagerState(initialPage = painterList.size)
+//
+//
+//    HorizontalPager(
+//        state = pagerState, modifier = Modifier.fillMaxSize(), pageCount = painterList.size
+//    ) { page ->
+//        val painter = painterList[page]
+//        Image(
+//            painter = painter, contentDescription = null, modifier = Modifier.fillMaxSize()
+//        )
+//    }
+//}
 
 
 //change and optimize with generics

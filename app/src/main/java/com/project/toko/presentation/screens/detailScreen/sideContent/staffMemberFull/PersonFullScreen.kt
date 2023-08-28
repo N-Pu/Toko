@@ -32,8 +32,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImagePainter
 import com.project.toko.domain.models.personFullModel.Anime
@@ -208,54 +206,54 @@ fun DisplayProjectsRelated(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun PreviewBottomSheet() {
-    val imageResource = painterResource(com.project.toko.R.drawable.kurisu)
-//    val painter = rememberAsyncImagePainter(model = com.example.animeapp.R.drawable.kurisu)
-    val listOfStrings: List<String> = listOf(
-        "строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1",
-        "строка 2",
-        "строка 3"
-    )
-
-
-    BottomSheetScaffold(
-        sheetContent = {
-
-            LazyColumn {
-                item { Spacer(modifier = Modifier.size(20.dp)) }
-                items(8) {
-                    Card {
-                        Row {
-                            Column {
-                                Image(painter = imageResource, contentDescription = "")
-                                Text(
-                                    text = "Kurisu",
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.width(100.dp)
-                                )
-                            }
-                            Column {
-                                listOfStrings.forEach {
-                                    Text(text = it)
-                                }
-                            }
-                        }
-
-                    }
-                    Spacer(modifier = Modifier.size(10.dp))
-                }
-
-
-            }
-        }
-    ) {
-        it.calculateBottomPadding()
-    }
-
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Preview
+//@Composable
+//fun PreviewBottomSheet() {
+//    val imageResource = painterResource(com.project.toko.R.drawable.kurisu)
+////    val painter = rememberAsyncImagePainter(model = com.example.animeapp.R.drawable.kurisu)
+//    val listOfStrings: List<String> = listOf(
+//        "строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1строка 1",
+//        "строка 2",
+//        "строка 3"
+//    )
+//
+//
+//    BottomSheetScaffold(
+//        sheetContent = {
+//
+//            LazyColumn {
+//                item { Spacer(modifier = Modifier.size(20.dp)) }
+//                items(8) {
+//                    Card {
+//                        Row {
+//                            Column {
+//                                Image(painter = imageResource, contentDescription = "")
+//                                Text(
+//                                    text = "Kurisu",
+//                                    textAlign = TextAlign.Center,
+//                                    modifier = Modifier.width(100.dp)
+//                                )
+//                            }
+//                            Column {
+//                                listOfStrings.forEach {
+//                                    Text(text = it)
+//                                }
+//                            }
+//                        }
+//
+//                    }
+//                    Spacer(modifier = Modifier.size(10.dp))
+//                }
+//
+//
+//            }
+//        }
+//    ) {
+//        it.calculateBottomPadding()
+//    }
+//
+//}
 
 
 
