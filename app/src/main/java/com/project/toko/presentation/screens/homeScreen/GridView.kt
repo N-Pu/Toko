@@ -10,8 +10,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
@@ -38,11 +36,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
@@ -51,7 +47,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.project.toko.R
 import com.project.toko.dao.Dao
 import com.project.toko.domain.models.newAnimeSearchModel.Data
 import com.project.toko.presentation.theme.LightGreen
@@ -79,7 +74,9 @@ fun GridAdder(
     LazyVerticalStaggeredGrid(
         state = scrollGridState,
         columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
-        modifier = modifier.fillMaxWidth(1f).fillMaxHeight(1f),
+        modifier = modifier
+            .fillMaxWidth(1f)
+            .fillMaxHeight(1f),
         horizontalArrangement = Arrangement.spacedBy(22.dp),
         verticalItemSpacing = 20.dp,
         contentPadding = PaddingValues(10.dp)
@@ -104,8 +101,9 @@ fun GridAdder(
             )
 
             // Загрузка следующей страницы при достижении конца списка и has_next_page = true
-            if (index == listData.data.lastIndex - 2  && isLoading.not()
-                && listData.pagination.has_next_page) {
+            if (index == listData.data.lastIndex - 2 && isLoading.not()
+                && listData.pagination.has_next_page
+            ) {
                 viewModel.loadNextPage()
             }
         }
@@ -184,18 +182,20 @@ fun AnimeCardBox(
                 }
 
             }) {
-
-                navigateToDetailScreen(
-                    navController, data.mal_id
-                )
-
+                viewModel.viewModelScope.launch(Dispatchers.Main) {
+                    navigateToDetailScreen(
+                        navController, data.mal_id
+                    )
+                }
             },
         colors = CardDefaults.cardColors(containerColor = LightGreen),
         shape = RectangleShape,
     ) {
-        Box(modifier = modifier
-            .fillMaxWidth(1f)
-            .fillMaxHeight(1f)) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .fillMaxHeight(1f)
+        ) {
             // Coil image loader
             Image(
                 painter = painter,
@@ -348,236 +348,236 @@ fun checkIdInDataBase(
     return dao.containsInDataBase(id)
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewGridView() {
-    val painter = rememberAsyncImagePainter(model = R.drawable.kurisu)
-
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 140.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(6) {
-            Card(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable {},
-                colors = CardDefaults.cardColors(containerColor = LightGreen),
-                shape = RectangleShape,
-            ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    // Coil image loader
-                    Image(
-                        painter = painter,
-                        contentDescription = "Images for each Anime",
-                        modifier = Modifier.aspectRatio(9f / 11f),
-                        contentScale = ContentScale.FillBounds
-                    )
-
-                    Column(
-                        modifier = Modifier.background(
-                            MaterialTheme.colorScheme.secondary.copy(
-                                alpha = 0.2f
-                            )
-                        )
-                    ) {
-                        Box(
-                            modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Filled.Star,
-                                contentDescription = "Favorite Icon",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(45.dp)
-                            )
-                            Text(
-                                text = "9.33",
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-//                            modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .width(45.dp)
-                                .height(50.dp),
-
-                            ) {
-//                            Column(modifier = Modifier.align(Alignment.Center).fillMaxSize()) {
-                            Icon(
-                                Icons.Filled.Person,
-                                contentDescription = "Favorite Icon",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .width(45.dp)
-                                    .height(50.dp)
-                            )
-                            Text(
-                                textAlign = TextAlign.Center,
-                                text = "1200000",
-                                color = Color.White,
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .align(
-                                        Alignment.BottomEnd
-                                    )
-                            )
-                        }
-
-                    }
-
-
-                }
-
-                Text(
-                    text = "Stein;Gate",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .basicMarquee(
-                            iterations = Int.MAX_VALUE,
-                            delayMillis = 2000,
-                            initialDelayMillis = 2000,
-                            velocity = 50.dp
-                        )
-                        .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight(1000),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
-            }
-
-
-        }
-    }
-
-}
-
-
-@OptIn(ExperimentalFoundationApi::class)
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewGridView2() {
-    val painter = rememberAsyncImagePainter(model = R.drawable.kurisu)
-
-//    val weight = if (it < 3) 2f else 1f
-    LazyVerticalStaggeredGrid(
-        columns = StaggeredGridCells.Adaptive(140.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
-        verticalItemSpacing = 10.dp,
-    ) {
-        item {
-
-        }
-        item {
-            Spacer(modifier = Modifier.height(40.dp))
-        }
-        items(6) {
-            Card(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(22.dp))
-                    .clickable {},
-                colors = CardDefaults.cardColors(containerColor = LightGreen),
-                shape = RectangleShape,
-            ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    // Coil image loader
-                    Image(
-                        painter = painter,
-                        contentDescription = "Images for each Anime",
-                        modifier = Modifier.aspectRatio(9f / 11f),
-                        contentScale = ContentScale.FillBounds
-                    )
-
-                    Column(
-                        modifier = Modifier.background(
-                            MaterialTheme.colorScheme.secondary.copy(
-                                alpha = 0.2f
-                            )
-                        )
-                    ) {
-                        Box(
-                            modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Filled.Star,
-                                contentDescription = "Favorite Icon",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(45.dp)
-                            )
-                            Text(
-                                text = "9.33",
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-//                            modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .width(45.dp)
-                                .height(50.dp),
-
-                            ) {
-//                            Column(modifier = Modifier.align(Alignment.Center).fillMaxSize()) {
-                            Icon(
-                                Icons.Filled.Person,
-                                contentDescription = "Favorite Icon",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .width(45.dp)
-                                    .height(50.dp)
-                            )
-                            Text(
-                                textAlign = TextAlign.Center,
-                                text = "1200000",
-                                color = Color.White,
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .align(
-                                        Alignment.BottomEnd
-                                    )
-                            )
-                        }
-
-                    }
-
-
-                }
-
-                Text(
-                    text = "Stein;Gate $it",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .basicMarquee(
-                            iterations = Int.MAX_VALUE,
-                            delayMillis = 2000,
-                            initialDelayMillis = 2000,
-                            velocity = 50.dp
-                        )
-                        .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight(1000),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
-            }
-        }
-
-    }
-}
+//@OptIn(ExperimentalFoundationApi::class)
+//@Preview(showSystemUi = true)
+//@Composable
+//fun PreviewGridView() {
+//    val painter = rememberAsyncImagePainter(model = R.drawable.kurisu)
+//
+//    LazyVerticalGrid(
+//        columns = GridCells.Adaptive(minSize = 140.dp),
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .fillMaxHeight(),
+//        horizontalArrangement = Arrangement.spacedBy(16.dp),
+//        verticalArrangement = Arrangement.spacedBy(16.dp)
+//    ) {
+//        items(6) {
+//            Card(
+//                modifier = Modifier
+//                    .clip(RoundedCornerShape(6.dp))
+//                    .clickable {},
+//                colors = CardDefaults.cardColors(containerColor = LightGreen),
+//                shape = RectangleShape,
+//            ) {
+//                Box(modifier = Modifier.fillMaxSize()) {
+//                    // Coil image loader
+//                    Image(
+//                        painter = painter,
+//                        contentDescription = "Images for each Anime",
+//                        modifier = Modifier.aspectRatio(9f / 11f),
+//                        contentScale = ContentScale.FillBounds
+//                    )
+//
+//                    Column(
+//                        modifier = Modifier.background(
+//                            MaterialTheme.colorScheme.secondary.copy(
+//                                alpha = 0.2f
+//                            )
+//                        )
+//                    ) {
+//                        Box(
+//                            modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
+//                        ) {
+//                            Icon(
+//                                Icons.Filled.Star,
+//                                contentDescription = "Favorite Icon",
+//                                tint = MaterialTheme.colorScheme.primary,
+//                                modifier = Modifier.size(45.dp)
+//                            )
+//                            Text(
+//                                text = "9.33",
+//                                color = Color.White,
+//                                fontSize = 10.sp,
+//                                fontWeight = FontWeight.Bold,
+////                            modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
+//                            )
+//                        }
+//                        Box(
+//                            modifier = Modifier
+//                                .width(45.dp)
+//                                .height(50.dp),
+//
+//                            ) {
+////                            Column(modifier = Modifier.align(Alignment.Center).fillMaxSize()) {
+//                            Icon(
+//                                Icons.Filled.Person,
+//                                contentDescription = "Favorite Icon",
+//                                tint = MaterialTheme.colorScheme.primary,
+//                                modifier = Modifier
+//                                    .width(45.dp)
+//                                    .height(50.dp)
+//                            )
+//                            Text(
+//                                textAlign = TextAlign.Center,
+//                                text = "1200000",
+//                                color = Color.White,
+//                                fontSize = 8.sp,
+//                                fontWeight = FontWeight.Bold,
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .align(
+//                                        Alignment.BottomEnd
+//                                    )
+//                            )
+//                        }
+//
+//                    }
+//
+//
+//                }
+//
+//                Text(
+//                    text = "Stein;Gate",
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .basicMarquee(
+//                            iterations = Int.MAX_VALUE,
+//                            delayMillis = 2000,
+//                            initialDelayMillis = 2000,
+//                            velocity = 50.dp
+//                        )
+//                        .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
+//                    fontFamily = FontFamily.Monospace,
+//                    fontWeight = FontWeight(1000),
+//                    overflow = TextOverflow.Ellipsis,
+//                    maxLines = 1
+//                )
+//            }
+//
+//
+//        }
+//    }
+//
+//}
+//
+//
+//@OptIn(ExperimentalFoundationApi::class)
+//@Preview(showSystemUi = true)
+//@Composable
+//fun PreviewGridView2() {
+//    val painter = rememberAsyncImagePainter(model = R.drawable.kurisu)
+//
+////    val weight = if (it < 3) 2f else 1f
+//    LazyVerticalStaggeredGrid(
+//        columns = StaggeredGridCells.Adaptive(140.dp),
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .fillMaxHeight(),
+//        horizontalArrangement = Arrangement.spacedBy(20.dp),
+//        verticalItemSpacing = 10.dp,
+//    ) {
+//        item {
+//
+//        }
+//        item {
+//            Spacer(modifier = Modifier.height(40.dp))
+//        }
+//        items(6) {
+//            Card(
+//                modifier = Modifier
+//                    .clip(RoundedCornerShape(22.dp))
+//                    .clickable {},
+//                colors = CardDefaults.cardColors(containerColor = LightGreen),
+//                shape = RectangleShape,
+//            ) {
+//                Box(modifier = Modifier.fillMaxSize()) {
+//                    // Coil image loader
+//                    Image(
+//                        painter = painter,
+//                        contentDescription = "Images for each Anime",
+//                        modifier = Modifier.aspectRatio(9f / 11f),
+//                        contentScale = ContentScale.FillBounds
+//                    )
+//
+//                    Column(
+//                        modifier = Modifier.background(
+//                            MaterialTheme.colorScheme.secondary.copy(
+//                                alpha = 0.2f
+//                            )
+//                        )
+//                    ) {
+//                        Box(
+//                            modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
+//                        ) {
+//                            Icon(
+//                                Icons.Filled.Star,
+//                                contentDescription = "Favorite Icon",
+//                                tint = MaterialTheme.colorScheme.primary,
+//                                modifier = Modifier.size(45.dp)
+//                            )
+//                            Text(
+//                                text = "9.33",
+//                                color = Color.White,
+//                                fontSize = 10.sp,
+//                                fontWeight = FontWeight.Bold,
+////                            modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
+//                            )
+//                        }
+//                        Box(
+//                            modifier = Modifier
+//                                .width(45.dp)
+//                                .height(50.dp),
+//
+//                            ) {
+////                            Column(modifier = Modifier.align(Alignment.Center).fillMaxSize()) {
+//                            Icon(
+//                                Icons.Filled.Person,
+//                                contentDescription = "Favorite Icon",
+//                                tint = MaterialTheme.colorScheme.primary,
+//                                modifier = Modifier
+//                                    .width(45.dp)
+//                                    .height(50.dp)
+//                            )
+//                            Text(
+//                                textAlign = TextAlign.Center,
+//                                text = "1200000",
+//                                color = Color.White,
+//                                fontSize = 8.sp,
+//                                fontWeight = FontWeight.Bold,
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .align(
+//                                        Alignment.BottomEnd
+//                                    )
+//                            )
+//                        }
+//
+//                    }
+//
+//
+//                }
+//
+//                Text(
+//                    text = "Stein;Gate $it",
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .basicMarquee(
+//                            iterations = Int.MAX_VALUE,
+//                            delayMillis = 2000,
+//                            initialDelayMillis = 2000,
+//                            velocity = 50.dp
+//                        )
+//                        .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
+//                    fontFamily = FontFamily.Monospace,
+//                    fontWeight = FontWeight(1000),
+//                    overflow = TextOverflow.Ellipsis,
+//                    maxLines = 1
+//                )
+//            }
+//        }
+//
+//    }
+//}

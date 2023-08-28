@@ -229,9 +229,6 @@ fun ActivateDetailScreen(
                 )
             }
 
-//            if (detailData?.synopsis?.isNotBlank() == true) {
-//                ExpandableText(text = detailData?.synopsis ?: "", modifier)
-//            }
             if (detailData?.synopsis?.isNotBlank() == true) {
                 ExpandableText(text = detailData!!.synopsis, modifier)
             }
@@ -264,7 +261,6 @@ fun ActivateDetailScreen(
             if (castData.isNotEmpty()) {
                 DisplayCast(
                     castList = castData, navController = navController,
-//                    viewModelProvider = viewModelProvider,
                     modifier = modifier
                 )
             }
@@ -302,70 +298,17 @@ fun ActivateDetailScreen(
 
 
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "broadcast: " + (detailData?.broadcast?.string ?: "None"))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "rating: " + (detailData?.rating ?: "None"))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "season: " + (detailData?.season ?: "None"))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "source: " + (detailData?.source ?: "None"))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "status: " + (detailData?.status ?: "None"))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "jap title: " + (detailData?.title_japanese ?: "None"))
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = "trailer url =" + (detailData?.trailer?.url ?: "None") +
                         "id " + (detailData?.trailer?.youtube_id ?: "None")
             )
+            Spacer(modifier = Modifier.height(16.dp))
+          Text(text = "url :" + (detailData?.url ?: "None"))
+            Box(modifier = modifier.size(100.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "approved :" + (detailData?.type ?: "None"))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "url :" + (detailData?.url ?: "None"))
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "title_synonyms", textDecoration = TextDecoration.Underline)
-            detailData?.title_synonyms?.forEach { // well, okay
-                Text(text = it)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "demographics", textDecoration = TextDecoration.Underline)
-            detailData?.demographics?.forEach { // idk
-                Text(text = it.name)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "licensors", textDecoration = TextDecoration.Underline)
-            detailData?.licensors?.forEach { Text(text = it.name) } //  companies that produce this animes on english television
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "producers", textDecoration = TextDecoration.Underline)
-            detailData?.producers?.forEach { // producer companies
-                Text(text = it.name)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "studios", textDecoration = TextDecoration.Underline)
-            detailData?.studios?.forEach { //студии
-                Text(text = it.name)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "explicit_genres", textDecoration = TextDecoration.Underline)
-            detailData?.explicit_genres?.forEach {
-                Text(text = it.name)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "themes", textDecoration = TextDecoration.Underline)
-            detailData?.themes?.forEach {
-                Text(text = it.name)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "titles", textDecoration = TextDecoration.Underline)
-            detailData?.titles?.forEach {
-                Text(text = it.title)
-            }
-
-            Spacer(modifier = Modifier.size(60.dp))
 
         }
 
@@ -379,8 +322,15 @@ fun ActivateDetailScreen(
 @Composable
 private fun ShowMoreInformation(modifier: Modifier, detailData: Data?) {
 
-    val positions = detailData?.demographics?.joinToString(separator = ", ")
-    val licensors = detailData?.licensors?.joinToString(separator = ", ")
+    val licensors = detailData?.licensors?.joinToString(", ") { licensor -> licensor.name }
+    val studios = detailData?.studios?.joinToString(", ") { studio -> studio.name }
+    val producers = detailData?.producers?.joinToString(", ") { producer -> producer.name }
+    val titles = detailData?.titles?.joinToString(", ") { title -> title.title }
+    val demographic = detailData?.demographics?.joinToString(", ") { demo -> demo.name }
+    val synonyms = detailData?.title_synonyms?.joinToString(", ") { it }
+    val airedFrom = detailData?.aired?.from?.dropLast(15) ?: "N/A"
+    val airedTo = detailData?.aired?.to?.dropLast(15) ?: "N/A"
+
     Column(
         modifier = modifier
             .fillMaxWidth(1f)
@@ -401,32 +351,64 @@ private fun ShowMoreInformation(modifier: Modifier, detailData: Data?) {
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
             Text(text = "Aired: ")
-            Text(text = "from " + detailData?.aired?.from + " to " + detailData?.aired?.to + "| prop " + detailData?.aired?.prop?.string)
-        }
-        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
-            Text(text = "Licensors: ")
-            Text(text = licensors ?: "N/A", minLines = 1)
+            Text(text = "from $airedFrom to $airedTo")
         }
 
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
-            Text(text = "Studios: ")
-            detailData?.studios?.forEach { Text(text = it.name) }
+            val licensor = if (licensors?.isEmpty() == true)
+                "N/A"
+            else licensors
+            Text(text = "Licensors: $licensor")
+
+        }
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+            val synonym = if (synonyms?.isEmpty() == true)
+                "N/A"
+            else synonyms
+            Text(text = "Synonyms: $synonym")
+
+        }
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+            val studio = if (studios?.isEmpty() == true)
+                "N/A"
+            else studios
+            Text(text = "Studios: $studio")
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
             Text(text = "Source: ")
             Text(text = detailData?.source ?: "N/A")
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
-            Text(text = "Demographic: ")
-//            detailData?.demographics?.forEach { Text(text = it.name.ifBlank {
-//                "N/A"
-//            }
-            Text(text = positions ?: "N/A")
+            val demo = if (demographic?.isEmpty() == true)
+                "N/A"
+            else demographic
+            Text(text = "Demographic: $demo")
+
+
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
             Text(text = "Rating: ")
             Text(text = detailData?.rating ?: "N/A", minLines = 1)
         }
+        Row {
+            Text(text = "Broadcast: " + (detailData?.broadcast?.string ?: "N/A"))
+        }
+        Row {
+            val producer = if (demographic?.isEmpty() == true)
+                "N/A"
+            else producers
+            Text(text = "Producers: $producer")
+        }
+
+
+        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+            val title = if (titles?.isEmpty() == true) {
+                "N/A"
+            } else titles
+            Text(text = "Titles: $title")
+
+        }
+
     }
 }
 
@@ -837,12 +819,7 @@ private fun YearTypeEpisodesTimeStatusStudio(data: Data?, modifier: Modifier) {
         }
 
         Text(
-            text = yearSeasonText
-//            .toUpperCase()
-            ,
-
-//        overflow = TextOverflow.Ellipsis,
-
+            text = yearSeasonText,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
             lineHeight = 20.sp,

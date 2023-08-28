@@ -157,7 +157,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
         viewModelScope.launch(Dispatchers.IO) {
             searchDebouncer
                 .debounce(500L)
-                .distinctUntilChanged()
+//                .distinctUntilChanged()
                 .collectLatest { searchQuery ->
                     if (searchQuery.isNotEmpty()) {
                         performSearch(searchQuery)

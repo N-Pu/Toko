@@ -73,7 +73,6 @@ class DetailScreenViewModel(private val malApiService: MalApiService) :
 
             try {
                 viewModelScope.launch(Dispatchers.IO) {
-//                withContext(Dispatchers.IO) {
                     val response = malApiService.getStaffFromId(id)
                     if (response.isSuccessful) {
                         val staff = response.body()?.data ?: emptyList()
