@@ -38,7 +38,6 @@ import com.project.toko.domain.models.castModel.ImagesX
 import com.project.toko.domain.models.castModel.JpgX
 import com.project.toko.domain.models.castModel.Person
 import com.project.toko.domain.models.castModel.VoiceActor
-import com.project.toko.presentation.navigation.DetailOnCast
 import com.project.toko.presentation.navigation.Screen
 import java.lang.Integer.min
 
@@ -136,7 +135,7 @@ private fun AddCast(
                 .height(460.dp)
                 .background(Color.White)
                 .clickable {
-                    navController.navigate(DetailOnCast.value) {
+                    navController.navigate(Screen.DetailOnCast.value) {
                         popUpTo(Screen.Detail.route) {
                             inclusive = true
                         }

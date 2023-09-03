@@ -37,7 +37,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.project.toko.domain.models.castModel.Character
 import com.project.toko.domain.models.castModel.Person
 import com.project.toko.domain.viewModel.DetailScreenViewModel
-import com.project.toko.presentation.navigation.DetailOnCast
 import com.project.toko.presentation.navigation.Screen
 import com.project.toko.presentation.theme.LightGreen
 
@@ -108,7 +107,7 @@ fun SingleCharacterMember(
             .clickable {
                 navController.navigate("detail_on_character/${character.mal_id}") {
                     launchSingleTop = true
-                    popUpTo(DetailOnCast.value) {
+                    popUpTo(Screen.DetailOnCast.value) {
                         saveState = true
                     }
                     restoreState = true

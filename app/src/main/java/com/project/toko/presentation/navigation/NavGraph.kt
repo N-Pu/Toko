@@ -57,7 +57,7 @@ fun SetupNavGraph(
             Log.d("CATCHED ID = ", id.toString())
         }
 
-        composable(route = Nothing.value) {
+        composable(route = Screen.Nothing.value) {
             NoId()
         }
         composable(route = Screen.Favorites.route) {
@@ -76,20 +76,20 @@ fun SetupNavGraph(
                 dao = dao
             )
         }
-        composable(route = DetailOnCast.value) {
+        composable(route = Screen.DetailOnCast.value) {
             ShowWholeCast(
                 navController, viewModelProvider[DetailScreenViewModel::class.java],
                 modifier = modifier
             )
         }
-        composable(route = DetailOnStaff.value) {
+        composable(route = Screen.DetailOnStaff.value) {
             ShowWholeStaff(
                 navController, viewModelProvider[DetailScreenViewModel::class.java],
                 modifier = modifier
             )
         }
         composable(
-            route = CharacterDetail.value,
+            route = Screen.CharacterDetail.value,
             arguments = listOf(navArgument("id") {
                 type = NavType.IntType
             })
@@ -103,7 +103,7 @@ fun SetupNavGraph(
             )
         }
         composable(
-            route = StaffDetail.value,
+            route = Screen.StaffDetail.value,
             arguments = listOf(navArgument("id") {
                 type = NavType.IntType
             })
@@ -118,7 +118,7 @@ fun SetupNavGraph(
         }
 
         composable(
-            route = ProducerDetail.value,
+            route = Screen.ProducerDetail.value,
             arguments = listOf(navArgument("id") {
                 type = NavType.IntType
             }, navArgument("studio_name") {

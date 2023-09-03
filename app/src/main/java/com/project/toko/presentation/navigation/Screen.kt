@@ -10,29 +10,27 @@ sealed class Screen(val route: String, val iconId: Int, val contentDescription: 
     object RandomAnimeOrManga :
         Screen("random_anime_or_manga_screen", R.drawable.random, "Current News on Anime")
 
+    object Nothing {
+        const val value = "no_id"
+    }
 
-}
+    object DetailOnCast {
+        const val value = "detail_on_cast"
+    }
 
-object Nothing {
-    const val value = "no_id"
-}
+    object DetailOnStaff {
+        const val value = "detail_on_staff"
+    }
 
-object DetailOnCast {
-    const val value = "detail_on_cast"
-}
+    object CharacterDetail {
+        const val value = "detail_on_character/{id}"
+    }
 
-object DetailOnStaff {
-    const val value = "detail_on_staff"
-}
+    object StaffDetail {
+        const val value = "detail_on_staff/{id}"
+    }
 
-object CharacterDetail {
-    const val value = "detail_on_character/{id}"
-}
-
-object StaffDetail {
-    const val value = "detail_on_staff/{id}"
-}
-
-object ProducerDetail {
-    const val value = "detail_on_producer/{id}/{studio_name}"
+    object ProducerDetail {
+        const val value = "detail_on_producer/{id}/{studio_name}"
+    }
 }

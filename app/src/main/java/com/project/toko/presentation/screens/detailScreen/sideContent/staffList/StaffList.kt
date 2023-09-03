@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import com.project.toko.presentation.navigation.DetailOnStaff
 import com.project.toko.presentation.navigation.Screen
 import java.lang.Integer.min
 
@@ -108,7 +107,7 @@ private fun ListEditor(
                 .height(231.dp)
                 .background(Color.White)
                 .clickable {
-                    navController.navigate(DetailOnStaff.value) {
+                    navController.navigate(Screen.DetailOnStaff.value) {
                         popUpTo(Screen.Detail.route) {
                             inclusive = true
                         }

@@ -56,7 +56,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.project.toko.dao.AnimeItem
 import com.project.toko.dao.MainDb
 import com.project.toko.domain.viewModel.DetailScreenViewModel
-import com.project.toko.presentation.navigation.Nothing
 import com.project.toko.presentation.navigation.Screen
 import com.project.toko.presentation.navigation.SetupNavGraph
 import com.project.toko.presentation.screens.homeScreen.checkIdInDataBase
@@ -226,7 +225,7 @@ fun BottomNavigationBar(
                                     }
                                 }
                             } else {
-                                navController.navigate(Nothing.value) {
+                                navController.navigate(Screen.Nothing.value) {
                                     launchSingleTop = true
                                 }
                             }
