@@ -48,13 +48,10 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     private val _currentPage = MutableStateFlow(1)
     val currentPage = _currentPage.asStateFlow()
 
-//    private val _totalPages = MutableStateFlow(0)
-//    val totalPages = _totalPages.asStateFlow()
-
     private val _isNextPageLoading = MutableStateFlow(false)
     val isNextPageLoading = _isNextPageLoading.asStateFlow()
 
-    private val _searchText = MutableStateFlow("")
+    private val _searchText = MutableStateFlow<String?>(null)
     val searchText = _searchText.asStateFlow()
 
     private val _animeSearch = MutableStateFlow(emptyNewAnimeSearchModel)
@@ -76,14 +73,10 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
 
     private var pre_genres = ""
-    private val _genres = MutableStateFlow("")
+    private val _genres = MutableStateFlow<String?>(null)
 
     private val _type = MutableStateFlow("")
     val type = _type.value
-
-//    private val _rating = MutableStateFlow("")
-//    val rating = _rating.value
-
 
     private val _ratingList = MutableStateFlow(getRating())
     val ratingList: StateFlow<List<Rating>> = _ratingList
@@ -123,17 +116,6 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     private val _safeForWork = mutableStateOf(false)
     var safeForWork = _safeForWork
 
-
-//    private val _sort = MutableStateFlow("")
-//    val sort = _sort.value
-
-//    private val _start_date = MutableStateFlow("")
-//    val start_date = _start_date.value
-//
-//    private val _end_date = MutableStateFlow("")
-//    val end_date = _end_date.value
-
-
     private val _typeList = MutableStateFlow(getTypes())
     val typeList: StateFlow<List<Types>> = _typeList
     private val pre_selectedType = MutableStateFlow<Types?>(null)
@@ -156,14 +138,13 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     init {
         viewModelScope.launch(Dispatchers.IO) {
             searchDebouncer
-                .debounce(500L)
-//                .distinctUntilChanged()
+                .debounce(1000L)
                 .collectLatest { searchQuery ->
-                    if (searchQuery.isNotEmpty()) {
-                        performSearch(searchQuery)
-                    } else {
-                        _animeSearch.value = emptyNewAnimeSearchModel
-                    }
+//                    if (searchQuery.isNotEmpty()) {
+                    performSearch(searchQuery)
+//                    } else {
+//                        _animeSearch.value = emptyNewAnimeSearchModel
+//                    }
                 }
         }
     }
@@ -171,14 +152,16 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     fun onSearchTextChange(text: String) {
         _searchText.value = text
         viewModelScope.launch(Dispatchers.IO) {
-            if (!isPerformingSearch.value) {
-                searchDebouncer.emit(text)
-            }
+//            if (!isPerformingSearch.value) {
+            searchDebouncer.emit(text)
+//            }
         }
     }
 
-    // note: if you hit the"ok" button without tapping on genres - it will show you whole list of animes.
-    private suspend fun performSearch(query: String) {
+    // note: if you hit the1"ok" button without tapping on genres - it will show you whole list of animes.
+    private suspend fun performSearch(query: String?) {
+        var currentQuery = query
+        var currentGenres = _genres.value
         try {
             // This "if" statement is temporary added because
             // Jikan.Api isn't working properly with query that
@@ -187,11 +170,17 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
             _currentPage.value = 1
             _isPerformingSearch.value = true
 
+            if (currentQuery == "") {
+                currentQuery = null
+            }
+            if (currentGenres == "") {
+                currentGenres = null
+            }
             val response = malApiRepository.getAnimeSearchByName(
                 sfw = safeForWork.value,
-                nameOfAnime = query,
+                query = currentQuery,
                 page = currentPage.value,
-                genres = _genres.value,
+                genres = currentGenres,
                 rating = _selectedRating.value?.ratingName,
                 type = _selectedType.value?.typeName,
                 orderBy = _selectedOrderBy.value?.orderBy,
@@ -216,10 +205,18 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     fun loadNextPage() {
         val query = searchText.value
-
+        var currentGenres = _genres.value
+        var currentQuery = query
+        if (currentQuery == "") {
+            currentQuery = null
+        }
+        if (currentGenres == "") {
+            currentGenres = null
+        }
         if (!hasNextPage.value) {
             return
         }
+
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -227,9 +224,9 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
                 val response =
                     malApiRepository.getAnimeSearchByName(
                         sfw = safeForWork.value,
-                        nameOfAnime = query,
+                        query = currentQuery,
                         page = nextPage,
-                        genres = _genres.value,
+                        genres = currentGenres,
                         rating = _selectedRating.value?.ratingName,
                         type = _selectedType.value?.typeName,
                         orderBy = _selectedOrderBy.value?.orderBy,
@@ -239,23 +236,18 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
                     ).body()
 
 
-//                viewModelScope.async {
                 if (response != null) {
                     homeScreenCaching(response.data)
 
                     hasNextPage.value = response.pagination.has_next_page
 
                 }
-//                }.await()
-
-//                viewModelScope.async {
                 response?.let { newAnimeSearchModel ->
                     _animeSearch.value =
                         _animeSearch.value.copy(data = _animeSearch.value.data + newAnimeSearchModel.data)
                     _currentPage.value = nextPage
                     _isNextPageLoading.value = newAnimeSearchModel.pagination.has_next_page
                 }
-//                }.await()
 
             } catch (e: Exception) {
                 Log.e("HomeScreenViewModel", "Failed to load next page: ${e.message}")
@@ -317,11 +309,7 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
         jobOrderBy.join()
         jobMinMaxScore.join()
 
-//        jobGenres.await()
-//        jobRating.await()
-//        jobTypes.await()
-//        jobOrderBy.await()
-//        jobMinMaxScore.await()
+
         performSearch(searchText.value)
 
     }
@@ -331,23 +319,10 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     var isDialogShown by mutableStateOf(false)
         private set
 
-//    fun onDialogLongClick() {
-//        viewModelScope.launch {
-//            isDialogShown = true
-//        }
-//    }
-//
-//     fun onDialogLongDismiss() {
-//         viewModelScope.launch {
-//             isDialogShown = false
-//         }
-//    }
-
 
     private val _selectedAnimeId = MutableStateFlow<Int?>(null)
     val selectedAnimeId: StateFlow<Int?> = _selectedAnimeId.asStateFlow()
 
-    // ...
 
     fun onDialogLongClick(animeId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
