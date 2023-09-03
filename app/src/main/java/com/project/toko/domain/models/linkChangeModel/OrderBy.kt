@@ -3,12 +3,11 @@ package com.project.toko.domain.models.linkChangeModel
 
 data class OrderBy(val orderBy: String, var isOrdered: Boolean = false)
 
-fun getOrderBy(): List<OrderBy> {
-    return listOf(
+fun getOrderBy(): List<OrderBy> =
+     listOf(
         OrderBy("mal_id"),
         OrderBy("title"),
         OrderBy("type"),
-        OrderBy("rating"),
         OrderBy("start_date"),
         OrderBy("end_date"),
         OrderBy("episodes"),
@@ -17,6 +16,4 @@ fun getOrderBy(): List<OrderBy> {
         OrderBy("rank"),
         OrderBy("popularity"),
         OrderBy("members"),
-//        "favorites"
     )
-}
