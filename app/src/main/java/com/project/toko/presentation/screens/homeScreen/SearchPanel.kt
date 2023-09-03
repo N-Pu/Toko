@@ -52,7 +52,6 @@ fun MainScreen(
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
-
     Column(
         modifier = modifier
             .fillMaxWidth(1f)
@@ -70,7 +69,7 @@ fun MainScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 35.dp, bottom = 15.dp)
         ) {
             OutlinedTextField(
-                value = searchText,
+                value = searchText ?: "",
                 onValueChange = viewModel::onSearchTextChange,
                 modifier = modifier.fillMaxWidth(1f),
                 prefix = {
