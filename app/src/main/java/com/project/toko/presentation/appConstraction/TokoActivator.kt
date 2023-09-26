@@ -75,16 +75,11 @@ fun TokoAppActivator(
 ) {
 
     val currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedId
-    var showButton by remember { mutableStateOf(false) }
+    val showButton by remember { mutableStateOf(false) }
 
     navController.addOnDestinationChangedListener { _, destination, arguments ->
-        showButton = when (destination.route) {
-            Screen.Detail.route -> {
-                currentDetailScreenId.value = arguments?.getInt("id") ?: 0
-                true
-            }
-
-            else -> false
+        if (destination.route == Screen.Detail.route) {
+            currentDetailScreenId.value = arguments?.getInt("id") ?: 0
         }
     }
 
