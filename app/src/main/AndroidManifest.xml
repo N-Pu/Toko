@@ -18,7 +18,7 @@
         android:theme="@style/Theme.Toko.BarColors"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".core.presentation_layer.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Toko.Splash">
 
