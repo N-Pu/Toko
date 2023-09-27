@@ -58,6 +58,7 @@ import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.cu
 import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.staffList.DisplayStaff
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.homeScreen.model.newAnimeSearchModel.Genre
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -79,16 +80,22 @@ fun ActivateDetailScreen(
 
     val castData by viewModel.castList.collectAsStateWithLifecycle()
     val staffData by viewModel.staffList.collectAsStateWithLifecycle()
+    val scrollState = viewModel.scrollState
 
 
-    LaunchedEffect(id) {
+    LaunchedEffect(key1 = id) {
         viewModel.viewModelScope.launch(Dispatchers.IO) {
+            val previousId = viewModel.previousId.value
+            if (id != previousId) {
+                scrollState.scrollTo(0)
+                viewModel.previousId.value = id
+            }
+
             viewModel.onTapAnime(id)
             delay(300)
             viewModel.addStaffFromId(id)
             delay(300)
             viewModel.addCastFromId(id)
-
         }
     }
 
@@ -108,7 +115,7 @@ fun ActivateDetailScreen(
 
         Column(
             modifier = modifier
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .background(Color(0xFFF4F4F4)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
@@ -216,7 +223,7 @@ fun ActivateDetailScreen(
             ) {
                 DisplayCustomGenreBoxes(
                     genres = detailData?.genres ?: listOf(
-                        com.project.toko.homeScreen.model.newAnimeSearchModel.Genre(
+                        Genre(
                             mal_id = 0,
                             "Nothing",
                             "None",
@@ -304,7 +311,7 @@ fun ActivateDetailScreen(
                         "id " + (detailData?.trailer?.youtube_id ?: "None")
             )
             Spacer(modifier = Modifier.height(16.dp))
-          Text(text = "url :" + (detailData?.url ?: "None"))
+            Text(text = "url :" + (detailData?.url ?: "None"))
             Box(modifier = modifier.size(100.dp))
 
 
@@ -318,7 +325,10 @@ fun ActivateDetailScreen(
 
 
 @Composable
-private fun ShowMoreInformation(modifier: Modifier, detailData: com.project.toko.homeScreen.model.newAnimeSearchModel.Data?) {
+private fun ShowMoreInformation(
+    modifier: Modifier,
+    detailData: com.project.toko.homeScreen.model.newAnimeSearchModel.Data?
+) {
 
     val licensors = detailData?.licensors?.joinToString(", ") { licensor -> licensor.name }
     val studios = detailData?.studios?.joinToString(", ") { studio -> studio.name }
@@ -778,7 +788,10 @@ private fun FavoritesLine(favorites: Int, modifier: Modifier) {
 }
 
 @Composable
-private fun YearTypeEpisodesTimeStatusStudio(data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data?, modifier: Modifier) {
+private fun YearTypeEpisodesTimeStatusStudio(
+    data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data?,
+    modifier: Modifier
+) {
     val isStudioEmpty = data?.studios.isNullOrEmpty()
     Column(
         verticalArrangement = Arrangement.Center,
