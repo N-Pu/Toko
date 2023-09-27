@@ -1,11 +1,14 @@
 package com.project.toko.detailScreen.viewModel
 
 import android.util.Log
+import androidx.compose.foundation.ScrollState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.core.model.cache.DataCacheSingleton
 import com.project.toko.core.repository.MalApiService
+import com.project.toko.homeScreen.model.newAnimeSearchModel.Data
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,17 +20,29 @@ class DetailScreenViewModel(private val malApiService: MalApiService) :
     ViewModel() {
 
     //detailData
-    private val _animeDetails = MutableStateFlow<com.project.toko.homeScreen.model.newAnimeSearchModel.Data?>(null)
-    val animeDetails: StateFlow<com.project.toko.homeScreen.model.newAnimeSearchModel.Data?> get() = _animeDetails
+    private val _animeDetails = MutableStateFlow<Data?>(null)
+    val animeDetails: StateFlow<Data?> get() = _animeDetails
     private val _loadedId = mutableStateOf(0)
     val loadedId = _loadedId
     private val animeCache = DataCacheSingleton.dataCache
     private val _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
 
+    private val _scrollState: ScrollState by mutableStateOf(ScrollState(0))
+    var scrollState = _scrollState
+
+    private val _previousId = MutableStateFlow(0)
+    var previousId = _previousId
+
     suspend fun onTapAnime(id: Int) {
 
         viewModelScope.launch(Dispatchers.IO) {
+            // Сохраните предыдущее id
+            val previousId = _loadedId.value
+            if (previousId != id) {
+                _previousId.value = previousId
+            }
+
 
             if (animeCache.containsId(id)) {
                 _animeDetails.value = animeCache.getData(id)
@@ -71,13 +86,11 @@ class DetailScreenViewModel(private val malApiService: MalApiService) :
             }
 
             try {
-                viewModelScope.launch(Dispatchers.IO) {
-                    val response = malApiService.getStaffFromId(id)
-                    if (response.isSuccessful) {
-                        val staff = response.body()?.data ?: emptyList()
-                        staffCache[id] = staff
-                        _staffList.value = staff
-                    }
+                val response = malApiService.getStaffFromId(id)
+                if (response.isSuccessful) {
+                    val staff = response.body()?.data ?: emptyList()
+                    staffCache[id] = staff
+                    _staffList.value = staff
                 }
             } catch (e: Exception) {
                 Log.e("StaffViewModel", e.message.toString())
@@ -104,24 +117,23 @@ class DetailScreenViewModel(private val malApiService: MalApiService) :
             return
         }
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val response = malApiService.getCharactersFromId(id)
-                    if (response.isSuccessful) {
-                        val characters = response.body()?.data ?: emptyList()
-                        castCache[id] = characters
-                        _castList.value = characters
-                    } else if (response.code() == 404) {
-                        // если получен ответ 404, присваиваем пустой список
-                        _castList.value = emptyList()
-                    }
-                } catch (e: Exception) {
-                    Log.e("CastInDetailScreenVM", e.message.toString())
-                    // если произошла ошибка, присваиваем пустой список
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = malApiService.getCharactersFromId(id)
+                if (response.isSuccessful) {
+                    val characters = response.body()?.data ?: emptyList()
+                    castCache[id] = characters
+                    _castList.value = characters
+                } else if (response.code() == 404) {
+                    // если получен ответ 404, присваиваем пустой список
                     _castList.value = emptyList()
                 }
+            } catch (e: Exception) {
+                Log.e("CastInDetailScreenVM", e.message.toString())
+                // если произошла ошибка, присваиваем пустой список
+                _castList.value = emptyList()
             }
         }
     }
+
 }
