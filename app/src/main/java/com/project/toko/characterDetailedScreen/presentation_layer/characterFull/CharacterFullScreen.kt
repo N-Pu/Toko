@@ -1,4 +1,4 @@
-package com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.characterFull
+package com.project.toko.characterDetailedScreen.presentation_layer.characterFull
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -42,7 +42,7 @@ import coil.compose.AsyncImagePainter
 import com.project.toko.characterDetailedScreen.model.characterFullModel.Anime
 import com.project.toko.characterDetailedScreen.model.characterFullModel.Data
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
-import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.bottomSheetActivatorButton.BottomSheetButton
+import com.project.toko.core.presentation_layer.bottomSheetActivatorButton.BottomSheetButton
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -1,4 +1,4 @@
-package com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.staffMemberFull
+package com.project.toko.staffDetailedScreen.presentation_layer.staffMemberFull
 
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -37,7 +37,7 @@ import coil.compose.AsyncImagePainter
 import com.project.toko.staffDetailedScreen.model.personFullModel.Anime
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.staffDetailedScreen.viewModel.PersonByIdViewModel
-import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.bottomSheetActivatorButton.BottomSheetButton
+import com.project.toko.core.presentation_layer.bottomSheetActivatorButton.BottomSheetButton
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

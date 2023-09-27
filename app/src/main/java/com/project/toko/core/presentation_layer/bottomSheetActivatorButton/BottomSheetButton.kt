@@ -1,4 +1,4 @@
-package com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.bottomSheetActivatorButton
+package com.project.toko.core.presentation_layer.bottomSheetActivatorButton
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -20,7 +20,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheetButton(modifier: Modifier, coroutine: CoroutineScope, rememberSheetState: BottomSheetScaffoldState) {
+fun BottomSheetButton(
+    modifier: Modifier,
+    coroutine: CoroutineScope,
+    rememberSheetState: BottomSheetScaffoldState
+) {
     Row(
         modifier = modifier.fillMaxWidth(1f),
         horizontalArrangement = Arrangement.Center

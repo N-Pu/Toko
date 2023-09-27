@@ -1,4 +1,4 @@
-package com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.producerFull
+package com.project.toko.producerDetailedScreen.presentation_layer.producerFull
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -32,7 +32,7 @@ import androidx.lifecycle.viewModelScope
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
-import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.bottomSheetActivatorButton.BottomSheetButton
+import com.project.toko.core.presentation_layer.bottomSheetActivatorButton.BottomSheetButton
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,14 +49,11 @@ fun ShowScreen(
 
     val coroutine = rememberCoroutineScope()
     val rememberSheetState = rememberBottomSheetScaffoldState()
-//    val scaffoldState = rememberBottomSheetScaffoldState()
     val viewModel = viewModelProvider[ProducerFullViewModel::class.java]
     LaunchedEffect(id) {
         viewModel.viewModelScope.launch(Dispatchers.IO) {
             viewModel.getProducerFromId(id)
         }
-
-
     }
 
 
