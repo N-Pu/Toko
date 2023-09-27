@@ -19,9 +19,9 @@ import com.project.toko.randomAnimeScreen.presentation_layer.randomAnimeScreen.S
 import com.project.toko.noId.presentation_layer.noId.NoId
 import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.castList.ShowWholeCast
 import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.staffList.ShowWholeStaff
-import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.characterFull.DisplayCharacterFromId
-import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.producerFull.ShowScreen
-import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.staffMemberFull.DisplayStaffMemberFromId
+import com.project.toko.characterDetailedScreen.presentation_layer.characterFull.DisplayCharacterFromId
+import com.project.toko.producerDetailedScreen.presentation_layer.producerFull.ShowScreen
+import com.project.toko.staffDetailedScreen.presentation_layer.staffMemberFull.DisplayStaffMemberFromId
 import com.project.toko.favoritesScreen.presentation_layer.FavoriteScreen
 
 @Composable
