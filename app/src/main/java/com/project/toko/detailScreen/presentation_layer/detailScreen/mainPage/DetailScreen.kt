@@ -543,13 +543,16 @@ private fun DisplayTitle(title: String, modifier: Modifier) {
 @Composable
 private fun DisplayPicture(painter: AsyncImagePainter, modifier: Modifier) {
 
-    Image(
-        painter = painter,
-        contentDescription = "Big anime picture",
-        contentScale = ContentScale.FillWidth,
-        modifier = modifier
-            .fillMaxWidth(1f),
-    )
+
+    Box {
+        Image(
+            painter = painter,
+            contentDescription = "Big anime picture",
+            contentScale = ContentScale.FillWidth,
+            modifier = modifier
+                .fillMaxWidth(1f),
+        )
+    }
 }
 
 @Composable
@@ -840,3 +843,5 @@ private fun YearTypeEpisodesTimeStatusStudio(
 
     }
 }
+
+

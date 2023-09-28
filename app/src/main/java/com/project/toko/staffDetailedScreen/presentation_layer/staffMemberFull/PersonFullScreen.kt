@@ -110,6 +110,7 @@ fun DisplayStaffMemberFromId(
                 horizontalAlignment = Alignment.CenterHorizontally
 
             ) {
+
                 item {
 
                     BoxWithConstraints(
@@ -119,6 +120,7 @@ fun DisplayStaffMemberFromId(
                             .wrapContentSize()
 
                     ) {
+
                         Image(
                             painter = painter,
                             contentDescription = "Person's name: ${staffFullState?.name}",

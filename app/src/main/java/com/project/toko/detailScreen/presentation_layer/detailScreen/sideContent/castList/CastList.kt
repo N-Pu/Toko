@@ -131,9 +131,11 @@ private fun AddCast(
                 .background(Color.White)
                 .clickable {
                     navController.navigate(Screen.DetailOnCast.value) {
-                        popUpTo(Screen.Detail.route) {
-                            inclusive = true
-                        }
+//                        launchSingleTop = true
+//                        popUpTo(Screen.Detail.route) {
+//                            inclusive = true
+
+//                        }
                     }
                 },
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -177,9 +179,9 @@ private fun CurrentCast(
         } else {
             modifier.clickable {
                 navController.navigate("detail_on_staff/${voiceActor.person.mal_id}") {
-                    popUpTo(Screen.Detail.route) {
-                        inclusive = true
-                    }
+//                    popUpTo(Screen.Detail.route) {
+//                        inclusive = true
+//                    }
                 }
             }
         }
@@ -267,9 +269,9 @@ private fun CurrentCast(
                     .size(80.dp, 130.dp)
                     .clickable {
                         navController.navigate(route = "detail_on_character/${data.character.mal_id}") {
-                            popUpTo(Screen.Detail.route) {
-                                inclusive = true
-                            }
+//                            popUpTo(Screen.Detail.route) {
+//                                inclusive = true
+//                            }
                         }
                     },
                 contentScale = ContentScale.Fit // Масштабирование изображения, чтобы вмещалось в квадрат

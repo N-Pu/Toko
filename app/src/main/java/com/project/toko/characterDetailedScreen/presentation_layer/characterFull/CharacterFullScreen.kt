@@ -118,7 +118,11 @@ fun DisplayCharacterFromId(
                     .fillMaxHeight(1f)
                     .verticalScroll(rememberScrollState())
             ) {
-
+//                Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.size(60.dp)) {
+//                    BackButton(modifier = modifier, onClick = {
+//                        navController.popBackStack()
+//                    })
+//                }
                 DisplayHorizontalPagerWithIndicator(
                     painterList = characterPicturesState,
                     modifier = modifier
