@@ -7,7 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 
-@Database(entities = [AnimeItem::class], version = 1, exportSchema = false)
+@Database(entities = [AnimeItem::class], version = 2, exportSchema = false)
 abstract class MainDb : RoomDatabase() {
 
     abstract fun getDao(): Dao

@@ -1,7 +1,6 @@
 package com.project.toko.core.presentation_layer.appConstraction
 
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -34,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,15 +54,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.project.toko.core.dao.AnimeItem
-import com.project.toko.core.dao.MainDb
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
-import com.project.toko.homeScreen.presentation_layer.homeScreen.checkIdInDataBase
 import com.project.toko.homeScreen.presentation_layer.homeScreen.formatScore
 import com.project.toko.homeScreen.presentation_layer.homeScreen.formatScoredBy
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -70,7 +70,7 @@ import kotlinx.coroutines.launch
 fun TokoAppActivator(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
-    context: Context,
+//    context: Context,
     modifier: Modifier
 ) {
 
@@ -95,7 +95,7 @@ fun TokoAppActivator(
             Row {
                 MyFloatingButton(
                     showButton = showButton,
-                    context = context,
+//                    context = context,
                     viewModelProvider = viewModelProvider,
                     modifier = modifier
                 )
@@ -300,23 +300,29 @@ fun BottomNavigationBar(
 fun MyFloatingButton(
     showButton: Boolean,
     viewModelProvider: ViewModelProvider,
-    context: Context,
+//    context: Context,
     modifier: Modifier
 ) {
 
 
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
+    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
+
     val detailScreenState by viewModelProvider[DetailScreenViewModel::class.java]
         .animeDetails.collectAsStateWithLifecycle()
 
 
-    val dao = MainDb.getDb(context).getDao()
-    if (checkIdInDataBase(dao = dao, id = detailScreenState?.mal_id ?: 0)
-            .collectAsStateWithLifecycle(initialValue = false).value
-    ) {
-        items.add(4, "Delete")
+
+
+    LaunchedEffect(key1 = null) {
+        val flow = daoViewModel.containsInDataBase(detailScreenState?.mal_id ?: 0)
+
+        if (flow.first()) {
+            items.add(4, "Delete")
+        }
     }
+
 
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf("") }
@@ -381,11 +387,11 @@ fun MyFloatingButton(
                         selectedItem = item
                         if (selectedItem == "Delete") {
                             detailScreenState?.let { data ->
-                                dao.removeFromDataBase(data.mal_id)
+                                daoViewModel.removeFromDataBase(data.mal_id)
                             }
                         } else {
                             detailScreenState?.let { data ->
-                                dao.addToCategory(
+                                daoViewModel.addToCategory(
                                     AnimeItem(
                                         data.mal_id,
                                         anime = data.title,

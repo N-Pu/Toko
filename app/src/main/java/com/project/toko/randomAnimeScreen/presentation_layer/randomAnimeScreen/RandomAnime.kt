@@ -32,12 +32,12 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.project.toko.core.dao.AnimeItem
-import com.project.toko.core.dao.Dao
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,24 +45,23 @@ import kotlin.math.roundToInt
 
 @Composable
 fun ShowRandomScreen(
-    navController: NavController, viewModelProvider: ViewModelProvider, modifier: Modifier, dao: Dao
+    navController: NavController, viewModelProvider: ViewModelProvider, modifier: Modifier
 ) {
     Column(modifier = modifier) {
         ShowRandomAnime(
             navController,
             modifier,
-            viewModel = viewModelProvider[RandomAnimeViewModel::class.java],
-            dao = dao
+            viewModelProvider = viewModelProvider
         )
     }
 }
 
 @Composable
 fun ShowRandomAnime(
-    navController: NavController, modifier: Modifier, viewModel: RandomAnimeViewModel, dao: Dao
+    navController: NavController, modifier: Modifier, viewModelProvider: ViewModelProvider
 ) {
 
-    val state by viewModel.animeDetails.collectAsStateWithLifecycle()
+    val state by viewModelProvider[RandomAnimeViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
     val cardIsShown = remember {
         mutableStateOf(true)
     }
@@ -74,9 +73,8 @@ fun ShowRandomAnime(
                 data = state,
                 modifier = modifier,
                 navController = navController,
-                viewModel = viewModel,
-                cardIsShown = cardIsShown,
-                dao = dao
+                viewModelProvider = viewModelProvider,
+                cardIsShown = cardIsShown
             )
         } else {
             LoadingAnimation()
@@ -324,11 +322,12 @@ fun AnimeCard(
     data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data?,
     modifier: Modifier,
     navController: NavController,
-    viewModel: RandomAnimeViewModel,
-    cardIsShown: MutableState<Boolean>,
-    dao: Dao
+    viewModelProvider: ViewModelProvider,
+    cardIsShown: MutableState<Boolean>
 ) {
 
+    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
+    val randomViewModel = viewModelProvider[RandomAnimeViewModel::class.java]
     val offsetX = remember { mutableStateOf(0f) }
     val offsetY = remember { mutableStateOf(0f) }
 
@@ -369,9 +368,9 @@ fun AnimeCard(
 
                         if (offsetX.value <= -500f && offsetY.value >= -550f) {
                             println("LEFT " + " x " + offsetX.value + " y " + offsetY.value)
-                            viewModel.viewModelScope.launch(Dispatchers.IO) {
+                            randomViewModel.viewModelScope.launch(Dispatchers.IO) {
                                 cardIsShown.value = false
-                                viewModel.onTapRandomAnime()
+                                randomViewModel.onTapRandomAnime()
                                 delay(1000L)
                                 cardIsShown.value = true
                                 offsetX.value = 0.0f
@@ -388,8 +387,8 @@ fun AnimeCard(
                         if (offsetX.value >= 500f && offsetY.value >= -550f) {
                             println("LEFT " + " x " + offsetX.value + " y " + offsetY.value)
 
-                            viewModel.viewModelScope.launch(Dispatchers.IO) {
-                                dao.addToCategory(
+                            daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                daoViewModel.addToCategory(
                                     animeItem = AnimeItem(
                                         id = data?.mal_id,
                                         anime = data?.title ?: "Error",
@@ -400,7 +399,7 @@ fun AnimeCard(
                                     )
                                 )
                                 cardIsShown.value = false
-                                viewModel.onTapRandomAnime()
+                                randomViewModel.onTapRandomAnime()
                                 delay(1000L)
                                 cardIsShown.value = true
                                 offsetX.value = 0.0f

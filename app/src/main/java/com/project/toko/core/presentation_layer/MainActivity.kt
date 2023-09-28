@@ -19,6 +19,7 @@ import androidx.core.view.doOnLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.project.toko.core.dao.MainDb
 import com.project.toko.core.model.cache.DataCacheSingleton
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.core.presentation_layer.appConstraction.TokoAppActivator
@@ -45,7 +46,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             HideStatusBar()
             val myViewModelFactory =
-                MyViewModelFactory(malApiRepository = MalApiService.api)
+                MyViewModelFactory(
+                    malApiRepository = MalApiService.api,
+                    dao = MainDb.getDb(this).getDao()
+                )
             val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
             navController = rememberNavController()
 
@@ -58,7 +62,7 @@ class MainActivity : ComponentActivity() {
                     TokoAppActivator(
                         navController = navController,
                         viewModelProvider = viewModelProvider,
-                        context = this,
+//                        context = this,
                         modifier = modifier
                     )
                 }
@@ -67,7 +71,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun navigationBarColorChanger() {
-        window.navigationBarColor = LightGreen.copy(alpha =  1f).toArgb()
+        window.navigationBarColor = LightGreen.copy(alpha = 1f).toArgb()
     }
 
     @Composable
@@ -92,9 +96,10 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
-        override fun onDestroy() {
-            super.onDestroy()
-            DataCacheSingleton.dataCache.clear()
-        }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        DataCacheSingleton.dataCache.clear()
     }
+
+}
