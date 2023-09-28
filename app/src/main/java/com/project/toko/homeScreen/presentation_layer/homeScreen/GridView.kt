@@ -47,12 +47,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.project.toko.core.dao.Dao
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -61,11 +59,10 @@ import java.util.Locale
 @Composable
 fun GridAdder(
     navController: NavHostController,
-    viewModel: HomeScreenViewModel,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier,
-    dao: Dao
+    modifier: Modifier
 ) {
+    val viewModel =  viewModelProvider[HomeScreenViewModel::class.java]
     val listData by viewModel.animeSearch.collectAsStateWithLifecycle()
     val scrollGridState = rememberLazyStaggeredGridState()
     val isLoading by viewModel.isNextPageLoading.collectAsStateWithLifecycle()
@@ -86,7 +83,7 @@ fun GridAdder(
         }
 
         item {
-            Spacer(modifier = modifier.height(50.dp))
+            Spacer(modifier = modifier.height(20.dp))
         }
         itemsIndexed(listData.data) { index, data ->
 
@@ -94,9 +91,8 @@ fun GridAdder(
             AnimeCardBox(
                 data = data,
                 navController = navController,
-                viewModel = viewModelProvider[HomeScreenViewModel::class.java],
-                modifier = modifier,
-                dao = dao
+                viewModelProvider = viewModelProvider,
+                modifier = modifier
             )
 
             // Загрузка следующей страницы при достижении конца списка и has_next_page = true
@@ -124,13 +120,10 @@ fun GridAdder(
                     }
 
                 },
-//                imageRequest = model,
                 modifier = modifier,
-                dao = dao,
-                viewModel = viewModel
+                viewModelProvider = viewModelProvider
             )
         }
-//        }
     }
 
 }
@@ -141,13 +134,13 @@ fun GridAdder(
 fun AnimeCardBox(
     data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data,
     navController: NavController,
-    viewModel: HomeScreenViewModel,
-    modifier: Modifier,
-    dao: Dao
+    viewModelProvider: ViewModelProvider,
+    modifier: Modifier
 ) {
     val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
     var isCardClicked by remember { mutableStateOf(false) }
 
+    val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val value by rememberInfiniteTransition().animateFloat(
         initialValue = if (isCardClicked) 0.99f else 1f, // Изменяем значение в зависимости от нажатия на Card
         targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
@@ -173,15 +166,15 @@ fun AnimeCardBox(
             })
             .clip(RoundedCornerShape(16.dp))
             .combinedClickable(onLongClick = {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
+                homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
                     isCardClicked = true
-                    viewModel.onDialogLongClick(data.mal_id)
+                    homeScreenViewModel.onDialogLongClick(data.mal_id)
                     delay(3000L)
                     isCardClicked = false
                 }
 
             }) {
-                viewModel.viewModelScope.launch(Dispatchers.Main) {
+                homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
                     navigateToDetailScreen(
                         navController, data.mal_id
                     )
@@ -261,10 +254,8 @@ fun AnimeCardBox(
                 score = formatScore(data.score),
                 scoredBy = formatScoredBy(data.scored_by),
                 animeImage = data.images.jpg.image_url,
-//                context = LocalContext.current,
                 modifier = modifier,
-                viewModel = viewModel,
-                dao = dao
+                viewModelProvider = viewModelProvider
             )
 
 
@@ -340,12 +331,6 @@ fun formatScore(float: Float?): String {
 }
 
 
-@Composable
-fun checkIdInDataBase(
-    dao: Dao, id: Int
-): Flow<Boolean> {
-    return dao.containsInDataBase(id)
-}
 
 //@OptIn(ExperimentalFoundationApi::class)
 //@Preview(showSystemUi = true)

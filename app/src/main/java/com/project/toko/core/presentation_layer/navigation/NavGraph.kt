@@ -4,14 +4,12 @@ package com.project.toko.core.presentation_layer.navigation
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.project.toko.core.dao.MainDb
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.ActivateDetailScreen
 import com.project.toko.homeScreen.presentation_layer.homeScreen.MainScreen
@@ -31,14 +29,12 @@ fun SetupNavGraph(
     modifier: Modifier,
 
     ) {
-    val dao = MainDb.getDb(LocalContext.current).getDao()
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
             MainScreen(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier,
-                dao = dao
+                modifier = modifier
             )
         }
         composable(
@@ -64,8 +60,7 @@ fun SetupNavGraph(
             FavoriteScreen(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier,
-                dao = dao
+                modifier = modifier
             )
         }
         composable(route = Screen.RandomAnimeOrManga.route) {
@@ -73,7 +68,6 @@ fun SetupNavGraph(
                 navController,
                 viewModelProvider,
                 modifier = modifier,
-                dao = dao
             )
         }
         composable(route = Screen.DetailOnCast.value) {
@@ -116,7 +110,6 @@ fun SetupNavGraph(
                 modifier = modifier
             )
         }
-
         composable(
             route = Screen.ProducerDetail.value,
             arguments = listOf(navArgument("id") {

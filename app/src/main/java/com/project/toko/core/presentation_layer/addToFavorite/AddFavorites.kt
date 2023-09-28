@@ -22,13 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.project.toko.core.dao.AnimeItem
-import com.project.toko.core.dao.Dao
-import com.project.toko.homeScreen.presentation_layer.homeScreen.checkIdInDataBase
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -49,14 +48,22 @@ fun AddFavorites(
     scoredBy: String,
     animeImage: String,
     modifier: Modifier,
-    viewModel: ViewModel,
-    dao: Dao
+    viewModelProvider: ViewModelProvider,
 ) {
+
+    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     var expanded by remember { mutableStateOf(false) }
-    if (checkIdInDataBase(
-            dao = dao, id = mal_id
+        val containsInDao = daoViewModel.containsInDataBase(id = mal_id
         ).collectAsStateWithLifecycle(initialValue = false).value
+//    LaunchedEffect(key1 = null) {
+//        val flow = daoViewModel.containsInDataBase(id = mal_id)
+//
+//        if (flow.first()) {
+//            items.add(4, "Delete")
+//        }
+//    }
+    if (containsInDao
     ) {
         items.add(4, "Delete")
     }
@@ -94,12 +101,12 @@ fun AddFavorites(
         ) {
             items.forEach { item ->
                 DropdownMenuItem(onClick = {
-                    viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                         selectedItem = item
                         if (selectedItem == "Delete") {
-                            dao.removeFromDataBase(mal_id)
+                            daoViewModel.removeFromDataBase(mal_id)
                         } else {
-                            dao.addToCategory(
+                            daoViewModel.addToCategory(
                                 AnimeItem(
                                     mal_id,
                                     anime = anime,
