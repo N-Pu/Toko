@@ -33,7 +33,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import com.project.toko.core.dao.Dao
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.presentation_layer.theme.SoftGreen
@@ -45,7 +44,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     navController: NavHostController, viewModelProvider: ViewModelProvider,
-    modifier: Modifier, dao: Dao
+    modifier: Modifier
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
@@ -94,10 +93,8 @@ fun MainScreen(
         if (!isSearching) {
             GridAdder(
                 navController = navController,
-                viewModel = viewModel,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier,
-                dao = dao
+                modifier = modifier
             )
         } else {
             LoadingAnimation()

@@ -1,6 +1,5 @@
 package com.project.toko.homeScreen.presentation_layer.homeScreen
 
-import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,23 +53,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.project.toko.core.dao.AnimeItem
-import com.project.toko.core.dao.Dao
 import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.DialogSideColor
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun CustomDialog(
-    onDismiss: () -> Unit, data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data, navController: NavController,
-    modifier: Modifier, dao: Dao, viewModel: HomeScreenViewModel
+    onDismiss: () -> Unit,
+    data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data,
+    navController: NavController,
+    modifier: Modifier,
+    viewModelProvider: ViewModelProvider
 ) {
 
 
@@ -158,7 +161,7 @@ fun CustomDialog(
                     YearTypeStudio(data = data, modifier = modifier)
                     EpisodesLabel(episodes = data.episodes, modifier = modifier)
                     AddToFavoriteRow(
-                        dao = dao, modifier = modifier, data = data, viewModel = viewModel
+                        modifier = modifier, data = data, viewModelProvider = viewModelProvider
                     )
                 }
 
@@ -227,6 +230,7 @@ private fun ScoreLabel(modifier: Modifier) {
     }
 
 }
+
 @Composable
 private fun ScoreNumber(modifier: Modifier, score: Float) {
 
@@ -322,7 +326,6 @@ private fun MembersLine(members: Int, modifier: Modifier) {
 }
 
 
-
 @Composable
 private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
@@ -349,7 +352,10 @@ private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
 
 @Composable
-private fun YearTypeStudio(data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data?, modifier: Modifier) {
+private fun YearTypeStudio(
+    data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data?,
+    modifier: Modifier
+) {
     val isStudioEmpty = data?.studios.isNullOrEmpty()
     Column(
         verticalArrangement = Arrangement.Center,
@@ -422,7 +428,13 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 
 
 @Composable
-private fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data, viewModel: HomeScreenViewModel) {
+private fun AddToFavoriteRow(
+    modifier: Modifier,
+    data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data,
+    viewModelProvider: ViewModelProvider
+) {
+    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
+
     Spacer(modifier = modifier.height(10.dp))
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -449,8 +461,8 @@ private fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: com.project.tok
                     fontWeight = FontWeight.Thin,
                 )
             }, modifier = modifier.height(20.dp), onClick = {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    dao.addToCategory(
+                daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                    daoViewModel.addToCategory(
                         AnimeItem(
                             data.mal_id,
                             data.title,
@@ -474,8 +486,8 @@ private fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: com.project.tok
                     fontWeight = FontWeight.Thin,
                 )
             }, modifier = modifier.height(20.dp), onClick = {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    dao.addToCategory(
+                daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                    daoViewModel.addToCategory(
                         AnimeItem(
                             data.mal_id,
                             data.title,
@@ -500,8 +512,8 @@ private fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: com.project.tok
                     fontWeight = FontWeight.Thin,
                 )
             }, modifier = modifier.height(20.dp), onClick = {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    dao.addToCategory(
+                daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                    daoViewModel.addToCategory(
                         AnimeItem(
                             data.mal_id,
                             data.title,
@@ -538,8 +550,8 @@ private fun AddToFavoriteRow(dao: Dao, modifier: Modifier, data: com.project.tok
                 modifier = modifier
                     .height(30.dp)
                     .clickable {
-                        viewModel.viewModelScope.launch(Dispatchers.IO) {
-                            dao.addToCategory(
+                        daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                            daoViewModel.addToCategory(
                                 AnimeItem(
                                     data.mal_id,
                                     data.title,
@@ -663,7 +675,10 @@ private fun ColoredBox(
 }
 
 @Composable
-private fun DisplayCustomGenres(genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>, modifier: Modifier) {
+private fun DisplayCustomGenres(
+    genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>,
+    modifier: Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -742,7 +757,11 @@ private fun DisplayDialogPicture(
 }
 
 @Composable
-private fun CheckGenresSize(numbOfGenres: Int?, genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>, modifier: Modifier) {
+private fun CheckGenresSize(
+    numbOfGenres: Int?,
+    genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>,
+    modifier: Modifier
+) {
     if (numbOfGenres != null) {
         if (numbOfGenres <= 3) {
             DisplayCustomGenres(

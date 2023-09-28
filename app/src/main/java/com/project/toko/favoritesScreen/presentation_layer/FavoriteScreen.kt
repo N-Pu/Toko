@@ -46,13 +46,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.core.dao.AnimeItem
-import com.project.toko.core.dao.Dao
-import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.presentation_layer.theme.SoftGreen
-
+import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 
 enum class AnimeListType {
     WATCHING, PLANNED, WATCHED, DROPPED
@@ -64,8 +62,7 @@ enum class AnimeListType {
 fun FavoriteScreen(
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier,
-    dao: Dao
+    modifier: Modifier
 ) {
     var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
     val scrollState = rememberLazyGridState()
@@ -111,8 +108,7 @@ fun FavoriteScreen(
             }
             Column(
                 modifier = modifier
-                    .weight(1f)
-                ,
+                    .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 FavoriteAnimeListButton(
@@ -124,8 +120,7 @@ fun FavoriteScreen(
             }
             Column(
                 modifier = modifier
-                    .weight(1f)
-                ,
+                    .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 FavoriteAnimeListButton(
@@ -145,7 +140,6 @@ fun FavoriteScreen(
         ) {
             when (selectedListType) {
                 AnimeListType.WATCHING -> FavoriteAnimeList(
-                    dao = dao,
                     category = "Watching",
                     navController = navController,
                     viewModelProvider = viewModelProvider,
@@ -154,7 +148,6 @@ fun FavoriteScreen(
                 )
 
                 AnimeListType.PLANNED -> FavoriteAnimeList(
-                    dao = dao,
                     category = "Planned",
                     navController = navController,
                     viewModelProvider = viewModelProvider,
@@ -163,7 +156,6 @@ fun FavoriteScreen(
                 )
 
                 AnimeListType.WATCHED -> FavoriteAnimeList(
-                    dao = dao,
                     category = "Watched",
                     navController = navController,
                     viewModelProvider = viewModelProvider,
@@ -172,7 +164,6 @@ fun FavoriteScreen(
                 )
 
                 AnimeListType.DROPPED -> FavoriteAnimeList(
-                    dao = dao,
                     category = "Dropped",
                     navController = navController,
                     viewModelProvider = viewModelProvider,
@@ -223,15 +214,18 @@ fun FavoriteAnimeListButton(
 // (watching, planned, watched, dropped)
 @Composable
 fun FavoriteAnimeList(
-    dao: Dao,
     category: String,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
     scrollState: LazyGridState,
     modifier: Modifier
 ) {
-    val animeListState by dao.getAnimeInCategory(category)
-        .collectAsStateWithLifecycle(initialValue = emptyList())
+
+
+    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
+    val animeListState by daoViewModel.getAnimeInCategory(category).collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
 
     Column(
         modifier = modifier
@@ -253,8 +247,7 @@ fun FavoriteAnimeList(
                     animeItem = animeItem,
                     navController = navController,
                     viewModelProvider = viewModelProvider,
-                    modifier = modifier,
-                    dao = dao
+                    modifier = modifier
                 )
             }
         }
@@ -270,10 +263,9 @@ fun FavoriteScreenCardBox(
     animeItem: AnimeItem,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier,
-    dao: Dao
+    modifier: Modifier
 ) {
-    val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
+//    val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val painter = rememberAsyncImagePainter(model = animeItem.animeImage)
 
     Box(
@@ -310,8 +302,7 @@ fun FavoriteScreenCardBox(
                     scoredBy = animeItem.scored_by,
                     animeImage = animeItem.animeImage,
                     modifier = modifier,
-                    viewModel = viewModel,
-                    dao = dao
+                    viewModelProvider = viewModelProvider
                 )
 
 
