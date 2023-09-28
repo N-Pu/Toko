@@ -16,9 +16,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -121,7 +123,7 @@ fun ActivateDetailScreen(
             verticalArrangement = Arrangement.Top
         ) {
             DisplayPicture(
-                painter = painter, modifier = modifier
+                painter = painter, modifier = modifier, navController = navController
             )
             Row(
                 modifier = modifier
@@ -541,15 +543,26 @@ private fun DisplayTitle(title: String, modifier: Modifier) {
 }
 
 @Composable
-private fun DisplayPicture(painter: AsyncImagePainter, modifier: Modifier) {
+private fun DisplayPicture(
+    painter: AsyncImagePainter,
+    modifier: Modifier,
+    navController: NavController
+) {
 
-    Image(
-        painter = painter,
-        contentDescription = "Big anime picture",
-        contentScale = ContentScale.FillWidth,
-        modifier = modifier
-            .fillMaxWidth(1f),
-    )
+
+    Box {
+        Image(
+            painter = painter,
+            contentDescription = "Big anime picture",
+            contentScale = ContentScale.FillWidth,
+            modifier = modifier
+                .fillMaxWidth(1f),
+        )
+        BackButton {
+            navController.popBackStack()
+        }
+
+    }
 }
 
 @Composable
@@ -838,5 +851,17 @@ private fun YearTypeEpisodesTimeStatusStudio(
             textAlign = TextAlign.Center
         )
 
+    }
+}
+
+
+@Composable
+fun BackButton(onClick: () -> Unit) {
+    IconButton(onClick = { onClick() }) {
+        Icon(
+            imageVector = Icons.Outlined.ArrowBack,
+            contentDescription = "Back Button",
+            tint = LightGreen
+        )
     }
 }
