@@ -54,6 +54,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.project.toko.core.dao.AnimeItem
+import com.project.toko.core.presentation_layer.backArrowButton.BackButton
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
@@ -76,10 +77,21 @@ fun TokoAppActivator(
 
     val currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedId
     val showButton by remember { mutableStateOf(false) }
+    var showBackArrow by remember { mutableStateOf(false) }
 
     navController.addOnDestinationChangedListener { _, destination, arguments ->
         if (destination.route == Screen.Detail.route) {
             currentDetailScreenId.value = arguments?.getInt("id") ?: 0
+        }
+
+        showBackArrow = when (destination.route) {
+            Screen.CharacterDetail.value -> true
+            Screen.Detail.route -> true
+            Screen.StaffDetail.value -> true
+            Screen.ProducerDetail.value -> true
+            else -> {
+                false
+            }
         }
     }
 
@@ -92,6 +104,7 @@ fun TokoAppActivator(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Row {
                 MyFloatingButton(
                     showButton = showButton,
@@ -132,6 +145,14 @@ fun TokoAppActivator(
                 navController = navController, viewModelProvider = viewModelProvider,
                 modifier = modifier,
             )
+        },
+        topBar = {
+            if (showBackArrow)
+                Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.size(60.dp)) {
+                    BackButton(modifier = modifier, onClick = {
+                        navController.popBackStack()
+                    })
+                }
         }
     )
 }

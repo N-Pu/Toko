@@ -558,10 +558,6 @@ private fun DisplayPicture(
             modifier = modifier
                 .fillMaxWidth(1f),
         )
-        BackButton {
-            navController.popBackStack()
-        }
-
     }
 }
 
@@ -851,17 +847,5 @@ private fun YearTypeEpisodesTimeStatusStudio(
             textAlign = TextAlign.Center
         )
 
-    }
-}
-
-
-@Composable
-fun BackButton(onClick: () -> Unit) {
-    IconButton(onClick = { onClick() }) {
-        Icon(
-            imageVector = Icons.Outlined.ArrowBack,
-            contentDescription = "Back Button",
-            tint = LightGreen
-        )
     }
 }
