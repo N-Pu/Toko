@@ -9,8 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PersonByIdViewModel(malApiService: MalApiService) : ViewModel() {
+class PersonByIdViewModel @Inject constructor(malApiService: MalApiService) : ViewModel() {
     private val animeRepository = malApiService
     private val _personFull = MutableStateFlow<Data?>(null)
     private val personCache = mutableMapOf<Int, Data?>()

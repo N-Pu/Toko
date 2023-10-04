@@ -6,27 +6,30 @@ import androidx.lifecycle.ViewModelProvider
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
 import com.project.toko.core.dao.Dao
+import com.project.toko.core.model.cache.DataCache
 import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
 import com.project.toko.staffDetailedScreen.viewModel.PersonByIdViewModel
 import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
+import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
-class MyViewModelFactory(
+class MyViewModelFactory @Inject constructor(
     private val malApiRepository: MalApiService,
-    private val dao: Dao
+    private val dao: Dao,
+    private val dataCache: DataCache
 ) : ViewModelProvider.Factory {
 
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(HomeScreenViewModel::class.java) -> HomeScreenViewModel(
-                malApiRepository
+                malApiRepository, dataCache
             ) as T
 
             modelClass.isAssignableFrom(DetailScreenViewModel::class.java) -> DetailScreenViewModel(
-                malApiRepository
+                malApiRepository,dataCache
             ) as T
 
             modelClass.isAssignableFrom(PersonByIdViewModel::class.java) -> PersonByIdViewModel(
@@ -38,7 +41,7 @@ class MyViewModelFactory(
             ) as T
 
             modelClass.isAssignableFrom(RandomAnimeViewModel::class.java) -> RandomAnimeViewModel(
-                malApiRepository
+                malApiRepository, dataCache
             ) as T
 
             modelClass.isAssignableFrom(ProducerFullViewModel::class.java) -> ProducerFullViewModel(

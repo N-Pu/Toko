@@ -19,8 +19,9 @@ import androidx.core.view.doOnLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.project.toko.core.dao.MainDb
-import com.project.toko.core.model.cache.DataCacheSingleton
+import com.project.toko.core.dao.Dao
+import com.project.toko.core.di.Application
+import com.project.toko.core.model.cache.DataCache
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.core.presentation_layer.appConstraction.TokoAppActivator
 import com.project.toko.core.presentation_layer.theme.TokoTheme
@@ -28,29 +29,45 @@ import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.viewModel.viewModelFactory.MyViewModelFactory
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 //@HiltAndroidApp
 class MainActivity : ComponentActivity() {
 
 
-    private lateinit var navController: NavHostController
-    private var modifier: Modifier = Modifier
+    lateinit var navController: NavHostController
 
+    @Inject
+    lateinit var dao: Dao
+
+    @Inject
+    lateinit var modifier: Modifier
+
+    @Inject
+    lateinit var malApi: MalApiService
+
+    @Inject
+    lateinit var dataCache: DataCache
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         navigationBarColorChanger()
 
+        val modifierComponent = (application as Application).modifierComponent
+        val databaseComponent = (application as Application).daoComponent
+        val malApiComponent = (application as Application).malApiComponent
+        val dataCacheComponent = (application as Application).dataCacheComponent
+        modifier = modifierComponent.providesModifier()
+        dao = databaseComponent.provideDao()
+        malApi = malApiComponent.provideMalApiService()
+        dataCache = dataCacheComponent.provideDataCache()
 
+        val myViewModelFactory =
+            MyViewModelFactory(malApiRepository = malApi, dao = dao, dataCache = dataCache)
+        val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
         setContent {
             HideStatusBar()
-            val myViewModelFactory =
-                MyViewModelFactory(
-                    malApiRepository = MalApiService.api,
-                    dao = MainDb.getDb(this).getDao()
-                )
-            val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
             navController = rememberNavController()
 
             TokoTheme {
@@ -62,7 +79,6 @@ class MainActivity : ComponentActivity() {
                     TokoAppActivator(
                         navController = navController,
                         viewModelProvider = viewModelProvider,
-//                        context = this,
                         modifier = modifier
                     )
                 }
@@ -99,7 +115,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        DataCacheSingleton.dataCache.clear()
+        dataCache.clear()
+//        DataCacheSingleton.dataCache.clear()
     }
 
 }

@@ -92,12 +92,21 @@ fun CustomDialog(
         }
         currentHeight.dp
     }
-
+//    var offsetY by remember { mutableStateOf(0f) }
     Dialog(onDismissRequest = {
         onDismiss.invoke()
     }) {
         Card(
-            modifier = modifier.size(weight, height()),
+            modifier = modifier
+                .size(weight, height())
+//                .offset { IntOffset(0, offsetY.roundToInt()) }
+//                .draggable(
+//                    orientation = Orientation.Vertical,
+//                    state = rememberDraggableState { delta ->
+//                        offsetY += delta
+//                    },
+//                )
+            ,
             colors = CardDefaults.cardColors(containerColor = DialogColor)
         ) {
             Column(

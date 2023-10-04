@@ -7,8 +7,9 @@ import com.project.toko.core.dao.Dao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DaoViewModel(private val dao: Dao) : ViewModel() {
+class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
 
 
     suspend fun addToCategory(animeItem: AnimeItem) {
@@ -23,7 +24,7 @@ class DaoViewModel(private val dao: Dao) : ViewModel() {
 
     suspend fun removeFromDataBase(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-        dao.removeFromDataBase(id)
+            dao.removeFromDataBase(id)
         }
     }
 

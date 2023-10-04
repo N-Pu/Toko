@@ -56,13 +56,6 @@ fun AddFavorites(
     var expanded by remember { mutableStateOf(false) }
         val containsInDao = daoViewModel.containsInDataBase(id = mal_id
         ).collectAsStateWithLifecycle(initialValue = false).value
-//    LaunchedEffect(key1 = null) {
-//        val flow = daoViewModel.containsInDataBase(id = mal_id)
-//
-//        if (flow.first()) {
-//            items.add(4, "Delete")
-//        }
-//    }
     if (containsInDao
     ) {
         items.add(4, "Delete")

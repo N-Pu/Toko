@@ -5,25 +5,25 @@ import android.util.Log
 import com.project.toko.characterDetailedScreen.model.characterFullModel.CharacterFullModel
 import com.project.toko.characterDetailedScreen.model.characterPicture.CharacterPicturesModel
 import com.project.toko.detailScreen.model.detailModel.AnimeDetailModel
+import com.project.toko.homeScreen.model.castModel.CastModel
+import com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel
+import com.project.toko.homeScreen.model.staffModel.StaffModel
 import com.project.toko.staffDetailedScreen.model.personFullModel.PersonFullModel
 import com.project.toko.producerDetailedScreen.model.producerModel.ProducerFullModel
 import kotlinx.coroutines.delay
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.HttpException
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.net.SocketTimeoutException
-import java.util.concurrent.TimeUnit
 
-private const val BASE_URL = "https://api.jikan.moe/"
+
 
 interface MalApiService {
-
+    companion object{
+        const val BASE_URL = "https://api.jikan.moe/"
+    }
 
     @GET("${BASE_URL}v4/anime?")
     suspend fun getAnimeSearchByName(
@@ -37,7 +37,7 @@ interface MalApiService {
         @Query("rating") rating: String? = null,
         @Query("order_by") orderBy: String? = null,
         @Query("sort") sort: String? = null,
-    ): Response<com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel>
+    ): Response<NewAnimeSearchModel>
 
     @GET("${BASE_URL}v4/anime/{id}/full")
     suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<AnimeDetailModel>
@@ -46,9 +46,10 @@ interface MalApiService {
     suspend fun getRandomAnime(): Response<AnimeDetailModel>
 
     @GET("${BASE_URL}v4/anime/{id}/characters")
-    suspend fun getCharactersFromId(@Path("id") id: Int): Response<com.project.toko.homeScreen.model.castModel.CastModel> {
+    suspend fun getCharactersFromId(@Path("id") id: Int): Response<CastModel>
+    {
         try {
-            return api.getCharactersFromId(id)
+            return getCharactersFromId(id)
         } catch (e: HttpException) {
             if (e.code() == 404) {
                 return Response.success(null)
@@ -64,9 +65,9 @@ interface MalApiService {
     suspend fun getCharacterFullPictures(@Path("id") id: Int): Response<CharacterPicturesModel>
 
     @GET("${BASE_URL}v4/anime/{id}/staff")
-    suspend fun getStaffFromId(@Path("id") id: Int): Response<com.project.toko.homeScreen.model.staffModel.StaffModel> {
+    suspend fun getStaffFromId(@Path("id") id: Int): Response<StaffModel> {
         try {
-            return api.getStaffFromId(id)
+            return getStaffFromId(id)
         } catch (e: HttpException) {
             if (e.code() == 404) {
                 return Response.success(null)
@@ -80,7 +81,7 @@ interface MalApiService {
         var retryCount = 0
         while (retryCount < 3) { // повторяем запрос не более 3 раз
             try {
-                return api.getPersonFullFromId(id)
+                return getPersonFullFromId(id)
             } catch (e: Exception) {
                 // обрабатываем ошибки
                 when (e) {
@@ -103,7 +104,7 @@ interface MalApiService {
         var retryCount = 0
         while (retryCount < 3) { // повторяем запрос не более 3 раз
             try {
-                return api.getProducerFullFromId(id)
+                return getProducerFullFromId(id)
             } catch (e: Exception) {
                 // обрабатываем ошибки
                 when (e) {
@@ -118,22 +119,5 @@ interface MalApiService {
             }
         }
         throw Exception("Failed to get response after $retryCount retries")
-    }
-
-    companion object {
-
-        private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-
-        private val httpClient = OkHttpClient.Builder()
-
-            .connectTimeout(20, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(logging).build()
-
-
-        val api: MalApiService by lazy {
-
-            Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create())
-                .client(httpClient).build().create(MalApiService::class.java)
-        }
     }
 }

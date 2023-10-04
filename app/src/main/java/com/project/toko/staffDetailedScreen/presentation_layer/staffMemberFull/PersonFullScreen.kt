@@ -1,7 +1,7 @@
 package com.project.toko.staffDetailedScreen.presentation_layer.staffMemberFull
 
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import  androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,6 +49,7 @@ fun DisplayStaffMemberFromId(
     mal_id: Int, navController: NavController, viewModelProvider: ViewModelProvider,
     modifier: Modifier
 ) {
+
     val viewModel = viewModelProvider[PersonByIdViewModel::class.java]
 
     LaunchedEffect(mal_id) {

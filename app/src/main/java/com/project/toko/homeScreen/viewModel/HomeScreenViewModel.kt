@@ -7,22 +7,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.toko.core.model.cache.DataCacheSingleton
+import com.project.toko.core.model.cache.DataCache
 import com.project.toko.core.repository.MalApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @OptIn(FlowPreview::class)
-class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewModel() {
+class HomeScreenViewModel @Inject constructor(
+    private val malApiRepository: MalApiService,
+    private val dataCache: DataCache
+) : ViewModel() {
 
     private var _isDropdownVisible = mutableStateOf(false)
     var isDropdownMenuVisible = _isDropdownVisible
-
-    private val animeCache = DataCacheSingleton.dataCache
 
     private val emptyItem = com.project.toko.homeScreen.model.newAnimeSearchModel.Items(0, 0, 0)
     private val emptyNewAnimeSearchModel =
@@ -61,8 +63,10 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     private val arrayOfGenres = MutableStateFlow(arrayListOf<Int>())
 
-    private val preSelectedGenre = MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getGenres())
-    val selectedGenre: MutableStateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.Genre>> = preSelectedGenre
+    private val preSelectedGenre =
+        MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getGenres())
+    val selectedGenre: MutableStateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.Genre>> =
+        preSelectedGenre
 
 
     private var pre_genres = ""
@@ -71,29 +75,39 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     private val _type = MutableStateFlow("")
     val type = _type.value
 
-    private val _ratingList = MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getRating())
-    val ratingList: StateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.Rating>> = _ratingList
+    private val _ratingList =
+        MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getRating())
+    val ratingList: StateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.Rating>> =
+        _ratingList
 
 
-    private val preSelectedRating = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Rating?>(null)
-    val selectedRating: StateFlow<com.project.toko.homeScreen.model.linkChangerModel.Rating?> = preSelectedRating
+    private val preSelectedRating =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Rating?>(null)
+    val selectedRating: StateFlow<com.project.toko.homeScreen.model.linkChangerModel.Rating?> =
+        preSelectedRating
 
-    private val _selectedRating = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Rating?>(null)
+    private val _selectedRating =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Rating?>(null)
+
     fun setSelectedRating(rating: com.project.toko.homeScreen.model.linkChangerModel.Rating) {
         preSelectedRating.value = if (rating == preSelectedRating.value) null else rating
     }
 
 
-    private val pre_min_score = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
-    private val _min_score = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
+    private val pre_min_score =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
+    private val _min_score =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
 
 
     fun setSelectedMinScore(score: com.project.toko.homeScreen.model.linkChangerModel.Score) {
         pre_min_score.value = if (score == pre_min_score.value) null else score
     }
 
-    private val pre_max_score = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
-    private val _max_score = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
+    private val pre_max_score =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
+    private val _max_score =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
 
     fun setSelectedMaxScore(score: com.project.toko.homeScreen.model.linkChangerModel.Score) {
         pre_max_score.value = if (score == pre_max_score.value) null else score
@@ -109,20 +123,32 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
     private val _safeForWork = mutableStateOf(false)
     var safeForWork = _safeForWork
 
-    private val _typeList = MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getTypes())
-    val typeList: StateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.Types>> = _typeList
-    private val pre_selectedType = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Types?>(null)
-    val selectedType: StateFlow<com.project.toko.homeScreen.model.linkChangerModel.Types?> = pre_selectedType
-    private val _selectedType = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Types?>(null)
+    private val _typeList =
+        MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getTypes())
+    val typeList: StateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.Types>> =
+        _typeList
+    private val pre_selectedType =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Types?>(null)
+    val selectedType: StateFlow<com.project.toko.homeScreen.model.linkChangerModel.Types?> =
+        pre_selectedType
+    private val _selectedType =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Types?>(null)
+
     fun setSelectedType(type: com.project.toko.homeScreen.model.linkChangerModel.Types) {
         pre_selectedType.value = if (type == pre_selectedType.value) null else type
     }
 
-    private val _orderByList = MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getOrderBy())
-    val orderByList: StateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.OrderBy>> = _orderByList
-    private val pre_selectedOrderBy = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.OrderBy?>(null)
-    val selectedOrderBy: StateFlow<com.project.toko.homeScreen.model.linkChangerModel.OrderBy?> = pre_selectedOrderBy
-    private val _selectedOrderBy = MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.OrderBy?>(null)
+    private val _orderByList =
+        MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getOrderBy())
+    val orderByList: StateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.OrderBy>> =
+        _orderByList
+    private val pre_selectedOrderBy =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.OrderBy?>(null)
+    val selectedOrderBy: StateFlow<com.project.toko.homeScreen.model.linkChangerModel.OrderBy?> =
+        pre_selectedOrderBy
+    private val _selectedOrderBy =
+        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.OrderBy?>(null)
+
     fun setSelectedOrderBy(orderBy: com.project.toko.homeScreen.model.linkChangerModel.OrderBy) {
         pre_selectedOrderBy.value = if (orderBy == pre_selectedOrderBy.value) null else orderBy
     }
@@ -334,8 +360,8 @@ class HomeScreenViewModel(private val malApiRepository: MalApiService) : ViewMod
 
     private fun homeScreenCaching(list: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Data>) {
         list.forEachIndexed { _, data ->
-            if (animeCache.containsId(data.mal_id).not()) {
-                animeCache.setData(data.mal_id, data)
+            if (dataCache.containsId(data.mal_id).not()) {
+                dataCache.setData(data.mal_id, data)
             }
         }
     }
