@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.toko.core.model.cache.DataCacheSingleton
+import com.project.toko.core.model.cache.DataCache
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.homeScreen.model.newAnimeSearchModel.Data
 import kotlinx.coroutines.Dispatchers
@@ -15,16 +15,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class DetailScreenViewModel(private val malApiService: MalApiService) :
-    ViewModel() {
+class DetailScreenViewModel @Inject constructor(
+    private val malApiService: MalApiService, private val dataCache: DataCache
+) : ViewModel() {
 
     //detailData
     private val _animeDetails = MutableStateFlow<Data?>(null)
     val animeDetails: StateFlow<Data?> get() = _animeDetails
     private val _loadedId = mutableStateOf(0)
     val loadedId = _loadedId
-    private val animeCache = DataCacheSingleton.dataCache
+
+    //    private val animeCache = DataCacheSingleton.dataCache
     private val _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
 
@@ -44,8 +47,8 @@ class DetailScreenViewModel(private val malApiService: MalApiService) :
             }
 
 
-            if (animeCache.containsId(id)) {
-                _animeDetails.value = animeCache.getData(id)
+            if (dataCache.containsId(id)) {
+                _animeDetails.value = dataCache.getData(id)
                 return@launch
             }
             try {
@@ -57,7 +60,7 @@ class DetailScreenViewModel(private val malApiService: MalApiService) :
                     if (data != null) {
                         withContext(Dispatchers.Main) {
                             _animeDetails.value = data
-                            animeCache.setData(id, data)
+                            dataCache.setData(id, data)
                         }
                     }
                 }

@@ -1,13 +1,15 @@
 package com.project.toko.core.model.cache
 
-class DataCache {
-    private val dataMap: MutableMap<Int, com.project.toko.homeScreen.model.newAnimeSearchModel.Data> = mutableMapOf()
+import com.project.toko.homeScreen.model.newAnimeSearchModel.Data
 
-    fun getData(id: Int): com.project.toko.homeScreen.model.newAnimeSearchModel.Data? {
+class DataCache {
+    private val dataMap: MutableMap<Int, Data> = mutableMapOf()
+
+    fun getData(id: Int): Data? {
         return dataMap[id]
     }
 
-    fun setData(id: Int, data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data) {
+    fun setData(id: Int, data: Data) {
         dataMap[id] = data
     }
 
@@ -20,6 +22,6 @@ class DataCache {
     }
 }
 
-object DataCacheSingleton {
-    val dataCache: DataCache = DataCache()
-}
+//object DataCacheSingleton {
+//    val dataCache: DataCache = DataCache()
+//}

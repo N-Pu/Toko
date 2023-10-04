@@ -15,6 +15,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_toko_round"
         android:supportsRtl="true"
+        android:name=".core.di.Application"
         android:theme="@style/Theme.Toko.BarColors"
         tools:targetApi="tiramisu">
         <activity

@@ -9,8 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProducerFullViewModel(private val malApiService: MalApiService): ViewModel() {
+class ProducerFullViewModel @Inject constructor(private val malApiService: MalApiService) :
+    ViewModel() {
     private val _producerFull = MutableStateFlow<Data?>(null)
     private val producerCache = mutableMapOf<Int, Data?>()
     val producerFull = _producerFull.asStateFlow()

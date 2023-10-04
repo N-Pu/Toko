@@ -1,6 +1,5 @@
 package com.project.toko.core.presentation_layer.appConstraction
 
-
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -25,11 +24,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,7 +74,6 @@ import kotlinx.coroutines.launch
 fun TokoAppActivator(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
-//    context: Context,
     modifier: Modifier
 ) {
 
@@ -95,40 +97,116 @@ fun TokoAppActivator(
         }
     }
 
-    Scaffold(bottomBar = {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(1f)
-                .fillMaxHeight(1f)
-                .padding(bottom = 45.dp),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+//    Scaffold(bottomBar = {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth(1f)
+//                .fillMaxHeight(1f)
+//                .padding(bottom = 45.dp),
+//            verticalArrangement = Arrangement.Bottom,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//
+//            Row {
+//                MyFloatingButton(
+//                    showButton = showButton,
+//                    viewModelProvider = viewModelProvider,
+//                    modifier = modifier
+//                )
+//            }
+//
+//            Row {
+//                BottomNavigationBar(
+//                    navController = navController,
+//                    currentDetailScreenId = currentDetailScreenId,
+//                    modifier = modifier
+//                )
+//
+//            }
+//
+//
+//        }
+//    },
+//        snackbarHost = {
+//
+//            // нижний бар уведомлений
+////            Snackbar {
+////                Box(
+////                    Modifier
+////                        .fillMaxSize()
+////                        .background(Color.Red)) {
+////                        Text("TEXT")
+////                }
+////            }
+//
+//        }, floatingActionButtonPosition = FabPosition.Center,
+//        content = { padding ->
+//            padding.calculateTopPadding()
+//            SetupNavGraph(
+//                navController = navController, viewModelProvider = viewModelProvider,
+//                modifier = modifier,
+//            )
+//        },
+//        topBar = {
+//            if (showBackArrow)
+//                Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.size(60.dp)) {
+//                    BackButton(modifier = modifier, onClick = {
+//                        navController.popBackStack()
+//                    })
+//                }
+//        }
+//    )
 
-            Row {
-                MyFloatingButton(
-                    showButton = showButton,
-//                    context = context,
-                    viewModelProvider = viewModelProvider,
-                    modifier = modifier
+    ModalNavigationDrawer(
+        drawerContent = {
+            ModalDrawerSheet {
+                Text("Drawer title", modifier = Modifier.padding(16.dp))
+                Divider()
+                NavigationDrawerItem(
+                    label = { Text(text = "Drawer Item") },
+                    selected = false,
+                    onClick = {
+                    }
                 )
+                // ...other drawer items
             }
-
-            Row {
-                BottomNavigationBar(
-                    navController = navController,
-                    currentDetailScreenId = currentDetailScreenId,
-                    modifier = modifier
-                )
-
-            }
-
-
         }
-    },
-        snackbarHost = {
 
-            // нижний бар уведомлений
+    ) {
+
+        Scaffold(bottomBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(1f)
+                    .padding(bottom = 45.dp),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Row {
+                    MyFloatingButton(
+                        showButton = showButton,
+                        viewModelProvider = viewModelProvider,
+                        modifier = modifier
+                    )
+                }
+
+                Row {
+                    BottomNavigationBar(
+                        navController = navController,
+                        currentDetailScreenId = currentDetailScreenId,
+                        modifier = modifier
+                    )
+
+                }
+
+
+            }
+        },
+            snackbarHost = {
+
+                // нижний бар уведомлений
 //            Snackbar {
 //                Box(
 //                    Modifier
@@ -138,23 +216,28 @@ fun TokoAppActivator(
 //                }
 //            }
 
-        }, floatingActionButtonPosition = FabPosition.Center,
-        content = { padding ->
-            padding.calculateTopPadding()
-            SetupNavGraph(
-                navController = navController, viewModelProvider = viewModelProvider,
-                modifier = modifier,
-            )
-        },
-        topBar = {
-            if (showBackArrow)
-                Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.size(60.dp)) {
-                    BackButton(modifier = modifier, onClick = {
-                        navController.popBackStack()
-                    })
-                }
-        }
-    )
+            }, floatingActionButtonPosition = FabPosition.Center,
+            content = { padding ->
+                padding.calculateTopPadding()
+                SetupNavGraph(
+                    navController = navController, viewModelProvider = viewModelProvider,
+                    modifier = modifier,
+                )
+            },
+            topBar = {
+                if (showBackArrow)
+                    Box(
+                        contentAlignment = Alignment.BottomCenter,
+                        modifier = modifier.size(60.dp)
+                    ) {
+                        BackButton(modifier = modifier, onClick = {
+                            navController.popBackStack()
+                        })
+                    }
+            }
+        )
+    }
+
 }
 
 
