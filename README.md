@@ -43,14 +43,15 @@ width="200" hspace="10" vspace="10">
 width="200" hspace="10" vspace="10">
 
 ### Libraries and Dependencies
-* <a href="https://square.github.io/retrofit/">Retrofit2</a> for network requests
+* <a href="https://square.github.io/retrofit/">Retrofit 2</a> for network requests
 * <a href="https://github.com/google/gson">Gson</a> for parsing JSON data
 * <a href="https://square.github.io/okhttp/">OkHttp</a>
 * <a href="https://github.com/coil-kt/coil">Coil</a> image loader
 * <a href="https://developer.android.com/jetpack/compose">Jetpack Compose</a> app development toolkit
 * <a href="https://developer.android.com/training/data-storage/room">Room</a> abstraction layer over SQLite
 * <a href="https://developer.android.com/jetpack/compose/navigation">Navigation Compose</a> for navigation between composables
-* <a href="https://kotlinlang.org/docs/coroutines-overview.html">Coroutines</a> 
+* <a href="https://kotlinlang.org/docs/coroutines-overview.html">Coroutines</a>
+* <a href="https://kotlinlang.org/docs/coroutines-overview.html">Dagger 2</a> dependency injection
 
 ## Generating signed APK
 From Android Studio:
