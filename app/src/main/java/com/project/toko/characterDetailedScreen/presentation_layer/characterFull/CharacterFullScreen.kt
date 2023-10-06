@@ -156,29 +156,32 @@ fun DisplayHorizontalPagerWithIndicator(
     painterList: List<com.project.toko.characterDetailedScreen.model.characterPicture.Data>,
     modifier: Modifier
 ) {
-
-    val pagerState = rememberPagerState(initialPage = 0)
+    val pagerState =
+        rememberPagerState {
+            painterList.size
+        }
 
     Spacer(
         modifier = modifier
             .height(40.dp)
     )
-    HorizontalPager(
-        state = pagerState,
-        modifier = modifier.size(400.dp),
-        pageCount = painterList.size,
-        reverseLayout = false
-    ) { page ->
-        val painter = rememberAsyncImagePainter(model = painterList[page].jpg.image_url)
-        Log.d("Picture #${page}", painterList[page].jpg.image_url)
-        Image(
-            painter = painter,
-            contentDescription = null,
-            modifier = modifier
-                .size(400.dp),
-//                .aspectRatio(9 / 11f)
-        )
+    if (painterList.isNotEmpty()) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = modifier.size(400.dp),
+            reverseLayout = false
+        ) { page ->
+            val painter = rememberAsyncImagePainter(model = painterList[page].jpg.image_url)
+            Log.d("Picture #${page}", painterList[page].jpg.image_url)
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = modifier
+                    .size(400.dp),
+            )
+        }
     }
+
 
     Spacer(
         modifier = modifier

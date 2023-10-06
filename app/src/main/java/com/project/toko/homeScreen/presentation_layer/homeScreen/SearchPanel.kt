@@ -135,7 +135,7 @@ private fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel, modifier:
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 8.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+//                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 content = {
 
