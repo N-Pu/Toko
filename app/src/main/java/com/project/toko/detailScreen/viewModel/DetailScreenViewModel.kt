@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.toko.core.model.cache.DataCache
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.homeScreen.model.newAnimeSearchModel.Data
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +17,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DetailScreenViewModel @Inject constructor(
-    private val malApiService: MalApiService, private val dataCache: DataCache
+    private val malApiService: MalApiService
 ) : ViewModel() {
 
     //detailData
@@ -46,11 +45,6 @@ class DetailScreenViewModel @Inject constructor(
                 _previousId.value = previousId
             }
 
-
-            if (dataCache.containsId(id)) {
-                _animeDetails.value = dataCache.getData(id)
-                return@launch
-            }
             try {
                 _isSearching.value = true
                 val response = malApiService.getDetailsFromAnime(id)
@@ -60,7 +54,6 @@ class DetailScreenViewModel @Inject constructor(
                     if (data != null) {
                         withContext(Dispatchers.Main) {
                             _animeDetails.value = data
-                            dataCache.setData(id, data)
                         }
                     }
                 }
@@ -82,12 +75,6 @@ class DetailScreenViewModel @Inject constructor(
 
     suspend fun addStaffFromId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val cachedStaff = staffCache[id]
-            if (cachedStaff != null) {
-                _staffList.value = cachedStaff
-                return@launch
-            }
-
             try {
                 val response = malApiService.getStaffFromId(id)
                 if (response.isSuccessful) {
@@ -114,12 +101,6 @@ class DetailScreenViewModel @Inject constructor(
     val castList = _castList.asStateFlow()
 
     suspend fun addCastFromId(id: Int) {
-        val cachedCharacters = castCache[id]
-        if (cachedCharacters != null) {
-            _castList.value = cachedCharacters
-            return
-        }
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = malApiService.getCharactersFromId(id)

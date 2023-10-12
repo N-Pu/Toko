@@ -1,4 +1,4 @@
-package com.project.toko.detailScreen.model.detailModel
+package com.project.toko.detailScreen.model.detailModel.old
 
 
 import com.google.gson.annotations.SerializedName

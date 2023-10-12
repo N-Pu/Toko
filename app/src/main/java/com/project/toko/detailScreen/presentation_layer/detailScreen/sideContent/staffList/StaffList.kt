@@ -107,7 +107,7 @@ private fun ListEditor(
                 .height(231.dp)
                 .background(Color.White)
                 .clickable {
-                    navController.navigate(Screen.DetailOnStaff.value) {
+                    navController.navigate(Screen.DetailOnStaff.route) {
                         popUpTo(Screen.Detail.route) {
                             inclusive = true
                         }

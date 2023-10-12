@@ -1,6 +1,7 @@
 package com.project.toko.staffDetailedScreen.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.staffDetailedScreen.model.personFullModel.Data
@@ -20,20 +21,19 @@ class PersonByIdViewModel @Inject constructor(malApiService: MalApiService) : Vi
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
+
+    private val _loadedId = mutableStateOf(0)
+    val loadedId = _loadedId
+
     fun getPersonFromId(mal_id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val cachedStaff = personCache[mal_id]
-            if (cachedStaff != null) {
-                _personFull.value = cachedStaff
-                return@launch
-            }
-
             try {
                 _isSearching.value = true
                 val response = animeRepository.getPersonFullFromId(mal_id)
                 if (response.isSuccessful) {
                     val data = response.body()?.data
                     personCache[mal_id] = data
+                    _loadedId.value = mal_id
                     _personFull.value = data
                 }
             } catch (e: Exception) {

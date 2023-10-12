@@ -52,7 +52,7 @@ fun SetupNavGraph(
             Log.d("CATCHED ID = ", id.toString())
         }
 
-        composable(route = Screen.Nothing.value) {
+        composable(route = Screen.Nothing.route) {
             NoId()
         }
         composable(route = Screen.Favorites.route) {
@@ -69,20 +69,20 @@ fun SetupNavGraph(
                 modifier = modifier,
             )
         }
-        composable(route = Screen.DetailOnCast.value) {
+        composable(route = Screen.DetailOnCast.route) {
             ShowWholeCast(
                 navController, viewModelProvider[DetailScreenViewModel::class.java],
                 modifier = modifier
             )
         }
-        composable(route = Screen.DetailOnStaff.value) {
+        composable(route = Screen.DetailOnStaff.route) {
             ShowWholeStaff(
                 navController, viewModelProvider[DetailScreenViewModel::class.java],
                 modifier = modifier
             )
         }
         composable(
-            route = Screen.CharacterDetail.value,
+            route = Screen.CharacterDetail.route,
             arguments = listOf(navArgument("id") {
                 type = NavType.IntType
             })
@@ -96,7 +96,7 @@ fun SetupNavGraph(
             )
         }
         composable(
-            route = Screen.StaffDetail.value,
+            route = Screen.StaffDetail.route,
             arguments = listOf(navArgument("id") {
                 type = NavType.IntType
             })
@@ -110,20 +110,34 @@ fun SetupNavGraph(
             )
         }
         composable(
-            route = Screen.ProducerDetail.value,
+            route = Screen.ProducerDetail.route,
             arguments = listOf(navArgument("id") {
                 type = NavType.IntType
-            }, navArgument("studio_name") {
-                type = NavType.StringType
-            })
+            }
+//                , navArgument("studio_name") {
+//                type = NavType.StringType
+//
+//                }
+            )
         ) { backStackEntry ->
             val id = backStackEntry.arguments!!.getInt("id")
-            val studio_name = backStackEntry.arguments!!.getString("studio_name")!!
+//            val studio_name = backStackEntry.arguments!!.getString("studio_name")!!
             ShowScreen(
-                id = id, viewModelProvider = viewModelProvider, studio_name = studio_name,
+                id = id, viewModelProvider = viewModelProvider,
+
+//                studio_name = studio_name,
                 modifier = modifier
             )
         }
 
     }
 }
+
+//@Composable
+//inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController): T {
+//    val navGraphRoute = destination.parent?.route ?: return viewModel()
+//    val parentEntry = remember(this) {
+//        navController.getBackStackEntry(navGraphRoute)
+//    }
+//    return viewModel(parentEntry)
+//}
