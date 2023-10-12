@@ -130,7 +130,7 @@ private fun AddCast(
                 .height(460.dp)
                 .background(Color.White)
                 .clickable {
-                    navController.navigate(Screen.DetailOnCast.value) {
+                    navController.navigate(Screen.DetailOnCast.route) {
 //                        launchSingleTop = true
 //                        popUpTo(Screen.Detail.route) {
 //                            inclusive = true

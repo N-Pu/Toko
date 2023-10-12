@@ -4,7 +4,7 @@ package com.project.toko.core.repository
 import android.util.Log
 import com.project.toko.characterDetailedScreen.model.characterFullModel.CharacterFullModel
 import com.project.toko.characterDetailedScreen.model.characterPicture.CharacterPicturesModel
-import com.project.toko.detailScreen.model.detailModel.AnimeDetailModel
+import com.project.toko.detailScreen.model.detailModel.old.AnimeDetailModel
 import com.project.toko.homeScreen.model.castModel.CastModel
 import com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel
 import com.project.toko.homeScreen.model.staffModel.StaffModel

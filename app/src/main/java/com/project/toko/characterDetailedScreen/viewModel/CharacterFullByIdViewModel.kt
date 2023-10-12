@@ -1,6 +1,7 @@
 package com.project.toko.characterDetailedScreen.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.characterDetailedScreen.model.characterFullModel.Data
@@ -19,21 +20,16 @@ class CharacterFullByIdViewModel @Inject constructor(private val malApiService: 
 
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
-
+    private val _loadedId = mutableStateOf(0)
+    val loadedId = _loadedId
     suspend fun getCharacterFromId(malId: Int) {
-        val cachedCharacter = charactersCache[malId]
-        if (cachedCharacter != null) {
-            _characterFull.value = cachedCharacter
-            return
-        }
-
         viewModelScope.launch(Dispatchers.IO) {
-
             try {
                 _isSearching.value = true
                 val response = malApiService.getCharacterFullFromId(malId)
                 if (response.isSuccessful) {
                     val character = response.body()?.data
+                    _loadedId.value = malId
                     charactersCache[malId] = character
                     _characterFull.value = character
                 }
@@ -56,14 +52,7 @@ class CharacterFullByIdViewModel @Inject constructor(private val malApiService: 
     val picturesList = _picturesList.asStateFlow()
 
     suspend fun getPicturesFromId(id: Int) {
-        val cachedPictures = picturesCache[id]
-        if (cachedPictures != null) {
-            _picturesList.value = cachedPictures
-            return
-        }
-
         viewModelScope.launch(Dispatchers.IO) {
-
             try {
                 val response = malApiService.getCharacterFullPictures(id)
                 if (response.isSuccessful) {
@@ -76,5 +65,4 @@ class CharacterFullByIdViewModel @Inject constructor(private val malApiService: 
             }
         }
     }
-
 }

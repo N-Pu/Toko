@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.toko.core.model.cache.DataCache
 import com.project.toko.core.repository.MalApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -20,7 +19,6 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class)
 class HomeScreenViewModel @Inject constructor(
     private val malApiRepository: MalApiService,
-    private val dataCache: DataCache
 ) : ViewModel() {
 
     private var _isDropdownVisible = mutableStateOf(false)
@@ -159,11 +157,7 @@ class HomeScreenViewModel @Inject constructor(
             searchDebouncer
                 .debounce(1000L)
                 .collectLatest { searchQuery ->
-//                    if (searchQuery.isNotEmpty()) {
                     performSearch(searchQuery)
-//                    } else {
-//                        _animeSearch.value = emptyNewAnimeSearchModel
-//                    }
                 }
         }
     }
@@ -171,9 +165,7 @@ class HomeScreenViewModel @Inject constructor(
     fun onSearchTextChange(text: String) {
         _searchText.value = text
         viewModelScope.launch(Dispatchers.IO) {
-//            if (!isPerformingSearch.value) {
             searchDebouncer.emit(text)
-//            }
         }
     }
 
@@ -209,7 +201,6 @@ class HomeScreenViewModel @Inject constructor(
             ).body()
 
             if (response != null) {
-                homeScreenCaching(response.data)
                 hasNextPage.value = response.pagination.has_next_page
                 _animeSearch.value = response
             }
@@ -256,11 +247,9 @@ class HomeScreenViewModel @Inject constructor(
 
 
                 if (response != null) {
-                    homeScreenCaching(response.data)
-
                     hasNextPage.value = response.pagination.has_next_page
-
                 }
+
                 response?.let { newAnimeSearchModel ->
                     _animeSearch.value =
                         _animeSearch.value.copy(data = _animeSearch.value.data + newAnimeSearchModel.data)
@@ -354,15 +343,6 @@ class HomeScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _selectedAnimeId.value = null
             isDialogShown = false
-        }
-    }
-
-
-    private fun homeScreenCaching(list: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Data>) {
-        list.forEachIndexed { _, data ->
-            if (dataCache.containsId(data.mal_id).not()) {
-                dataCache.setData(data.mal_id, data)
-            }
         }
     }
 }

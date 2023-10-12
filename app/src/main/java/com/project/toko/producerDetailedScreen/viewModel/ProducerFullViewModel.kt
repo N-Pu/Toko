@@ -1,6 +1,7 @@
 package com.project.toko.producerDetailedScreen.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.core.repository.MalApiService
@@ -20,20 +21,18 @@ class ProducerFullViewModel @Inject constructor(private val malApiService: MalAp
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
+
+    private val _loadedId = mutableStateOf(0)
+    val loadedId = _loadedId
     fun getProducerFromId(mal_id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val cachedProducer = producerCache[mal_id]
-            if (cachedProducer != null) {
-                _producerFull.value = cachedProducer
-                return@launch
-            }
-
             try {
                 _isSearching.value = true
                 val response = malApiService.getProducerFullFromId(mal_id)
                 if (response.isSuccessful) {
                     val producer = response.body()?.data
                     producerCache[mal_id] = producer
+                    _loadedId.value = mal_id
                     _producerFull.value = producer
                 }
             } catch (e: Exception) {

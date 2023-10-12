@@ -1,5 +1,6 @@
 package com.project.toko.core.presentation_layer.theme
 
+
 import androidx.compose.ui.graphics.Color
 
 val MainBackgroundColor = Color(0xFFFEFBF0)
@@ -15,3 +16,4 @@ object ScoreColors {
     val Green = Color(104, 190, 174)
     val Blank = Color(0xFFA2ADB1)
 }
+

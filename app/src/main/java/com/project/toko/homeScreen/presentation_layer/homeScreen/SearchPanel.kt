@@ -63,7 +63,7 @@ fun MainScreen(
                 .background(
                     LightGreen
                 )
-                .padding(start = 20.dp, end = 20.dp, top = 35.dp, bottom = 15.dp)
+                .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 15.dp)
         ) {
             OutlinedTextField(
                 value = searchText ?: "",

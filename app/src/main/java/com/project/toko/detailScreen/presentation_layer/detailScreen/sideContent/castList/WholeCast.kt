@@ -105,7 +105,7 @@ fun SingleCharacterMember(
             .clickable {
                 navController.navigate("detail_on_character/${character.mal_id}") {
                     launchSingleTop = true
-                    popUpTo(Screen.DetailOnCast.value) {
+                    popUpTo(Screen.DetailOnCast.route) {
                         saveState = true
                     }
                     restoreState = true

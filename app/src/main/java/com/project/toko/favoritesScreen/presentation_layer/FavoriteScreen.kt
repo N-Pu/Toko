@@ -76,7 +76,7 @@ fun FavoriteScreen(
         Row(
             modifier = modifier
                 .fillMaxWidth(1f)
-                .height(80.dp)
+                .height(50.dp)
                 .background(LightGreen),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Bottom
@@ -174,7 +174,7 @@ fun FavoriteScreen(
         }
 
 
-        Spacer(modifier = Modifier.height(35.dp))
+//        Spacer(modifier = Modifier.height(35.dp))
     }
 }
 
@@ -190,8 +190,8 @@ fun FavoriteAnimeListButton(
 ) {
     BoxWithConstraints(
         modifier = modifier
-            .padding(10.dp)
-            .height(30.dp)
+//            .padding(10.dp)
+//            .height(30.dp)
     ) {
         TextButton(
             onClick = onClick, modifier = modifier, colors = ButtonDefaults.buttonColors(
@@ -229,8 +229,9 @@ fun FavoriteAnimeList(
 
     Column(
         modifier = modifier
-            .fillMaxWidth(1f)
-            .fillMaxHeight(0.95f)
+//            .fillMaxWidth(1f)
+//            .fillMaxHeight(0.95f)
+            .fillMaxSize(1f)
     ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(140.dp), state = scrollState,

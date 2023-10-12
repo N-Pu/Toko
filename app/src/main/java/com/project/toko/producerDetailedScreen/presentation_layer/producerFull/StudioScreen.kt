@@ -1,6 +1,5 @@
 package com.project.toko.producerDetailedScreen.presentation_layer.producerFull
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -38,12 +37,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowScreen(
     id: Int,
     viewModelProvider: ViewModelProvider,
-    studio_name: String,
+//    studio_name: String,
     modifier: Modifier
 ) {
 
@@ -116,15 +115,16 @@ fun ShowScreen(
                 }
 
                 item {
-                    producerState?.let {
-                        Text(
-                            text = studio_name,
-                            textAlign = TextAlign.Center,
-                            fontSize = 40.sp,
-                            modifier = modifier.fillMaxWidth(),
-                            maxLines = 2
-                        )
-                    }
+
+//                    producerState?.let {
+//                        Text(
+//                            text = studio_name,
+//                            textAlign = TextAlign.Center,
+//                            fontSize = 40.sp,
+//                            modifier = modifier.fillMaxWidth(),
+//                            maxLines = 2
+//                        )
+//                    }
                 }
                 item {
                     BottomSheetButton(modifier, coroutine, rememberSheetState)

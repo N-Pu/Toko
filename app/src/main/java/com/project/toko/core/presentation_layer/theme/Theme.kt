@@ -1,38 +1,23 @@
 package com.project.toko.core.presentation_layer.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.ViewCompat
 
-//private val DarkColorScheme = darkColorScheme(
-//    primary = Purple80,
-//    secondary = PurpleGrey80,
-//    tertiary = Pink80
-//)
-//
-//private val LightColorScheme = lightColorScheme(
-//    primary = Purple40,
-//    secondary = PurpleGrey40,
-//    tertiary = Pink40
-
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorScheme = darkColorScheme(
     primary = MainBackgroundColor,
     secondary = SoftGreen,
-    tertiary = LightGreen
+    tertiary = LightGreen,
+
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = MainBackgroundColor,
     secondary = SoftGreen,
-    tertiary = LightGreen
+    tertiary = LightGreen,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -45,10 +30,6 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
-
-//private val f = NavigationBarItemColors(LightYellow,LightYellow,LightYellow,LightYellow,LightYellow)
-
-
 @Composable
 fun TokoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -56,21 +37,13 @@ fun TokoTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
-            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
-        }
+    val systemUiController = rememberSystemUiController()
+    if (darkTheme) {
+        systemUiController.setSystemBarsColor(color = DarkColorScheme.tertiary, darkIcons = false)
+        systemUiController.setNavigationBarColor(color = DarkColorScheme.tertiary, darkIcons = false)
+    } else {
+        systemUiController.setSystemBarsColor(color = LightColorScheme.tertiary, darkIcons = true)
+        systemUiController.setNavigationBarColor(color = LightColorScheme.tertiary, darkIcons = true)
     }
 
     MaterialTheme(
@@ -78,4 +51,5 @@ fun TokoTheme(
         typography = Typography,
         content = content
     )
+
 }
