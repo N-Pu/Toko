@@ -56,7 +56,6 @@ class MainActivity : ComponentActivity() {
         modifier = modifierComponent.providesModifier()
         dao = databaseComponent.provideDao()
         malApi = malApiComponent.provideMalApiService()
-
         val myViewModelFactory =
              MyViewModelFactory(malApiRepository = malApi, dao = dao)
         val viewModelProvider = ViewModelProvider(this, myViewModelFactory)

@@ -14,10 +14,8 @@ import javax.inject.Inject
 class Application @Inject constructor() : Application() {
 
     val modifierComponent: ModifierComponent = DaggerModifierComponent.create()
-    val daoComponent: DatabaseComponent = DaggerDatabaseComponent
-        .builder()
-        .databaseModule(DatabaseModule(this))
-        .build()
+    val daoComponent: DatabaseComponent =
+        DaggerDatabaseComponent.builder().databaseModule(DatabaseModule(this)).build()
     val malApiComponent: MalApiComponent =
         DaggerMalApiComponent.builder().malApiModule(MalApiModule(this)).build()
 }
