@@ -2,6 +2,7 @@ package com.project.toko.core.presentation_layer
 
 
 import android.os.Bundle
+import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity() {
 //        )
         super.onCreate(savedInstanceState)
 //        navigationBarColorChanger()
-
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
         val modifierComponent = (application as Application).modifierComponent
         val databaseComponent = (application as Application).daoComponent
         val malApiComponent = (application as Application).malApiComponent
