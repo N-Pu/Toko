@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FabPosition
@@ -194,10 +195,6 @@ fun BottomNavigationBar(
 
 ) {
 
-
-//    val items = listOf(
-//        Screen.Home, Screen.Detail, Screen.Favorites, Screen.RandomAnimeOrManga
-//    )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -223,216 +220,163 @@ fun BottomNavigationBar(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = modifier.padding(horizontal = 10.dp, vertical = 10.dp)
+            modifier = modifier
+                .width(80.dp)
+                .clickable {
+                    try {
+                        navController.navigate(Screen.Home.route) {
+
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            navController.graph.startDestinationRoute?.let { _ ->
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                            }
+
+                        }
+                    } catch (e: IllegalArgumentException) {
+
+                        Log.e("CATCH", Screen.Home.route + " " + e.message.toString())
+
+                    }
+                }
+                .padding(horizontal = 10.dp, vertical = 10.dp)
+
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = Screen.Home.iconId!!),
                 contentDescription = Screen.Home.contentDescription,
                 modifier = modifier
                     .size(30.dp)
-                    .clickable {
-                        try {
-                            navController.navigate(Screen.Home.route) {
-
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
-                                navController.graph.startDestinationRoute?.let { _ ->
-                                    launchSingleTop = true
-                                    // Restore state when reselecting a previously selected item
-                                }
-
-                            }
-                        } catch (e: IllegalArgumentException) {
-
-                            Log.e("CATCH", Screen.Home.route + " " + e.message.toString())
-
-                        }
-                    }
             )
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+            modifier = modifier
+                .width(80.dp)
+                .clickable {
+                    try {
+                        when (lastSelectedScreen) {
+                            Screen.Detail.route -> {
+                                navController.navigate("detail_screen/${currentDetailScreenId.value}") {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+
+                            Screen.CharacterDetail.route -> {
+                                navController.navigate("detail_on_character/${characterDetailScreenId.value}") {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+
+                            Screen.StaffDetail.route -> {
+                                navController.navigate("detail_on_staff/${personDetailScreenId.value}") {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+
+                            Screen.ProducerDetail.route -> {
+                                navController.navigate("detail_on_producer/${producerDetailScreenId.value}/full") {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+
+                            else -> {
+                                navController.navigate(Screen.Nothing.route) {
+                                    launchSingleTop = true
+                                }
+                            }
+                        }
+                    } catch (e: IllegalArgumentException) {
+                        Log.e("CATCH", Screen.Detail.route + " " + e.message.toString())
+                    }
+                }
+                .padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = Screen.Detail.iconId!!),
                 contentDescription = Screen.Detail.contentDescription,
                 modifier = modifier
                     .size(30.dp)
-                    .clickable {
-//                        try {
-//                            if (currentDetailScreenId.value != 0) {
-//                                navController.navigate("detail_screen/${currentDetailScreenId.value}") {
-//                                    navController.graph.startDestinationRoute?.let { _ ->
-//                                        launchSingleTop = true
-//                                    }
-//                                }
-//                            } else {
-//                                navController.navigate(Screen.Nothing.route) {
-//                                    launchSingleTop = true
-//                                }
-//                            }
-//
-//                        } catch (e: IllegalArgumentException) {
-//                            Log.e("CATCH", items[1].route + " " + e.message.toString())
-//                        }
 
-//                        try {
-//                            when (rememberLastVisible) {
-//                                Screen.Detail.route -> {
-//                                    navController.navigate("detail_screen/${currentDetailScreenId.value}") {
-//                                        navController.graph.startDestinationRoute?.let { _ ->
-//                                            launchSingleTop = true
-//                                        }
-//                                    }
-//                                    rememberLastVisible = Screen.Detail.route
-//                                }
-//
-//                                Screen.CharacterDetail.route -> {
-//                                    navController.navigate("detail_on_character/${characterDetailScreenId.value}") {
-//                                        navController.graph.startDestinationRoute?.let { _ ->
-//                                            launchSingleTop = true
-//                                        }
-//                                    }
-//                                    rememberLastVisible = Screen.CharacterDetail.route
-//                                }
-//
-//                                Screen.StaffDetail.route -> {
-//                                    navController.navigate("detail_on_staff/${personDetailScreenId.value}") {
-//                                        navController.graph.startDestinationRoute?.let { _ ->
-//                                            launchSingleTop = true
-//                                        }
-//                                    }
-//                                    rememberLastVisible = Screen.StaffDetail.route
-//                                }
-//
-//                                Screen.ProducerDetail.route -> {
-//                                    navController.navigate("detail_on_producer/${producerDetailScreenId.value}") {
-//                                        navController.graph.startDestinationRoute?.let { _ ->
-//                                            launchSingleTop = true
-//                                        }
-//                                    }
-//                                    rememberLastVisible = Screen.ProducerDetail.route
-//                                }
-//
-//                                "0" -> navController.navigate(Screen.Nothing.route) {
-//                                    launchSingleTop = true
-//                                }
-//                            }
-//
-//                        } catch (e: IllegalArgumentException) {
-//                            Log.e("CATCH", items[1].route + " " + e.message.toString())
-//                        }
-
-
-                        try {
-                            when (lastSelectedScreen) {
-                                Screen.Detail.route -> {
-                                    navController.navigate("detail_screen/${currentDetailScreenId.value}") {
-                                        navController.graph.startDestinationRoute?.let { _ ->
-                                            launchSingleTop = true
-                                        }
-                                    }
-                                }
-
-                                Screen.CharacterDetail.route -> {
-                                    navController.navigate("detail_on_character/${characterDetailScreenId.value}") {
-                                        navController.graph.startDestinationRoute?.let { _ ->
-                                            launchSingleTop = true
-                                        }
-                                    }
-                                }
-
-                                Screen.StaffDetail.route -> {
-                                    navController.navigate("detail_on_staff/${personDetailScreenId.value}") {
-                                        navController.graph.startDestinationRoute?.let { _ ->
-                                            launchSingleTop = true
-                                        }
-                                    }
-                                }
-
-                                Screen.ProducerDetail.route -> {
-                                    navController.navigate("detail_on_producer/${producerDetailScreenId.value}/full") {
-                                        navController.graph.startDestinationRoute?.let { _ ->
-                                            launchSingleTop = true
-                                        }
-                                    }
-                                }
-
-                                else -> {
-                                    navController.navigate(Screen.Nothing.route) {
-                                        launchSingleTop = true
-                                    }
-                                }
-                            }
-                        } catch (e: IllegalArgumentException) {
-                            Log.e("CATCH", Screen.Detail.route + " " + e.message.toString())
-                        }
-                    }
             )
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+            modifier = modifier
+                .width(80.dp)
+                .clickable {
+                    try {
+                        navController.navigate(Screen.Favorites.route) {
+
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            navController.graph.startDestinationRoute?.let { _ ->
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                            }
+
+                        }
+                    } catch (e: IllegalArgumentException) {
+
+                        Log.e("CATCH", Screen.Favorites.route + " " + e.message.toString())
+
+                    }
+                }
+                .padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = Screen.Favorites.iconId!!),
                 contentDescription = Screen.Favorites.contentDescription,
                 modifier = modifier
                     .size(30.dp)
-                    .clickable {
-                        try {
-                            navController.navigate(Screen.Favorites.route) {
 
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
-                                navController.graph.startDestinationRoute?.let { _ ->
-                                    launchSingleTop = true
-                                    // Restore state when reselecting a previously selected item
-                                }
-
-                            }
-                        } catch (e: IllegalArgumentException) {
-
-                            Log.e("CATCH", Screen.Favorites.route + " " + e.message.toString())
-
-                        }
-                    }
             )
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = modifier.padding(horizontal = 10.dp, vertical = 0.dp)
+            modifier = modifier
+                .width(80.dp)
+                .clickable {
+                    try {
+                        navController.navigate(Screen.RandomAnimeOrManga.route) {
+
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            navController.graph.startDestinationRoute?.let { _ ->
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                            }
+
+                        }
+                    } catch (e: IllegalArgumentException) {
+
+                        Log.e(
+                            "CATCH",
+                            Screen.RandomAnimeOrManga.route + " " + e.message.toString()
+                        )
+
+                    }
+                }
+                .padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = Screen.RandomAnimeOrManga.iconId!!),
                 contentDescription = Screen.RandomAnimeOrManga.contentDescription,
                 modifier = modifier
                     .size(30.dp)
-                    .clickable {
-                        try {
-                            navController.navigate(Screen.RandomAnimeOrManga.route) {
 
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
-                                navController.graph.startDestinationRoute?.let { _ ->
-                                    launchSingleTop = true
-                                    // Restore state when reselecting a previously selected item
-                                }
-
-                            }
-                        } catch (e: IllegalArgumentException) {
-
-                            Log.e(
-                                "CATCH",
-                                Screen.RandomAnimeOrManga.route + " " + e.message.toString()
-                            )
-
-                        }
-                    }
             )
         }
     }

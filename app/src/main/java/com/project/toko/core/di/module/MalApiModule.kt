@@ -46,12 +46,15 @@ class MalApiModule @Inject constructor(private val application: Application) {
 
     @Provides
     @Singleton
-    fun provideHttpClient(cache: Cache): OkHttpClient {
+    fun provideHttpClient(
+        cache: Cache,
+        httpLoggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient {
         return OkHttpClient.Builder()
             .cache(cache)
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(provideLoggingInterceptor())
+            .addInterceptor(httpLoggingInterceptor)
             .build()
     }
 
