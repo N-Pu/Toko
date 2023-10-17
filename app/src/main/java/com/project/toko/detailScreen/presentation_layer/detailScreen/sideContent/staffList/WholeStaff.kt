@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.navigation.Screen
+import com.project.toko.detailScreen.model.staffModel.Person
 
 
 @Composable
@@ -64,7 +65,7 @@ fun ShowWholeStaff(
 
 @Composable
 fun SingleStaffMember(
-    person: com.project.toko.homeScreen.model.staffModel.Person,
+    person: Person,
     positions: List<String>,
     navController: NavController,
     modifier: Modifier

@@ -4,10 +4,12 @@ package com.project.toko.core.repository
 import android.util.Log
 import com.project.toko.characterDetailedScreen.model.characterFullModel.CharacterFullModel
 import com.project.toko.characterDetailedScreen.model.characterPicture.CharacterPicturesModel
-import com.project.toko.detailScreen.model.detailModel.old.AnimeDetailModel
-import com.project.toko.homeScreen.model.castModel.CastModel
+import com.project.toko.detailScreen.model.detailModel.DetailScreenModel
+import com.project.toko.randomAnimeScreen.model.AnimeRandomModel
+import com.project.toko.detailScreen.model.castModel.CastModel
+import com.project.toko.detailScreen.model.recommendationsModel.RecommendationsModel
 import com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel
-import com.project.toko.homeScreen.model.staffModel.StaffModel
+import com.project.toko.detailScreen.model.staffModel.StaffModel
 import com.project.toko.staffDetailedScreen.model.personFullModel.PersonFullModel
 import com.project.toko.producerDetailedScreen.model.producerModel.ProducerFullModel
 import kotlinx.coroutines.delay
@@ -40,10 +42,13 @@ interface MalApiService {
     ): Response<NewAnimeSearchModel>
 
     @GET("${BASE_URL}v4/anime/{id}/full")
-    suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<AnimeDetailModel>
+    suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<DetailScreenModel>
+
+    @GET("${BASE_URL}v4/anime/{id}/recommendations")
+    suspend fun getRecommendationsFromAnime(@Path("id") id: Int): Response<RecommendationsModel>
 
     @GET("${BASE_URL}v4/random/anime")
-    suspend fun getRandomAnime(): Response<AnimeDetailModel>
+    suspend fun getRandomAnime(): Response<AnimeRandomModel>
 
     @GET("${BASE_URL}v4/anime/{id}/characters")
     suspend fun getCharactersFromId(@Path("id") id: Int): Response<CastModel>

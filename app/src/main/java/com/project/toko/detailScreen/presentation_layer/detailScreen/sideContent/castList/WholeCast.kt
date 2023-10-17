@@ -37,6 +37,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.detailScreen.model.castModel.Character
+import com.project.toko.detailScreen.model.castModel.Person
 
 
 @Composable
@@ -88,7 +90,7 @@ fun ShowWholeCast(
 
 @Composable
 fun SingleCharacterMember(
-    character: com.project.toko.homeScreen.model.castModel.Character,
+    character: Character,
     role: String,
     navController: NavController,
     modifier: Modifier
@@ -141,7 +143,7 @@ fun SingleCharacterMember(
 
 @Composable
 fun SinglePersonMember(
-    person: com.project.toko.homeScreen.model.castModel.Person,
+    person: Person,
     language: String,
     navController: NavController,
     modifier: Modifier

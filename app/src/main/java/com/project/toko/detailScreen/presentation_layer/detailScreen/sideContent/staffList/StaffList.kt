@@ -36,11 +36,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.core.presentation_layer.navigation.Screen
+import com.project.toko.detailScreen.model.staffModel.StaffData
 import java.lang.Integer.min
 
 @Composable
 fun DisplayStaff(
-    staffList: List<com.project.toko.homeScreen.model.staffModel.Data>,
+    staffList: List<StaffData>,
     navController: NavController,
     modifier: Modifier
 ) {
@@ -50,7 +51,7 @@ fun DisplayStaff(
 
 @Composable
 private fun ListEditor(
-    listData: List<com.project.toko.homeScreen.model.staffModel.Data>,
+    listData: List<StaffData>,
     navController: NavController,
     modifier: Modifier
 ) {
@@ -59,7 +60,7 @@ private fun ListEditor(
     Row(
         modifier = modifier
             .fillMaxWidth(1f)
-            .padding(start = 20.dp, bottom = 15.dp, end = 20.dp, top = 15.dp),
+            .padding(start = 20.dp, bottom = 0.dp, end = 20.dp, top = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -80,6 +81,8 @@ private fun ListEditor(
     Row(
         modifier = Modifier
             .fillMaxHeight()
+            .height(180.dp)
+//            .background(Color.Red)
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
@@ -140,15 +143,15 @@ private fun ListEditor(
 @Composable
 private fun StaffComponentsCard(
     modifier: Modifier,
-    data: com.project.toko.homeScreen.model.staffModel.Data,
+    data: StaffData,
     personPainter: AsyncImagePainter,
     navController: NavController
 ) {
     val positions = data.positions.joinToString(separator = ", ")
     Row(
         modifier = modifier
-            .width(457.dp)
-            .height(231.dp)
+            .width(320.dp)
+            .height(160.dp)
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
             .clip(RoundedCornerShape(10.dp))
             .background(Color.White),
@@ -167,8 +170,8 @@ private fun StaffComponentsCard(
                 contentDescription = "Staff member: ${data.person.name}",
                 modifier = modifier
                     .clip(RoundedCornerShape(5.dp))
-                    .width(100.dp)
-                    .height(157.dp)
+                    .width(70.dp)
+                    .height(107.dp)
                     .clickable {
                         navController.navigate("detail_on_staff/${data.person.mal_id}") {
                             popUpTo(Screen.Detail.route) {
@@ -198,13 +201,14 @@ private fun StaffComponentsCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 23.sp
+                    fontSize = 15.sp
                 )
             }
             Row(
                 modifier = modifier
                     .fillMaxWidth(1f)
                     .fillMaxHeight(1f)
+//                    .background(Color.Red)
                     .padding(end = 22.dp)
             ) {
 
@@ -213,7 +217,8 @@ private fun StaffComponentsCard(
                     modifier = modifier,
                     minLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 16.sp
+                    fontSize = 11.sp,
+                    lineHeight = 10.sp
                 )
 
 

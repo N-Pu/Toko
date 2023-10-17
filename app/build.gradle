@@ -151,4 +151,6 @@ dependencies {
     //status bar colors
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.30.1"
 
+    // youtube
+    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0'
 }

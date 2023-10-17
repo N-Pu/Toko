@@ -20,7 +20,6 @@ import com.project.toko.core.viewModel.viewModelFactory.MyViewModelFactory
 import javax.inject.Inject
 
 
-
 class MainActivity : ComponentActivity() {
 
 
@@ -34,6 +33,7 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var malApi: MalApiService
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -49,6 +49,8 @@ class MainActivity : ComponentActivity() {
 //        )
         super.onCreate(savedInstanceState)
 //        navigationBarColorChanger()
+
+
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         val modifierComponent = (application as Application).modifierComponent
         val databaseComponent = (application as Application).daoComponent
@@ -57,7 +59,10 @@ class MainActivity : ComponentActivity() {
         dao = databaseComponent.provideDao()
         malApi = malApiComponent.provideMalApiService()
         val myViewModelFactory =
-             MyViewModelFactory(malApiRepository = malApi, dao = dao)
+            MyViewModelFactory(
+                malApiRepository = malApi,
+                dao = dao
+            )
         val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
         setContent {
 //            HideStatusBar()
@@ -72,12 +77,16 @@ class MainActivity : ComponentActivity() {
                     TokoAppActivator(
                         navController = navController,
                         viewModelProvider = viewModelProvider,
-                        modifier = modifier
+                        modifier = modifier,
+//                        exoPlayer = exoPlayer,
+//                        playerView = playerView
+
                     )
                 }
             }
         }
     }
+
 
 //    private fun navigationBarColorChanger() {
 //        window.navigationBarColor = LightGreen.copy(alpha = 1f).toArgb()

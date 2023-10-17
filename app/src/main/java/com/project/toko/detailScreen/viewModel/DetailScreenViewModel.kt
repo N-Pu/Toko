@@ -7,7 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.core.repository.MalApiService
-import com.project.toko.homeScreen.model.newAnimeSearchModel.Data
+import com.project.toko.detailScreen.model.castModel.CastData
+import com.project.toko.detailScreen.model.detailModel.DetailData
+import com.project.toko.detailScreen.model.recommendationsModel.RecommendationsData
+import com.project.toko.detailScreen.model.staffModel.StaffData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,16 +20,15 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DetailScreenViewModel @Inject constructor(
-    private val malApiService: MalApiService
+    private val malApiService: MalApiService,
 ) : ViewModel() {
 
     //detailData
-    private val _animeDetails = MutableStateFlow<Data?>(null)
-    val animeDetails: StateFlow<Data?> get() = _animeDetails
+    private val _animeDetails = MutableStateFlow<DetailData?>(null)
+    val animeDetails: StateFlow<DetailData?> get() = _animeDetails
     private val _loadedId = mutableStateOf(0)
     val loadedId = _loadedId
 
-    //    private val animeCache = DataCacheSingleton.dataCache
     private val _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
 
@@ -67,10 +69,9 @@ class DetailScreenViewModel @Inject constructor(
 
 
     //staff
-    private val staffCache =
-        mutableMapOf<Int, List<com.project.toko.homeScreen.model.staffModel.Data>>()
+
     private val _staffList =
-        MutableStateFlow<List<com.project.toko.homeScreen.model.staffModel.Data>>(emptyList())
+        MutableStateFlow<List<StaffData>>(emptyList())
     val staffList = _staffList.asStateFlow()
 
     suspend fun addStaffFromId(id: Int) {
@@ -79,11 +80,10 @@ class DetailScreenViewModel @Inject constructor(
                 val response = malApiService.getStaffFromId(id)
                 if (response.isSuccessful) {
                     val staff = response.body()?.data ?: emptyList()
-                    staffCache[id] = staff
                     _staffList.value = staff
                 }
             } catch (e: Exception) {
-                Log.e("StaffViewModel", e.message.toString())
+                Log.e("Staff", e.message.toString())
             } finally {
                 if (_staffList.value.isEmpty()) {
                     _staffList.value = emptyList()
@@ -94,10 +94,8 @@ class DetailScreenViewModel @Inject constructor(
 
 
     // cast
-    private val castCache =
-        mutableMapOf<Int, List<com.project.toko.homeScreen.model.castModel.Data>>()
     private val _castList =
-        MutableStateFlow<List<com.project.toko.homeScreen.model.castModel.Data>>(emptyList())
+        MutableStateFlow<List<CastData>>(emptyList())
     val castList = _castList.asStateFlow()
 
     suspend fun addCastFromId(id: Int) {
@@ -106,18 +104,40 @@ class DetailScreenViewModel @Inject constructor(
                 val response = malApiService.getCharactersFromId(id)
                 if (response.isSuccessful) {
                     val characters = response.body()?.data ?: emptyList()
-                    castCache[id] = characters
                     _castList.value = characters
                 } else if (response.code() == 404) {
                     // если получен ответ 404, присваиваем пустой список
                     _castList.value = emptyList()
                 }
             } catch (e: Exception) {
-                Log.e("CastInDetailScreenVM", e.message.toString())
+                Log.e("Cast", e.message.toString())
                 // если произошла ошибка, присваиваем пустой список
                 _castList.value = emptyList()
             }
         }
     }
 
+
+    // recommendations
+    private val _recommendationList = MutableStateFlow<List<RecommendationsData>>(emptyList())
+    val recommendationList = _recommendationList.asStateFlow()
+
+    suspend fun addRecommendationsFromId(id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = malApiService.getRecommendationsFromAnime(id)
+                if (response.isSuccessful) {
+                    val recommendationData = response.body()?.data ?: emptyList()
+                    _recommendationList.value = recommendationData
+                } else if (response.code() == 404) {
+                    // если получен ответ 404, присваиваем пустой список
+                    _recommendationList.value = emptyList()
+                }
+            } catch (e: Exception) {
+                Log.e("Recommendations", e.message.toString())
+                // если произошла ошибка, присваиваем пустой список
+                _recommendationList.value = emptyList()
+            }
+        }
+    }
 }

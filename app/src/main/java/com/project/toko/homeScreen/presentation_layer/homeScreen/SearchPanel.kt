@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,10 +34,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import com.project.toko.R
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.presentation_layer.theme.SoftGreen
 import com.project.toko.core.presentation_layer.theme.ScoreColors
+import com.project.toko.core.presentation_layer.theme.SearchBarColor
+import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -53,41 +58,59 @@ fun MainScreen(
         modifier = modifier
             .fillMaxWidth(1f)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround,
+        Column(
             modifier = modifier
                 .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
+                .height(140.dp)
                 .shadow(20.dp)
                 .fillMaxWidth(1f)
-                .background(
-                    LightGreen
-                )
-                .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 15.dp)
+                .background(Color.White)
+                .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 0.dp)
         ) {
-            OutlinedTextField(
-                value = searchText ?: "",
-                onValueChange = viewModel::onSearchTextChange,
-                modifier = modifier.fillMaxWidth(1f),
-                prefix = {
-                    Icon(Icons.Filled.Search, "Search Icon")
-                },
-                singleLine = true,
-                trailingIcon = {
-                    DropDownMenuWithIconButton(viewModel, modifier)
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = LightGreen,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    disabledContainerColor = Color.White,
-                    focusedBorderColor = Color.White,
-                    unfocusedBorderColor = Color.White,
-                    focusedTrailingIconColor = LightGreen,
-                    focusedPlaceholderColor = LightGreen,
-                    focusedPrefixColor = LightGreen,
+            Row(
+                verticalAlignment = Alignment.Top
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),
+                    contentDescription = "None",
+                    modifier = modifier
+                        .height(50.dp)
+                        .width(70.dp),
+                    alpha = 0.8f
                 )
-            )
+            }
+            Row(
+                modifier = modifier
+                    .wrapContentSize()
+                    .padding(top = 10.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(SearchBarColor),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                TextField(
+                    placeholder = { Text(text = "Search...") },
+                    value = searchText ?: "",
+                    onValueChange = viewModel::onSearchTextChange,
+                    modifier = modifier
+                        .clip(RoundedCornerShape(30.dp))
+                        .height(50.dp)
+                        .fillMaxWidth(1f),
+                    prefix = {
+                        Icon(Icons.Filled.Search, "Search Icon", tint = iconColorInSearchPanel)
+                    },
+                    singleLine = true,
+                    trailingIcon = {
+                        DropDownMenuWithIconButton(viewModel, modifier)
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = iconColorInSearchPanel,
+                        focusedPlaceholderColor = iconColorInSearchPanel,
+                        unfocusedPlaceholderColor = iconColorInSearchPanel,
+                        cursorColor = iconColorInSearchPanel,
+//                        unfocusedSuffixColor = Color.Red
+                    )
+                )
+            }
         }
 
         if (!isSearching) {
