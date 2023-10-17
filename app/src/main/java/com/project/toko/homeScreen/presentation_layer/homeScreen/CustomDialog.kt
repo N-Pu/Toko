@@ -70,7 +70,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CustomDialog(
     onDismiss: () -> Unit,
-    data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data,
+    data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData,
     navController: NavController,
     modifier: Modifier,
     viewModelProvider: ViewModelProvider
@@ -362,7 +362,7 @@ private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
 @Composable
 private fun YearTypeStudio(
-    data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data?,
+    data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData?,
     modifier: Modifier
 ) {
     val isStudioEmpty = data?.studios.isNullOrEmpty()
@@ -439,7 +439,7 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 @Composable
 private fun AddToFavoriteRow(
     modifier: Modifier,
-    data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data,
+    data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData,
     viewModelProvider: ViewModelProvider
 ) {
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]

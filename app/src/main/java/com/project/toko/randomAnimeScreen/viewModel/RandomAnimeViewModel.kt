@@ -13,8 +13,8 @@ import javax.inject.Inject
 class RandomAnimeViewModel @Inject constructor(private val malApiService: MalApiService) :
     ViewModel() {
     private var isSearching = false
-    private val _animeDetails = MutableStateFlow<com.project.toko.homeScreen.model.newAnimeSearchModel.Data?>(null)
-    val animeDetails: StateFlow<com.project.toko.homeScreen.model.newAnimeSearchModel.Data?> get() = _animeDetails
+    private val _animeDetails = MutableStateFlow<com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData?>(null)
+    val animeDetails: StateFlow<com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData?> get() = _animeDetails
 
    suspend fun onTapRandomAnime() {
         if (isSearching) return

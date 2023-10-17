@@ -14,7 +14,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.project.toko.core.presentation_layer.theme.LightGreen
-import com.project.toko.homeScreen.model.newAnimeSearchModel.Genre
 
 @Composable
 private fun ColorBox(
@@ -39,7 +38,7 @@ private fun ColorBox(
 }
 
 @Composable
-fun DisplayCustomGenreBoxes(genres: List<Genre>, modifier: Modifier) {
+fun DisplayCustomGenreBoxes(genres: List<com.project.toko.detailScreen.model.detailModel.Genre>, modifier: Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()

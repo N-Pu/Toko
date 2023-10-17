@@ -319,7 +319,7 @@ fun CardPreview() {
 
 @Composable
 fun AnimeCard(
-    data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data?,
+    data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData?,
     modifier: Modifier,
     navController: NavController,
     viewModelProvider: ViewModelProvider,

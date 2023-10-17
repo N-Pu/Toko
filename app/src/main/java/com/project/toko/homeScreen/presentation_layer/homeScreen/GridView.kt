@@ -47,22 +47,23 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
+import com.project.toko.core.presentation_layer.theme.LightCardColor
+import com.project.toko.core.presentation_layer.theme.MainBackgroundColor
+import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GridAdder(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier
 ) {
-    val viewModel =  viewModelProvider[HomeScreenViewModel::class.java]
+    val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val listData by viewModel.animeSearch.collectAsStateWithLifecycle()
     val scrollGridState = rememberLazyStaggeredGridState()
     val isLoading by viewModel.isNextPageLoading.collectAsStateWithLifecycle()
@@ -71,8 +72,8 @@ fun GridAdder(
         state = scrollGridState,
         columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
         modifier = modifier
-            .fillMaxWidth(1f)
-            .fillMaxHeight(1f),
+            .fillMaxSize()
+            .background(MainBackgroundColor),
         horizontalArrangement = Arrangement.spacedBy(22.dp),
         verticalItemSpacing = 20.dp,
         contentPadding = PaddingValues(10.dp)
@@ -132,7 +133,7 @@ fun GridAdder(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnimeCardBox(
-    data: com.project.toko.homeScreen.model.newAnimeSearchModel.Data,
+    data: AnimeSearchData,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier
@@ -141,7 +142,7 @@ fun AnimeCardBox(
     var isCardClicked by remember { mutableStateOf(false) }
 
     val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
-    val value by rememberInfiniteTransition().animateFloat(
+    val value by rememberInfiniteTransition(label = "").animateFloat(
         initialValue = if (isCardClicked) 0.99f else 1f, // Изменяем значение в зависимости от нажатия на Card
         targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
         animationSpec = infiniteRepeatable(
@@ -150,7 +151,7 @@ fun AnimeCardBox(
                 easing = LinearEasing
             ),
             repeatMode = RepeatMode.Reverse
-        )
+        ), label = ""
     )
 
     Card(
@@ -180,7 +181,7 @@ fun AnimeCardBox(
                     )
                 }
             },
-        colors = CardDefaults.cardColors(containerColor = LightGreen),
+        colors = CardDefaults.cardColors(containerColor = LightCardColor),
         shape = RectangleShape,
     ) {
         Box(
@@ -329,7 +330,6 @@ fun formatScore(float: Float?): String {
         float.toString()
     }
 }
-
 
 
 //@OptIn(ExperimentalFoundationApi::class)

@@ -34,14 +34,18 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.core.presentation_layer.navigation.Screen
+import com.project.toko.detailScreen.model.castModel.CastData
+import com.project.toko.detailScreen.model.castModel.ImagesX
+import com.project.toko.detailScreen.model.castModel.JpgX
+import com.project.toko.detailScreen.model.castModel.Person
+import com.project.toko.detailScreen.model.castModel.VoiceActor
 import java.lang.Integer.min
 
 
 @Composable
 fun DisplayCast(
-    castList: List<com.project.toko.homeScreen.model.castModel.Data>,
+    castList: List<CastData>,
     navController: NavController,
-//    viewModelProvider: ViewModelProvider,
     modifier: Modifier
 ) {
     val castWithJapVoiceActors = hasJapVoiceActor(castList)
@@ -79,7 +83,7 @@ fun DisplayCast(
 
 @Composable
 private fun AddCast(
-    castList: List<com.project.toko.homeScreen.model.castModel.Data>,
+    castList: List<CastData>,
     navController: NavController,
     modifier: Modifier,
     numCharacterAndActors: Int
@@ -126,16 +130,11 @@ private fun AddCast(
             modifier
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(5.dp))
-                .width(140.dp)
+                .width(120.dp)
                 .height(460.dp)
                 .background(Color.White)
                 .clickable {
                     navController.navigate(Screen.DetailOnCast.route) {
-//                        launchSingleTop = true
-//                        popUpTo(Screen.Detail.route) {
-//                            inclusive = true
-
-//                        }
                     }
                 },
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -168,8 +167,8 @@ private fun CurrentCast(
     modifier: Modifier,
     personPainter: AsyncImagePainter,
     characterPainter: AsyncImagePainter,
-    voiceActor: com.project.toko.homeScreen.model.castModel.VoiceActor,
-    data: com.project.toko.homeScreen.model.castModel.Data,
+    voiceActor: VoiceActor,
+    data: CastData,
     navController: NavController
 ) {
 
@@ -199,7 +198,7 @@ private fun CurrentCast(
                 painter = personPainter,
                 contentDescription = "Voice actor : ${voiceActor.person.name}",
                 modifier = customModifier
-                    .size(85.dp, 135.dp),
+                    .size(80.dp, 130.dp),
                 contentScale = ContentScale.FillBounds
             )
 
@@ -229,7 +228,7 @@ private fun CurrentCast(
                     )
                 }
             }
-            Row(modifier = modifier.height(50.dp)) {}
+            Row(modifier = modifier.height(40.dp)) {}
             Column(
                 horizontalAlignment = Alignment.End,
                 modifier = modifier
@@ -281,10 +280,10 @@ private fun CurrentCast(
     }
 }
 
-private fun hasJapVoiceActor(castList: List<com.project.toko.homeScreen.model.castModel.Data>): List<com.project.toko.homeScreen.model.castModel.Data> {
+private fun hasJapVoiceActor(castList: List<CastData>): List<CastData> {
     return castList.map { data ->
         val japOrFirstVoiceActor = getJapOrFirstVoiceActor(data)
-        com.project.toko.homeScreen.model.castModel.Data(
+        CastData(
             data.character,
             data.role,
             listOf(japOrFirstVoiceActor)
@@ -292,16 +291,16 @@ private fun hasJapVoiceActor(castList: List<com.project.toko.homeScreen.model.ca
     }
 }
 
-private fun getJapOrFirstVoiceActor(data: com.project.toko.homeScreen.model.castModel.Data): com.project.toko.homeScreen.model.castModel.VoiceActor {
+private fun getJapOrFirstVoiceActor(data: CastData): VoiceActor {
     return if (data.voice_actors.isNotEmpty()) {
         data.voice_actors.firstOrNull { it.language == "Japanese" }
             ?: data.voice_actors[0]
     } else {
-        com.project.toko.homeScreen.model.castModel.VoiceActor(
+        VoiceActor(
             "",
-            com.project.toko.homeScreen.model.castModel.Person(
-                com.project.toko.homeScreen.model.castModel.ImagesX(
-                    com.project.toko.homeScreen.model.castModel.JpgX(
+            Person(
+                ImagesX(
+                    JpgX(
                         ""
                     )
                 ), 0, "", ""

@@ -11,13 +11,19 @@ private val DarkColorScheme = darkColorScheme(
     primary = MainBackgroundColor,
     secondary = SoftGreen,
     tertiary = LightGreen,
+    background = DarkBackgroundColor,
+    scrim = DarktIconTint,
+    onBackground = DarkBottomBarColor,
 
-)
+    )
 
 private val LightColorScheme = lightColorScheme(
     primary = MainBackgroundColor,
+    onBackground = LightBottomBarColor,
     secondary = SoftGreen,
     tertiary = LightGreen,
+    background = LightBackgroundColor,
+    scrim = LightIconTint
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -39,11 +45,17 @@ fun TokoTheme(
 ) {
     val systemUiController = rememberSystemUiController()
     if (darkTheme) {
-        systemUiController.setSystemBarsColor(color = DarkColorScheme.tertiary, darkIcons = false)
-        systemUiController.setNavigationBarColor(color = DarkColorScheme.tertiary, darkIcons = false)
+        systemUiController.setSystemBarsColor(color = DarkColorScheme.background, darkIcons = false)
+        systemUiController.setNavigationBarColor(
+            color = DarkColorScheme.background,
+            darkIcons = false
+        )
     } else {
-        systemUiController.setSystemBarsColor(color = LightColorScheme.tertiary, darkIcons = true)
-        systemUiController.setNavigationBarColor(color = LightColorScheme.tertiary, darkIcons = true)
+        systemUiController.setSystemBarsColor(color = LightColorScheme.background, darkIcons = true)
+        systemUiController.setNavigationBarColor(
+            color = LightColorScheme.background,
+            darkIcons = true
+        )
     }
 
     MaterialTheme(

@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -45,7 +44,8 @@ import com.project.toko.core.presentation_layer.backArrowButton.BackButton
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
-import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.presentation_layer.theme.LightBottomBarColor
+import com.project.toko.core.presentation_layer.theme.LightIconTint
 import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
 import com.project.toko.staffDetailedScreen.viewModel.PersonByIdViewModel
 
@@ -53,7 +53,9 @@ import com.project.toko.staffDetailedScreen.viewModel.PersonByIdViewModel
 fun TokoAppActivator(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier,
+//    exoPlayer: ExoPlayer,
+//    playerView: PlayerView
 ) {
 
     val currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedId
@@ -164,6 +166,7 @@ fun TokoAppActivator(
                 SetupNavGraph(
                     navController = navController, viewModelProvider = viewModelProvider,
                     modifier = modifier,
+//                    exoPlayer = exoPlayer, playerView = playerView
                 )
             },
             topBar = {
@@ -204,8 +207,7 @@ fun BottomNavigationBar(
                 RoundedCornerShape(10.dp)
             )
             .fillMaxWidth(1f)
-            .background(LightGreen.copy(alpha = 0.6f))
-            .background(Color.Transparent)
+            .background(LightBottomBarColor)
             .height(50.dp),
 
         horizontalArrangement = Arrangement.SpaceAround,
@@ -247,7 +249,8 @@ fun BottomNavigationBar(
                 imageVector = ImageVector.vectorResource(id = Screen.Home.iconId!!),
                 contentDescription = Screen.Home.contentDescription,
                 modifier = modifier
-                    .size(30.dp)
+                    .size(30.dp),
+                tint = LightIconTint
             )
         }
         Column(
@@ -300,13 +303,14 @@ fun BottomNavigationBar(
                         Log.e("CATCH", Screen.Detail.route + " " + e.message.toString())
                     }
                 }
-                .padding(horizontal = 10.dp, vertical = 0.dp)
+                .padding(horizontal = 10.dp, vertical = 10.dp)
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = Screen.Detail.iconId!!),
                 contentDescription = Screen.Detail.contentDescription,
                 modifier = modifier
-                    .size(30.dp)
+                    .size(30.dp),
+                tint = LightIconTint
 
             )
         }
@@ -333,13 +337,15 @@ fun BottomNavigationBar(
 
                     }
                 }
-                .padding(horizontal = 10.dp, vertical = 0.dp)
+                .padding(horizontal = 10.dp, vertical = 10.dp)
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = Screen.Favorites.iconId!!),
                 contentDescription = Screen.Favorites.contentDescription,
                 modifier = modifier
-                    .size(30.dp)
+                    .size(30.dp),
+                tint = LightIconTint
+
 
             )
         }
@@ -369,13 +375,15 @@ fun BottomNavigationBar(
 
                     }
                 }
-                .padding(horizontal = 10.dp, vertical = 0.dp)
+                .padding(horizontal = 10.dp, vertical = 10.dp)
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = Screen.RandomAnimeOrManga.iconId!!),
                 contentDescription = Screen.RandomAnimeOrManga.contentDescription,
                 modifier = modifier
-                    .size(30.dp)
+                    .size(30.dp),
+
+                tint = LightIconTint
 
             )
         }
