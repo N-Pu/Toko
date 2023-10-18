@@ -169,4 +169,5 @@ fun ExpandableRelated(
             }
         }
     }
+    Spacer(modifier = modifier.height(20.dp))
 }

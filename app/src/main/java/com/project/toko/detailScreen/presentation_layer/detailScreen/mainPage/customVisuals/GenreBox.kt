@@ -39,21 +39,26 @@ private fun ColorBox(
 
 @Composable
 fun DisplayCustomGenreBoxes(genres: List<com.project.toko.detailScreen.model.detailModel.Genre>, modifier: Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
-            .height(80.dp),
-        horizontalArrangement = Arrangement.Center
+
+    if (genres
+        .isNotEmpty()
     ) {
-        genres.forEachIndexed { index, genre ->
-            if (index != 0) {
-                Spacer(modifier = modifier.width(8.dp))
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .height(80.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            genres.forEachIndexed { index, genre ->
+                if (index != 0) {
+                    Spacer(modifier = modifier.width(8.dp))
+                }
+                ColorBox(
+                    text = genre.name,
+                    modifier
+                )
             }
-            ColorBox(
-                text = genre.name,
-                modifier
-            )
         }
     }
 }
