@@ -5,14 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -44,41 +47,40 @@ import java.lang.Integer.min
 
 @Composable
 fun DisplayCast(
-    castList: List<CastData>,
-    navController: NavController,
-    modifier: Modifier
+    castList: List<CastData>, navController: NavController, modifier: Modifier
 ) {
-    val castWithJapVoiceActors = hasJapVoiceActor(castList)
-    val numCharacterAndActors =
-        min(12, castList.size) // Количество персонажей для вывода (не более 12)
-    Row(
-        modifier = modifier
-            .fillMaxWidth(1f)
-            .padding(start = 20.dp, bottom = 15.dp, end = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
 
-        Column {
-            Text(
-                text = "Cast",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
+    if (castList.isNotEmpty()) {
+        val castWithJapVoiceActors = hasJapVoiceActor(castList)
+        val numCharacterAndActors =
+            min(12, castList.size) // Количество персонажей для вывода (не более 12)
+        Row(
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .padding(start = 20.dp, bottom = 15.dp, end = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            Column {
+                Text(
+                    text = "Cast", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold
+                )
+            }
+            Column {
+                Text(
+                    text = " $numCharacterAndActors>",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
         }
-        Column {
-            Text(
-                text = " $numCharacterAndActors>",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-        }
+        AddCast(
+            castList = castWithJapVoiceActors,
+            navController = navController,
+            modifier = modifier,
+            numCharacterAndActors = numCharacterAndActors
+        )
     }
-    AddCast(
-        castList = castWithJapVoiceActors,
-        navController = navController,
-        modifier = modifier,
-        numCharacterAndActors = numCharacterAndActors
-    )
 }
 
 @Composable
@@ -90,8 +92,7 @@ private fun AddCast(
 ) {
     val numCards = (numCharacterAndActors + 2) / 3 // Определение количества карточек
     Row(
-        modifier = Modifier
-            .horizontalScroll(rememberScrollState())
+        modifier = Modifier.horizontalScroll(rememberScrollState())
     ) {
         repeat(numCards) { i ->
             val startIdx = i * 3
@@ -104,8 +105,8 @@ private fun AddCast(
                 modifier
                     .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
                     .clip(RoundedCornerShape(10.dp))
-                    .width(360.dp)
-                    .height(460.dp)
+                    .width(320.dp)
+                    .height(440.dp)
                     .background(Color.White),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -131,21 +132,30 @@ private fun AddCast(
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(5.dp))
                 .width(120.dp)
-                .height(460.dp)
-                .background(Color.White)
-                .clickable {
-                    navController.navigate(Screen.DetailOnCast.route) {
-                    }
-                },
+                .height(440.dp)
+                .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
 
-            Icon(
-                imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "More cast",
-                modifier = modifier.width(140.dp)
-            )
+            Box(modifier = modifier.size(100.dp)) {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(Color(198, 198, 198))
+                        .clickable {
+                            navController.navigate(Screen.DetailOnCast.route) {}
+                        }, contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = "More cast",
+                        modifier = modifier.width(140.dp)
+                    )
+                }
+            }
+
             Text(
                 text = "More Cast",
                 textAlign = TextAlign.Left,
@@ -155,7 +165,11 @@ private fun AddCast(
                 modifier = modifier
             )
         }
-        Column(modifier = modifier.width(20.dp)) {
+        Column(
+            modifier = modifier
+                .width(30.dp)
+                .background(Color.Red)
+        ) {
             // Пустая колонка для выравнивания
         }
     }
@@ -172,18 +186,13 @@ private fun CurrentCast(
     navController: NavController
 ) {
 
-    val customModifier =
-        if (voiceActor.language == "") {
-            modifier
-        } else {
-            modifier.clickable {
-                navController.navigate("detail_on_staff/${voiceActor.person.mal_id}") {
-//                    popUpTo(Screen.Detail.route) {
-//                        inclusive = true
-//                    }
-                }
-            }
+    val customModifier = if (voiceActor.language == "") {
+        modifier
+    } else {
+        modifier.clickable {
+            navController.navigate("detail_on_staff/${voiceActor.person.mal_id}") {}
         }
+    }
 
     Row(
         modifier = modifier.height(150.dp),
@@ -192,18 +201,20 @@ private fun CurrentCast(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier.size(85.dp, 135.dp)
         ) {
             Image(
                 painter = personPainter,
                 contentDescription = "Voice actor : ${voiceActor.person.name}",
                 modifier = customModifier
-                    .size(80.dp, 130.dp),
+                    .width(70.dp)
+                    .height(107.dp),
                 contentScale = ContentScale.FillBounds
             )
 
         }
-        Column(modifier = modifier.width(150.dp)) {
+        Column(modifier = modifier.width(140.dp)) {
             Column(
                 horizontalAlignment = Alignment.Start,
                 modifier = modifier
@@ -216,7 +227,8 @@ private fun CurrentCast(
                         modifier = Modifier,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
                     )
                 }
                 Row {
@@ -224,7 +236,8 @@ private fun CurrentCast(
                         text = voiceActor.language,
                         modifier = Modifier,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 11.sp
                     )
                 }
             }
@@ -233,7 +246,7 @@ private fun CurrentCast(
                 horizontalAlignment = Alignment.End,
                 modifier = modifier
                     .fillMaxWidth(1f)
-                    .padding(end = 5.dp)
+                    .padding(end = 5.dp, bottom = 5.dp)
             ) {
                 Row {
                     Text(
@@ -242,7 +255,8 @@ private fun CurrentCast(
                         textAlign = TextAlign.End,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
                     )
                 }
                 Row {
@@ -251,7 +265,8 @@ private fun CurrentCast(
                         modifier = Modifier,
                         textAlign = TextAlign.End,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 11.sp
                     )
                 }
             }
@@ -265,7 +280,8 @@ private fun CurrentCast(
                 painter = characterPainter,
                 contentDescription = "Character name: ${data.character.name}",
                 modifier = Modifier
-                    .size(80.dp, 130.dp)
+                    .width(70.dp)
+                    .height(107.dp)
                     .clickable {
                         navController.navigate(route = "detail_on_character/${data.character.mal_id}") {
 //                            popUpTo(Screen.Detail.route) {
@@ -284,21 +300,17 @@ private fun hasJapVoiceActor(castList: List<CastData>): List<CastData> {
     return castList.map { data ->
         val japOrFirstVoiceActor = getJapOrFirstVoiceActor(data)
         CastData(
-            data.character,
-            data.role,
-            listOf(japOrFirstVoiceActor)
+            data.character, data.role, listOf(japOrFirstVoiceActor)
         )
     }
 }
 
 private fun getJapOrFirstVoiceActor(data: CastData): VoiceActor {
     return if (data.voice_actors.isNotEmpty()) {
-        data.voice_actors.firstOrNull { it.language == "Japanese" }
-            ?: data.voice_actors[0]
+        data.voice_actors.firstOrNull { it.language == "Japanese" } ?: data.voice_actors[0]
     } else {
         VoiceActor(
-            "",
-            Person(
+            "", Person(
                 ImagesX(
                     JpgX(
                         ""

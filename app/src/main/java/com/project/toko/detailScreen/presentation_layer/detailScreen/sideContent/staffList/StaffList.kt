@@ -5,16 +5,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -45,7 +48,9 @@ fun DisplayStaff(
     navController: NavController,
     modifier: Modifier
 ) {
-    ListEditor(listData = staffList, navController = navController, modifier = modifier)
+    if (staffList.isNotEmpty()) {
+        ListEditor(listData = staffList, navController = navController, modifier = modifier)
+    }
 }
 
 
@@ -106,31 +111,41 @@ private fun ListEditor(
             modifier
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(5.dp))
-                .width(189.dp)
-                .height(231.dp)
-                .background(Color.White)
-                .clickable {
-                    navController.navigate(Screen.DetailOnStaff.route) {
-                        popUpTo(Screen.Detail.route) {
-                            inclusive = true
-                        }
-                    }
-                },
+                .width(160.dp)
+                .height(160.dp)
+                .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            Box(modifier = modifier.size(100.dp)) {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(Color(198, 198, 198))
+                        .clickable {
+                            navController.navigate(Screen.DetailOnStaff.route) {
+                                popUpTo(Screen.Detail.route) {
+                                    inclusive = true
+                                }
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = "More Staff",
+                        modifier = modifier.width(140.dp)
+                    )
+                }
+            }
 
-            Icon(
-                imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "More cast",
-                modifier = modifier.width(140.dp)
-            )
             Text(
-                text = "More Cast",
+                text = "More Staff",
                 textAlign = TextAlign.Left,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
-                fontSize = 22.sp,
+                fontSize = 20.sp,
                 modifier = modifier
             )
         }

@@ -31,100 +31,107 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ExpandableText(text: String, modifier: Modifier) {
-    val wordCount = text.split(" ").count()
+fun ExpandableText(text: String?, modifier: Modifier) {
+    val wordCount = text?.split(" ")?.count()
     var expanded by remember { mutableStateOf(false) }
     val toggleExpanded: () -> Unit = { expanded = !expanded }
 
-    val maxLines = if (expanded) Int.MAX_VALUE else 4
-
-    if (wordCount <= 20) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth(1f)
-                .padding(start = 20.dp, bottom = 25.dp, end = 20.dp),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Top
-        ) {
-            Spacer(modifier = modifier.height(10.dp))
-            Text(
-                text = text,
-                maxLines = maxLines,
-                overflow = TextOverflow.Ellipsis,
-                modifier = modifier,
-                softWrap = true
-            )
-        }
-        return
-    }
-
-
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth(1f)
-            .padding(start = 20.dp, bottom = 0.dp, end = 20.dp),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text(
-            text = "Synopsis",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-
-        Spacer(modifier = modifier.height(10.dp))
-        Text(
-            text = text,
-            maxLines = maxLines,
-            overflow = TextOverflow.Ellipsis,
-            modifier = modifier
-                .clickable(onClick = toggleExpanded)
-                .animateContentSize(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessLow
+    val maxLines = if (expanded) Int.MAX_VALUE else 6
+    
+        if (wordCount != null) {
+            if (wordCount <= 40) {
+                Column(
+                    modifier = modifier
+                        .fillMaxWidth(1f)
+                        .padding(start = 20.dp, bottom = 25.dp, end = 20.dp),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    Spacer(modifier = modifier.height(10.dp))
+                    Text(
+                        text = text,
+                        maxLines = maxLines,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = modifier,
+                        softWrap = true
                     )
-                ),
-            softWrap = true
-        )
-        Spacer(modifier = modifier
-            .fillMaxWidth()
-            .height(10.dp))
-        Spacer(modifier = modifier
-            .fillMaxWidth()
-            .background(Color.Black.copy(0.3f))
-            .height(1.dp))
-        Row(
-            modifier = Modifier,
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.Top
-        ) {
-            Text(
-                text = "Details",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = modifier.clickable(onClick = toggleExpanded),
-                color = Color(0xB2000000)
-            )
-            if (expanded) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = null,
-                    modifier = modifier
-                        .clickable(onClick = toggleExpanded)
-                        .align(Alignment.CenterVertically)
+                }
+                return
+            }
 
+
+
+
+            Column(
+                modifier = modifier
+                    .fillMaxWidth(1f)
+                    .padding(start = 20.dp, bottom = 0.dp, end = 20.dp),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Top
+            ) {
+                Text(
+                    text = "Synopsis",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold
                 )
-            } else {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = null,
+
+                Spacer(modifier = modifier.height(10.dp))
+                Text(
+                    text = text,
+                    maxLines = maxLines,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = modifier
                         .clickable(onClick = toggleExpanded)
-                        .align(Alignment.CenterVertically)
+                        .animateContentSize(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ),
+                    softWrap = true
                 )
+                Spacer(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(10.dp)
+                )
+                Spacer(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .background(Color.Black.copy(0.3f))
+                        .height(1.dp)
+                )
+                Row(
+                    modifier = Modifier,
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        text = "Details",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = modifier.clickable(onClick = toggleExpanded),
+                        color = Color(0xB2000000)
+                    )
+                    if (expanded) {
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowUp,
+                            contentDescription = null,
+                            modifier = modifier
+                                .clickable(onClick = toggleExpanded)
+                                .align(Alignment.CenterVertically)
+
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowDown,
+                            contentDescription = null,
+                            modifier = modifier
+                                .clickable(onClick = toggleExpanded)
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                }
             }
         }
-    }
 }
