@@ -152,7 +152,7 @@ fun DisplayCharacterFromId(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DisplayHorizontalPagerWithIndicator(
+private fun DisplayHorizontalPagerWithIndicator(
     painterList: List<com.project.toko.characterDetailedScreen.model.characterPicture.Data>,
     modifier: Modifier
 ) {

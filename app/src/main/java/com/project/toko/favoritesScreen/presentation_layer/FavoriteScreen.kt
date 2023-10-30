@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -51,10 +53,8 @@ import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetai
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.presentation_layer.theme.SoftGreen
 import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
+import com.project.toko.favoritesScreen.model.AnimeListType
 
-enum class AnimeListType {
-    WATCHING, PLANNED, WATCHED, DROPPED
-}
 
 // Function that creates 4 grid sections
 // - watching, planned, watched, dropped
@@ -66,6 +66,7 @@ fun FavoriteScreen(
 ) {
     var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
     val scrollState = rememberLazyGridState()
+    val arrayOfEntries = AnimeListType.values()
 
     Column(
         modifier
@@ -77,60 +78,26 @@ fun FavoriteScreen(
             modifier = modifier
                 .fillMaxWidth(1f)
                 .height(50.dp)
-                .background(LightGreen),
-            horizontalArrangement = Arrangement.Center,
+                .background(LightGreen)
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.Bottom
         ) {
-            Column(
-                modifier = modifier
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                FavoriteAnimeListButton(
-                    listType = AnimeListType.WATCHING,
-                    selectedListType = selectedListType,
-                    onClick = { selectedListType = AnimeListType.WATCHING },
-                    modifier = modifier
-                )
-            }
-            Column(
-                modifier = modifier
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                FavoriteAnimeListButton(
-                    listType = AnimeListType.PLANNED,
-                    selectedListType = selectedListType,
-                    onClick = { selectedListType = AnimeListType.PLANNED },
-                    modifier = modifier
-                )
-            }
-            Column(
-                modifier = modifier
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                FavoriteAnimeListButton(
-                    listType = AnimeListType.WATCHED,
-                    selectedListType = selectedListType,
-                    onClick = { selectedListType = AnimeListType.WATCHED },
-                    modifier = modifier
-                )
-            }
-            Column(
-                modifier = modifier
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                FavoriteAnimeListButton(
-                    listType = AnimeListType.DROPPED,
-                    selectedListType = selectedListType,
-                    onClick = { selectedListType = AnimeListType.DROPPED },
-                    modifier = modifier
-                )
-            }
 
+            arrayOfEntries.forEach { entry ->
+                Column(
+                    modifier = modifier.padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    FavoriteAnimeListButton(
+                        listType = entry,
+                        selectedListType = selectedListType,
+                        onClick = { selectedListType = entry},
+                        modifier = modifier
+                    )
+                }
+            }
         }
         Row(
             modifier = modifier
@@ -140,7 +107,7 @@ fun FavoriteScreen(
         ) {
             when (selectedListType) {
                 AnimeListType.WATCHING -> FavoriteAnimeList(
-                    category = "Watching",
+                    category = AnimeListType.WATCHING.route,
                     navController = navController,
                     viewModelProvider = viewModelProvider,
                     scrollState = scrollState,
@@ -148,15 +115,15 @@ fun FavoriteScreen(
                 )
 
                 AnimeListType.PLANNED -> FavoriteAnimeList(
-                    category = "Planned",
+                    category = AnimeListType.PLANNED.route,
                     navController = navController,
                     viewModelProvider = viewModelProvider,
                     scrollState = scrollState,
                     modifier = modifier
                 )
 
-                AnimeListType.WATCHED -> FavoriteAnimeList(
-                    category = "Watched",
+                AnimeListType.COMPLETED -> FavoriteAnimeList(
+                    category = AnimeListType.COMPLETED.route,
                     navController = navController,
                     viewModelProvider = viewModelProvider,
                     scrollState = scrollState,
@@ -164,7 +131,31 @@ fun FavoriteScreen(
                 )
 
                 AnimeListType.DROPPED -> FavoriteAnimeList(
-                    category = "Dropped",
+                    category = AnimeListType.DROPPED.route,
+                    navController = navController,
+                    viewModelProvider = viewModelProvider,
+                    scrollState = scrollState,
+                    modifier = modifier
+                )
+
+                AnimeListType.PERSON -> FavoriteAnimeList(
+                    category = AnimeListType.PERSON.route,
+                    navController = navController,
+                    viewModelProvider = viewModelProvider,
+                    scrollState = scrollState,
+                    modifier = modifier
+                )
+
+                AnimeListType.FAVORITE -> FavoriteAnimeList(
+                    category = AnimeListType.FAVORITE.route,
+                    navController = navController,
+                    viewModelProvider = viewModelProvider,
+                    scrollState = scrollState,
+                    modifier = modifier
+                )
+
+                AnimeListType.CHARACTER -> FavoriteAnimeList(
+                    category = AnimeListType.CHARACTER.route,
                     navController = navController,
                     viewModelProvider = viewModelProvider,
                     scrollState = scrollState,
@@ -172,9 +163,6 @@ fun FavoriteScreen(
                 )
             }
         }
-
-
-//        Spacer(modifier = Modifier.height(35.dp))
     }
 }
 
@@ -190,8 +178,6 @@ fun FavoriteAnimeListButton(
 ) {
     BoxWithConstraints(
         modifier = modifier
-//            .padding(10.dp)
-//            .height(30.dp)
     ) {
         TextButton(
             onClick = onClick, modifier = modifier, colors = ButtonDefaults.buttonColors(
@@ -229,8 +215,6 @@ fun FavoriteAnimeList(
 
     Column(
         modifier = modifier
-//            .fillMaxWidth(1f)
-//            .fillMaxHeight(0.95f)
             .fillMaxSize(1f)
     ) {
         LazyVerticalGrid(
@@ -266,7 +250,6 @@ fun FavoriteScreenCardBox(
     viewModelProvider: ViewModelProvider,
     modifier: Modifier
 ) {
-//    val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val painter = rememberAsyncImagePainter(model = animeItem.animeImage)
 
     Box(

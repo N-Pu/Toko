@@ -339,7 +339,7 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    fun onDialogDismiss() {
+     fun onDialogDismiss() {
         viewModelScope.launch(Dispatchers.IO) {
             _selectedAnimeId.value = null
             isDialogShown = false

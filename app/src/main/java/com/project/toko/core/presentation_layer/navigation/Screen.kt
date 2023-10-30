@@ -5,17 +5,18 @@ import com.project.toko.R
 
 sealed class Screen(val route: String, val iconId: Int?, val contentDescription: String) {
     object Home : Screen("home_screen", R.drawable.home, "Search Anime")
-    object Detail : Screen("detail_screen/{id}", R.drawable.media, "Details on Anime")
-    object Favorites : Screen("favorites_screen", R.drawable.favorite, "Favorite anime")
+    object Detail : Screen("detail_screen/{id}", R.drawable.detail, "Details on Anime")
+    object Favorites : Screen("favorites_screen", R.drawable.bookmarkempty, "Favorite anime")
     object RandomAnimeOrManga :
-        Screen("random_anime_or_manga_screen", R.drawable.random, "Current News on Anime")
+        Screen("random_anime_or_manga_screen", R.drawable.shuffle, "Current News on Anime")
 
     object Nothing : Screen("no_id", null, "No id screen")
 
-    object DetailOnCast : Screen("detail_on_cast", null, "Details on whole cast of current anime")
+    object DetailOnWholeCast :
+        Screen("detail_on_whole_cast/{id}", null, "Details on whole cast of current anime")
 
-    object DetailOnStaff :
-        Screen("detail_on_staff", null, "Details on whole staff of current anime")
+    object DetailOnWholeStaff :
+        Screen("detail_on_whole_staff", null, "Details on whole staff of current anime")
 
     object CharacterDetail :
         Screen("detail_on_character/{id}", null, "Details on current character")

@@ -1,11 +1,15 @@
 package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,7 +18,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -40,13 +43,13 @@ import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.cu
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ScoreNumber
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ShowBackground
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ShowMoreInformation
+import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ShowPictureAlbum
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.YearTypeEpisodesTimeStatusStudio
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.youtubePlayer.YoutubePlayer
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
@@ -65,10 +68,13 @@ fun ActivateDetailScreen(
     val staffData by viewModel.staffList.collectAsStateWithLifecycle()
     val recommendationsData by viewModel.recommendationList.collectAsStateWithLifecycle()
     val scrollState = viewModel.scrollState
-
+    val picturesData by viewModel.picturesData.collectAsStateWithLifecycle()
+//    var isDialogShown by remember { mutableStateOf(false) }
+    val isDialogShown = remember { mutableStateOf(false) }
+//    var isDialogShown=false
 
     LaunchedEffect(key1 = id) {
-        viewModel.viewModelScope.launch(Dispatchers.IO) {
+//        viewModel.viewModelScope.launch(Dispatchers.IO) {
             val previousId = viewModel.previousId.value
             if (id != previousId) {
                 scrollState.scrollTo(0)
@@ -81,7 +87,9 @@ fun ActivateDetailScreen(
             viewModel.addCastFromId(id)
             delay(1000L)
             viewModel.addRecommendationsFromId(id)
-        }
+            delay(1000L)
+            viewModel.showPictures(id)
+//        }
     }
 
 
@@ -106,8 +114,20 @@ fun ActivateDetailScreen(
             verticalArrangement = Arrangement.Top
         ) {
             DisplayPicture(
-                painter = painter, modifier = modifier.fillMaxSize()
+                painter = painter,
+                modifier = modifier
+                    .fillMaxSize()
+                    .combinedClickable(onClick = {}, onLongClick = {
+                        isDialogShown.value = true
+                    })
             )
+
+            ShowPictureAlbum(
+                isDialogShown = isDialogShown,
+                picturesData = picturesData,
+                modifier = modifier
+            )
+
             DisplayTitle(title = detailData?.title ?: "No title name", modifier)
             DisplayJapAndEnglishTitles(detailData = detailData, modifier = modifier)
             YearTypeEpisodesTimeStatusStudio(data = detailData, modifier = modifier)
@@ -160,6 +180,11 @@ fun ActivateDetailScreen(
             )
             AddToFavorites(viewModelProvider, modifier)
             ExpandableText(text = detailData!!.synopsis, modifier)
+//            FullScreenYoutubeActivity().YoutubePlayerSecond(
+//                detailData?.trailer?.youtube_id ?: "",
+//                LocalLifecycleOwner.current,
+//                modifier
+//            )
             YoutubePlayer(
                 detailData?.trailer?.youtube_id ?: "",
                 LocalLifecycleOwner.current,
@@ -170,7 +195,7 @@ fun ActivateDetailScreen(
             ShowBackground(detailData = detailData, modifier = modifier)
             DisplayCast(
                 castList = castData, navController = navController,
-                modifier = modifier
+                modifier = modifier, detailMalId = viewModel.loadedId.intValue
             )
             DisplayStaff(
                 staffList = staffData,

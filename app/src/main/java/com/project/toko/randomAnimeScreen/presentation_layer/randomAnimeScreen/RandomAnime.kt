@@ -37,45 +37,64 @@ import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.presentation_layer.theme.MainBackgroundColor
 import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
+import com.project.toko.favoritesScreen.model.AnimeListType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@Composable
-fun ShowRandomScreen(
-    navController: NavController, viewModelProvider: ViewModelProvider, modifier: Modifier
-) {
-    Column(modifier = modifier) {
-        ShowRandomAnime(
-            navController,
-            modifier,
-            viewModelProvider = viewModelProvider
-        )
-    }
-}
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShowRandomAnime(
     navController: NavController, modifier: Modifier, viewModelProvider: ViewModelProvider
 ) {
-
-    val state by viewModelProvider[RandomAnimeViewModel::class.java].animeDetails.collectAsStateWithLifecycle()
+    val randomViewModel = viewModelProvider[RandomAnimeViewModel::class.java]
+    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
+    val state by randomViewModel.animeDetails.collectAsStateWithLifecycle()
     val cardIsShown = remember {
         mutableStateOf(true)
     }
 
-    Column {
-        if (cardIsShown.value) {
 
-            AnimeCard(
-                data = state,
-                modifier = modifier,
-                navController = navController,
-                viewModelProvider = viewModelProvider,
-                cardIsShown = cardIsShown
-            )
+    Column(
+        modifier.background(MainBackgroundColor).fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        if (cardIsShown.value) {
+            if (state == null) {
+                BoxWithConstraints(
+                    modifier = Modifier
+                        .clip(CardDefaults.shape)
+                        .background(LightGreen)
+                        .combinedClickable(onDoubleClick = {
+                            randomViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                randomViewModel.onTapRandomAnime()
+                            }
+                        }) {}
+                        .padding(20.dp, 20.dp, 20.dp, 20.dp)
+                ) {
+                    Text(
+                        text = "Tap 2 times",
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            } else {
+                AnimeCard(
+                    data = state,
+                    modifier = modifier,
+                    navController = navController,
+                    randomViewModel = randomViewModel,
+                    cardIsShown = cardIsShown,
+                    daoViewModel = daoViewModel
+                )
+            }
+
         } else {
             LoadingAnimation()
         }
@@ -87,8 +106,8 @@ fun ShowRandomAnime(
 @Composable
 fun DraggablePreview() {
 
-    val offsetX = remember { mutableStateOf(0f) }
-    val offsetY = remember { mutableStateOf(0f) }
+    val offsetX = remember { mutableFloatStateOf(0f) }
+    val offsetY = remember { mutableFloatStateOf(0f) }
 
     Column {
         Row(
@@ -98,23 +117,28 @@ fun DraggablePreview() {
         ) {
             Card(modifier = Modifier
                 .size(250.dp)
-                .offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
+                .offset {
+                    IntOffset(
+                        offsetX.floatValue.roundToInt(),
+                        offsetY.floatValue.roundToInt()
+                    )
+                }
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
-                        offsetX.value += dragAmount.x
-                        offsetY.value += dragAmount.y
+                        offsetX.floatValue += dragAmount.x
+                        offsetY.floatValue += dragAmount.y
 
-                        if (offsetX.value <= -250f && offsetY.value >= -550f) {
-                            println("LEFT " + " x " + offsetX.value + " y " + offsetY.value)
+                        if (offsetX.floatValue <= -250f && offsetY.floatValue >= -550f) {
+                            println("LEFT " + " x " + offsetX.floatValue + " y " + offsetY.floatValue)
                         }
-                        if (offsetY.value <= -551f) {
-                            println("UP" + " y " + offsetY.value)
+                        if (offsetY.floatValue <= -551f) {
+                            println("UP" + " y " + offsetY.floatValue)
                         }
                     }
                 }
                 .graphicsLayer(
-                    translationX = offsetX.value, translationY = offsetY.value
+                    translationX = offsetX.floatValue, translationY = offsetY.floatValue
                 )
 
             ) {
@@ -124,7 +148,7 @@ fun DraggablePreview() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "x = " + offsetX.value.toString() + "/" + "y = " + offsetY.value.toString(),
+                        text = "x = " + offsetX.floatValue.toString() + "/" + "y = " + offsetY.floatValue.toString(),
                         textAlign = TextAlign.Center,
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Light,
@@ -142,8 +166,8 @@ fun DraggablePreview() {
 @Composable
 fun CardPreview() {
 
-    val offsetX = remember { mutableStateOf(0f) }
-    val offsetY = remember { mutableStateOf(0f) }
+    val offsetX = remember { mutableFloatStateOf(0f) }
+    val offsetY = remember { mutableFloatStateOf(0f) }
 
     val scoreRoundedCornerShape = remember { RoundedCornerShape(bottomEnd = 10.dp) }
     Column(
@@ -156,24 +180,24 @@ fun CardPreview() {
             .clip(CardDefaults.shape)
             .width(340.dp)
             .height(490.dp)
-            .offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
+            .offset { IntOffset(offsetX.floatValue.roundToInt(), offsetY.floatValue.roundToInt()) }
             .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
                     change.consume()
-                    offsetX.value += dragAmount.x
-                    offsetY.value += dragAmount.y
+                    offsetX.floatValue += dragAmount.x
+                    offsetY.floatValue += dragAmount.y
 
-                    if (offsetY.value <= -551f) {
-                        println("UP" + " y " + offsetY.value)
+                    if (offsetY.floatValue <= -551f) {
+                        println("UP" + " y " + offsetY.floatValue)
                     }
-                    if (offsetX.value <= -250f && offsetY.value >= -550f) {
-                        println("LEFT " + " x " + offsetX.value + " y " + offsetY.value)
+                    if (offsetX.floatValue <= -250f && offsetY.floatValue >= -550f) {
+                        println("LEFT " + " x " + offsetX.floatValue + " y " + offsetY.floatValue)
                     }
 
                 }
             }
             .graphicsLayer(
-                translationX = offsetX.value, translationY = offsetY.value
+                translationX = offsetX.floatValue, translationY = offsetY.floatValue
             )
 
         ) {
@@ -322,14 +346,13 @@ fun AnimeCard(
     data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData?,
     modifier: Modifier,
     navController: NavController,
-    viewModelProvider: ViewModelProvider,
-    cardIsShown: MutableState<Boolean>
+    cardIsShown: MutableState<Boolean>,
+    randomViewModel: RandomAnimeViewModel,
+    daoViewModel: DaoViewModel
 ) {
 
-    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
-    val randomViewModel = viewModelProvider[RandomAnimeViewModel::class.java]
-    val offsetX = remember { mutableStateOf(0f) }
-    val offsetY = remember { mutableStateOf(0f) }
+    val offsetX = remember { mutableFloatStateOf(0f) }
+    val offsetY = remember { mutableFloatStateOf(0f) }
 
     val model = ImageRequest.Builder(LocalContext.current)
         .data(data?.images?.jpg?.large_image_url)
@@ -359,33 +382,38 @@ fun AnimeCard(
             modifier = modifier
                 .width(340.dp)
                 .height(510.dp)
-                .offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
+                .offset {
+                    IntOffset(
+                        offsetX.floatValue.roundToInt(),
+                        offsetY.floatValue.roundToInt()
+                    )
+                }
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
-                        offsetX.value += dragAmount.x
-                        offsetY.value += dragAmount.y
+                        offsetX.floatValue += dragAmount.x
+                        offsetY.floatValue += dragAmount.y
 
-                        if (offsetX.value <= -500f && offsetY.value >= -550f) {
-                            println("LEFT " + " x " + offsetX.value + " y " + offsetY.value)
+                        if (offsetX.floatValue <= -500f && offsetY.floatValue >= -550f) {
+                            println("LEFT " + " x " + offsetX.floatValue + " y " + offsetY.floatValue)
                             randomViewModel.viewModelScope.launch(Dispatchers.IO) {
                                 cardIsShown.value = false
                                 randomViewModel.onTapRandomAnime()
                                 delay(1000L)
                                 cardIsShown.value = true
-                                offsetX.value = 0.0f
-                                offsetY.value = 0.0f
+                                offsetX.floatValue = 0.0f
+                                offsetY.floatValue = 0.0f
                             }
                         }
-                        if (offsetY.value <= -550f) {
-                            println("UP" + " y " + offsetY.value)
+                        if (offsetY.floatValue <= -550f) {
+                            println("UP" + " y " + offsetY.floatValue)
                             data?.let { animeData ->
                                 navigateToDetailScreen(navController, animeData.mal_id)
                             }
 
                         }
-                        if (offsetX.value >= 500f && offsetY.value >= -550f) {
-                            println("LEFT " + " x " + offsetX.value + " y " + offsetY.value)
+                        if (offsetX.floatValue >= 500f && offsetY.floatValue >= -550f) {
+                            println("LEFT " + " x " + offsetX.floatValue + " y " + offsetY.floatValue)
 
                             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                                 daoViewModel.addToCategory(
@@ -395,21 +423,21 @@ fun AnimeCard(
                                         animeImage = data?.images?.jpg?.large_image_url ?: "",
                                         score = data?.score.toString(),
                                         scored_by = data?.scored_by.toString(),
-                                        category = "Planned",
+                                        category = AnimeListType.PLANNED.route
                                     )
                                 )
                                 cardIsShown.value = false
                                 randomViewModel.onTapRandomAnime()
                                 delay(1000L)
                                 cardIsShown.value = true
-                                offsetX.value = 0.0f
-                                offsetY.value = 0.0f
+                                offsetX.floatValue = 0.0f
+                                offsetY.floatValue = 0.0f
                             }
                         }
                     }
                 }
                 .graphicsLayer(
-                    translationX = offsetX.value, translationY = offsetY.value
+                    translationX = offsetX.floatValue, translationY = offsetY.floatValue
                 )
 
         ) {
@@ -654,7 +682,10 @@ private fun ColoredBox(
 }
 
 @Composable
-private fun DisplayCustomGenres(genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>, modifier: Modifier) {
+private fun DisplayCustomGenres(
+    genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>,
+    modifier: Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth(),

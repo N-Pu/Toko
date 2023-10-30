@@ -34,10 +34,9 @@ import androidx.compose.ui.unit.sp
 fun ExpandableText(text: String?, modifier: Modifier) {
     val wordCount = text?.split(" ")?.count()
     var expanded by remember { mutableStateOf(false) }
+    val maxLines = if (expanded) Int.MAX_VALUE else 6
     val toggleExpanded: () -> Unit = { expanded = !expanded }
 
-    val maxLines = if (expanded) Int.MAX_VALUE else 6
-    
         if (wordCount != null) {
             if (wordCount <= 40) {
                 Column(
