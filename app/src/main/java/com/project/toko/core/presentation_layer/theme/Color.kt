@@ -15,7 +15,7 @@ val SoftGreen = Color(0xFF076D63)
 
 val LightBackgroundColor = Color(0xFFF4F4F4)
 val LightIconTint = Color(154, 154, 154)
-val LightBottomBarColor = Color(255, 255, 255).copy(0.6f)
+val LightBottomBarColor = Color(255, 255, 255)
 val LightCardColor = Color(255, 255, 255)
 
 
@@ -36,7 +36,19 @@ val SectionColor = Brush.linearGradient(
     start = Offset(0.0f, 0.0f),
     end = Offset(750.0f, 0.0f))
 
+val BackArrowCastColor = Brush.linearGradient(
+    0.0f to FirstBarColor,
+//    0.3f to SecondBarColor,
+    1.0f to SecondBarColor,
+    start = Offset(0.0f, 0.0f),
+    end = Offset(950.0f, 0.0f))
 
+val BackArrowSecondCastColor = Brush.linearGradient(
+    0.0f to FirstBarColor,
+//    0.3f to SecondBarColor,
+    1.0f to SecondBarColor,
+    start = Offset(0.0f, 0.0f),
+    end = Offset(450.0f, 0.0f))
 
 //    .linearGradient(
 // 0.0f to FirstBarColor,
@@ -51,7 +63,7 @@ val SectionColor = Brush.linearGradient(
 val CardBackgroundColor = Color(0xFF494949)
 val DarkBackgroundColor = Color(0xFF414141)
 val DarktIconTint = Color(255, 255, 255, 178)
-val DarkBottomBarColor = Color(0,0,0,).copy(0.6f)
+val DarkBottomBarColor = Color(49, 49, 49, 255)
 object ScoreColors {
     val Red = Color(255, 77, 87)
     val Yellow =  Color(255, 160, 0)

@@ -47,11 +47,12 @@ fun DisplayCustomGenreBoxes(genres: List<com.project.toko.detailScreen.model.det
             modifier = modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
-                .height(80.dp),
+                .height(80.dp)
+                .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             genres.forEachIndexed { index, genre ->
-                if (index != 0) {
+                if (index != 0 || index == genres.size) {
                     Spacer(modifier = modifier.width(8.dp))
                 }
                 ColorBox(

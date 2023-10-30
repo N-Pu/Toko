@@ -33,6 +33,9 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+<!--        <activity android:name=".detailScreen.presentation_layer.detailScreen.mainPage.custom.youtubePlayer.FullScreenYoutubeActivity">-->
+
+<!--        </activity>-->
     </application>
 
 </manifest>

@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
 
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
+//        WindowCompat.setDecorFitsSystemWindows(window,false)
         val modifierComponent = (application as Application).modifierComponent
         val databaseComponent = (application as Application).daoComponent
         val malApiComponent = (application as Application).malApiComponent

@@ -3,12 +3,14 @@ package com.project.toko.detailScreen.viewModel
 import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.detailScreen.model.castModel.CastData
 import com.project.toko.detailScreen.model.detailModel.DetailData
+import com.project.toko.detailScreen.model.pictureModel.DetailPicturesData
 import com.project.toko.detailScreen.model.recommendationsModel.RecommendationsData
 import com.project.toko.detailScreen.model.staffModel.StaffData
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +28,7 @@ class DetailScreenViewModel @Inject constructor(
     //detailData
     private val _animeDetails = MutableStateFlow<DetailData?>(null)
     val animeDetails: StateFlow<DetailData?> get() = _animeDetails
-    private val _loadedId = mutableStateOf(0)
+    private val _loadedId = mutableIntStateOf(0)
     val loadedId = _loadedId
 
     private val _isSearching = MutableStateFlow(false)
@@ -42,7 +44,7 @@ class DetailScreenViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             // Сохраните предыдущее id
-            val previousId = _loadedId.value
+            val previousId = _loadedId.intValue
             if (previousId != id) {
                 _previousId.value = previousId
             }
@@ -52,7 +54,7 @@ class DetailScreenViewModel @Inject constructor(
                 val response = malApiService.getDetailsFromAnime(id)
                 if (response.isSuccessful) {
                     val data = response.body()?.data
-                    _loadedId.value = id
+                    _loadedId.intValue = id
                     if (data != null) {
                         withContext(Dispatchers.Main) {
                             _animeDetails.value = data
@@ -140,4 +142,29 @@ class DetailScreenViewModel @Inject constructor(
             }
         }
     }
+
+
+    private val _picturesData = MutableStateFlow<List<DetailPicturesData>>(emptyList())
+    val picturesData = _picturesData.asStateFlow()
+    suspend fun showPictures(id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = malApiService.getDetailScreenPictures(id)
+                if (response.isSuccessful) {
+                    val pictures = response.body()?.data ?: emptyList()
+//                    DetailPicturesData(jpg = Jpg("","",""), webp = Webp("","",""))
+                    _picturesData.value = pictures
+                } else if (response.code() == 404) {
+                    // если получен ответ 404, присваиваем пустой список
+                    _picturesData.value = emptyList()
+                }
+            } catch (e: Exception) {
+                Log.e("Recommendations", e.message.toString())
+                // если произошла ошибка, присваиваем пустой список
+                _picturesData.value = emptyList()
+            }
+        }
+    }
+
+
 }

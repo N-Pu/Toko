@@ -19,9 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import com.project.toko.R
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.detailScreen.model.staffModel.StaffData
 import java.lang.Integer.min
@@ -87,7 +85,6 @@ private fun ListEditor(
         modifier = Modifier
             .fillMaxHeight()
             .height(180.dp)
-//            .background(Color.Red)
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
@@ -117,27 +114,23 @@ private fun ListEditor(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Box(modifier = modifier.size(100.dp)) {
-                Box(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                        .background(Color(198, 198, 198))
-                        .clickable {
-                            navController.navigate(Screen.DetailOnStaff.route) {
-                                popUpTo(Screen.Detail.route) {
-                                    inclusive = true
-                                }
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = "More Staff",
-                        modifier = modifier.width(140.dp)
-                    )
-                }
+
+            Box(
+                modifier = modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(Color(198, 198, 198))
+                    .clickable {
+                        navController.navigate(Screen.DetailOnWholeStaff.route)
+                    }
+                , contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = R.drawable.vector),
+                    contentDescription = "More cast",
+                    modifier = modifier.fillMaxSize(0.7f)
+                )
+
             }
 
             Text(
@@ -189,9 +182,6 @@ private fun StaffComponentsCard(
                     .height(107.dp)
                     .clickable {
                         navController.navigate("detail_on_staff/${data.person.mal_id}") {
-                            popUpTo(Screen.Detail.route) {
-                                inclusive = true
-                            }
                         }
                     },
                 contentScale = ContentScale.FillBounds
@@ -223,7 +213,6 @@ private fun StaffComponentsCard(
                 modifier = modifier
                     .fillMaxWidth(1f)
                     .fillMaxHeight(1f)
-//                    .background(Color.Red)
                     .padding(end = 22.dp)
             ) {
 

@@ -7,6 +7,7 @@ import com.project.toko.characterDetailedScreen.model.characterPicture.Character
 import com.project.toko.detailScreen.model.detailModel.DetailScreenModel
 import com.project.toko.randomAnimeScreen.model.AnimeRandomModel
 import com.project.toko.detailScreen.model.castModel.CastModel
+import com.project.toko.detailScreen.model.pictureModel.DetailPicturesDataModel
 import com.project.toko.detailScreen.model.recommendationsModel.RecommendationsModel
 import com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel
 import com.project.toko.detailScreen.model.staffModel.StaffModel
@@ -44,6 +45,8 @@ interface MalApiService {
     @GET("${BASE_URL}v4/anime/{id}/full")
     suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<DetailScreenModel>
 
+    @GET("${BASE_URL}v4/anime/{id}/pictures")
+    suspend fun getDetailScreenPictures(@Path("id") id: Int): Response<DetailPicturesDataModel>
     @GET("${BASE_URL}v4/anime/{id}/recommendations")
     suspend fun getRecommendationsFromAnime(@Path("id") id: Int): Response<RecommendationsModel>
 

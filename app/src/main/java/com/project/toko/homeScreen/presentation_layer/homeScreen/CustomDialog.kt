@@ -40,7 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -57,8 +58,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.size.Size
 import com.project.toko.core.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.DialogSideColor
@@ -76,10 +75,7 @@ fun CustomDialog(
     viewModelProvider: ViewModelProvider
 ) {
 
-
-    val model = ImageRequest.Builder(LocalContext.current).data(data.images.jpg.large_image_url)
-        .size(Size.ORIGINAL).crossfade(true).build()
-
+    val painter = rememberAsyncImagePainter(model = data.images.jpg.large_image_url)
     val weight = 500.dp
 
     val height = {
@@ -137,21 +133,18 @@ fun CustomDialog(
             Row(
                 modifier = modifier
                     .padding(15.dp, 0.dp),
-                horizontalArrangement = Arrangement.Start
             ) {
                 Column(
                     modifier = modifier
+
                         .fillMaxWidth(0.55f)
                         .fillMaxHeight(0.5f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-
                     DisplayDialogPicture(
-                        model, data.mal_id, navController, modifier = modifier
+                        painter, data.mal_id, navController, modifier = modifier
                     )
-
-
                 }
                 Column(
                     modifier = modifier
@@ -744,7 +737,7 @@ private fun Synopsis(modifier: Modifier, synopsis: String?) {
 
 @Composable
 private fun DisplayDialogPicture(
-    imageRequest: ImageRequest,
+    painter: Painter,
     mal_id: Int,
     navController: NavController,
     modifier: Modifier
@@ -752,11 +745,13 @@ private fun DisplayDialogPicture(
 
 
     Image(
-        painter = rememberAsyncImagePainter(model = imageRequest),
+        painter = painter,
         contentDescription = "Big anime picture",
 
-//        contentScale = ContentScale.Crop,
+        contentScale = ContentScale.FillBounds,
         modifier = modifier
+
+            .fillMaxSize()
             .clip(CardDefaults.shape)
             .clickable {
                 navigateToDetailScreen(navController, mal_id)

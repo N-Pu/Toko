@@ -13,7 +13,6 @@ import androidx.navigation.navArgument
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.ActivateDetailScreen
 import com.project.toko.homeScreen.presentation_layer.homeScreen.MainScreen
-import com.project.toko.randomAnimeScreen.presentation_layer.randomAnimeScreen.ShowRandomScreen
 import com.project.toko.noId.presentation_layer.noId.NoId
 import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.castList.ShowWholeCast
 import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.staffList.ShowWholeStaff
@@ -21,13 +20,14 @@ import com.project.toko.characterDetailedScreen.presentation_layer.characterFull
 import com.project.toko.producerDetailedScreen.presentation_layer.producerFull.ShowScreen
 import com.project.toko.staffDetailedScreen.presentation_layer.staffMemberFull.DisplayStaffMemberFromId
 import com.project.toko.favoritesScreen.presentation_layer.FavoriteScreen
+import com.project.toko.randomAnimeScreen.presentation_layer.randomAnimeScreen.ShowRandomAnime
 
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier
-    ) {
+) {
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
             MainScreen(
@@ -63,21 +63,24 @@ fun SetupNavGraph(
             )
         }
         composable(route = Screen.RandomAnimeOrManga.route) {
-            ShowRandomScreen(
-                navController,
-                viewModelProvider,
+            ShowRandomAnime(
+                navController = navController,
+                viewModelProvider = viewModelProvider,
                 modifier = modifier,
             )
         }
-        composable(route = Screen.DetailOnCast.route) {
+        composable(route = Screen.DetailOnWholeCast.route) {
+
             ShowWholeCast(
-                navController, viewModelProvider[DetailScreenViewModel::class.java],
-                modifier = modifier
+                navController,
+                viewModelProvider[DetailScreenViewModel::class.java],
+                modifier
             )
         }
-        composable(route = Screen.DetailOnStaff.route) {
+        composable(route = Screen.DetailOnWholeStaff.route) {
             ShowWholeStaff(
-                navController, viewModelProvider[DetailScreenViewModel::class.java],
+                navController,
+                viewModelProvider[DetailScreenViewModel::class.java],
                 modifier = modifier
             )
         }

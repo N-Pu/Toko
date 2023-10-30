@@ -17,9 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,16 +24,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.ImageLoader
 import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
-import com.project.toko.core.presentation_layer.navigation.Screen
+import coil.decode.SvgDecoder
+import com.project.toko.R
 import com.project.toko.detailScreen.model.castModel.CastData
 import com.project.toko.detailScreen.model.castModel.ImagesX
 import com.project.toko.detailScreen.model.castModel.JpgX
@@ -47,13 +47,14 @@ import java.lang.Integer.min
 
 @Composable
 fun DisplayCast(
-    castList: List<CastData>, navController: NavController, modifier: Modifier
+    castList: List<CastData>, navController: NavController, modifier: Modifier, detailMalId: Int
 ) {
 
     if (castList.isNotEmpty()) {
         val castWithJapVoiceActors = hasJapVoiceActor(castList)
         val numCharacterAndActors =
             min(12, castList.size) // Количество персонажей для вывода (не более 12)
+
         Row(
             modifier = modifier
                 .fillMaxWidth(1f)
@@ -78,7 +79,8 @@ fun DisplayCast(
             castList = castWithJapVoiceActors,
             navController = navController,
             modifier = modifier,
-            numCharacterAndActors = numCharacterAndActors
+            numCharacterAndActors = numCharacterAndActors,
+            detailMalId = detailMalId
         )
     }
 }
@@ -88,7 +90,8 @@ private fun AddCast(
     castList: List<CastData>,
     navController: NavController,
     modifier: Modifier,
-    numCharacterAndActors: Int
+    numCharacterAndActors: Int,
+    detailMalId: Int
 ) {
     val numCards = (numCharacterAndActors + 2) / 3 // Определение количества карточек
     Row(
@@ -131,30 +134,32 @@ private fun AddCast(
             modifier
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(5.dp))
-                .width(120.dp)
+                .width(160.dp)
                 .height(440.dp)
                 .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
 
-            Box(modifier = modifier.size(100.dp)) {
-                Box(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                        .background(Color(198, 198, 198))
-                        .clickable {
-                            navController.navigate(Screen.DetailOnCast.route) {}
-                        }, contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = "More cast",
-                        modifier = modifier.width(140.dp)
-                    )
-                }
+
+            Box(
+                modifier = modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(Color(198, 198, 198))
+                    .clickable {
+//                        navController.navigate(Screen.DetailOnWholeCast.route)
+                        navController.navigate("detail_on_whole_cast/${detailMalId}")
+                    }, contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = R.drawable.vector),
+                    contentDescription = "More cast",
+                    modifier = modifier.fillMaxSize(0.7f)
+                )
+
             }
+
 
             Text(
                 text = "More Cast",
@@ -167,8 +172,7 @@ private fun AddCast(
         }
         Column(
             modifier = modifier
-                .width(30.dp)
-                .background(Color.Red)
+                .width(20.dp)
         ) {
             // Пустая колонка для выравнивания
         }
@@ -193,6 +197,9 @@ private fun CurrentCast(
             navController.navigate("detail_on_staff/${voiceActor.person.mal_id}") {}
         }
     }
+    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
+        add(SvgDecoder.Factory())
+    }.build()
 
     Row(
         modifier = modifier.height(150.dp),
@@ -204,15 +211,34 @@ private fun CurrentCast(
             verticalArrangement = Arrangement.Center,
             modifier = modifier.size(85.dp, 135.dp)
         ) {
-            Image(
-                painter = personPainter,
-                contentDescription = "Voice actor : ${voiceActor.person.name}",
-                modifier = customModifier
-                    .width(70.dp)
-                    .height(107.dp),
-                contentScale = ContentScale.FillBounds
-            )
 
+            if (voiceActor.person.url == "") {
+                Box(
+                    modifier = Modifier
+                        .width(70.dp)
+                        .height(107.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(Color(102, 102, 102)),
+                    contentAlignment =  Alignment.Center
+
+                    ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.personplaceholder, imageLoader = svgImageLoader
+                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp)
+                    )
+                }
+            } else {
+                Image(
+                    painter = personPainter,
+                    contentDescription = "Voice actor : ${voiceActor.person.name}",
+                    modifier = customModifier
+                        .width(70.dp)
+                        .height(107.dp)
+                        .clip(RoundedCornerShape(3.dp)),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
         }
         Column(modifier = modifier.width(140.dp)) {
             Column(
@@ -276,21 +302,42 @@ private fun CurrentCast(
             verticalArrangement = Arrangement.Center,
             modifier = modifier.size(85.dp, 135.dp)
         ) {
-            Image(
-                painter = characterPainter,
-                contentDescription = "Character name: ${data.character.name}",
-                modifier = Modifier
-                    .width(70.dp)
-                    .height(107.dp)
-                    .clickable {
-                        navController.navigate(route = "detail_on_character/${data.character.mal_id}") {
+
+            if (data.character.url == "") {
+                Box(
+                    modifier = Modifier
+                        .width(70.dp)
+                        .height(107.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(Color(102, 102, 102)),
+                    contentAlignment =  Alignment.Center
+
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.personplaceholder, imageLoader = svgImageLoader
+                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp)
+                    )
+                }
+            } else {
+                Image(
+                    painter = characterPainter,
+                    contentDescription = "Character name: ${data.character.name}",
+                    modifier = Modifier
+                        .width(70.dp)
+                        .height(107.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .clickable {
+                            navController.navigate(route = "detail_on_character/${data.character.mal_id}") {
 //                            popUpTo(Screen.Detail.route) {
 //                                inclusive = true
 //                            }
-                        }
-                    },
-                contentScale = ContentScale.Fit // Масштабирование изображения, чтобы вмещалось в квадрат
-            )
+                            }
+                        },
+                    contentScale = ContentScale.Fit // Масштабирование изображения, чтобы вмещалось в квадрат
+                )
+
+            }
         }
 
     }

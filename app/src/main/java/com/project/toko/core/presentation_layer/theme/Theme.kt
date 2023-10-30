@@ -4,7 +4,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
-
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorScheme = darkColorScheme(
@@ -14,6 +13,7 @@ private val DarkColorScheme = darkColorScheme(
     background = DarkBackgroundColor,
     scrim = DarktIconTint,
     onBackground = DarkBottomBarColor,
+    surface = DarkBottomBarColor
 
     )
 
@@ -23,7 +23,8 @@ private val LightColorScheme = lightColorScheme(
     secondary = SoftGreen,
     tertiary = LightGreen,
     background = LightBackgroundColor,
-    scrim = LightIconTint
+    scrim = LightIconTint,
+    surface = LightBottomBarColor
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -43,17 +44,34 @@ fun TokoTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+//    val view = LocalView.current
+//    val window = (view.context as Activity).window
+//    window.statusBarColor = if (darkTheme) DarkColorScheme.background.copy(alpha = 0.7f)
+//        .toArgb() else LightColorScheme.background.copy(alpha = 0.7f).toArgb()
+//    window.navigationBarColor = if (darkTheme) DarkColorScheme.background.copy(alpha = 0.0f)
+//        .toArgb() else LightColorScheme.background.copy(alpha = 0.0f).toArgb()
+//    window.statusBarColor = DarkColorScheme.background
+//        .toArgb()
+//        Color.Transparent.toArgb()
+
+
     val systemUiController = rememberSystemUiController()
     if (darkTheme) {
-        systemUiController.setSystemBarsColor(color = DarkColorScheme.background, darkIcons = false)
+        systemUiController.setSystemBarsColor(
+            color = DarkColorScheme.surface.copy(0.4f),
+            darkIcons = false
+        )
         systemUiController.setNavigationBarColor(
-            color = DarkColorScheme.background,
+            color = DarkColorScheme.surface,
             darkIcons = false
         )
     } else {
-        systemUiController.setSystemBarsColor(color = LightColorScheme.background, darkIcons = true)
+        systemUiController.setSystemBarsColor(
+            color = LightColorScheme.surface.copy(1f),
+            darkIcons = true
+        )
         systemUiController.setNavigationBarColor(
-            color = LightColorScheme.background,
+            color = LightColorScheme.surface,
             darkIcons = true
         )
     }
