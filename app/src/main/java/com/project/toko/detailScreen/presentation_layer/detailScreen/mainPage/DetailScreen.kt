@@ -69,27 +69,26 @@ fun ActivateDetailScreen(
     val recommendationsData by viewModel.recommendationList.collectAsStateWithLifecycle()
     val scrollState = viewModel.scrollState
     val picturesData by viewModel.picturesData.collectAsStateWithLifecycle()
-//    var isDialogShown by remember { mutableStateOf(false) }
     val isDialogShown = remember { mutableStateOf(false) }
-//    var isDialogShown=false
+//    val blurEverything = remember { mutableIntStateOf(1) }
 
     LaunchedEffect(key1 = id) {
-//        viewModel.viewModelScope.launch(Dispatchers.IO) {
-            val previousId = viewModel.previousId.value
-            if (id != previousId) {
-                scrollState.scrollTo(0)
-                viewModel.previousId.value = id
-            }
-            viewModel.onTapAnime(id)
-            delay(300)
-            viewModel.addStaffFromId(id)
-            delay(300)
-            viewModel.addCastFromId(id)
-            delay(1000L)
-            viewModel.addRecommendationsFromId(id)
-            delay(1000L)
-            viewModel.showPictures(id)
-//        }
+
+        val previousId = viewModel.previousId.value
+        if (id != previousId) {
+            scrollState.scrollTo(0)
+            viewModel.previousId.value = id
+        }
+        viewModel.onTapAnime(id)
+        delay(300)
+        viewModel.addStaffFromId(id)
+        delay(300)
+        viewModel.addCastFromId(id)
+        delay(1000L)
+        viewModel.addRecommendationsFromId(id)
+        delay(1000L)
+        viewModel.showPictures(id)
+
     }
 
 
@@ -119,6 +118,7 @@ fun ActivateDetailScreen(
                     .fillMaxSize()
                     .combinedClickable(onClick = {}, onLongClick = {
                         isDialogShown.value = true
+//                        blurEverything.value = 25
                     })
             )
 
@@ -211,6 +211,7 @@ fun ActivateDetailScreen(
             )
             Recommendations(recommendationsData, navController, viewModelProvider, modifier)
             Spacer(modifier = modifier.height(20.dp))
+
         }
     } else {
         LoadingAnimation()
