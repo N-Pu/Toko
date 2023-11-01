@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -76,25 +78,53 @@ fun CustomDialog(
 ) {
 
     val painter = rememberAsyncImagePainter(model = data.images.jpg.large_image_url)
-    val weight = 500.dp
+    val localDensity = LocalConfiguration.current
+    val isSynopsisEmpty = data.synopsis.isNullOrEmpty()
+    val isGenresEmpty = data.genres.isEmpty()
+    val weight = localDensity.screenWidthDp.dp - 50.dp
+//    var genreHeight by remember {
+//        mutableStateOf(0.dp)
+//    }
+//    val synopsisHeight = remember {
+//        mutableStateOf(0.dp)
+//    }
+
+    var currentHeight = 550.dp
 
     val height = {
-        var currentHeight = 550
-        if (data.synopsis.isNullOrEmpty()) {
-            currentHeight -= 160
+//        var currentHeight = localDensity.screenHeightDp.dp - 150.dp
+        if (isSynopsisEmpty) {
+//            currentHeight -= synopsisHeight.value
+            currentHeight -= 160.dp
         }
-        if (data.genres.isNullOrEmpty()) {
-            currentHeight -= 60
+        if (isGenresEmpty) {
+            currentHeight -= 60.dp
         }
-        currentHeight.dp
+        currentHeight
     }
-//    var offsetY by remember { mutableStateOf(0f) }
-    Dialog(onDismissRequest = {
-        onDismiss.invoke()
-    }) {
-        Card(
-            modifier = modifier
-                .size(weight, height())
+
+    Dialog(
+        onDismissRequest = {
+            onDismiss.invoke()
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Box(modifier = modifier
+            .width(weight)
+            .height(height())) {
+
+
+            Card(
+                modifier = modifier
+//                . width(weight)
+
+
+//                .size(weight, height())
+
 //                .offset { IntOffset(0, offsetY.roundToInt()) }
 //                .draggable(
 //                    orientation = Orientation.Vertical,
@@ -102,95 +132,95 @@ fun CustomDialog(
 //                        offsetY += delta
 //                    },
 //                )
-            ,
-            colors = CardDefaults.cardColors(containerColor = DialogColor)
-        ) {
-            Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(15.dp, 10.dp),
-                horizontalAlignment = Alignment.Start
+                ,
+                colors = CardDefaults.cardColors(containerColor = DialogColor)
             ) {
-                Text(
-                    text = data.title,
-                    fontSize = 18.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                if (!data.title_english.isNullOrEmpty()) {
+                Column(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(15.dp, 10.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
                     Text(
-                        text = data.title_english,
-                        fontSize = 10.sp,
+                        text = data.title,
+                        fontSize = 18.sp,
                         color = Color.White,
-                        lineHeight = 10.sp,
+                        fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                    if (!data.title_english.isNullOrEmpty()) {
+                        Text(
+                            text = data.title_english,
+                            fontSize = 10.sp,
+                            color = Color.White,
+                            lineHeight = 10.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
-            }
-            Row(
-                modifier = modifier
-                    .padding(15.dp, 0.dp),
-            ) {
-                Column(
+                Row(
                     modifier = modifier
-
-                        .fillMaxWidth(0.55f)
-                        .fillMaxHeight(0.5f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .padding(15.dp, 0.dp),
                 ) {
-                    DisplayDialogPicture(
-                        painter, data.mal_id, navController, modifier = modifier
-                    )
+                    Column(
+                        modifier = modifier
+
+                            .fillMaxWidth(0.55f)
+                            .fillMaxHeight(0.5f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        DisplayDialogPicture(
+                            painter, data.mal_id, navController, modifier = modifier
+                        )
+                    }
+                    Column(
+                        modifier = modifier
+                            .fillMaxWidth(1f)
+                    ) {
+
+                        ScoreLabel(modifier = modifier)
+                        ScoreNumber(modifier = modifier, score = data.score)
+                        ScoreByNumber(modifier = modifier, scoreBy = data.scored_by)
+
+                        Spacer(modifier = modifier.height(10.dp))
+
+                        RankedLine(rank = data.rank, modifier = modifier)
+                        PopularityLine(popularity = data.popularity, modifier = modifier)
+                        MembersLine(members = data.members, modifier = modifier)
+                        YearTypeStudio(data = data, modifier = modifier)
+                        EpisodesLabel(episodes = data.episodes, modifier = modifier)
+                        AddToFavoriteRow(
+                            modifier = modifier, data = data, viewModelProvider = viewModelProvider
+                        )
+                    }
+
                 }
                 Column(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(1f)
+                        .padding(top = 5.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
-
-                    ScoreLabel(modifier = modifier)
-                    ScoreNumber(modifier = modifier, score = data.score)
-                    ScoreByNumber(modifier = modifier, scoreBy = data.scored_by)
-
-                    Spacer(modifier = modifier.height(10.dp))
-
-                    RankedLine(rank = data.rank, modifier = modifier)
-                    PopularityLine(popularity = data.popularity, modifier = modifier)
-                    MembersLine(members = data.members, modifier = modifier)
-                    YearTypeStudio(data = data, modifier = modifier)
-                    EpisodesLabel(episodes = data.episodes, modifier = modifier)
-                    AddToFavoriteRow(
-                        modifier = modifier, data = data, viewModelProvider = viewModelProvider
-                    )
+                    StatusLine(data.status, modifier)
+                    RatingLine(rating = data.rating, modifier = modifier)
                 }
 
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .padding(0.dp, 0.dp, 0.dp, 0.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                StatusLine(data.status, modifier)
-                RatingLine(rating = data.rating, modifier = modifier)
                 CheckGenresSize(
                     numbOfGenres = data.genres.size,
                     genres = data.genres,
                     modifier = modifier
                 )
+                Synopsis(
+                    modifier = modifier,
+                    synopsis = data.synopsis,
+                    isSynopsisEmpty = !isSynopsisEmpty,
+//                synopsisHeight = synopsisHeight,
+//                localDensity = localDensity
+                )
             }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .height(150.dp)
-            ) {
-                Synopsis(modifier = modifier, synopsis = data.synopsis)
-            }
-
         }
     }
 }
@@ -212,8 +242,7 @@ private fun ScoreLabel(modifier: Modifier) {
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
 
@@ -327,7 +356,6 @@ private fun MembersLine(members: Int, modifier: Modifier) {
     }
 }
 
-
 @Composable
 private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
@@ -351,7 +379,6 @@ private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
         )
     }
 }
-
 
 @Composable
 private fun YearTypeStudio(
@@ -394,7 +421,6 @@ private fun YearTypeStudio(
     }
 }
 
-
 @Composable
 private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 
@@ -427,7 +453,6 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 
 
 }
-
 
 @Composable
 private fun AddToFavoriteRow(
@@ -608,7 +633,6 @@ private fun AddToFavoriteRow(
     }
 }
 
-
 @Composable
 private fun StatusLine(status: String, modifier: Modifier) {
     Row(
@@ -684,10 +708,12 @@ private fun DisplayCustomGenres(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(60.dp)
             .horizontalScroll(
                 rememberScrollState()
             )
-            .padding(0.dp, 10.dp, 0.dp, 0.dp),
+            .padding(0.dp, 10.dp, 0.dp, 0.dp)
+        ,
         horizontalArrangement = Arrangement.Center
     ) {
         genres.forEachIndexed { index, genre ->
@@ -703,36 +729,47 @@ private fun DisplayCustomGenres(
 
 
 @Composable
-private fun Synopsis(modifier: Modifier, synopsis: String?) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(0.dp, 0.dp, 0.dp, 15.dp)
-    ) {
+private fun Synopsis(
+    modifier: Modifier,
+    synopsis: String?,
+    isSynopsisEmpty: Boolean,
+//    synopsisHeight: MutableState<Dp>,
+//    localDensity: Configuration
+) {
+    if (isSynopsisEmpty) {
         Column(
             modifier = modifier
-                .fillMaxWidth()
-                .padding(15.dp, 10.dp, 0.dp, 0.dp)
+                .fillMaxSize()
+                .padding(bottom = 15.dp)
+//                .onGloballyPositioned { coordinates ->
+//                    synopsisHeight.value = with(localDensity) {coordinates.size.height.dp}
+//                }
         ) {
-            Text(text = "Synopsis", fontWeight = FontWeight.ExtraBold, color = Color.White)
-        }
-        Column(
-            modifier = modifier
-                .height(160.dp)
-                .fillMaxWidth(1f)
-                .verticalScroll(
-                    rememberScrollState()
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(start = 15.dp)
+
+            ) {
+                Text(text = "Synopsis", fontWeight = FontWeight.ExtraBold, color = Color.White)
+            }
+            Column(
+                modifier = modifier
+                    .height(160.dp)
+                    .fillMaxWidth(1f)
+                    .verticalScroll(
+                        rememberScrollState()
+                    )
+                    .padding(15.dp, 5.dp, 15.dp, 15.dp)
+
+            ) {
+                Text(
+                    text = synopsis ?: "", color = Color.White, fontSize = 12.sp,
+                    fontWeight = FontWeight.Thin, lineHeight = 12.sp,
                 )
-                .padding(15.dp, 5.dp, 15.dp, 15.dp)
-        ) {
-            Text(
-                text = synopsis ?: "", color = Color.White, fontSize = 12.sp,
-                fontWeight = FontWeight.Thin, lineHeight = 12.sp,
-            )
+            }
         }
     }
-
 }
 
 @Composable
@@ -777,6 +814,5 @@ private fun CheckGenresSize(
                 modifier = modifier
             )
         }
-
     }
 }

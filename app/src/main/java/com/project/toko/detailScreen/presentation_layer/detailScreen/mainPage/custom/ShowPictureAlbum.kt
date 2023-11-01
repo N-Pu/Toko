@@ -3,6 +3,7 @@ package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.c
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,8 @@ import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -23,10 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.detailScreen.model.pictureModel.DetailPicturesData
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowPictureAlbum(
     isDialogShown: MutableState<Boolean>,
@@ -34,25 +38,37 @@ fun ShowPictureAlbum(
     modifier: Modifier
 ) {
     if (picturesData.isNotEmpty() && isDialogShown.value) {
-        Dialog(onDismissRequest = {
-            isDialogShown.value = false
-        }) {
-            DisplayHorizontalPagerWithIndicator(picturesData, modifier)
+        AlertDialog(
+            onDismissRequest = { isDialogShown.value = false },
+            properties = DialogProperties(
+                dismissOnClickOutside = true,
+                dismissOnBackPress = true,
+                usePlatformDefaultWidth = false
+            ), modifier = modifier
+                .fillMaxWidth()
+        ) {
+            DisplayHorizontalPagerWithIndicator(picturesData, modifier, isDialogShown)
         }
     }
+
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun DisplayHorizontalPagerWithIndicator(
     picturesData: List<DetailPicturesData>,
-    modifier: Modifier
+    modifier: Modifier,
+    isDialogShown: MutableState<Boolean>
 ) {
     val pagerState =
         rememberPagerState {
             picturesData.size
         }
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
         val fling = PagerDefaults.flingBehavior(
             state = pagerState,
             pagerSnapDistance = PagerSnapDistance.atMost(5)
@@ -71,7 +87,8 @@ private fun DisplayHorizontalPagerWithIndicator(
                         painter = painter,
                         contentDescription = null,
                         modifier = modifier
-                            .fillMaxSize().padding(horizontal = 10.dp),
+                            .fillMaxSize()
+                            .padding(horizontal = 10.dp),
                     )
                 }
             }
@@ -85,6 +102,8 @@ private fun DisplayHorizontalPagerWithIndicator(
             modifier = modifier
                 .padding(vertical = 8.dp)
                 .fillMaxWidth()
+                .clickable { isDialogShown.value = false }
+
         ) {
             repeat(picturesData.size) { index ->
                 val color =
