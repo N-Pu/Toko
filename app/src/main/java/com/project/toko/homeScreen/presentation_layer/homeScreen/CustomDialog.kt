@@ -60,7 +60,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.project.toko.core.dao.AnimeItem
+import com.project.toko.favoritesScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.DialogSideColor
 import com.project.toko.core.presentation_layer.theme.LightGreen

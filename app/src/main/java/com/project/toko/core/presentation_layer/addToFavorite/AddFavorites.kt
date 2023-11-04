@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import com.project.toko.core.dao.AnimeItem
+import com.project.toko.favoritesScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 import kotlinx.coroutines.Dispatchers

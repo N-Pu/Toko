@@ -18,8 +18,8 @@ import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent
 import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.staffList.ShowWholeStaff
 import com.project.toko.characterDetailedScreen.presentation_layer.characterFull.DisplayCharacterFromId
 import com.project.toko.producerDetailedScreen.presentation_layer.producerFull.ShowScreen
-import com.project.toko.staffDetailedScreen.presentation_layer.staffMemberFull.DisplayStaffMemberFromId
 import com.project.toko.favoritesScreen.presentation_layer.FavoriteScreen
+import com.project.toko.personDetailedScreen.presentation_layer.staffMemberFull.DisplayPersonFullScreen
 import com.project.toko.randomAnimeScreen.presentation_layer.randomAnimeScreen.ShowRandomAnime
 
 @Composable
@@ -105,7 +105,7 @@ fun SetupNavGraph(
             })
         ) { backStackEntry ->
             val id = backStackEntry.arguments!!.getInt("id")
-            DisplayStaffMemberFromId(
+            DisplayPersonFullScreen(
                 mal_id = id,
                 navController = navController,
                 viewModelProvider = viewModelProvider,

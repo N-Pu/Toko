@@ -3,7 +3,7 @@ package com.project.toko.core.repository
 
 import android.util.Log
 import com.project.toko.characterDetailedScreen.model.characterFullModel.CharacterFullModel
-import com.project.toko.characterDetailedScreen.model.characterPicture.CharacterPicturesModel
+import com.project.toko.characterDetailedScreen.model.characterPictures.CharacterPicturesModel
 import com.project.toko.detailScreen.model.detailModel.DetailScreenModel
 import com.project.toko.randomAnimeScreen.model.AnimeRandomModel
 import com.project.toko.detailScreen.model.castModel.CastModel
@@ -11,7 +11,8 @@ import com.project.toko.detailScreen.model.pictureModel.DetailPicturesDataModel
 import com.project.toko.detailScreen.model.recommendationsModel.RecommendationsModel
 import com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel
 import com.project.toko.detailScreen.model.staffModel.StaffModel
-import com.project.toko.staffDetailedScreen.model.personFullModel.PersonFullModel
+import com.project.toko.personDetailedScreen.model.personFullModel.PersonFullModel
+import com.project.toko.personDetailedScreen.model.personPictures.PersonPicturesModel
 import com.project.toko.producerDetailedScreen.model.producerModel.ProducerFullModel
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
@@ -47,6 +48,8 @@ interface MalApiService {
 
     @GET("${BASE_URL}v4/anime/{id}/pictures")
     suspend fun getDetailScreenPictures(@Path("id") id: Int): Response<DetailPicturesDataModel>
+
+
     @GET("${BASE_URL}v4/anime/{id}/recommendations")
     suspend fun getRecommendationsFromAnime(@Path("id") id: Int): Response<RecommendationsModel>
 
@@ -72,6 +75,8 @@ interface MalApiService {
     @GET("${BASE_URL}v4/characters/{id}/pictures")
     suspend fun getCharacterFullPictures(@Path("id") id: Int): Response<CharacterPicturesModel>
 
+    @GET("${BASE_URL}v4/people/{id}/pictures")
+    suspend fun getPersonFullPictures(@Path("id") id: Int): Response<PersonPicturesModel>
     @GET("${BASE_URL}v4/anime/{id}/staff")
     suspend fun getStaffFromId(@Path("id") id: Int): Response<StaffModel> {
         try {

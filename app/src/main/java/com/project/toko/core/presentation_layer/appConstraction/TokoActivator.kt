@@ -44,7 +44,7 @@ import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
 import com.project.toko.core.presentation_layer.theme.LightBottomBarColor
 import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
-import com.project.toko.staffDetailedScreen.viewModel.PersonByIdViewModel
+import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
 
 @Composable
 fun TokoAppActivator(

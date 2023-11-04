@@ -31,7 +31,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
-import com.project.toko.core.dao.AnimeItem
+import com.project.toko.favoritesScreen.dao.AnimeItem
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen

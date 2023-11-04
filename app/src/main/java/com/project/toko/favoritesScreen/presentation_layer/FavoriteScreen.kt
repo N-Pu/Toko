@@ -47,13 +47,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
-import com.project.toko.core.dao.AnimeItem
+import com.project.toko.characterDetailedScreen.dao.CharacterItem
+import com.project.toko.favoritesScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.presentation_layer.theme.SoftGreen
 import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 import com.project.toko.favoritesScreen.model.AnimeListType
+import com.project.toko.personDetailedScreen.dao.PersonItem
 
 
 // Function that creates 4 grid sections
@@ -138,8 +140,7 @@ fun FavoriteScreen(
                     modifier = modifier
                 )
 
-                AnimeListType.PERSON -> FavoriteAnimeList(
-                    category = AnimeListType.PERSON.route,
+                AnimeListType.PERSON -> ShowPerson(
                     navController = navController,
                     viewModelProvider = viewModelProvider,
                     scrollState = scrollState,
@@ -154,8 +155,7 @@ fun FavoriteScreen(
                     modifier = modifier
                 )
 
-                AnimeListType.CHARACTER -> FavoriteAnimeList(
-                    category = AnimeListType.CHARACTER.route,
+                AnimeListType.CHARACTER -> ShowCharacter(
                     navController = navController,
                     viewModelProvider = viewModelProvider,
                     scrollState = scrollState,
@@ -240,6 +240,314 @@ fun FavoriteAnimeList(
 }
 
 
+@Composable
+fun ShowCharacter(
+    navController: NavController,
+    viewModelProvider: ViewModelProvider,
+    scrollState: LazyGridState,
+    modifier: Modifier
+) {
+
+
+    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
+    val animeListState by daoViewModel.getCharacter().collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxSize(1f)
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(140.dp), state = scrollState,
+
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .fillMaxHeight(1f),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(5.dp)
+        ) {
+            items(animeListState) { characterItem ->
+                CharacterCardBox(
+                    characterItem = characterItem,
+                    navController = navController,
+                    modifier = modifier
+                )
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun CharacterCardBox(
+    characterItem: CharacterItem,
+    navController: NavController,
+    modifier: Modifier
+) {
+    val painter = rememberAsyncImagePainter(model = characterItem.image)
+
+    Box(
+        modifier = modifier
+    ) {
+        Card(
+            modifier = modifier
+                .clickable {
+                    characterItem.id?.let {
+                        navController.navigate(route = "detail_on_character/${it}")
+                    }
+                },
+            colors = CardDefaults.cardColors(containerColor = LightGreen),
+            shape = RectangleShape
+        ) {
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(1f)
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = "Images for anime: ${characterItem.anime}",
+                    modifier = modifier.aspectRatio(9f / 11f),
+                    contentScale = ContentScale.FillBounds
+                )
+
+//                AddFavorites(
+//                    mal_id = animeItem.id ?: 0,
+//                    anime = animeItem.anime,
+//                    score = animeItem.score,
+//                    scoredBy = animeItem.scored_by,
+//                    animeImage = animeItem.animeImage,
+//                    modifier = modifier,
+//                    viewModelProvider = viewModelProvider
+//                )
+
+            }
+            Text(
+                text = characterItem.name,
+                textAlign = TextAlign.Center,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .basicMarquee(
+                        iterations = Int.MAX_VALUE,
+                        delayMillis = 2000,
+                        initialDelayMillis = 2000,
+                        velocity = 50.dp
+                    )
+                    .padding(16.dp),
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight(1000),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+
+            Text(
+                text = "From:" + characterItem.anime,
+                textAlign = TextAlign.Center,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .basicMarquee(
+                        iterations = Int.MAX_VALUE,
+                        delayMillis = 2000,
+                        initialDelayMillis = 2000,
+                        velocity = 50.dp
+                    )
+                    .padding(16.dp),
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight(1000),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+
+
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+@Composable
+fun ShowPerson(
+    navController: NavController,
+    viewModelProvider: ViewModelProvider,
+    scrollState: LazyGridState,
+    modifier: Modifier
+) {
+
+
+    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
+    val personList by daoViewModel.getPerson().collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxSize(1f)
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(140.dp), state = scrollState,
+
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .fillMaxHeight(1f),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(5.dp)
+        ) {
+            items(personList) { personItem ->
+                PersonCardBox(
+                    personItem = personItem,
+                    navController = navController,
+                    modifier = modifier
+                )
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PersonCardBox(
+    personItem: PersonItem,
+    navController: NavController,
+    modifier: Modifier
+) {
+    val painter = rememberAsyncImagePainter(model = personItem.image)
+
+    Box(
+        modifier = modifier
+    ) {
+        Card(
+            modifier = modifier
+                .clickable {
+                    personItem.id?.let {
+                        navController.navigate("detail_on_staff/${it}")
+                    }
+                },
+            colors = CardDefaults.cardColors(containerColor = LightGreen),
+            shape = RectangleShape
+        ) {
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(1f)
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = "Images for anime: ${personItem.image}",
+                    modifier = modifier.aspectRatio(9f / 11f),
+                    contentScale = ContentScale.FillBounds
+                )
+
+//                AddFavorites(
+//                    mal_id = animeItem.id ?: 0,
+//                    anime = animeItem.anime,
+//                    score = animeItem.score,
+//                    scoredBy = animeItem.scored_by,
+//                    animeImage = animeItem.animeImage,
+//                    modifier = modifier,
+//                    viewModelProvider = viewModelProvider
+//                )
+
+            }
+            Text(
+                text = personItem.name,
+                textAlign = TextAlign.Center,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .basicMarquee(
+                        iterations = Int.MAX_VALUE,
+                        delayMillis = 2000,
+                        initialDelayMillis = 2000,
+                        velocity = 50.dp
+                    )
+                    .padding(16.dp),
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight(1000),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+
+            if (!personItem.givenName.isNullOrEmpty()) {
+                Text(
+                    text = "Given name:" + personItem.givenName,
+                    textAlign = TextAlign.Center,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .basicMarquee(
+                            iterations = Int.MAX_VALUE,
+                            delayMillis = 2000,
+                            initialDelayMillis = 2000,
+                            velocity = 50.dp
+                        )
+                        .padding(16.dp),
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight(1000),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
+            if (!personItem.familyName.isNullOrEmpty()) {
+                Text(
+                    text = "Family name:" + personItem.familyName,
+                    textAlign = TextAlign.Center,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .basicMarquee(
+                            iterations = Int.MAX_VALUE,
+                            delayMillis = 2000,
+                            initialDelayMillis = 2000,
+                            velocity = 50.dp
+                        )
+                        .padding(16.dp),
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight(1000),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
+
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Function for showing a single
 // anime-card with "+" button
 @OptIn(ExperimentalFoundationApi::class)
@@ -317,6 +625,15 @@ fun FavoriteScreenCardBox(
         }
     }
 }
+
+
+
+
+
+
+
+
+
 
 // Icon that placed in FavoriteScreenCardBox
 // that shows score
