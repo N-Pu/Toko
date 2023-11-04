@@ -9,7 +9,7 @@ import com.project.toko.core.dao.Dao
 import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
-import com.project.toko.staffDetailedScreen.viewModel.PersonByIdViewModel
+import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
 import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
 import javax.inject.Inject
 

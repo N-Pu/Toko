@@ -40,7 +40,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
-import com.project.toko.core.dao.AnimeItem
+import com.project.toko.favoritesScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel

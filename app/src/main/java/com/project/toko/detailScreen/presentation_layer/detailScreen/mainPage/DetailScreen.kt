@@ -32,7 +32,7 @@ import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.DisplayPicture
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.DisplayTitle
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ExpandableRelated
-import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ExpandableText
+import com.project.toko.core.presentation_layer.expandableText.ExpandableText
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.FavoritesLine
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.MembersLine
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.PopularityLine
@@ -179,7 +179,7 @@ fun ActivateDetailScreen(
                 modifier = modifier
             )
             AddToFavorites(viewModelProvider, modifier)
-            ExpandableText(text = detailData!!.synopsis, modifier)
+            ExpandableText(text = detailData!!.synopsis, title = "Synopsis", modifier = modifier)
 //            FullScreenYoutubeActivity().YoutubePlayerSecond(
 //                detailData?.trailer?.youtube_id ?: "",
 //                LocalLifecycleOwner.current,

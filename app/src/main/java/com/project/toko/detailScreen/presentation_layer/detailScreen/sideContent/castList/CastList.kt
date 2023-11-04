@@ -235,7 +235,7 @@ private fun CurrentCast(
                     modifier = customModifier
                         .width(70.dp)
                         .height(107.dp)
-                        .clip(RoundedCornerShape(3.dp)),
+                        .clip(RoundedCornerShape(6.dp)),
                     contentScale = ContentScale.FillBounds
                 )
             }
@@ -308,7 +308,7 @@ private fun CurrentCast(
                     modifier = Modifier
                         .width(70.dp)
                         .height(107.dp)
-                        .clip(RoundedCornerShape(3.dp))
+                        .clip(RoundedCornerShape(6.dp))
                         .background(Color(102, 102, 102)),
                     contentAlignment =  Alignment.Center
 
@@ -326,7 +326,7 @@ private fun CurrentCast(
                     modifier = Modifier
                         .width(70.dp)
                         .height(107.dp)
-                        .clip(RoundedCornerShape(3.dp))
+                        .clip(RoundedCornerShape(6.dp))
                         .clickable {
                             navController.navigate(route = "detail_on_character/${data.character.mal_id}") {
 //                            popUpTo(Screen.Detail.route) {
