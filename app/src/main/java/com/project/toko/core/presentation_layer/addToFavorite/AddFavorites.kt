@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import com.project.toko.favoritesScreen.dao.AnimeItem
+import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.LightGreen
-import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
+import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -49,6 +49,10 @@ fun AddFavorites(
     animeImage: String,
     modifier: Modifier,
     viewModelProvider: ViewModelProvider,
+    rating: String,
+    status: String,
+    secondName: String?,
+
 ) {
 
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
@@ -101,12 +105,16 @@ fun AddFavorites(
                         } else {
                             daoViewModel.addToCategory(
                                 AnimeItem(
-                                    mal_id,
-                                    anime = anime,
+                                 id = mal_id,
+                                    animeName = anime,
                                     score = score,
                                     scored_by = scoredBy,
                                     animeImage = animeImage,
-                                    category = selectedItem
+                                    category = selectedItem,
+                                    status = status,
+                                    secondName = secondName ?: "",
+                                    rating = rating
+
                                 )
                             )
                         }

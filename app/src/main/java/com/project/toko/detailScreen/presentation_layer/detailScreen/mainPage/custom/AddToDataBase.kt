@@ -40,11 +40,11 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
-import com.project.toko.favoritesScreen.dao.AnimeItem
+import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.LightGreen
-import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
+import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
-import com.project.toko.favoritesScreen.model.AnimeListType
+import com.project.toko.daoScreen.model.AnimeListType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -81,11 +81,14 @@ fun AddToFavorites(
                     daoViewModel.addToCategory(
                         AnimeItem(
                             id = detailScreenState?.mal_id,
-                            anime = detailScreenState?.title ?: "",
+                            animeName = detailScreenState?.title ?: "",
                             score = formatScore(detailScreenState?.score),
                             scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
                             animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
-                            category = AnimeListType.FAVORITE.route
+                            category = AnimeListType.FAVORITE.route,
+                            status = detailScreenState?.status ?: "",
+                            rating = detailScreenState?.rating ?: "",
+                            secondName = detailScreenState?.title_japanese ?: ""
                         )
                     )
                 }
@@ -116,11 +119,14 @@ fun AddToFavorites(
                     daoViewModel.addToCategory(
                         AnimeItem(
                             id = detailScreenState?.mal_id,
-                            anime = detailScreenState?.title ?: "",
+                            animeName = detailScreenState?.title ?: "",
                             score = formatScore(detailScreenState?.score),
                             scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
                             animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
-                            category = AnimeListType.PLANNED.route
+                            category = AnimeListType.PLANNED.route,
+                            status = detailScreenState?.status ?: "",
+                            rating = detailScreenState?.rating ?: "",
+                            secondName = detailScreenState?.title_japanese ?: ""
                         )
 
                     )
@@ -220,14 +226,14 @@ fun AddToFavorites(
                             daoViewModel.addToCategory(
                                 AnimeItem(
                                     id = detailScreenState?.mal_id,
-                                    anime = detailScreenState?.title ?: "",
+                                    animeName = detailScreenState?.title ?: "",
                                     score = formatScore(detailScreenState?.score),
-                                    scored_by = formatScoredBy(
-                                        detailScreenState?.scored_by ?: 0.0f
-                                    ),
-                                    animeImage = detailScreenState?.images?.jpg?.large_image_url
-                                        ?: "",
-                                    category = AnimeListType.COMPLETED.route
+                                    scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
+                                    animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
+                                    category = AnimeListType.COMPLETED.route,
+                                    status = detailScreenState?.status ?: "",
+                                    rating = detailScreenState?.rating ?: "",
+                                    secondName = detailScreenState?.title_japanese ?: ""
                                 )
 
                             )
@@ -283,14 +289,14 @@ fun AddToFavorites(
                             daoViewModel.addToCategory(
                                 AnimeItem(
                                     id = detailScreenState?.mal_id,
-                                    anime = detailScreenState?.title ?: "",
+                                    animeName = detailScreenState?.title ?: "",
                                     score = formatScore(detailScreenState?.score),
-                                    scored_by = formatScoredBy(
-                                        detailScreenState?.scored_by ?: 0.0f
-                                    ),
-                                    animeImage = detailScreenState?.images?.jpg?.large_image_url
-                                        ?: "",
-                                    category = AnimeListType.DROPPED.route
+                                    scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
+                                    animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
+                                    category = AnimeListType.DROPPED.route,
+                                    status = detailScreenState?.status ?: "",
+                                    rating = detailScreenState?.rating ?: "",
+                                    secondName = detailScreenState?.title_japanese ?: ""
                                 )
 
                             )
@@ -346,14 +352,14 @@ fun AddToFavorites(
                             daoViewModel.addToCategory(
                                 AnimeItem(
                                     id = detailScreenState?.mal_id,
-                                    anime = detailScreenState?.title ?: "",
+                                    animeName = detailScreenState?.title ?: "",
                                     score = formatScore(detailScreenState?.score),
-                                    scored_by = formatScoredBy(
-                                        detailScreenState?.scored_by ?: 0.0f
-                                    ),
-                                    animeImage = detailScreenState?.images?.jpg?.large_image_url
-                                        ?: "",
-                                    category = AnimeListType.WATCHING.route
+                                    scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
+                                    animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
+                                    category = AnimeListType.WATCHING.route,
+                                    status = detailScreenState?.status ?: "",
+                                    rating = detailScreenState?.rating ?: "",
+                                    secondName = detailScreenState?.title_japanese ?: ""
                                 )
 
                             )

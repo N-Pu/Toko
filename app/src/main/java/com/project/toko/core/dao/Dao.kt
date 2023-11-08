@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.project.toko.characterDetailedScreen.dao.CharacterItem
-import com.project.toko.favoritesScreen.dao.AnimeItem
+import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.personDetailedScreen.dao.PersonItem
 import kotlinx.coroutines.flow.Flow
 
@@ -18,8 +18,18 @@ interface Dao {
     suspend fun addToCategory(animeItem: AnimeItem)
 
     // Функция для получения всех аниме в определенной категории
-    @Query("SELECT * FROM animeItems WHERE category = :category")
-    fun getAnimeInCategory(category: String): Flow<List<AnimeItem>>
+    @Query("SELECT * FROM animeItems " +
+            "WHERE category = :category AND " +
+            "(CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END)")
+    fun getAnimeInCategory(category: String, searchText: String): Flow<List<AnimeItem>>
+
+//    @Query("SELECT * FROM animeItems " +
+//            "WHERE category = :category " +
+//            "AND (CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END) " +
+//            "ORDER BY CASE WHEN :isSorted THEN animeName ELSE NULL END, " +
+//            "animeName ASC")
+//    fun getAnimeInCategory(category: String, searchText: String, isSorted: Boolean): Flow<List<AnimeItem>>
+
 
     @Query("DELETE FROM animeItems WHERE id = :id")
     suspend fun removeFromDataBase(id: Int)
@@ -34,6 +44,18 @@ interface Dao {
     @Query("SELECT category FROM animeItems WHERE id = :id")
     fun getCategoryForId(id: Int): Flow<String?>
 
+//    @Query("SELECT * FROM animeItems ORDER BY animeName ASC")
+    @Query("SELECT * FROM animeItems WHERE category = :category ORDER BY animeName ASC")
+    fun sortAnimeByName(category: String): Flow<List<AnimeItem>>
+
+
+
+//    @Query("SELECT * FROM animeItems ORDER BY score DESC")
+//    fun sortAnimeByScore(): Flow<List<AnimeItem>>
+//
+//    @Query("SELECT * FROM animeItems ORDER BY scored_by DESC")
+//    fun sortAnimeByScoreBy(): Flow<List<AnimeItem>>
+
 
 
     // character table
@@ -43,13 +65,11 @@ interface Dao {
     @Query("DELETE FROM characterItem WHERE id = :id")
     suspend fun removeCharacterFromDataBase(id: Int)
 
-    @Query("SELECT * FROM characterItem")
-    fun getCharacter(): Flow<List<CharacterItem>>
+    @Query("SELECT * FROM characterItem WHERE (CASE WHEN :searchText = '' THEN 1 ELSE name LIKE '%' || :searchText || '%' END)")
+    fun getAllCharacters(searchText: String): Flow<List<CharacterItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addCharacter(characterItem: CharacterItem)
-
-
 
     // character table
     @Query("SELECT EXISTS(SELECT 1 FROM personItem WHERE id = :id LIMIT 1)")
@@ -58,9 +78,11 @@ interface Dao {
     @Query("DELETE FROM personItem WHERE id = :id")
     suspend fun removePersonFromDataBase(id: Int)
 
-    @Query("SELECT * FROM personItem")
-    fun getPerson(): Flow<List<PersonItem>>
+    @Query("SELECT * FROM personItem WHERE (CASE WHEN :searchText = '' THEN 1 ELSE name LIKE '%' || :searchText || '%' END)")
+    fun getAllPeople(searchText: String): Flow<List<PersonItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addPerson(personItem: PersonItem)
+
+
 }

@@ -22,7 +22,7 @@ class HomeScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var _isDropdownVisible = mutableStateOf(false)
-    var isDropdownMenuVisible = _isDropdownVisible
+    val isDropdownMenuVisible = _isDropdownVisible
 
     private val emptyItem = com.project.toko.homeScreen.model.newAnimeSearchModel.Items(0, 0, 0)
     private val emptyNewAnimeSearchModel =
@@ -163,8 +163,8 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun onSearchTextChange(text: String) {
-        _searchText.value = text
         viewModelScope.launch(Dispatchers.IO) {
+            _searchText.value = text
             searchDebouncer.emit(text)
         }
     }
@@ -339,7 +339,7 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-     fun onDialogDismiss() {
+    fun onDialogDismiss() {
         viewModelScope.launch(Dispatchers.IO) {
             _selectedAnimeId.value = null
             isDialogShown = false
