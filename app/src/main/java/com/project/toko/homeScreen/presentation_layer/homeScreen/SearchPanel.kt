@@ -87,7 +87,7 @@ fun MainScreen(
                     .background(SearchBarColor),
                 verticalAlignment = Alignment.Bottom
             ) {
-                TextField(
+                OutlinedTextField(
                     placeholder = { Text(text = "Search...") },
                     value = searchText ?: "",
                     onValueChange = viewModel::onSearchTextChange,
@@ -107,7 +107,9 @@ fun MainScreen(
                         focusedPlaceholderColor = iconColorInSearchPanel,
                         unfocusedPlaceholderColor = iconColorInSearchPanel,
                         cursorColor = iconColorInSearchPanel,
-//                        unfocusedSuffixColor = Color.Red
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedBorderColor = Color.Transparent
+
                     )
                 )
             }

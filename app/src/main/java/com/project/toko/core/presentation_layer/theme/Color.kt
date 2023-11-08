@@ -18,6 +18,7 @@ val LightIconTint = Color(154, 154, 154)
 val LightBottomBarColor = Color(255, 255, 255)
 val LightCardColor = Color(255, 255, 255)
 
+val threeLines = Color(65, 65, 65)
 
 val iconColorInSearchPanel = Color(0, 0, 0, 77)
 private val FirstBarColor = Color(104, 190, 174, 161)
@@ -71,3 +72,13 @@ object ScoreColors {
     val Blank = Color(0xFFA2ADB1)
 }
 
+    private val watching = Color(189, 218, 213)
+    private val planned = Color(157, 214, 204)
+    private val completed = Color(126, 206, 192)
+    private val dropped = Color(104, 190, 174)
+    private val favorite = Color(69, 167, 149)
+    private val person = Color(46, 135, 118)
+    private val character = Color(34, 124, 107, 255)
+
+val favoriteTopBarColors = listOf(watching, planned, completed, dropped, favorite,person,
+    character)

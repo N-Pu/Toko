@@ -1,4 +1,4 @@
-package com.project.toko.favoritesScreen.model
+package com.project.toko.daoScreen.model
 
 enum class AnimeListType(val route: String) {
     WATCHING("Watching"),

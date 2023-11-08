@@ -28,7 +28,7 @@ import com.project.toko.characterDetailedScreen.dao.CharacterItem
 import com.project.toko.characterDetailedScreen.model.characterFullModel.Data
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
 import com.project.toko.core.presentation_layer.theme.LightGreen
-import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
+import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -61,15 +61,18 @@ fun ShowNamesAndInteractionIcons(
             lineHeight = 20.sp
         )
         Spacer(modifier = modifier.size(2.dp))
-        Text(
-            text = "(" + data.name_kanji + ")",
-            textAlign = TextAlign.Start,
-            fontSize = 20.sp,
-            modifier = modifier.fillMaxWidth(),
-            minLines = 1,
-            fontWeight = FontWeight.ExtraBold,
-            lineHeight = 20.sp
-        )
+
+        if (!data.name_kanji.isNullOrEmpty()) {
+            Text(
+                text = "(" + data.name_kanji + ")",
+                textAlign = TextAlign.Start,
+                fontSize = 20.sp,
+                modifier = modifier.fillMaxWidth(),
+                minLines = 1,
+                fontWeight = FontWeight.ExtraBold,
+                lineHeight = 20.sp
+            )
+        }
         Column(
             modifier = modifier
                 .fillMaxWidth()

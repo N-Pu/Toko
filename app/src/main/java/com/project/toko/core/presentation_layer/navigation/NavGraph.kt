@@ -18,7 +18,7 @@ import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent
 import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.staffList.ShowWholeStaff
 import com.project.toko.characterDetailedScreen.presentation_layer.characterFull.DisplayCharacterFromId
 import com.project.toko.producerDetailedScreen.presentation_layer.producerFull.ShowScreen
-import com.project.toko.favoritesScreen.presentation_layer.FavoriteScreen
+import com.project.toko.daoScreen.presentation_layer.DaoScreen
 import com.project.toko.personDetailedScreen.presentation_layer.staffMemberFull.DisplayPersonFullScreen
 import com.project.toko.randomAnimeScreen.presentation_layer.randomAnimeScreen.ShowRandomAnime
 
@@ -56,7 +56,7 @@ fun SetupNavGraph(
             NoId()
         }
         composable(route = Screen.Favorites.route) {
-            FavoriteScreen(
+            DaoScreen(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
                 modifier = modifier

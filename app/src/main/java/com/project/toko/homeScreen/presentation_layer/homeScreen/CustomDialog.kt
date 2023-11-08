@@ -60,11 +60,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.project.toko.favoritesScreen.dao.AnimeItem
+import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.DialogSideColor
 import com.project.toko.core.presentation_layer.theme.LightGreen
-import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
+import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -205,7 +205,7 @@ fun CustomDialog(
                     horizontalAlignment = Alignment.Start
                 ) {
                     StatusLine(data.status, modifier)
-                    RatingLine(rating = data.rating, modifier = modifier)
+                    RatingLine(rating = data.rating ?: "N/A", modifier = modifier)
                 }
 
                 CheckGenresSize(
@@ -496,6 +496,9 @@ private fun AddToFavoriteRow(
                             data.score.toString(),
                             data.scored_by.toInt().toString(),
                             data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
                             "Watching"
                         )
                     )
@@ -521,6 +524,9 @@ private fun AddToFavoriteRow(
                             data.score.toString(),
                             data.scored_by.toInt().toString(),
                             data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
                             "Watched"
                         )
                     )
@@ -547,6 +553,9 @@ private fun AddToFavoriteRow(
                             data.score.toString(),
                             data.scored_by.toInt().toString(),
                             data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
                             "Dropped"
                         )
                     )
@@ -583,10 +592,11 @@ private fun AddToFavoriteRow(
                                     data.mal_id,
                                     data.title,
                                     data.score.toString(),
-                                    data.scored_by
-                                        .toInt()
-                                        .toString(),
+                                    data.scored_by.toInt().toString(),
                                     data.images.jpg.large_image_url,
+                                    data.status,
+                                    data.rating ?: "N/A",
+                                    data.title_japanese,
                                     "Planned"
                                 )
                             )

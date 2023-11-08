@@ -1,0 +1,17 @@
+<svg width="79"
+    height="79"
+    viewBox="0 0 79 79"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M4 39.4231C4 58.9867 19.8595 74.8462 39.4231 74.8462C58.9867 74.8462 74.8462 58.9867 74.8462 39.4231C74.8462 19.8595 58.9867 4 39.4231 4C19.8595 4 4 19.8595 4 39.4231Z"
+        stroke="white"
+        stroke-width="7.8718"
+        stroke-linecap="round"
+        stroke-linejoin="round" />
+    <circle
+        cx="39.3008"
+        cy="38.9297"
+        r="23.5"
+        fill="white" />
+</svg>

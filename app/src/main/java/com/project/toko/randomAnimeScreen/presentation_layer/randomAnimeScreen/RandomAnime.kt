@@ -31,15 +31,15 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
-import com.project.toko.favoritesScreen.dao.AnimeItem
+import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.presentation_layer.theme.MainBackgroundColor
-import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
-import com.project.toko.favoritesScreen.model.AnimeListType
+import com.project.toko.daoScreen.daoViewModel.DaoViewModel
+import com.project.toko.daoScreen.model.AnimeListType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -419,11 +419,14 @@ fun AnimeCard(
                                 daoViewModel.addToCategory(
                                     animeItem = AnimeItem(
                                         id = data?.mal_id,
-                                        anime = data?.title ?: "Error",
+                                        animeName = data?.title ?: "Error",
                                         animeImage = data?.images?.jpg?.large_image_url ?: "",
                                         score = data?.score.toString(),
                                         scored_by = data?.scored_by.toString(),
-                                        category = AnimeListType.PLANNED.route
+                                        category = AnimeListType.PLANNED.route,
+                                        status = data?.status ?: "",
+                                        rating = data?.rating ?: "",
+                                        secondName = data?.title_japanese ?: ""
                                     )
                                 )
                                 cardIsShown.value = false

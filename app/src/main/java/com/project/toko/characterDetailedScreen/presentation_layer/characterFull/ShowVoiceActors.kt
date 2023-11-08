@@ -88,7 +88,7 @@ fun PreviewTopSection() {
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
     ) {
-        repeat(7) { i ->
+        repeat(7) {
             Row(Modifier.background(Color.Green)) {
                 Column(
                     modifier = Modifier

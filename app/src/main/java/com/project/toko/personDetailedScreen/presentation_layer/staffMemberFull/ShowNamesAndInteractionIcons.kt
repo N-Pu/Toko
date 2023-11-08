@@ -26,7 +26,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import  com.project.toko.personDetailedScreen.model.personFullModel.Data
 import com.project.toko.core.presentation_layer.theme.LightGreen
-import com.project.toko.core.viewModel.daoViewModel.DaoViewModel
+import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.personDetailedScreen.dao.PersonItem
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
 import kotlinx.coroutines.launch
@@ -66,7 +66,7 @@ fun ShowNamesAndInteractionIcons(
         Spacer(modifier = modifier.size(2.dp))
         if (!data.given_name.isNullOrBlank()) {
             Text(
-                text = "Given name:" + data.given_name,
+                text = "Given name: " + data.given_name,
                 textAlign = TextAlign.Start,
                 fontSize = 14.sp,
                 modifier = modifier.fillMaxWidth(),
@@ -78,7 +78,7 @@ fun ShowNamesAndInteractionIcons(
         Spacer(modifier = modifier.size(2.dp))
         if (!data.family_name.isNullOrBlank()) {
             Text(
-                text = "Family name:" + data.family_name,
+                text = "Family name: " + data.family_name,
                 textAlign = TextAlign.Start,
                 fontSize = 14.sp,
                 modifier = modifier.fillMaxWidth(),
@@ -90,7 +90,7 @@ fun ShowNamesAndInteractionIcons(
         Spacer(modifier = modifier.size(2.dp))
         if (!data.birthday.isNullOrBlank()) {
             Text(
-                text = "Birthday" + birthday(data.birthday),
+                text = "Birthday: " + birthday(data.birthday),
                 textAlign = TextAlign.Start,
                 fontSize = 14.sp,
                 modifier = modifier.fillMaxWidth(),

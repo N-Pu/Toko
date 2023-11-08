@@ -118,7 +118,7 @@ private fun BackArrow(modifier: Modifier, navController: NavController, detailSc
 
 
 @Composable
-fun SingleStaffMember(
+private fun SingleStaffMember(
     person: Person,
     positions: List<String>,
     navController: NavController,

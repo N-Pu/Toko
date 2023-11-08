@@ -20,7 +20,7 @@ data class AnimeSearchData(
     @SerializedName("popularity") val popularity: Int,
     @SerializedName("producers") val producers: List<Producer>,
     @SerializedName("rank") val rank: Int,
-    @SerializedName("rating") val rating: String,
+    @SerializedName("rating") val rating: String?,
     @SerializedName("score") val score: Float,
     @SerializedName("scored_by") val scored_by: Float,
     @SerializedName("season") val season: String,

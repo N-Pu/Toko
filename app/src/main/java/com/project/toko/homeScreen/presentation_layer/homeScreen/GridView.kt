@@ -87,8 +87,6 @@ fun GridAdder(
             Spacer(modifier = modifier.height(20.dp))
         }
         itemsIndexed(listData.data) { index, data ->
-
-
             AnimeCardBox(
                 data = data,
                 navController = navController,
@@ -256,7 +254,10 @@ fun AnimeCardBox(
                 scoredBy = formatScoredBy(data.scored_by),
                 animeImage = data.images.jpg.image_url,
                 modifier = modifier,
-                viewModelProvider = viewModelProvider
+                viewModelProvider = viewModelProvider,
+                status = data.status,
+                rating = data.rating ?: "N/A",
+                secondName = data.title_japanese
             )
 
 
