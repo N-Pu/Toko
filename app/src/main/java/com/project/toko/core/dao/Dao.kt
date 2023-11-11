@@ -18,17 +18,50 @@ interface Dao {
     suspend fun addToCategory(animeItem: AnimeItem)
 
     // Функция для получения всех аниме в определенной категории
-    @Query("SELECT * FROM animeItems " +
-            "WHERE category = :category AND " +
-            "(CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END)")
-    fun getAnimeInCategory(category: String, searchText: String): Flow<List<AnimeItem>>
+//    @Query("SELECT * FROM animeItems " +
+//            "WHERE category = :category AND " +
+//            "(CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END)")
+//    fun getAnimeInCategory(category: String, searchText: String): Flow<List<AnimeItem>>
+
 
 //    @Query("SELECT * FROM animeItems " +
-//            "WHERE category = :category " +
-//            "AND (CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END) " +
-//            "ORDER BY CASE WHEN :isSorted THEN animeName ELSE NULL END, " +
-//            "animeName ASC")
-//    fun getAnimeInCategory(category: String, searchText: String, isSorted: Boolean): Flow<List<AnimeItem>>
+//            "WHERE category = :category AND " +
+//            "(CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END) " +
+//            "ORDER BY " +
+//            "CASE WHEN :isSortedAlphabetically = 1 THEN animeName END ASC, " +
+//            "CASE WHEN :isSortedByScore = 1 THEN score END DESC, " +
+//            "CASE WHEN :isSortedByUsers = 1 THEN scored_by END ASC, " +
+//            "CASE WHEN :isAiredFrom = 1 THEN airedFrom END DESC")
+//    fun getAnimeInCategory(
+//        category: String,
+//        searchText: String,
+//        isSortedAlphabetically: Boolean,
+//        isSortedByScore: Boolean,
+//        isSortedByUsers: Boolean,
+//        isAiredFrom: Boolean,
+//        type: String
+//    ): Flow<List<AnimeItem>>
+
+
+    @Query("SELECT * FROM animeItems " +
+            "WHERE category = :category AND " +
+            "(CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END) " +
+            "AND (CASE WHEN :type = '' THEN 1 ELSE type = :type END) " +
+            "ORDER BY " +
+            "CASE WHEN :isSortedAlphabetically = 1 THEN animeName END ASC, " +
+            "CASE WHEN :isSortedByScore = 1 THEN score END DESC, " +
+            "CASE WHEN :isSortedByUsers = 1 THEN scored_by END ASC, " +
+            "CASE WHEN :isAiredFrom = 1 THEN airedFrom END DESC")
+    fun getAnimeInCategory(
+        category: String,
+        searchText: String,
+        isSortedAlphabetically: Boolean,
+        isSortedByScore: Boolean,
+        isSortedByUsers: Boolean,
+        isAiredFrom: Boolean,
+        type: String
+    ): Flow<List<AnimeItem>>
+
 
 
     @Query("DELETE FROM animeItems WHERE id = :id")
@@ -47,15 +80,6 @@ interface Dao {
 //    @Query("SELECT * FROM animeItems ORDER BY animeName ASC")
     @Query("SELECT * FROM animeItems WHERE category = :category ORDER BY animeName ASC")
     fun sortAnimeByName(category: String): Flow<List<AnimeItem>>
-
-
-
-//    @Query("SELECT * FROM animeItems ORDER BY score DESC")
-//    fun sortAnimeByScore(): Flow<List<AnimeItem>>
-//
-//    @Query("SELECT * FROM animeItems ORDER BY scored_by DESC")
-//    fun sortAnimeByScoreBy(): Flow<List<AnimeItem>>
-
 
 
     // character table

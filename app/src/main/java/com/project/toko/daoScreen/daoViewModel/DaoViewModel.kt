@@ -1,5 +1,6 @@
 package com.project.toko.daoScreen.daoViewModel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.characterDetailedScreen.dao.CharacterItem
@@ -17,11 +18,31 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
     private val _searchText = MutableStateFlow<String?>(null)
     val searchText = _searchText.asStateFlow()
 
-//    private val _currentCategory = mutableStateOf<String?>(null)
-//        val currentCategory = _currentCategory
+    private val _isSortedAlphabetically = mutableStateOf(false)
+    val isSortedAlphabetically = _isSortedAlphabetically
+    private val _isSortedByScore = mutableStateOf(false)
+    val isSortedByScore = _isSortedByScore
+    private val _isSortedByUsers = mutableStateOf(false)
+    val isSortedByUsers = _isSortedByUsers
+    private val _isAiredFrom = mutableStateOf(false)
+    val isAiredFrom = _isAiredFrom
 
-//    private val _currentAnimeList = MutableStateFlow<List<AnimeItem>>(emptyList())
-//    val currentAnimeList = _currentAnimeList.asStateFlow()
+    private val _selectedType = mutableStateOf<String?>(null)
+    val selectedType = _selectedType
+
+
+    private val _isTvSelected = mutableStateOf(false)
+    val isTvSelected = _isTvSelected
+    private val _isMovieSelected = mutableStateOf(false)
+    val isMovieSelected = _isMovieSelected
+    private val _isOvaSelected = mutableStateOf(false)
+    val isOvaSelected = _isOvaSelected
+    private val _isSpecialSelected = mutableStateOf(false)
+    val isSpecialSelected = _isSpecialSelected
+    private val _isOnaSelected = mutableStateOf(false)
+    val isOnaSelected = _isOnaSelected
+    private val _isMusicSelected = mutableStateOf(false)
+    val isMusicSelected = _isMusicSelected
     fun onSearchTextChange(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _searchText.value = text
@@ -34,10 +55,30 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
         }
     }
 
-    fun getAnimeInCategory(category: String): Flow<List<AnimeItem>> {
+//    fun getAnimeInCategory(category: String): Flow<List<AnimeItem>> {
+//        return dao.getAnimeInCategory(category, searchText = _searchText.value ?: "")
+//    }
 
-        return dao.getAnimeInCategory(category, searchText = _searchText.value ?: "")
+    fun getAnimeInCategory(
+        category: String,
+        searchText: String,
+        isSortedAlphabetically: Boolean,
+        isSortedByScore: Boolean,
+        isSortedByUsers: Boolean,
+        isAiredFrom: Boolean,
+        type: String?
+    ): Flow<List<AnimeItem>> {
+        return dao.getAnimeInCategory(
+            category = category,
+            searchText = searchText,
+            isSortedAlphabetically = isSortedAlphabetically,
+            isSortedByScore = isSortedByScore,
+            isSortedByUsers = isSortedByUsers,
+            isAiredFrom = isAiredFrom,
+            type = type ?: ""
+        )
     }
+
 
     suspend fun removeFromDataBase(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -52,19 +93,6 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
     fun containsItemIdInCategory(id: Int, categoryId: String): Flow<Boolean> {
         return dao.containsItemIdInCategory(id, categoryId)
     }
-
-    fun sortAnimeByName(category: String): Flow<List<AnimeItem>> {
-        return dao.sortAnimeByName(category)
-    }
-
-//    fun getAnimeListSortedByScore(): Flow<List<AnimeItem>>{
-//        return dao.sortAnimeByScore()
-//    }
-//
-//    fun getAnimeListSortedByScoredBy(): Flow<List<AnimeItem>> {
-//        return dao.sortAnimeByScore()
-//    }
-
 
     // Character
     fun isCharacterInDao(id: Int): Flow<Boolean> {
@@ -107,4 +135,47 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
             dao.addPerson(personItem)
         }
     }
+
+
+//    fun sorting(
+//        isSortedAlphabetically: MutableState<Boolean>,
+//        isSortedByScore: MutableState<Boolean>,
+//        isSortedByUsers: MutableState<Boolean>,
+//        isAiredFrom: MutableState<Boolean>,
+//        currentAnimeInSection: List<AnimeItem>
+//    ): List<AnimeItem> {
+//        var sortedList = currentAnimeInSection
+//
+//        if (isSortedAlphabetically.value) {
+//            isSortedByScore.value = false
+//            isSortedByUsers.value = false
+//            isAiredFrom.value = false
+//            sortedList = currentAnimeInSection.sortedBy { animeItem -> animeItem.animeName }
+//        }
+//
+//        if (isSortedByScore.value) {
+//            isSortedAlphabetically.value = false
+//            isSortedByUsers.value = false
+//            isAiredFrom.value = false
+//            sortedList =
+//                currentAnimeInSection.sortedByDescending { animeItem -> animeItem.score.toFloatOrNull() }
+//        }
+//        if (isSortedByUsers.value) {
+//            isSortedAlphabetically.value = false
+//            isSortedByScore.value = false
+//            isAiredFrom.value = false
+//            sortedList =
+//                currentAnimeInSection.sortedByDescending { animeItem -> animeItem.scored_by.toFloatOrNull() }
+//        }
+//
+//        if (isAiredFrom.value) {
+//            isSortedAlphabetically.value = false
+//            isSortedByScore.value = false
+//            isSortedByUsers.value = false
+//            sortedList =
+//                currentAnimeInSection.sortedByDescending { animeItem -> animeItem.airedFrom }
+//        }
+//
+//        return sortedList
+//    }
 }

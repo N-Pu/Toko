@@ -17,14 +17,16 @@ data class AnimeItem(
     val scored_by: String,
     @ColumnInfo(name = "animeImage")
     val animeImage: String,
-
     @ColumnInfo(name = "status")
     val status: String,
     @ColumnInfo(name = "rating")
     val rating: String,
     @ColumnInfo(name = "secondName")
     val secondName: String,
-
+    @ColumnInfo(name = "airedFrom")
+    val airedFrom: String,
     @ColumnInfo(name = "category")
-    val category: String? = null
+    val category: String? = null,
+    @ColumnInfo(name = "type")
+    val type: String
 )

@@ -16,10 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -60,6 +58,9 @@ import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.daoScreen.model.AnimeListType
 import com.project.toko.personDetailedScreen.dao.PersonItem
 
+//class DaoScreen
+
+//@Inject lateinit var svgImageLoader : ImageLoader
 
 @Composable
 fun DaoScreen(
@@ -71,15 +72,28 @@ fun DaoScreen(
     val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
         add(SvgDecoder.Factory())
     }.build()
+
     var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
-    val scrollState = rememberLazyGridState()
+//    val scrollState = rememberLazyGridState()
     val arrayOfEntries = AnimeListType.values()
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     val searchText by daoViewModel.searchText.collectAsStateWithLifecycle()
-    val sortingMenu = remember {
-        mutableStateOf(false)
-    }
-//    val currentCategory = daoViewModel.currentCategory.value
+    val rightSortingMenu = remember { mutableStateOf(false) }
+    val leftSortingMenu = remember { mutableStateOf(false) }
+
+    val isSortedAlphabetically = daoViewModel.isSortedAlphabetically
+    val isSortedByScore = daoViewModel.isSortedByScore
+    val isSortedByUsers = daoViewModel.isSortedByUsers
+    val isAiredFrom = daoViewModel.isAiredFrom
+
+
+    val selectedType = daoViewModel.selectedType
+    val isTvSelected = daoViewModel.isTvSelected
+    val isMovieSelected = daoViewModel.isMovieSelected
+    val isOvaSelected = daoViewModel.isOvaSelected
+    val isSpecialSelected = daoViewModel.isSpecialSelected
+    val isOnaSelected = daoViewModel.isOnaSelected
+    val isMusicSelected = daoViewModel.isMusicSelected
 
     Column(
         modifier = modifier
@@ -159,69 +173,93 @@ fun DaoScreen(
         TwoSortingButtons(
             modifier = modifier,
             svgImageLoader = svgImageLoader,
-            sortingMenu = sortingMenu,
-            daoViewModel = daoViewModel,
-            selectedListType = selectedListType
-//            currentCategory = currentCategory
+            rightSortingMenu = rightSortingMenu,
+            isSortedAlphabetically = isSortedAlphabetically,
+            isSortedByScore = isSortedByScore,
+            isSortedByUsers = isSortedByUsers,
+            isAiredFrom = isAiredFrom,
+            leftSortingMenu = leftSortingMenu,
+            isTvSelected = isTvSelected,
+            isMovieSelected = isMovieSelected,
+            isOvaSelected = isOvaSelected,
+            isSpecialSelected = isSpecialSelected,
+            isOnaSelected = isOnaSelected,
+            isMusicSelected = isMusicSelected,
+            selectedType = selectedType
+
         )
         Row(
             modifier = modifier
-                .fillMaxWidth(1f)
-                .fillMaxHeight(1f)
+                .fillMaxSize()
                 .background(Color.White)
         ) {
+
             when (selectedListType) {
                 AnimeListType.WATCHING -> FavoriteAnimeList(
-                    category = AnimeListType.WATCHING.route,
                     navController = navController,
                     daoViewModel = daoViewModel,
-                    scrollState = scrollState,
-                    modifier = modifier
+                    modifier = modifier,
+                    category = AnimeListType.WATCHING.route,
+                    isSortedAlphabetically = isSortedAlphabetically,
+                    isSortedByScore = isSortedByScore,
+                    isSortedByUsers = isSortedByUsers,
+                    isAiredFrom = isAiredFrom,
+                    searchText = searchText ?: "",
+                    type = selectedType
                 )
 
                 AnimeListType.PLANNED -> FavoriteAnimeList(
-                    category = AnimeListType.PLANNED.route,
                     navController = navController,
                     daoViewModel = daoViewModel,
-                    scrollState = scrollState,
-                    modifier = modifier
+                    modifier = modifier,
+                    category = AnimeListType.PLANNED.route,
+                    isSortedAlphabetically = isSortedAlphabetically,
+                    isSortedByScore = isSortedByScore,
+                    isSortedByUsers = isSortedByUsers,
+                    isAiredFrom = isAiredFrom, searchText = searchText ?: "", type = selectedType
                 )
 
                 AnimeListType.COMPLETED -> FavoriteAnimeList(
-                    category = AnimeListType.COMPLETED.route,
                     navController = navController,
                     daoViewModel = daoViewModel,
-                    scrollState = scrollState,
-                    modifier = modifier
+                    modifier = modifier,
+                    category = AnimeListType.COMPLETED.route,
+                    isSortedAlphabetically = isSortedAlphabetically,
+                    isSortedByScore = isSortedByScore,
+                    isSortedByUsers = isSortedByUsers,
+                    isAiredFrom = isAiredFrom, searchText = searchText ?: "", type = selectedType
                 )
 
                 AnimeListType.DROPPED -> FavoriteAnimeList(
-                    category = AnimeListType.DROPPED.route,
                     navController = navController,
                     daoViewModel = daoViewModel,
-                    scrollState = scrollState,
-                    modifier = modifier
+                    modifier = modifier,
+                    category = AnimeListType.DROPPED.route,
+                    isSortedAlphabetically = isSortedAlphabetically,
+                    isSortedByScore = isSortedByScore,
+                    isSortedByUsers = isSortedByUsers,
+                    isAiredFrom = isAiredFrom, searchText = searchText ?: "", type = selectedType
                 )
 
                 AnimeListType.FAVORITE -> FavoriteAnimeList(
-                    category = AnimeListType.FAVORITE.route,
                     navController = navController,
                     daoViewModel = daoViewModel,
-                    scrollState = scrollState,
-                    modifier = modifier
+                    modifier = modifier,
+                    category = AnimeListType.FAVORITE.route,
+                    isSortedAlphabetically = isSortedAlphabetically,
+                    isSortedByScore = isSortedByScore,
+                    isSortedByUsers = isSortedByUsers,
+                    isAiredFrom = isAiredFrom, searchText = searchText ?: "", type = selectedType
                 )
 
                 AnimeListType.PERSON -> ShowPerson(
                     navController = navController,
                     viewModelProvider = viewModelProvider,
-                    scrollState = scrollState,
                     modifier = modifier
                 )
 
                 AnimeListType.CHARACTER -> ShowCharacter(
                     navController = navController,
-                    viewModelProvider = viewModelProvider,
-                    scrollState = scrollState,
                     modifier = modifier,
                     daoViewModel = daoViewModel,
                 )
@@ -271,19 +309,37 @@ private fun FavoriteAnimeListButton(
 // (watching, planned, watched, dropped)
 @Composable
 private fun FavoriteAnimeList(
-    category: String,
     navController: NavController,
     daoViewModel: DaoViewModel,
-    scrollState: LazyGridState,
     modifier: Modifier,
-//    isAlphabeticallySorted: MutableState<Boolean>
+    isSortedAlphabetically: MutableState<Boolean>,
+    isSortedByScore: MutableState<Boolean>,
+    isSortedByUsers: MutableState<Boolean>,
+    isAiredFrom: MutableState<Boolean>,
+    category: String,
+    searchText: String,
+    type: MutableState<String?>
 
 ) {
-
-    val animeListState by daoViewModel.getAnimeInCategory(category).collectAsStateWithLifecycle(
-        initialValue = emptyList()
+    val currentAnimeInSection by daoViewModel.getAnimeInCategory(
+        category = category,
+        searchText = searchText,
+        isSortedByScore = isSortedByScore.value,
+        isAiredFrom = isAiredFrom.value,
+        isSortedAlphabetically = isSortedAlphabetically.value,
+        isSortedByUsers = isSortedByUsers.value,
+        type = type.value ?: ""
     )
-//    daoViewModel.currentCategory.value = category
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+
+//    val sorted =
+//        daoViewModel.sorting(
+//            isSortedAlphabetically = isSortedAlphabetically,
+//            isSortedByScore = isSortedByScore,
+//            isSortedByUsers = isSortedByUsers,
+//            currentAnimeInSection = currentAnimeInSection,
+//            isAiredFrom = isAiredFrom
+//        )
 
     Column(
         modifier = modifier
@@ -294,7 +350,7 @@ private fun FavoriteAnimeList(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(animeListState) { animeItem ->
+            items(currentAnimeInSection) { animeItem ->
                 FavoriteScreenCardBox(
                     animeItem = animeItem,
                     navController = navController,
@@ -306,11 +362,14 @@ private fun FavoriteAnimeList(
 }
 
 
+//private fun scoresToFloat(currentScore: String): Float {
+//    return  currentScore.toFloat()
+//}
 @Composable
 private fun ShowCharacter(
     navController: NavController,
-    viewModelProvider: ViewModelProvider,
-    scrollState: LazyGridState,
+//    viewModelProvider: ViewModelProvider,
+//    scrollState: LazyGridState,
     modifier: Modifier,
     daoViewModel: DaoViewModel
 ) {
@@ -397,7 +456,7 @@ private fun CharacterCardBox(
 private fun ShowPerson(
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    scrollState: LazyGridState,
+//    scrollState: LazyGridState,
     modifier: Modifier
 ) {
 
@@ -528,6 +587,14 @@ private fun FavoriteScreenCardBox(
                     fontWeight = FontWeight.Bold,
                     fontSize = 25.sp
                 )
+//                Text(
+//                    text = animeItem.airedFrom,
+//                    modifier = modifier,
+//                    maxLines = 2,
+//                    overflow = TextOverflow.Ellipsis,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 25.sp
+//                )
                 if (!animeItem.secondName.isNullOrEmpty()) {
                     Row(
                         modifier = modifier
@@ -634,10 +701,22 @@ private fun FavoriteScreenCardBox(
 private fun TwoSortingButtons(
     modifier: Modifier,
     svgImageLoader: ImageLoader,
-    sortingMenu: MutableState<Boolean>,
-    daoViewModel: DaoViewModel,
-    selectedListType: AnimeListType
+    leftSortingMenu: MutableState<Boolean>,
+    rightSortingMenu: MutableState<Boolean>,
+    isSortedAlphabetically: MutableState<Boolean>,
+    isSortedByScore: MutableState<Boolean>,
+    isSortedByUsers: MutableState<Boolean>,
+    isAiredFrom: MutableState<Boolean>,
+    isTvSelected: MutableState<Boolean>,
+    isMovieSelected: MutableState<Boolean>,
+    isOvaSelected: MutableState<Boolean>,
+    isSpecialSelected: MutableState<Boolean>,
+    isOnaSelected: MutableState<Boolean>,
+    isMusicSelected: MutableState<Boolean>,
+    selectedType: MutableState<String?>
 ) {
+
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -650,12 +729,243 @@ private fun TwoSortingButtons(
                     model = R.drawable.sidelinegreen, imageLoader = svgImageLoader
                 ), contentDescription = null
             )
-            Text(
-                text = "All >",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 22.sp,
-                modifier = modifier.padding(start = 20.dp)
-            )
+            if (leftSortingMenu.value) {
+                Text(
+                    text = "All v",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 22.sp,
+                    modifier = modifier
+                        .padding(start = 20.dp)
+                        .clickable {
+                            leftSortingMenu.value = !leftSortingMenu.value
+                        }
+                )
+            } else {
+                Text(
+                    text = "All >",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 22.sp,
+                    modifier = modifier
+                        .padding(start = 20.dp)
+                        .clickable {
+                            leftSortingMenu.value = !leftSortingMenu.value
+                        }
+                )
+            }
+        }
+
+        DropdownMenu(
+            modifier = modifier
+                .background(threeLines),
+            expanded = leftSortingMenu.value,
+            onDismissRequest = { leftSortingMenu.value = false }) {
+            DropdownMenuItem(
+                text = {
+                    Text(text = "TV", fontSize = 22.sp, color = Color.White)
+
+                },
+                trailingIcon = {
+                    if (isTvSelected.value) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.circle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    }
+                },
+                onClick = {
+                    isTvSelected.value = !isTvSelected.value
+                    if (isTvSelected.value) {
+                        selectedType.value = "TV"
+                    } else {
+                        selectedType.value = null
+                    }
+
+                    isMovieSelected.value = false
+                    isOnaSelected.value = false
+                    isOvaSelected.value = false
+                    isSpecialSelected.value = false
+                    isMusicSelected.value = false
+
+                })
+            DropdownMenuItem(
+                text = {
+                    Text(text = "ONA", fontSize = 22.sp, color = Color.White)
+
+                },
+                trailingIcon = {
+                    if (isOnaSelected.value) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.circle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    }
+                },
+                onClick = {
+                    isOnaSelected.value = !isOnaSelected.value
+                    if (isOnaSelected.value) {
+                        selectedType.value = "ONA"
+                    } else {
+                        selectedType.value = null
+                    }
+                    isMovieSelected.value = false
+                    isTvSelected.value = false
+                    isOvaSelected.value = false
+                    isSpecialSelected.value = false
+                    isMusicSelected.value = false
+                })
+            DropdownMenuItem(
+                text = {
+                    Text(text = "OVA", fontSize = 22.sp, color = Color.White)
+
+                },
+                trailingIcon = {
+                    if (isOvaSelected.value) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.circle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    }
+                },
+                onClick = {
+                    isOvaSelected.value = !isOvaSelected.value
+
+                    if (isOvaSelected.value) {
+                        selectedType.value = "OVA"
+                    } else {
+                        selectedType.value = null
+                    }
+                    isMovieSelected.value = false
+                    isTvSelected.value = false
+                    isOnaSelected.value = false
+                    isSpecialSelected.value = false
+                    isMusicSelected.value = false
+                })
+            DropdownMenuItem(
+                text = {
+                    Text(text = "Movie", fontSize = 22.sp, color = Color.White)
+
+                },
+                trailingIcon = {
+                    if (isMovieSelected.value) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.circle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    }
+                },
+                onClick = {
+
+                    isMovieSelected.value = !isMovieSelected.value
+
+                    if (isMovieSelected.value) {
+                        selectedType.value = "Movie"
+                    } else {
+                        selectedType.value = null
+                    }
+                    isOvaSelected.value = false
+                    isTvSelected.value = false
+                    isOnaSelected.value = false
+                    isSpecialSelected.value = false
+                    isMusicSelected.value = false
+                })
+            DropdownMenuItem(
+                text = {
+                    Text(text = "Special", fontSize = 22.sp, color = Color.White)
+
+                },
+                trailingIcon = {
+                    if (isSpecialSelected.value) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.circle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    }
+                },
+                onClick = {
+
+                    isSpecialSelected.value = !isSpecialSelected.value
+
+                    if (isSpecialSelected.value) {
+                        selectedType.value = "Special"
+                    } else {
+                        selectedType.value = null
+                    }
+                    isOvaSelected.value = false
+                    isMovieSelected.value = false
+                    isTvSelected.value = false
+                    isOnaSelected.value = false
+                    isMusicSelected.value = false
+                })
+            DropdownMenuItem(
+                text = {
+                    Text(text = "Music", fontSize = 22.sp, color = Color.White)
+
+                },
+                trailingIcon = {
+                    if (isMusicSelected.value) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.circle, imageLoader = svgImageLoader
+                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                        )
+                    }
+                },
+                onClick = {
+                    isMusicSelected.value = !isMusicSelected.value
+
+                    if (isMusicSelected.value) {
+                        selectedType.value = "Music"
+                    } else {
+                        selectedType.value = null
+                    }
+                    isOvaSelected.value = false
+                    isTvSelected.value = false
+                    isOnaSelected.value = false
+                    isMovieSelected.value  = false
+                    isSpecialSelected.value = false
+                })
+
         }
         Column(
             modifier = modifier
@@ -669,13 +979,13 @@ private fun TwoSortingButtons(
                 modifier = modifier
                     .size(22.dp)
                     .clickable {
-                        sortingMenu.value = true
+                        rightSortingMenu.value = true
                     }
             )
 
             DropdownMenu(
-                expanded = sortingMenu.value,
-                onDismissRequest = { sortingMenu.value = false },
+                expanded = rightSortingMenu.value,
+                onDismissRequest = { rightSortingMenu.value = false },
                 modifier = modifier
                     .fillMaxWidth(0.58f)
                     .background(threeLines)
@@ -687,56 +997,106 @@ private fun TwoSortingButtons(
 
                     },
                     trailingIcon = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.circle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
-                        )
+                        if (isSortedAlphabetically.value) {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                            )
+                        } else {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = R.drawable.circle, imageLoader = svgImageLoader
+                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                            )
+                        }
                     },
                     onClick = {
-                            daoViewModel.sortAnimeByName(selectedListType.name)
+                        isSortedByScore.value = false
+                        isSortedByUsers.value = false
+                        isAiredFrom.value = false
+                        isSortedAlphabetically.value = !isSortedAlphabetically.value
+                    })
+                DropdownMenuItem(
+                    text = {
+                        Text(text = "Score", fontSize = 22.sp, color = Color.White)
+                    },
+                    trailingIcon = {
+                        if (isSortedByScore.value) {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                            )
+                        } else {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = R.drawable.circle, imageLoader = svgImageLoader
+                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                            )
+                        }
+                    },
+                    onClick = {
+                        isSortedByUsers.value = false
+                        isSortedAlphabetically.value = false
+                        isAiredFrom.value = false
+                        isSortedByScore.value = !isSortedByScore.value
+
+                    })
+                DropdownMenuItem(
+                    text = {
+                        Text(text = "Users", fontSize = 22.sp, color = Color.White)
+                    },
+                    trailingIcon = {
+                        if (isSortedByUsers.value) {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                            )
+                        } else {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = R.drawable.circle, imageLoader = svgImageLoader
+                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                            )
+                        }
+                    },
+                    onClick = {
+                        isSortedAlphabetically.value = false
+                        isSortedByScore.value = false
+                        isAiredFrom.value = false
+                        isSortedByUsers.value = !isSortedByUsers.value
+
                     })
                 DropdownMenuItem(
                     text = {
 
-                        Text(text = "Score", fontSize = 22.sp, color = Color.White)
-                    },
-                    trailingIcon = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.circle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
-                        )
-                    },
-                    onClick = { })
-                DropdownMenuItem(
-                    text = {
-
-                        Text(text = "Air Start Date", fontSize = 22.sp, color = Color.White)
+                        Text(text = "Aired Start Date", fontSize = 22.sp, color = Color.White)
 
                     },
                     trailingIcon = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.circle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
-                        )
+                        if (isAiredFrom.value) {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                            )
+                        } else {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = R.drawable.circle, imageLoader = svgImageLoader
+                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                            )
+                        }
                     },
-                    onClick = { })
-                DropdownMenuItem(
-                    text = {
+                    onClick = {
+                        isSortedAlphabetically.value = false
+                        isSortedByScore.value = false
+                        isSortedByUsers.value = false
+                        isAiredFrom.value = !isAiredFrom.value
 
-                        Text(text = "Last Updated", fontSize = 22.sp, color = Color.White)
-
-                    },
-                    trailingIcon = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
-                        )
-                    },
-                    onClick = {})
+                    })
             }
         }
     }

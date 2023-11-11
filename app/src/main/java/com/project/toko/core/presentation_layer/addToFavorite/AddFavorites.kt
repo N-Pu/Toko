@@ -52,6 +52,8 @@ fun AddFavorites(
     rating: String,
     status: String,
     secondName: String?,
+    airedFrom: String,
+    type: String
 
 ) {
 
@@ -113,7 +115,9 @@ fun AddFavorites(
                                     category = selectedItem,
                                     status = status,
                                     secondName = secondName ?: "",
-                                    rating = rating
+                                    rating = rating,
+                                    airedFrom = airedFrom,
+                                    type = type
 
                                 )
                             )

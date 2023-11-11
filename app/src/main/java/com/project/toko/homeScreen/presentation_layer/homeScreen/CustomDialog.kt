@@ -65,6 +65,7 @@ import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.DialogSideColor
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
+import com.project.toko.daoScreen.model.AnimeListType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -113,9 +114,11 @@ fun CustomDialog(
             usePlatformDefaultWidth = false
         )
     ) {
-        Box(modifier = modifier
-            .width(weight)
-            .height(height())) {
+        Box(
+            modifier = modifier
+                .width(weight)
+                .height(height())
+        ) {
 
 
             Card(
@@ -499,7 +502,9 @@ private fun AddToFavoriteRow(
                             data.status,
                             data.rating ?: "N/A",
                             data.title_japanese,
-                            "Watching"
+                            airedFrom = data.aired.from,
+                            category = AnimeListType.WATCHING.route,
+                            type = data.type
                         )
                     )
                 }
@@ -527,7 +532,9 @@ private fun AddToFavoriteRow(
                             data.status,
                             data.rating ?: "N/A",
                             data.title_japanese,
-                            "Watched"
+                            airedFrom = data.aired.from,
+                            category = AnimeListType.COMPLETED.route,
+                            type = data.type
                         )
                     )
                 }
@@ -556,7 +563,9 @@ private fun AddToFavoriteRow(
                             data.status,
                             data.rating ?: "N/A",
                             data.title_japanese,
-                            "Dropped"
+                            airedFrom = data.aired.from,
+                            category = AnimeListType.DROPPED.route,
+                            type = data.type
                         )
                     )
                 }
@@ -592,12 +601,16 @@ private fun AddToFavoriteRow(
                                     data.mal_id,
                                     data.title,
                                     data.score.toString(),
-                                    data.scored_by.toInt().toString(),
+                                    data.scored_by
+                                        .toInt()
+                                        .toString(),
                                     data.images.jpg.large_image_url,
                                     data.status,
                                     data.rating ?: "N/A",
                                     data.title_japanese,
-                                    "Planned"
+                                    airedFrom = data.aired.from,
+                                    category = AnimeListType.PLANNED.route,
+                                    type = data.type
                                 )
                             )
                         }
@@ -722,8 +735,7 @@ private fun DisplayCustomGenres(
             .horizontalScroll(
                 rememberScrollState()
             )
-            .padding(0.dp, 10.dp, 0.dp, 0.dp)
-        ,
+            .padding(0.dp, 10.dp, 0.dp, 0.dp),
         horizontalArrangement = Arrangement.Center
     ) {
         genres.forEachIndexed { index, genre ->

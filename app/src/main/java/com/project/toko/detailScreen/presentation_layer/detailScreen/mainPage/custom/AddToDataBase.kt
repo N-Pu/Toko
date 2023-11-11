@@ -4,14 +4,11 @@ package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.c
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
@@ -24,13 +21,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
@@ -88,7 +83,9 @@ fun AddToFavorites(
                             category = AnimeListType.FAVORITE.route,
                             status = detailScreenState?.status ?: "",
                             rating = detailScreenState?.rating ?: "",
-                            secondName = detailScreenState?.title_japanese ?: ""
+                            secondName = detailScreenState?.title_japanese ?: "",
+                            airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                            type = detailScreenState?.type ?:"N/A"
                         )
                     )
                 }
@@ -126,7 +123,9 @@ fun AddToFavorites(
                             category = AnimeListType.PLANNED.route,
                             status = detailScreenState?.status ?: "",
                             rating = detailScreenState?.rating ?: "",
-                            secondName = detailScreenState?.title_japanese ?: ""
+                            secondName = detailScreenState?.title_japanese ?: "",
+                            airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                            type = detailScreenState?.type ?:"N/A"
                         )
 
                     )
@@ -233,7 +232,9 @@ fun AddToFavorites(
                                     category = AnimeListType.COMPLETED.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
-                                    secondName = detailScreenState?.title_japanese ?: ""
+                                    secondName = detailScreenState?.title_japanese ?: "",
+                                    airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                                    type = detailScreenState?.type ?:"N/A"
                                 )
 
                             )
@@ -296,7 +297,9 @@ fun AddToFavorites(
                                     category = AnimeListType.DROPPED.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
-                                    secondName = detailScreenState?.title_japanese ?: ""
+                                    secondName = detailScreenState?.title_japanese ?: "",
+                                    airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                                    type = detailScreenState?.type ?:"N/A"
                                 )
 
                             )
@@ -359,7 +362,9 @@ fun AddToFavorites(
                                     category = AnimeListType.WATCHING.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
-                                    secondName = detailScreenState?.title_japanese ?: ""
+                                    secondName = detailScreenState?.title_japanese ?: "",
+                                    airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                                    type = detailScreenState?.type ?:"N/A"
                                 )
 
                             )
@@ -371,157 +376,6 @@ fun AddToFavorites(
                 )
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewDropDownMenu() {
-
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
-
-    Column(
-        modifier = Modifier
-            .height(120.dp)
-            .width(170.dp)
-            .padding(10.dp)
-            .clip(
-                RoundedCornerShape(12.dp)
-            )
-            .background(Color(65, 65, 65)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceAround
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(0.9f)
-        ) {
-
-            Text(text = "Completed", color = Color.White)
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = R.drawable.eyewhite, imageLoader = svgImageLoader
-                ),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(20.dp)
-                    .background(Color.White)
-            )
-        }
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(0.9f)
-        ) {
-
-            Text(text = "Dropped", color = Color.White)
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = R.drawable.dropped, imageLoader = svgImageLoader
-                ),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(20.dp)
-                    .background(Color.White)
-            )
-        }
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(0.9f)
-        ) {
-
-            Text(text = "Add to list", color = Color.White)
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = R.drawable.add, imageLoader = svgImageLoader
-                ),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(20.dp)
-                    .background(Color.White)
-            )
-        }
-    }
-}
-
-
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewDropDownSecond() {
-
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
-
-    DropdownMenu(
-        expanded = true,
-        onDismissRequest = { true }, modifier = Modifier
-            .height(120.dp)
-            .width(170.dp)
-//                    .padding(10.dp)
-            .background(Color(65, 65, 65))
-    ) {
-        DropdownMenuItem(text = {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-            ) {
-                Text(text = "Completed", color = Color.White)
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = R.drawable.eyewhite, imageLoader = svgImageLoader
-                    ), contentDescription = null, modifier = Modifier.size(22.dp)
-                )
-            }
-        }, onClick = { }, modifier = Modifier
-            .height(40.dp)
-            .width(170.dp)
-        )
-        DropdownMenuItem(text = {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-            ) {
-                Text(text = "Dropped", color = Color.White)
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = R.drawable.dropped, imageLoader = svgImageLoader
-                    ), contentDescription = null, modifier = Modifier.size(22.dp)
-
-                )
-            }
-        }, onClick = { }, modifier = Modifier
-            .height(40.dp)
-            .width(170.dp)
-        )
-        DropdownMenuItem(text = {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-            ) {
-                Text(text = "Add to list", color = Color.White)
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = R.drawable.add, imageLoader = svgImageLoader
-                    ), contentDescription = null, modifier = Modifier.size(22.dp)
-
-                )
-            }
-
-        }, onClick = { }, modifier = Modifier
-            .height(40.dp)
-            .width(170.dp)
-        )
     }
 }
 

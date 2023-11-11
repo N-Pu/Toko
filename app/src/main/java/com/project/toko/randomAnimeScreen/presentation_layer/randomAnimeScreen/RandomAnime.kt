@@ -43,6 +43,7 @@ import com.project.toko.daoScreen.model.AnimeListType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Locale
 import kotlin.math.roundToInt
 
 
@@ -60,23 +61,23 @@ fun ShowRandomAnime(
 
 
     Column(
-        modifier.background(MainBackgroundColor).fillMaxSize(),
+        modifier
+            .background(MainBackgroundColor)
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         if (cardIsShown.value) {
             if (state == null) {
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .clip(CardDefaults.shape)
-                        .background(LightGreen)
-                        .combinedClickable(onDoubleClick = {
-                            randomViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                randomViewModel.onTapRandomAnime()
-                            }
-                        }) {}
-                        .padding(20.dp, 20.dp, 20.dp, 20.dp)
-                ) {
+                BoxWithConstraints(modifier = Modifier
+                    .clip(CardDefaults.shape)
+                    .background(LightGreen)
+                    .combinedClickable(onDoubleClick = {
+                        randomViewModel.viewModelScope.launch(Dispatchers.IO) {
+                            randomViewModel.onTapRandomAnime()
+                        }
+                    }) {}
+                    .padding(20.dp, 20.dp, 20.dp, 20.dp)) {
                     Text(
                         text = "Tap 2 times",
                         fontSize = 30.sp,
@@ -119,8 +120,7 @@ fun DraggablePreview() {
                 .size(250.dp)
                 .offset {
                     IntOffset(
-                        offsetX.floatValue.roundToInt(),
-                        offsetY.floatValue.roundToInt()
+                        offsetX.floatValue.roundToInt(), offsetY.floatValue.roundToInt()
                     )
                 }
                 .pointerInput(Unit) {
@@ -180,7 +180,11 @@ fun CardPreview() {
             .clip(CardDefaults.shape)
             .width(340.dp)
             .height(490.dp)
-            .offset { IntOffset(offsetX.floatValue.roundToInt(), offsetY.floatValue.roundToInt()) }
+            .offset {
+                IntOffset(
+                    offsetX.floatValue.roundToInt(), offsetY.floatValue.roundToInt()
+                )
+            }
             .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
                     change.consume()
@@ -270,22 +274,13 @@ fun CardPreview() {
                                 DisplayCustomGenres(
                                     genres = listOf(
                                         com.project.toko.homeScreen.model.newAnimeSearchModel.Genre(
-                                            0,
-                                            "Adventure",
-                                            "",
-                                            ""
+                                            0, "Adventure", "", ""
                                         ),
                                         com.project.toko.homeScreen.model.newAnimeSearchModel.Genre(
-                                            0,
-                                            "Comedy",
-                                            "",
-                                            ""
+                                            0, "Comedy", "", ""
                                         ),
                                         com.project.toko.homeScreen.model.newAnimeSearchModel.Genre(
-                                            0,
-                                            "Romance",
-                                            "",
-                                            ""
+                                            0, "Romance", "", ""
                                         ),
                                     ), modifier = Modifier
                                 )
@@ -295,14 +290,10 @@ fun CardPreview() {
 
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 Text(
-                                    text = "   Status: ",
-                                    fontSize = 12.sp,
-                                    color = Color.White
+                                    text = "   Status: ", fontSize = 12.sp, color = Color.White
                                 )
                                 Text(
-                                    text = "Finished Airing",
-                                    fontSize = 12.sp,
-                                    color = LightGreen
+                                    text = "Finished Airing", fontSize = 12.sp, color = LightGreen
                                 )
                             }
                             Row(modifier = Modifier.fillMaxWidth()) {
@@ -354,16 +345,12 @@ fun AnimeCard(
     val offsetX = remember { mutableFloatStateOf(0f) }
     val offsetY = remember { mutableFloatStateOf(0f) }
 
-    val model = ImageRequest.Builder(LocalContext.current)
-        .data(data?.images?.jpg?.large_image_url)
-        .size(Size.ORIGINAL)
-        .crossfade(true)
-        .build()
+    val model = ImageRequest.Builder(LocalContext.current).data(data?.images?.jpg?.large_image_url)
+        .size(Size.ORIGINAL).crossfade(true).build()
 
-    val painter =
-        rememberAsyncImagePainter(
-            model = model,
-        )
+    val painter = rememberAsyncImagePainter(
+        model = model,
+    )
 
     val scoreRoundedCornerShape = remember { RoundedCornerShape(bottomEnd = 10.dp) }
 
@@ -377,15 +364,13 @@ fun AnimeCard(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize(1f)
     ) {
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color(129, 129, 129, 65)),
+        Card(colors = CardDefaults.cardColors(containerColor = Color(129, 129, 129, 65)),
             modifier = modifier
                 .width(340.dp)
                 .height(510.dp)
                 .offset {
                     IntOffset(
-                        offsetX.floatValue.roundToInt(),
-                        offsetY.floatValue.roundToInt()
+                        offsetX.floatValue.roundToInt(), offsetY.floatValue.roundToInt()
                     )
                 }
                 .pointerInput(Unit) {
@@ -414,19 +399,20 @@ fun AnimeCard(
                         }
                         if (offsetX.floatValue >= 500f && offsetY.floatValue >= -550f) {
                             println("LEFT " + " x " + offsetX.floatValue + " y " + offsetY.floatValue)
-
                             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                                 daoViewModel.addToCategory(
                                     animeItem = AnimeItem(
                                         id = data?.mal_id,
                                         animeName = data?.title ?: "Error",
                                         animeImage = data?.images?.jpg?.large_image_url ?: "",
-                                        score = data?.score.toString(),
-                                        scored_by = data?.scored_by.toString(),
+                                        score = formatScoredBy(data?.score ?: 0.0f),
+                                        scored_by = formatScoredBy(data?.scored_by ?: 0.0f),
                                         category = AnimeListType.PLANNED.route,
                                         status = data?.status ?: "",
                                         rating = data?.rating ?: "",
-                                        secondName = data?.title_japanese ?: ""
+                                        secondName = data?.title_japanese ?: "",
+                                        airedFrom = data?.aired?.from ?: "N/A",
+                                        type = data?.type ?: "N/A"
                                     )
                                 )
                                 cardIsShown.value = false
@@ -529,8 +515,7 @@ fun AnimeCard(
                         Box(
                             modifier = modifier
                                 .background(
-                                    scoreColorChanger(data?.score ?: 0.0f),
-                                    scoreRoundedCornerShape
+                                    scoreColorChanger(data?.score ?: 0.0f), scoreRoundedCornerShape
                                 )
                                 .size(75.dp), contentAlignment = Alignment.Center
                         ) {
@@ -579,8 +564,7 @@ fun AnimeCard(
 
                                     if (numbOfGenres > 3) {
                                         DisplayCustomGenres(
-                                            genres = data.genres.take(3),
-                                            modifier = modifier
+                                            genres = data.genres.take(3), modifier = modifier
                                         )
                                     }
 
@@ -591,23 +575,17 @@ fun AnimeCard(
 
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 Text(
-                                    text = "   Status: ",
-                                    fontSize = 12.sp,
-                                    color = Color.White
+                                    text = "   Status: ", fontSize = 12.sp, color = Color.White
                                 )
 
                                 Text(
-                                    text = data?.status ?: "",
-                                    fontSize = 12.sp,
-                                    color = LightGreen
+                                    text = data?.status ?: "", fontSize = 12.sp, color = LightGreen
                                 )
 
                             }
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 Text(
-                                    text = "   Rating: ",
-                                    fontSize = 12.sp,
-                                    color = Color.White
+                                    text = "   Rating: ", fontSize = 12.sp, color = Color.White
                                 )
 
                                 Text(
@@ -665,8 +643,7 @@ fun AnimeCard(
 
 @Composable
 private fun ColoredBox(
-    text: String,
-    modifier: Modifier
+    text: String, modifier: Modifier
 ) {
 
     Box(
@@ -686,22 +663,40 @@ private fun ColoredBox(
 
 @Composable
 private fun DisplayCustomGenres(
-    genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>,
-    modifier: Modifier
+    genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>, modifier: Modifier
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+        modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
     ) {
         genres.forEachIndexed { index, genre ->
             if (index != 0) {
                 Spacer(modifier = modifier.width(8.dp))
             }
             ColoredBox(
-                text = genre.name,
-                modifier
+                text = genre.name, modifier
             )
         }
     }
 }
+
+private fun formatScoredBy(float: Float): String {
+    return if (float == 0f) {
+        "N/A"
+    } else {
+        val formattedString = String.format(Locale.US, "%.1f", float)
+        if (formattedString.endsWith(".0")) {
+            formattedString.substring(0, formattedString.length - 2)
+        } else {
+            formattedString.replace(",", ".")
+        }
+    }
+}
+
+
+//private fun formatScore(float: Float?): String {
+//    return if (float == null || float == 0f) {
+//        "N/A"
+//    } else {
+//        float.toString()
+//    }
+//}
