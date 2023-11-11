@@ -240,9 +240,7 @@ fun AnimeCardBox(
                         fontWeight = FontWeight.Bold,
                         modifier = modifier
                             .fillMaxWidth()
-                            .align(
-                                Alignment.BottomEnd
-                            )
+                            .align(Alignment.BottomEnd)
                     )
                 }
             }
@@ -257,7 +255,9 @@ fun AnimeCardBox(
                 viewModelProvider = viewModelProvider,
                 status = data.status,
                 rating = data.rating ?: "N/A",
-                secondName = data.title_japanese
+                secondName = data.title_japanese,
+                airedFrom = data.aired.from,
+                type = data.type
             )
 
 
@@ -311,7 +311,7 @@ fun AnimeCardBox(
 
 
 fun formatScoredBy(float: Float): String {
-    return if (float == 0f) {
+    return if (float == 0.0f) {
         "N/A"
     } else {
         val formattedString = String.format(Locale.US, "%.1f", float)
@@ -325,7 +325,7 @@ fun formatScoredBy(float: Float): String {
 
 
 fun formatScore(float: Float?): String {
-    return if (float == null || float == 0f) {
+    return if (float == null || float == 0.0f) {
         "N/A"
     } else {
         float.toString()
