@@ -17,41 +17,17 @@ interface Dao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addToCategory(animeItem: AnimeItem)
 
-    // Функция для получения всех аниме в определенной категории
-//    @Query("SELECT * FROM animeItems " +
-//            "WHERE category = :category AND " +
-//            "(CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END)")
-//    fun getAnimeInCategory(category: String, searchText: String): Flow<List<AnimeItem>>
-
-
-//    @Query("SELECT * FROM animeItems " +
-//            "WHERE category = :category AND " +
-//            "(CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END) " +
-//            "ORDER BY " +
-//            "CASE WHEN :isSortedAlphabetically = 1 THEN animeName END ASC, " +
-//            "CASE WHEN :isSortedByScore = 1 THEN score END DESC, " +
-//            "CASE WHEN :isSortedByUsers = 1 THEN scored_by END ASC, " +
-//            "CASE WHEN :isAiredFrom = 1 THEN airedFrom END DESC")
-//    fun getAnimeInCategory(
-//        category: String,
-//        searchText: String,
-//        isSortedAlphabetically: Boolean,
-//        isSortedByScore: Boolean,
-//        isSortedByUsers: Boolean,
-//        isAiredFrom: Boolean,
-//        type: String
-//    ): Flow<List<AnimeItem>>
-
-
-    @Query("SELECT * FROM animeItems " +
-            "WHERE category = :category AND " +
-            "(CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END) " +
-            "AND (CASE WHEN :type = '' THEN 1 ELSE type = :type END) " +
-            "ORDER BY " +
-            "CASE WHEN :isSortedAlphabetically = 1 THEN animeName END ASC, " +
-            "CASE WHEN :isSortedByScore = 1 THEN score END DESC, " +
-            "CASE WHEN :isSortedByUsers = 1 THEN scored_by END ASC, " +
-            "CASE WHEN :isAiredFrom = 1 THEN airedFrom END DESC")
+    @Query(
+        "SELECT * FROM animeItems " +
+                "WHERE category = :category AND " +
+                "(CASE WHEN :searchText = '' THEN 1 ELSE animeName LIKE '%' || :searchText || '%' END) " +
+                "AND (CASE WHEN :type = '' THEN 1 ELSE type = :type END) " +
+                "ORDER BY " +
+                "CASE WHEN :isSortedAlphabetically = 1 THEN animeName END ASC, " +
+                "CASE WHEN :isSortedByScore = 1 THEN score END DESC, " +
+                "CASE WHEN :isSortedByUsers = 1 THEN scored_by END ASC, " +
+                "CASE WHEN :isAiredFrom = 1 THEN airedFrom END DESC"
+    )
     fun getAnimeInCategory(
         category: String,
         searchText: String,
@@ -61,7 +37,6 @@ interface Dao {
         isAiredFrom: Boolean,
         type: String
     ): Flow<List<AnimeItem>>
-
 
 
     @Query("DELETE FROM animeItems WHERE id = :id")
@@ -77,11 +52,6 @@ interface Dao {
     @Query("SELECT category FROM animeItems WHERE id = :id")
     fun getCategoryForId(id: Int): Flow<String?>
 
-//    @Query("SELECT * FROM animeItems ORDER BY animeName ASC")
-    @Query("SELECT * FROM animeItems WHERE category = :category ORDER BY animeName ASC")
-    fun sortAnimeByName(category: String): Flow<List<AnimeItem>>
-
-
     // character table
     @Query("SELECT EXISTS(SELECT 1 FROM characterItem WHERE id = :id LIMIT 1)")
     fun isCharacterInDao(id: Int): Flow<Boolean>
@@ -89,7 +59,7 @@ interface Dao {
     @Query("DELETE FROM characterItem WHERE id = :id")
     suspend fun removeCharacterFromDataBase(id: Int)
 
-    @Query("SELECT * FROM characterItem WHERE (CASE WHEN :searchText = '' THEN 1 ELSE name LIKE '%' || :searchText || '%' END)")
+    @Query("SELECT * FROM characterItem WHERE (CASE WHEN :searchText = '' THEN  1 ELSE name LIKE '%' || :searchText || '%' END) ORDER BY name")
     fun getAllCharacters(searchText: String): Flow<List<CharacterItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -102,11 +72,9 @@ interface Dao {
     @Query("DELETE FROM personItem WHERE id = :id")
     suspend fun removePersonFromDataBase(id: Int)
 
-    @Query("SELECT * FROM personItem WHERE (CASE WHEN :searchText = '' THEN 1 ELSE name LIKE '%' || :searchText || '%' END)")
+    @Query("SELECT * FROM personItem WHERE (CASE WHEN :searchText = '' THEN 1 ELSE name LIKE '%' || :searchText || '%' END) ORDER BY name")
     fun getAllPeople(searchText: String): Flow<List<PersonItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addPerson(personItem: PersonItem)
-
-
 }
