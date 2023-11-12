@@ -170,30 +170,31 @@ fun DaoScreen(
                 )
             }
         }
-        TwoSortingButtons(
-            modifier = modifier,
-            svgImageLoader = svgImageLoader,
-            rightSortingMenu = rightSortingMenu,
-            isSortedAlphabetically = isSortedAlphabetically,
-            isSortedByScore = isSortedByScore,
-            isSortedByUsers = isSortedByUsers,
-            isAiredFrom = isAiredFrom,
-            leftSortingMenu = leftSortingMenu,
-            isTvSelected = isTvSelected,
-            isMovieSelected = isMovieSelected,
-            isOvaSelected = isOvaSelected,
-            isSpecialSelected = isSpecialSelected,
-            isOnaSelected = isOnaSelected,
-            isMusicSelected = isMusicSelected,
-            selectedType = selectedType
 
-        )
+        if ((selectedListType != AnimeListType.CHARACTER) and (selectedListType != AnimeListType.PERSON)) {
+            TwoSortingButtons(
+                modifier = modifier,
+                svgImageLoader = svgImageLoader,
+                rightSortingMenu = rightSortingMenu,
+                isSortedAlphabetically = isSortedAlphabetically,
+                isSortedByScore = isSortedByScore,
+                isSortedByUsers = isSortedByUsers,
+                isAiredFrom = isAiredFrom,
+                leftSortingMenu = leftSortingMenu,
+                isTvSelected = isTvSelected,
+                isMovieSelected = isMovieSelected,
+                isOvaSelected = isOvaSelected,
+                isSpecialSelected = isSpecialSelected,
+                isOnaSelected = isOnaSelected,
+                isMusicSelected = isMusicSelected,
+                selectedType = selectedType
+            )
+        }
         Row(
             modifier = modifier
                 .fillMaxSize()
                 .background(Color.White)
         ) {
-
             when (selectedListType) {
                 AnimeListType.WATCHING -> FavoriteAnimeList(
                     navController = navController,
@@ -216,7 +217,9 @@ fun DaoScreen(
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
                     isSortedByUsers = isSortedByUsers,
-                    isAiredFrom = isAiredFrom, searchText = searchText ?: "", type = selectedType
+                    isAiredFrom = isAiredFrom,
+                    searchText = searchText ?: "",
+                    type = selectedType
                 )
 
                 AnimeListType.COMPLETED -> FavoriteAnimeList(
@@ -227,7 +230,9 @@ fun DaoScreen(
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
                     isSortedByUsers = isSortedByUsers,
-                    isAiredFrom = isAiredFrom, searchText = searchText ?: "", type = selectedType
+                    isAiredFrom = isAiredFrom,
+                    searchText = searchText ?: "",
+                    type = selectedType
                 )
 
                 AnimeListType.DROPPED -> FavoriteAnimeList(
@@ -238,7 +243,9 @@ fun DaoScreen(
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
                     isSortedByUsers = isSortedByUsers,
-                    isAiredFrom = isAiredFrom, searchText = searchText ?: "", type = selectedType
+                    isAiredFrom = isAiredFrom,
+                    searchText = searchText ?: "",
+                    type = selectedType
                 )
 
                 AnimeListType.FAVORITE -> FavoriteAnimeList(
@@ -249,7 +256,9 @@ fun DaoScreen(
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
                     isSortedByUsers = isSortedByUsers,
-                    isAiredFrom = isAiredFrom, searchText = searchText ?: "", type = selectedType
+                    isAiredFrom = isAiredFrom,
+                    searchText = searchText ?: "",
+                    type = selectedType
                 )
 
                 AnimeListType.PERSON -> ShowPerson(
@@ -962,7 +971,7 @@ private fun TwoSortingButtons(
                     isOvaSelected.value = false
                     isTvSelected.value = false
                     isOnaSelected.value = false
-                    isMovieSelected.value  = false
+                    isMovieSelected.value = false
                     isSpecialSelected.value = false
                 })
 
@@ -1095,7 +1104,6 @@ private fun TwoSortingButtons(
                         isSortedByScore.value = false
                         isSortedByUsers.value = false
                         isAiredFrom.value = !isAiredFrom.value
-
                     })
             }
         }
