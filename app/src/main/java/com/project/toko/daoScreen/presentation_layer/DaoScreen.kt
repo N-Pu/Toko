@@ -724,8 +724,6 @@ private fun TwoSortingButtons(
     isMusicSelected: MutableState<Boolean>,
     selectedType: MutableState<String?>
 ) {
-
-
     Row(
         modifier = modifier
             .fillMaxWidth()

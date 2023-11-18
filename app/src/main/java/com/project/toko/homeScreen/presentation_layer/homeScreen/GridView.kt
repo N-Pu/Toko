@@ -1,12 +1,14 @@
 package com.project.toko.homeScreen.presentation_layer.homeScreen
 
-
+import androidx.compose.animation.animateContentSize
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -24,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +52,6 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
 import com.project.toko.core.presentation_layer.theme.LightCardColor
-import com.project.toko.core.presentation_layer.theme.MainBackgroundColor
 import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -61,19 +63,31 @@ import java.util.Locale
 fun GridAdder(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier,
+    isTabMenuOpen: MutableState<Boolean>
 ) {
+
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val listData by viewModel.animeSearch.collectAsStateWithLifecycle()
     val scrollGridState = rememberLazyStaggeredGridState()
     val isLoading by viewModel.isNextPageLoading.collectAsStateWithLifecycle()
+    var log by remember { mutableStateOf("") }
 
     LazyVerticalStaggeredGrid(
-        state = scrollGridState,
+        state = if (scrollGridState.firstVisibleItemIndex >= 4) {
+            log = scrollGridState.firstVisibleItemIndex.toString()
+            isTabMenuOpen.value = false
+            scrollGridState
+        } else {
+            log = scrollGridState.firstVisibleItemIndex.toString()
+            isTabMenuOpen.value = true
+            scrollGridState
+        },
         columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
         modifier = modifier
             .fillMaxSize()
-            .background(MainBackgroundColor),
+            .background(Color(0xFFF4F4F4))
+            .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow)),
         horizontalArrangement = Arrangement.spacedBy(22.dp),
         verticalItemSpacing = 20.dp,
         contentPadding = PaddingValues(10.dp)
@@ -82,7 +96,6 @@ fun GridAdder(
             Spacer(modifier = modifier.height(1.dp))
 
         }
-
         item {
             Spacer(modifier = modifier.height(20.dp))
         }
@@ -257,7 +270,7 @@ fun AnimeCardBox(
                 rating = data.rating ?: "N/A",
                 secondName = data.title_japanese,
                 airedFrom = data.aired.from,
-                type = data.type
+                type = data.type ?: "N/A"
             )
 
 

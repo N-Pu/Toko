@@ -15,7 +15,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.project.toko.core.presentation_layer.theme.LightGreen
-import com.project.toko.core.presentation_layer.theme.MainBackgroundColor
 import kotlinx.coroutines.delay
 
 
@@ -57,7 +56,7 @@ fun LoadingAnimation(
     Box(
         modifier
             .fillMaxSize()
-            .background(MainBackgroundColor)
+            .background(Color(0xFFF4F4F4))
             .wrapContentSize(Alignment.Center)
     ) {
 

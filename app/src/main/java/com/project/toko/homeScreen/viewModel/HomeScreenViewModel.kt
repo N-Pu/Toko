@@ -3,11 +3,23 @@ package com.project.toko.homeScreen.viewModel
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.core.repository.MalApiService
+import com.project.toko.homeScreen.model.linkChangerModel.OrderBy
+import com.project.toko.homeScreen.model.linkChangerModel.Rating
+import com.project.toko.homeScreen.model.linkChangerModel.Score
+import com.project.toko.homeScreen.model.linkChangerModel.Types
+import com.project.toko.homeScreen.model.linkChangerModel.getGenres
+import com.project.toko.homeScreen.model.linkChangerModel.getOrderBy
+import com.project.toko.homeScreen.model.linkChangerModel.getRating
+import com.project.toko.homeScreen.model.linkChangerModel.getTypes
+import com.project.toko.homeScreen.model.newAnimeSearchModel.Items
+import com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel
+import com.project.toko.homeScreen.model.newAnimeSearchModel.Pagination
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
@@ -21,14 +33,12 @@ class HomeScreenViewModel @Inject constructor(
     private val malApiRepository: MalApiService,
 ) : ViewModel() {
 
-    private var _isDropdownVisible = mutableStateOf(false)
-    val isDropdownMenuVisible = _isDropdownVisible
 
-    private val emptyItem = com.project.toko.homeScreen.model.newAnimeSearchModel.Items(0, 0, 0)
+    private val emptyItem = Items(0, 0, 0)
     private val emptyNewAnimeSearchModel =
-        com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel(
+        NewAnimeSearchModel(
             data = ArrayList(),
-            pagination = com.project.toko.homeScreen.model.newAnimeSearchModel.Pagination(
+            pagination = Pagination(
                 false,
                 emptyItem,
                 0
@@ -62,59 +72,57 @@ class HomeScreenViewModel @Inject constructor(
     private val arrayOfGenres = MutableStateFlow(arrayListOf<Int>())
 
     private val preSelectedGenre =
-        MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getGenres())
-    val selectedGenre: MutableStateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.Genre>> =
+        MutableStateFlow(getGenres())
+    val selectedGenre =
         preSelectedGenre
 
 
     private var pre_genres = ""
+
     private val _genres = MutableStateFlow<String?>(null)
 
-    private val _type = MutableStateFlow("")
-    val type = _type.value
-
     private val _ratingList =
-        MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getRating())
-    val ratingList: StateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.Rating>> =
+        MutableStateFlow(getRating())
+    val ratingList =
         _ratingList
 
 
     private val preSelectedRating =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Rating?>(null)
-    val selectedRating: StateFlow<com.project.toko.homeScreen.model.linkChangerModel.Rating?> =
+        MutableStateFlow<Rating?>(null)
+    val selectedRating =
         preSelectedRating
 
     private val _selectedRating =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Rating?>(null)
+        MutableStateFlow<Rating?>(null)
 
-    fun setSelectedRating(rating: com.project.toko.homeScreen.model.linkChangerModel.Rating) {
+    fun setSelectedRating(rating: Rating) {
         preSelectedRating.value = if (rating == preSelectedRating.value) null else rating
     }
 
 
     private val pre_min_score =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
+        MutableStateFlow<Score?>(null)
     private val _min_score =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
+        MutableStateFlow<Score?>(null)
 
 
-    fun setSelectedMinScore(score: com.project.toko.homeScreen.model.linkChangerModel.Score) {
+    fun setSelectedMinScore(score: Score) {
         pre_min_score.value = if (score == pre_min_score.value) null else score
     }
 
     private val pre_max_score =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
+        MutableStateFlow<Score?>(null)
     private val _max_score =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Score?>(null)
+        MutableStateFlow<Score?>(null)
 
-    fun setSelectedMaxScore(score: com.project.toko.homeScreen.model.linkChangerModel.Score) {
+    fun setSelectedMaxScore(score: Score) {
         pre_max_score.value = if (score == pre_max_score.value) null else score
     }
 
     private val preSelectedMinMax = mutableStateOf(false)
     val selectedMinMax: MutableState<Boolean> = preSelectedMinMax
 
-    private val _scoreState = mutableStateOf(0)
+    private val _scoreState = mutableIntStateOf(0)
     val scoreState = _scoreState
 
 
@@ -122,35 +130,34 @@ class HomeScreenViewModel @Inject constructor(
     var safeForWork = _safeForWork
 
     private val _typeList =
-        MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getTypes())
-    val typeList: StateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.Types>> =
+        MutableStateFlow(getTypes())
+    val typeList =
         _typeList
     private val pre_selectedType =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Types?>(null)
-    val selectedType: StateFlow<com.project.toko.homeScreen.model.linkChangerModel.Types?> =
+        MutableStateFlow<Types?>(null)
+    val selectedType: StateFlow<Types?> =
         pre_selectedType
     private val _selectedType =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.Types?>(null)
+        MutableStateFlow<Types?>(null)
 
-    fun setSelectedType(type: com.project.toko.homeScreen.model.linkChangerModel.Types) {
+    fun setSelectedType(type: Types) {
         pre_selectedType.value = if (type == pre_selectedType.value) null else type
     }
 
     private val _orderByList =
-        MutableStateFlow(com.project.toko.homeScreen.model.linkChangerModel.getOrderBy())
-    val orderByList: StateFlow<List<com.project.toko.homeScreen.model.linkChangerModel.OrderBy>> =
+        MutableStateFlow(getOrderBy())
+    val orderByList =
         _orderByList
     private val pre_selectedOrderBy =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.OrderBy?>(null)
-    val selectedOrderBy: StateFlow<com.project.toko.homeScreen.model.linkChangerModel.OrderBy?> =
+        MutableStateFlow<OrderBy?>(null)
+    val selectedOrderBy: StateFlow<OrderBy?> =
         pre_selectedOrderBy
     private val _selectedOrderBy =
-        MutableStateFlow<com.project.toko.homeScreen.model.linkChangerModel.OrderBy?>(null)
+        MutableStateFlow<OrderBy?>(null)
 
-    fun setSelectedOrderBy(orderBy: com.project.toko.homeScreen.model.linkChangerModel.OrderBy) {
+    fun setSelectedOrderBy(orderBy: OrderBy) {
         pre_selectedOrderBy.value = if (orderBy == pre_selectedOrderBy.value) null else orderBy
     }
-
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -169,15 +176,15 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    // note: if you hit the1"ok" button without tapping on genres - it will show you whole list of animes.
+    // note: if you hit "ok" button without tapping on genres - it will show you whole list of animes.
     private suspend fun performSearch(query: String?) {
-        var currentQuery = query
-        var currentGenres = _genres.value
         try {
             // This "if" statement is temporary added because
             // Jikan.Api isn't working properly with query that
             // contains less then 3 letters.
 
+            var currentQuery = query
+            var currentGenres = _genres.value
             _currentPage.value = 1
             _isPerformingSearch.value = true
 
@@ -227,24 +234,23 @@ class HomeScreenViewModel @Inject constructor(
             return
         }
 
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val nextPage = currentPage.value + 1
+
                 val response =
                     malApiRepository.getAnimeSearchByName(
                         sfw = safeForWork.value,
                         query = currentQuery,
                         page = nextPage,
-                        genres = currentGenres,
-                        rating = _selectedRating.value?.ratingName,
-                        type = _selectedType.value?.typeName,
-                        orderBy = _selectedOrderBy.value?.orderBy,
-                        max_score = _max_score.value?.score,
-                        min_score = _min_score.value?.score
+                        genres = makeArrayToLinkWithCommas(arrayOfGenres.value),
+                        rating = preSelectedRating.value?.ratingName,
+                        type = pre_selectedType.value?.typeName,
+                        orderBy = pre_selectedOrderBy.value?.orderBy,
+                        max_score = pre_max_score.value?.score,
+                        min_score = pre_min_score.value?.score
 
                     ).body()
-
 
                 if (response != null) {
                     hasNextPage.value = response.pagination.has_next_page
@@ -293,33 +299,25 @@ class HomeScreenViewModel @Inject constructor(
 
 
     suspend fun addAllParams() {
-        val jobGenres = viewModelScope.async(Dispatchers.IO) {
+        viewModelScope.async(Dispatchers.IO) {
             pre_genres = makeArrayToLinkWithCommas(arrayOfGenres.value)
             _genres.value = pre_genres
-        }
-        val jobRating = viewModelScope.async(Dispatchers.IO) {
+        }.join()
+        viewModelScope.async(Dispatchers.IO) {
             _selectedRating.value = preSelectedRating.value
-        }
-        val jobTypes = viewModelScope.async(Dispatchers.IO) {
+        }.join()
+        viewModelScope.async(Dispatchers.IO) {
             _selectedType.value = pre_selectedType.value
-        }
-        val jobOrderBy = viewModelScope.async(Dispatchers.IO) {
+        }.join()
+        viewModelScope.async(Dispatchers.IO) {
             _selectedOrderBy.value = pre_selectedOrderBy.value
-        }
-        val jobMinMaxScore = viewModelScope.async(Dispatchers.IO) {
+        }.join()
+        viewModelScope.async(Dispatchers.IO) {
             _min_score.value = pre_min_score.value
             _max_score.value = pre_max_score.value
-        }
-
-        jobGenres.join()
-        jobRating.join()
-        jobTypes.join()
-        jobOrderBy.join()
-        jobMinMaxScore.join()
-
+        }.join()
 
         performSearch(searchText.value)
-
     }
 
 
