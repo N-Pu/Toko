@@ -1,0 +1,65 @@
+<svg width="103"
+    height="103"
+    viewBox="0 0 103 103"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+    <circle
+        cx="51.4996"
+        cy="51.4996"
+        r="51.4996"
+        fill="white"
+        fill-opacity="0.24" />
+    <g clip-path="url(#clip0_259_1154)">
+        <g filter="url(#filter0_d_259_1154)">
+            <path
+                d="M34.3332 51.4997H51.4997M51.4997 51.4997H68.6663M51.4997 51.4997V68.6663M51.4997 51.4997V34.3332M51.4997 90.1244C30.1679 90.1244 12.875 72.8316 12.875 51.4997C12.875 30.1679 30.1679 12.875 51.4997 12.875C72.8316 12.875 90.1244 30.1679 90.1244 51.4997C90.1244 72.8316 72.8316 90.1244 51.4997 90.1244Z"
+                stroke="white"
+                stroke-width="4.20405"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                shape-rendering="crispEdges" />
+        </g>
+    </g>
+    <defs>
+        <filter
+            id="filter0_d_259_1154"
+            x="2.36534"
+            y="10.7729"
+            width="98.2693"
+            height="98.2698"
+            filterUnits="userSpaceOnUse"
+            color-interpolation-filters="sRGB">
+            <feFlood
+                flood-opacity="0"
+                result="BackgroundImageFix" />
+            <feColorMatrix
+                in="SourceAlpha"
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                result="hardAlpha" />
+            <feOffset dy="8.4081" />
+            <feGaussianBlur stdDeviation="4.20405" />
+            <feComposite
+                in2="hardAlpha"
+                operator="out" />
+            <feColorMatrix
+                type="matrix"
+                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
+            <feBlend
+                mode="normal"
+                in2="BackgroundImageFix"
+                result="effect1_dropShadow_259_1154" />
+            <feBlend
+                mode="normal"
+                in="SourceGraphic"
+                in2="effect1_dropShadow_259_1154"
+                result="shape" />
+        </filter>
+        <clipPath id="clip0_259_1154">
+            <rect
+                width="102.999"
+                height="102.999"
+                fill="white" />
+        </clipPath>
+    </defs>
+</svg>

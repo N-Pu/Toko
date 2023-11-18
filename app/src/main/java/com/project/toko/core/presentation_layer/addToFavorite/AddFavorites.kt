@@ -1,15 +1,15 @@
 package com.project.toko.core.presentation_layer.addToFavorite
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import com.project.toko.R
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
@@ -53,15 +56,17 @@ fun AddFavorites(
     status: String,
     secondName: String?,
     airedFrom: String?,
-    type: String
+    type: String,
+    imageLoader: ImageLoader
 
 ) {
 
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     var expanded by remember { mutableStateOf(false) }
-        val containsInDao = daoViewModel.containsInDataBase(id = mal_id
-        ).collectAsStateWithLifecycle(initialValue = false).value
+    val containsInDao = daoViewModel.containsInDataBase(
+        id = mal_id
+    ).collectAsStateWithLifecycle(initialValue = false).value
     if (containsInDao
     ) {
         items.add(4, "Delete")
@@ -78,16 +83,17 @@ fun AddFavorites(
             horizontalAlignment = Alignment.End,
             modifier = modifier
                 .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 10.dp)
         ) {
-            IconButton(
-                onClick = { expanded = true },
-            ) {
-                Icon(
-                    Icons.Default.AddCircle,
-                    contentDescription = null,
-                    tint = LightGreen
-                )
-            }
+            Image(
+                modifier = modifier.size(38.dp).clickable { expanded = true },
+                painter = rememberAsyncImagePainter(
+                    model = R.drawable.addpluscircle,
+                    imageLoader = imageLoader
+                ),
+                contentDescription = "Add circle"
+            )
+
         }
 
         DropdownMenu(
@@ -107,7 +113,7 @@ fun AddFavorites(
                         } else {
                             daoViewModel.addToCategory(
                                 AnimeItem(
-                                 id = mal_id,
+                                    id = mal_id,
                                     animeName = anime,
                                     score = score,
                                     scored_by = scoredBy,

@@ -17,13 +17,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -39,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,9 +45,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import com.project.toko.R
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
 import com.project.toko.core.presentation_layer.theme.LightCardColor
+import com.project.toko.core.presentation_layer.theme.scoreBoardColor
 import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -108,9 +108,7 @@ fun GridAdder(
             )
 
             // Загрузка следующей страницы при достижении конца списка и has_next_page = true
-            if (index == listData.data.lastIndex - 2 && isLoading.not()
-                && listData.pagination.has_next_page
-            ) {
+            if (index == listData.data.lastIndex - 2 && isLoading.not() && listData.pagination.has_next_page) {
                 viewModel.loadNextPage()
             }
         }
@@ -124,16 +122,12 @@ fun GridAdder(
 
         if (selectedAnime != null) {
             CustomDialog(
-                data = selectedAnime,
-                navController = navController,
-                onDismiss = {
+                data = selectedAnime, navController = navController, onDismiss = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.onDialogDismiss()
                     }
 
-                },
-                modifier = modifier,
-                viewModelProvider = viewModelProvider
+                }, modifier = modifier, viewModelProvider = viewModelProvider
             )
         }
     }
@@ -158,12 +152,13 @@ fun AnimeCardBox(
         targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = 600,
-                easing = LinearEasing
-            ),
-            repeatMode = RepeatMode.Reverse
+                durationMillis = 600, easing = LinearEasing
+            ), repeatMode = RepeatMode.Reverse
         ), label = ""
     )
+    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
+        add(SvgDecoder.Factory())
+    }.build()
 
     Card(
         modifier = modifier
@@ -196,9 +191,7 @@ fun AnimeCardBox(
         shape = RectangleShape,
     ) {
         Box(
-            modifier = modifier
-                .fillMaxWidth(1f)
-                .fillMaxHeight(1f)
+            modifier = modifier.fillMaxSize()
         ) {
             // Coil image loader
             Image(
@@ -211,39 +204,36 @@ fun AnimeCardBox(
             )
 
             Column(
-                modifier = modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
+                modifier = modifier
+                    .width(50.dp)
+                    .clip(RoundedCornerShape(bottomEnd = 15.dp))
+                    .background(scoreBoardColor)
             ) {
-                Box(
-                    modifier = modifier.size(45.dp), contentAlignment = Alignment.Center
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(top = 5.dp),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        Icons.Filled.Star,
-                        contentDescription = "Score ${data.score}",
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = modifier.size(45.dp)
-                    )
+
                     Text(
                         text = formatScore(data.score),
                         color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-
-                        )
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-                Box(
+                Column(
                     modifier = modifier
-                        .width(45.dp)
+                        .fillMaxWidth()
                         .height(50.dp),
-
-                    ) {
-
-                    Icon(
-                        Icons.Filled.Person,
-                        contentDescription = "Scored by ${data.scored_by}",
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = modifier
-                            .width(45.dp)
-                            .height(50.dp)
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    Image(
+                        modifier = modifier.size(25.dp), painter = rememberAsyncImagePainter(
+                            model = R.drawable.usergroup, imageLoader = svgImageLoader
+                        ), contentDescription = null
                     )
                     Text(
                         textAlign = TextAlign.Center,
@@ -252,8 +242,6 @@ fun AnimeCardBox(
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomEnd)
                     )
                 }
             }
@@ -270,7 +258,8 @@ fun AnimeCardBox(
                 rating = data.rating ?: "N/A",
                 secondName = data.title_japanese,
                 airedFrom = data.aired.from,
-                type = data.type ?: "N/A"
+                type = data.type ?: "N/A",
+                imageLoader = svgImageLoader
             )
 
 
