@@ -12,8 +12,6 @@ import coil.compose.AsyncImagePainter
     painter: AsyncImagePainter,
     modifier: Modifier,
 ) {
-
-
     Box {
         Image(
             painter = painter,

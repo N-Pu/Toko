@@ -2,13 +2,17 @@ package com.project.toko.homeScreen.presentation_layer.homeScreen
 
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import android.view.MotionEvent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,10 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,8 +32,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -38,10 +45,12 @@ import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.theme.LightGreen
-import com.project.toko.core.presentation_layer.theme.SoftGreen
 import com.project.toko.core.presentation_layer.theme.ScoreColors
 import com.project.toko.core.presentation_layer.theme.SearchBarColor
 import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
+import com.project.toko.homeScreen.model.linkChangerModel.Score
+import com.project.toko.homeScreen.model.linkChangerModel.getStateScore
+import com.project.toko.homeScreen.model.tabRow.TabItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -54,9 +63,12 @@ fun MainScreen(
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
+    val isTabMenuOpen = remember { mutableStateOf(true) }
+
     Column(
         modifier = modifier
             .fillMaxWidth(1f)
+            .background(Color(0xFFF4F4F4))
     ) {
         Column(
             modifier = modifier
@@ -99,9 +111,6 @@ fun MainScreen(
                         Icon(Icons.Filled.Search, "Search Icon", tint = iconColorInSearchPanel)
                     },
                     singleLine = true,
-                    trailingIcon = {
-                        DropDownMenuWithIconButton(viewModel, modifier)
-                    },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = iconColorInSearchPanel,
                         focusedPlaceholderColor = iconColorInSearchPanel,
@@ -115,11 +124,14 @@ fun MainScreen(
             }
         }
 
+        TabSelectionMenu(viewModel, modifier, isTabMenuOpen)
+
         if (!isSearching) {
             GridAdder(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier
+                modifier = modifier,
+                isTabMenuOpen = isTabMenuOpen
             )
         } else {
             LoadingAnimation()
@@ -129,53 +141,121 @@ fun MainScreen(
 }
 
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
-private fun DropDownMenuWithIconButton(viewModel: HomeScreenViewModel, modifier: Modifier) {
-    val isDropdownVisible = viewModel.isDropdownMenuVisible
+fun TabSelectionMenu(
+    viewModel: HomeScreenViewModel,
+    modifier: Modifier,
+    isTabMenuOpen: MutableState<Boolean>
+) {
 
-    IconButton(onClick = {
-
-        viewModel.viewModelScope.launch(Dispatchers.IO) {
-            isDropdownVisible.value = true
-        }
-
-    }, modifier = modifier.size(65.dp)) {
-        Icon(
-            imageVector = Icons.Filled.MoreVert,
-            contentDescription = "GenreButton",
-            modifier = modifier.size(30.dp)
-        )
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    var sizeOfCurrentComposable by remember {
+        mutableStateOf(IntSize.Zero)
     }
 
-    DropdownMenu(
-        expanded = isDropdownVisible.value,
-        onDismissRequest = { isDropdownVisible.value = false },
-        offset = DpOffset(x = (-270).dp, y = 0.dp)
-    ) {
-        Box(modifier.size(360.dp)) {
+    val tabItems = listOf(
+        TabItem("Type"),
+        TabItem("Genres"),
+        TabItem("Rating"),
+        TabItem("Score"),
+        TabItem("Order By"),
+    )
+    val pagerState = rememberPagerState { tabItems.size }
 
+    LaunchedEffect(selectedTabIndex) {
+        pagerState.animateScrollToPage(selectedTabIndex)
+    }
+    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+        if (!pagerState.isScrollInProgress) {
+            selectedTabIndex = pagerState.currentPage
+        }
+    }
+//    ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
+    Row(
+        horizontalArrangement = Arrangement.Center, modifier = modifier
+            .fillMaxWidth()
+            .background(Color(0xFFF4F4F4))
+    ) {
+
+        ScrollableTabRow(
+//        TabRow(
+            modifier = modifier
+                .fillMaxWidth(0.85f),
+            selectedTabIndex = selectedTabIndex,
+            contentColor = Color.Black,
+            containerColor = Color(0xFFF4F4F4),
+            indicator = { tabPositions ->
+                if (selectedTabIndex < tabPositions.size) {
+                    TabRowDefaults.Indicator(
+                        modifier = modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                        color = LightGreen
+                    )
+                }
+            },
+            edgePadding = 0.dp
+        ) {
+            tabItems.forEachIndexed { index, item ->
+                Tab(
+                    selected = index == selectedTabIndex, onClick = {
+                        selectedTabIndex = index
+                    },
+                    modifier = modifier.background(Color(0xFFF4F4F4))
+                ) {
+                    Text(text = item.title, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+                    Spacer(modifier = modifier.height(5.dp))
+                }
+            }
+        }
+    }
+    Spacer(
+        modifier = modifier
+            .height(20.dp)
+            .fillMaxWidth()
+            .background(Color(0xFFF4F4F4))
+    )
+    if (isTabMenuOpen.value) {
+        HorizontalPager(
+            state = pagerState, modifier = modifier
+                .fillMaxWidth()
+                .onSizeChanged {
+                    sizeOfCurrentComposable = it
+                }
+                .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow))
+        ) { index ->
             FlowRow(
                 modifier = modifier
-                    .fillMaxWidth()
+                    .background(Color(0xFFF4F4F4))
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 8.dp, vertical = 8.dp),
-//                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
                 content = {
+                    when (tabItems[index]) {
+                        tabItems[0] -> {
+                            ShowTypes(viewModel, modifier)
+                        }
 
-                    ShowGenres(viewModel, modifier)
-                    ShowRating(viewModel, modifier)
-                    ShowTypes(viewModel, modifier)
-                    ShowOrderBy(viewModel, modifier)
-                    ScoreBar(viewModel = viewModel, modifier = modifier)
-                    SafeFowWorkSwitch(viewModel)
+                        tabItems[1] -> {
+                            ShowGenres(viewModel, modifier)
+                        }
 
-                })
+                        tabItems[2] -> {
+                            ShowRating(viewModel, modifier)
+                        }
+
+                        tabItems[3] -> {
+                            ScoreBar(viewModel, modifier)
+                        }
+
+                        tabItems[4] -> {
+                            ShowOrderBy(viewModel, modifier)
+                        }
+                    }
+//                    SafeFowWorkSwitch(viewModel)
+
+                }
+            )
         }
-        AddAllButton(viewModel, isDropdownVisible, modifier = modifier)
     }
-
 }
 
 @Composable
@@ -197,8 +277,8 @@ private fun SafeFowWorkSwitch(viewModel: HomeScreenViewModel) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ScoreBar(
-    modifier: Modifier,
-    viewModel: HomeScreenViewModel
+    viewModel: HomeScreenViewModel,
+    modifier: Modifier
 ) {
     var ratingState by viewModel.scoreState
     var selected by viewModel.selectedMinMax
@@ -206,14 +286,6 @@ private fun ScoreBar(
         targetValue = if (selected) 30.dp else 34.dp,
         spring(Spring.DampingRatioMediumBouncy), label = ""
     )
-
-
-
-    Box(contentAlignment = Alignment.Center) {
-        Divider(thickness = 25.dp)
-        Text(text = "min - max score", textAlign = TextAlign.Center)
-    }
-
     Row(
         modifier = modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically,
@@ -227,50 +299,53 @@ private fun ScoreBar(
                     .width(size)
                     .height(size)
                     .pointerInteropFilter {
-                        when (it.action) {
-                            MotionEvent.ACTION_DOWN -> {
-                                if (i == ratingState) {
-                                    // Повторное нажатие на звезду
-                                    selected = false
-                                    ratingState = 0
+                        viewModel.viewModelScope.launch {
+                            when (it.action) {
+                                MotionEvent.ACTION_DOWN -> {
+                                    if (i == ratingState) {
+                                        // Повторное нажатие на звезду
+                                        selected = false
+                                        ratingState = 0
 
-                                    viewModel.setSelectedMinScore(
-                                        com.project.toko.homeScreen.model.linkChangerModel.Score(
-                                            com.project.toko.homeScreen.model.linkChangerModel.getStateScore(
-                                                ratingState
-                                            ).minScore
+                                        viewModel.setSelectedMinScore(
+                                            Score(
+                                                getStateScore(
+                                                    ratingState
+                                                ).minScore
+                                            )
                                         )
-                                    )
-                                    viewModel.setSelectedMaxScore(
-                                        com.project.toko.homeScreen.model.linkChangerModel.Score(
-                                            com.project.toko.homeScreen.model.linkChangerModel.getStateScore(
-                                                ratingState
-                                            ).maxScore
+                                        viewModel.setSelectedMaxScore(
+                                            Score(
+                                                getStateScore(
+                                                    ratingState
+                                                ).maxScore
+                                            )
                                         )
-                                    )
-                                } else {
-                                    selected = true
-                                    ratingState = i
-                                    viewModel.setSelectedMinScore(
-                                        com.project.toko.homeScreen.model.linkChangerModel.Score(
-                                            com.project.toko.homeScreen.model.linkChangerModel.getStateScore(
-                                                ratingState
-                                            ).minScore
+                                    } else {
+                                        selected = true
+                                        ratingState = i
+                                        viewModel.setSelectedMinScore(
+                                            Score(
+                                                getStateScore(
+                                                    ratingState
+                                                ).minScore
+                                            )
                                         )
-                                    )
-                                    viewModel.setSelectedMaxScore(
-                                        com.project.toko.homeScreen.model.linkChangerModel.Score(
-                                            com.project.toko.homeScreen.model.linkChangerModel.getStateScore(
-                                                ratingState
-                                            ).maxScore
+                                        viewModel.setSelectedMaxScore(
+                                            Score(
+                                                getStateScore(
+                                                    ratingState
+                                                ).maxScore
+                                            )
                                         )
-                                    )
+                                    }
+                                }
+
+                                MotionEvent.ACTION_UP -> {
+                                    selected = false
                                 }
                             }
-
-                            MotionEvent.ACTION_UP -> {
-                                selected = false
-                            }
+                            viewModel.addAllParams()
                         }
                         true
                     },
@@ -311,36 +386,40 @@ private fun starColorChanger(selectedScore: Int, starNumber: Int): Color {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ShowGenres(
     viewModel: HomeScreenViewModel,
     modifier: Modifier
 ) {
     val selectedGenre by viewModel.selectedGenre.collectAsStateWithLifecycle()
-
-    Box(contentAlignment = Alignment.TopCenter) {
-        Divider(thickness = 25.dp)
-        Text(text = "Genres", textAlign = TextAlign.Center)
-
-    }
-
-    selectedGenre.forEach { genreForUI ->
-        ButtonCreator(
-            text = genreForUI.name,
-            isTouched = genreForUI.isSelected.value,
-            onClick = {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    genreForUI.isSelected.value = !genreForUI.isSelected.value
-                    viewModel.tappingOnGenre(genreForUI.id)
-                }
-            },
-            modifier = modifier
-        )
-        Spacer(
-            modifier = modifier
-                .width(8.dp)
-                .height(50.dp)
-        )
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .height(310.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        FlowRow(horizontalArrangement = Arrangement.Center) {
+            selectedGenre.forEach { genreForUI ->
+                ButtonCreator(
+                    text = genreForUI.name,
+                    isTouched = genreForUI.isSelected.value,
+                    onClick = {
+                        viewModel.viewModelScope.launch(Dispatchers.IO) {
+                            genreForUI.isSelected.value = !genreForUI.isSelected.value
+                            viewModel.tappingOnGenre(genreForUI.id)
+                            viewModel.addAllParams()
+                        }
+                    },
+                    modifier = modifier
+                )
+                Spacer(
+                    modifier = modifier
+                        .width(8.dp)
+                        .height(50.dp)
+                )
+            }
+        }
     }
 }
 
@@ -357,9 +436,9 @@ private fun ButtonCreator(
             .clip(CircleShape)
             .background(
                 if (isTouched) {
-                    LightGreen
+                    Color(104, 190, 174)
                 } else {
-                    SoftGreen
+                    Color(222, 222, 222)
                 }
             )
             .clickable(onClick = onClick),
@@ -367,9 +446,10 @@ private fun ButtonCreator(
         content = {
             Text(
                 text = text,
-                color = Color.White,
+                color = if (isTouched) Color.White else Color.Black,
                 textAlign = TextAlign.Center,
-                modifier = modifier.padding(8.dp)
+                modifier = modifier.padding(8.dp),
+                fontSize = 18.sp
             )
         }
     )
@@ -379,109 +459,85 @@ private fun ButtonCreator(
 private fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val ratingList by viewModel.ratingList.collectAsStateWithLifecycle()
     val selectedRating by viewModel.selectedRating.collectAsStateWithLifecycle()
-
-    Box(contentAlignment = Alignment.Center) {
-        Divider(thickness = 25.dp)
-        Text(text = "Rating", textAlign = TextAlign.Center)
-    }
-
-    ratingList.forEach { rating ->
-        ButtonCreator(
-            isTouched = rating == selectedRating,
-            onClick = {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    viewModel.setSelectedRating(rating)
-                }
-            },
-            text = rating.ratingName,
-            modifier = modifier
-        )
-        Spacer(
-            modifier = modifier
-                .width(8.dp)
-                .height(50.dp)
-        )
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        ratingList.forEach { rating ->
+            ButtonCreator(
+                isTouched = rating == selectedRating,
+                onClick = {
+                    viewModel.viewModelScope.launch(Dispatchers.IO) {
+                        viewModel.setSelectedRating(rating)
+                        viewModel.addAllParams()
+                    }
+                },
+                text = rating.ratingName,
+                modifier = modifier
+            )
+            Spacer(
+                modifier = modifier
+                    .width(8.dp)
+                    .height(50.dp)
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val typeList by viewModel.typeList.collectAsStateWithLifecycle()
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
 
-    Box(contentAlignment = Alignment.Center) {
-        Divider(thickness = 25.dp)
-        Text(text = "Type", textAlign = TextAlign.Center)
-    }
-
-    typeList.forEach { type ->
-        ButtonCreator(
-            isTouched = type == selectedType,
-            onClick = {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    viewModel.setSelectedType(type)
-                }
-            },
-            text = type.typeName,
-            modifier = modifier
-        )
-        Spacer(
-            modifier = modifier
-                .width(8.dp)
-                .height(50.dp)
-        )
+    FlowRow(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
+        typeList.forEach { type ->
+            ButtonCreator(
+                isTouched = type == selectedType,
+                onClick = {
+                    viewModel.viewModelScope.launch(Dispatchers.IO) {
+                        viewModel.setSelectedType(type)
+                        viewModel.addAllParams()
+                    }
+                },
+                text = type.typeName,
+                modifier = modifier
+            )
+            Spacer(
+                modifier = modifier
+                    .width(8.dp)
+                    .height(50.dp)
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ShowOrderBy(viewModel: HomeScreenViewModel, modifier: Modifier) {
     val orderByList by viewModel.orderByList.collectAsStateWithLifecycle()
     val selectedOrderBy by viewModel.selectedOrderBy.collectAsStateWithLifecycle()
 
-    Box(contentAlignment = Alignment.Center) {
-        Divider(thickness = 25.dp)
-        Text(text = "Order by", textAlign = TextAlign.Center)
-    }
 
-    orderByList.forEach { orderBy ->
-        ButtonCreator(
-            isTouched = orderBy == selectedOrderBy,
-            onClick = {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    viewModel.setSelectedOrderBy(orderBy)
-                }
-            },
-            text = orderBy.orderBy,
-            modifier = modifier
-        )
-        Spacer(
-            modifier = modifier
-                .width(8.dp)
-                .height(50.dp)
-        )
-    }
-}
-
-@Composable
-private fun AddAllButton(
-    viewModel: HomeScreenViewModel,
-    isDropdownVisible: MutableState<Boolean>,
-    modifier: Modifier
-) {
-    Box(modifier = modifier.fillMaxWidth()) {
-        Button(
-            onClick = {
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-
-                    viewModel.addAllParams()
-                    isDropdownVisible.value = false
-
-                }
-            },
-            modifier = modifier.align(Alignment.BottomCenter)
-
-        ) {
-            Text(text = "Ok", color = Color.Red)
+    FlowRow(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
+        orderByList.forEach { orderBy ->
+            ButtonCreator(
+                isTouched = orderBy == selectedOrderBy,
+                onClick = {
+                    viewModel.viewModelScope.launch(Dispatchers.IO) {
+                        viewModel.setSelectedOrderBy(orderBy)
+                        viewModel.addAllParams()
+                    }
+                },
+                text = orderBy.orderBy,
+                modifier = modifier
+            )
+            Spacer(
+                modifier = modifier
+                    .width(8.dp)
+                    .height(50.dp)
+            )
         }
     }
+
 }
