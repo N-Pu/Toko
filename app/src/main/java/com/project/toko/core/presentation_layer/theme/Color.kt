@@ -20,6 +20,14 @@ val LightCardColor = Color(255, 255, 255)
 
 val threeLines = Color(65, 65, 65)
 
+
+val scoreBoardColor = Brush.linearGradient(
+    0.0f to Color(0f, 0f, 0f, 0.59f),
+    0.7f to Color(0, 0, 0, 1),
+    1.0f to Color(0, 0, 0, 1),
+    start = Offset(0.0f, 0.0f),
+    end = Offset(0.0f, 500.0f)
+)
 val iconColorInSearchPanel = Color(0, 0, 0, 77)
 private val FirstBarColor = Color(104, 190, 174, 161)
 private val SecondBarColor = Color(255, 255, 255, 0)
@@ -28,28 +36,32 @@ val SearchBarColor = Brush.linearGradient(
 //    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
-    end = Offset(600.0f, 0.0f))
+    end = Offset(600.0f, 0.0f)
+)
 
 val SectionColor = Brush.linearGradient(
     0.0f to FirstBarColor,
 //    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
-    end = Offset(750.0f, 0.0f))
+    end = Offset(750.0f, 0.0f)
+)
 
 val BackArrowCastColor = Brush.linearGradient(
     0.0f to FirstBarColor,
 //    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
-    end = Offset(950.0f, 0.0f))
+    end = Offset(950.0f, 0.0f)
+)
 
 val BackArrowSecondCastColor = Brush.linearGradient(
     0.0f to FirstBarColor,
 //    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
-    end = Offset(450.0f, 0.0f))
+    end = Offset(450.0f, 0.0f)
+)
 
 //    .linearGradient(
 // 0.0f to FirstBarColor,
@@ -65,20 +77,23 @@ val CardBackgroundColor = Color(0xFF494949)
 val DarkBackgroundColor = Color(0xFF414141)
 val DarktIconTint = Color(255, 255, 255, 178)
 val DarkBottomBarColor = Color(49, 49, 49, 255)
+
 object ScoreColors {
     val Red = Color(255, 77, 87)
-    val Yellow =  Color(255, 160, 0)
+    val Yellow = Color(255, 160, 0)
     val Green = Color(104, 190, 174)
     val Blank = Color(0xFFA2ADB1)
 }
 
-    private val watching = Color(189, 218, 213)
-    private val planned = Color(157, 214, 204)
-    private val completed = Color(126, 206, 192)
-    private val dropped = Color(104, 190, 174)
-    private val favorite = Color(69, 167, 149)
-    private val person = Color(46, 135, 118)
-    private val character = Color(34, 124, 107, 255)
+private val watching = Color(189, 218, 213)
+private val planned = Color(157, 214, 204)
+private val completed = Color(126, 206, 192)
+private val dropped = Color(104, 190, 174)
+private val favorite = Color(69, 167, 149)
+private val person = Color(46, 135, 118)
+private val character = Color(34, 124, 107, 255)
 
-val favoriteTopBarColors = listOf(watching, planned, completed, dropped, favorite,person,
-    character)
+val favoriteTopBarColors = listOf(
+    watching, planned, completed, dropped, favorite, person,
+    character
+)
