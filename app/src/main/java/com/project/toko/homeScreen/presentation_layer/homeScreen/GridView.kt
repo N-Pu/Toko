@@ -12,6 +12,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
@@ -21,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,7 +54,9 @@ import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
 import com.project.toko.core.presentation_layer.theme.LightCardColor
+import com.project.toko.core.presentation_layer.theme.SectionColor
 import com.project.toko.core.presentation_layer.theme.scoreBoardColor
+import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -71,49 +76,193 @@ fun GridAdder(
     val listData by viewModel.animeSearch.collectAsStateWithLifecycle()
     val scrollGridState = rememberLazyStaggeredGridState()
     val isLoading by viewModel.isNextPageLoading.collectAsStateWithLifecycle()
+    val lastTenAnimeFromWatchingSection =
+        viewModel.showListOfWatching().collectAsStateWithLifecycle(
+            initialValue = emptyList()
+        )
+    val getJustTenAddedAnime =
+        viewModel.showLastAdded().collectAsStateWithLifecycle(
+            initialValue = emptyList()
+        )
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getTopTrendingAnime("bypopularity", 25)
+        delay(2000L)
+        viewModel.getTopAiring("airing", 25)
+        delay(2000L)
+        viewModel.getTopUpcoming("upcoming", 25)
+    }
+    val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
+    val getTopUpcoming by viewModel.topUpcomingAnime.collectAsStateWithLifecycle()
+    val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
+
     var log by remember { mutableStateOf("") }
+    if (listData.data.isNotEmpty()) {
+        LazyVerticalStaggeredGrid(
+            state = if (scrollGridState.firstVisibleItemIndex >= 4) {
+                log = scrollGridState.firstVisibleItemIndex.toString()
+                isTabMenuOpen.value = false
+                scrollGridState
+            } else {
+                log = scrollGridState.firstVisibleItemIndex.toString()
+                isTabMenuOpen.value = true
+                scrollGridState
+            },
+            columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color(0xFFF4F4F4))
+                .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow)),
+            horizontalArrangement = Arrangement.spacedBy(22.dp),
+            verticalItemSpacing = 20.dp,
+            contentPadding = PaddingValues(10.dp)
+        ) {
+            item {
+                Spacer(modifier = modifier.height(1.dp))
 
-    LazyVerticalStaggeredGrid(
-        state = if (scrollGridState.firstVisibleItemIndex >= 4) {
-            log = scrollGridState.firstVisibleItemIndex.toString()
-            isTabMenuOpen.value = false
-            scrollGridState
-        } else {
-            log = scrollGridState.firstVisibleItemIndex.toString()
-            isTabMenuOpen.value = true
-            scrollGridState
-        },
-        columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFFF4F4F4))
-            .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow)),
-        horizontalArrangement = Arrangement.spacedBy(22.dp),
-        verticalItemSpacing = 20.dp,
-        contentPadding = PaddingValues(10.dp)
-    ) {
-        item {
-            Spacer(modifier = modifier.height(1.dp))
+            }
+            item {
+                Spacer(modifier = modifier.height(20.dp))
+            }
+            itemsIndexed(listData.data) { index, data ->
+                AnimeCardBox(
+                    data = data,
+                    navController = navController,
+                    viewModelProvider = viewModelProvider,
+                    modifier = modifier
+                )
 
-        }
-        item {
-            Spacer(modifier = modifier.height(20.dp))
-        }
-        itemsIndexed(listData.data) { index, data ->
-            AnimeCardBox(
-                data = data,
-                navController = navController,
-                viewModelProvider = viewModelProvider,
-                modifier = modifier
-            )
-
-            // Загрузка следующей страницы при достижении конца списка и has_next_page = true
-            if (index == listData.data.lastIndex - 2 && isLoading.not() && listData.pagination.has_next_page) {
-                viewModel.loadNextPage()
+                // Загрузка следующей страницы при достижении конца списка и has_next_page = true
+                if (index == listData.data.lastIndex - 2 && isLoading.not() && listData.pagination.has_next_page) {
+                    viewModel.loadNextPage()
+                }
             }
         }
-    }
 
+    } else {
+
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color(0xFFF4F4F4))
+        ) {
+            if (lastTenAnimeFromWatchingSection.value.isNotEmpty()) {
+                item {
+                    ShowSectionName(sectionName = "Now Watching ", modifier = modifier)
+                }
+                item {
+                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+                        lastTenAnimeFromWatchingSection.value.forEach { data ->
+                            Spacer(modifier = modifier.width(20.dp))
+                            ShowSection(
+                                data = data, navController = navController,
+                                viewModelProvider = viewModelProvider,
+                                modifier = modifier
+                            )
+                        }
+                        Spacer(modifier = modifier.width(20.dp))
+                    }
+
+                }
+                item {
+                    Spacer(modifier = modifier.height(20.dp))
+                }
+            }
+            if (getTrendingAnime.data.isNotEmpty()) {
+                item {
+                    ShowSectionName(sectionName = "Trending", modifier = modifier)
+                }
+                item {
+                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+
+                        getTrendingAnime.data.forEach { data ->
+                            Spacer(modifier = modifier.width(20.dp))
+                            ShowTopAnime(
+                                data = data, navController = navController,
+                                viewModelProvider = viewModelProvider,
+                                modifier = modifier
+                            )
+                        }
+                        Spacer(modifier = modifier.width(20.dp))
+                    }
+
+                }
+                item {
+                    Spacer(modifier = modifier.height(20.dp))
+                }
+            }
+            if (getJustTenAddedAnime.value.isNotEmpty()) {
+                item {
+                    ShowSectionName(sectionName = "Just Added", modifier = modifier)
+                }
+                item {
+                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+
+                        getJustTenAddedAnime.value.forEach { data ->
+                            Spacer(modifier = modifier.width(20.dp))
+                            ShowSection(
+                                data = data, navController = navController,
+                                viewModelProvider = viewModelProvider,
+                                modifier = modifier
+                            )
+                        }
+                        Spacer(modifier = modifier.width(20.dp))
+                    }
+
+                }
+                item {
+                    Spacer(modifier = modifier.height(20.dp))
+                }
+            }
+            if (getTopAiring.data.isNotEmpty()) {
+                item {
+                    ShowSectionName(sectionName = "Top Airing", modifier = modifier)
+                }
+                item {
+                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+
+                        getTopAiring.data.forEach { data ->
+                            Spacer(modifier = modifier.width(20.dp))
+                            ShowTopAnime(
+                                data = data, navController = navController,
+                                viewModelProvider = viewModelProvider,
+                                modifier = modifier
+                            )
+                        }
+                        Spacer(modifier = modifier.width(20.dp))
+                    }
+
+                }
+                item {
+                    Spacer(modifier = modifier.height(20.dp))
+                }
+            }
+            if (getTopUpcoming.data.isNotEmpty()) {
+                item {
+                    ShowSectionName(sectionName = "Top Upcoming", modifier = modifier)
+                }
+                item {
+                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+
+                        getTopUpcoming.data.forEach { data ->
+                            Spacer(modifier = modifier.width(20.dp))
+                            ShowTopAnime(
+                                data = data, navController = navController,
+                                viewModelProvider = viewModelProvider,
+                                modifier = modifier
+                            )
+                        }
+                        Spacer(modifier = modifier.width(20.dp))
+                    }
+
+                }
+                item {
+                    Spacer(modifier = modifier.height(20.dp))
+                }
+            }
+        }
+
+    }
 
 
     if (viewModel.isDialogShown) {
@@ -130,14 +279,52 @@ fun GridAdder(
                 }, modifier = modifier, viewModelProvider = viewModelProvider
             )
         }
-    }
 
+        val selectedTrending =
+            getTrendingAnime.data.find { it.mal_id == viewModel.selectedAnimeId.value }
+
+        if (selectedTrending != null) {
+            CustomDialog(
+                data = selectedTrending, navController = navController, onDismiss = {
+                    viewModel.viewModelScope.launch(Dispatchers.IO) {
+                        viewModel.onDialogDismiss()
+                    }
+
+                }, modifier = modifier, viewModelProvider = viewModelProvider
+            )
+        }
+        val selectedAiring = getTopAiring.data.find { it.mal_id == viewModel.selectedAnimeId.value }
+
+        if (selectedAiring != null) {
+            CustomDialog(
+                data = selectedAiring, navController = navController, onDismiss = {
+                    viewModel.viewModelScope.launch(Dispatchers.IO) {
+                        viewModel.onDialogDismiss()
+                    }
+
+                }, modifier = modifier, viewModelProvider = viewModelProvider
+            )
+        }
+        val selectedUpcoming =
+            getTopUpcoming.data.find { it.mal_id == viewModel.selectedAnimeId.value }
+
+        if (selectedUpcoming != null) {
+            CustomDialog(
+                data = selectedUpcoming, navController = navController, onDismiss = {
+                    viewModel.viewModelScope.launch(Dispatchers.IO) {
+                        viewModel.onDialogDismiss()
+                    }
+
+                }, modifier = modifier, viewModelProvider = viewModelProvider
+            )
+        }
+    }
 }
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AnimeCardBox(
+private fun AnimeCardBox(
     data: AnimeSearchData,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
@@ -270,12 +457,6 @@ fun AnimeCardBox(
             textAlign = TextAlign.Start,
             modifier = modifier
                 .fillMaxWidth()
-//                .basicMarquee(
-//                    iterations = Int.MAX_VALUE,
-//                    delayMillis = 2000,
-//                    initialDelayMillis = 2000,
-//                    velocity = 50.dp
-//                )
                 .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
             lineHeight = 16.sp,
             fontWeight = FontWeight.ExtraBold,
@@ -311,8 +492,7 @@ fun AnimeCardBox(
     }
 }
 
-
-fun formatScoredBy(float: Float): String {
+private fun formatScoredBy(float: Float): String {
     return if (float == 0.0f) {
         "N/A"
     } else {
@@ -326,7 +506,7 @@ fun formatScoredBy(float: Float): String {
 }
 
 
-fun formatScore(float: Float?): String {
+private fun formatScore(float: Float?): String {
     return if (float == null || float == 0.0f) {
         "N/A"
     } else {
@@ -335,236 +515,367 @@ fun formatScore(float: Float?): String {
 }
 
 
-//@OptIn(ExperimentalFoundationApi::class)
-//@Preview(showSystemUi = true)
-//@Composable
-//fun PreviewGridView() {
-//    val painter = rememberAsyncImagePainter(model = R.drawable.kurisu)
-//
-//    LazyVerticalGrid(
-//        columns = GridCells.Adaptive(minSize = 140.dp),
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .fillMaxHeight(),
-//        horizontalArrangement = Arrangement.spacedBy(16.dp),
-//        verticalArrangement = Arrangement.spacedBy(16.dp)
-//    ) {
-//        items(6) {
-//            Card(
-//                modifier = Modifier
-//                    .clip(RoundedCornerShape(6.dp))
-//                    .clickable {},
-//                colors = CardDefaults.cardColors(containerColor = LightGreen),
-//                shape = RectangleShape,
-//            ) {
-//                Box(modifier = Modifier.fillMaxSize()) {
-//                    // Coil image loader
-//                    Image(
-//                        painter = painter,
-//                        contentDescription = "Images for each Anime",
-//                        modifier = Modifier.aspectRatio(9f / 11f),
-//                        contentScale = ContentScale.FillBounds
-//                    )
-//
-//                    Column(
-//                        modifier = Modifier.background(
-//                            MaterialTheme.colorScheme.secondary.copy(
-//                                alpha = 0.2f
-//                            )
-//                        )
-//                    ) {
-//                        Box(
-//                            modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
-//                        ) {
-//                            Icon(
-//                                Icons.Filled.Star,
-//                                contentDescription = "Favorite Icon",
-//                                tint = MaterialTheme.colorScheme.primary,
-//                                modifier = Modifier.size(45.dp)
-//                            )
-//                            Text(
-//                                text = "9.33",
-//                                color = Color.White,
-//                                fontSize = 10.sp,
-//                                fontWeight = FontWeight.Bold,
-////                            modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
-//                            )
-//                        }
-//                        Box(
-//                            modifier = Modifier
-//                                .width(45.dp)
-//                                .height(50.dp),
-//
-//                            ) {
-////                            Column(modifier = Modifier.align(Alignment.Center).fillMaxSize()) {
-//                            Icon(
-//                                Icons.Filled.Person,
-//                                contentDescription = "Favorite Icon",
-//                                tint = MaterialTheme.colorScheme.primary,
-//                                modifier = Modifier
-//                                    .width(45.dp)
-//                                    .height(50.dp)
-//                            )
-//                            Text(
-//                                textAlign = TextAlign.Center,
-//                                text = "1200000",
-//                                color = Color.White,
-//                                fontSize = 8.sp,
-//                                fontWeight = FontWeight.Bold,
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .align(
-//                                        Alignment.BottomEnd
-//                                    )
-//                            )
-//                        }
-//
-//                    }
-//
-//
-//                }
-//
-//                Text(
-//                    text = "Stein;Gate",
-//                    textAlign = TextAlign.Center,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .basicMarquee(
-//                            iterations = Int.MAX_VALUE,
-//                            delayMillis = 2000,
-//                            initialDelayMillis = 2000,
-//                            velocity = 50.dp
-//                        )
-//                        .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
-//                    fontFamily = FontFamily.Monospace,
-//                    fontWeight = FontWeight(1000),
-//                    overflow = TextOverflow.Ellipsis,
-//                    maxLines = 1
-//                )
-//            }
-//
-//
-//        }
-//    }
-//
-//}
-//
-//
-//@OptIn(ExperimentalFoundationApi::class)
-//@Preview(showSystemUi = true)
-//@Composable
-//fun PreviewGridView2() {
-//    val painter = rememberAsyncImagePainter(model = R.drawable.kurisu)
-//
-////    val weight = if (it < 3) 2f else 1f
-//    LazyVerticalStaggeredGrid(
-//        columns = StaggeredGridCells.Adaptive(140.dp),
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .fillMaxHeight(),
-//        horizontalArrangement = Arrangement.spacedBy(20.dp),
-//        verticalItemSpacing = 10.dp,
-//    ) {
-//        item {
-//
-//        }
-//        item {
-//            Spacer(modifier = Modifier.height(40.dp))
-//        }
-//        items(6) {
-//            Card(
-//                modifier = Modifier
-//                    .clip(RoundedCornerShape(22.dp))
-//                    .clickable {},
-//                colors = CardDefaults.cardColors(containerColor = LightGreen),
-//                shape = RectangleShape,
-//            ) {
-//                Box(modifier = Modifier.fillMaxSize()) {
-//                    // Coil image loader
-//                    Image(
-//                        painter = painter,
-//                        contentDescription = "Images for each Anime",
-//                        modifier = Modifier.aspectRatio(9f / 11f),
-//                        contentScale = ContentScale.FillBounds
-//                    )
-//
-//                    Column(
-//                        modifier = Modifier.background(
-//                            MaterialTheme.colorScheme.secondary.copy(
-//                                alpha = 0.2f
-//                            )
-//                        )
-//                    ) {
-//                        Box(
-//                            modifier = Modifier.size(45.dp), contentAlignment = Alignment.Center
-//                        ) {
-//                            Icon(
-//                                Icons.Filled.Star,
-//                                contentDescription = "Favorite Icon",
-//                                tint = MaterialTheme.colorScheme.primary,
-//                                modifier = Modifier.size(45.dp)
-//                            )
-//                            Text(
-//                                text = "9.33",
-//                                color = Color.White,
-//                                fontSize = 10.sp,
-//                                fontWeight = FontWeight.Bold,
-////                            modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
-//                            )
-//                        }
-//                        Box(
-//                            modifier = Modifier
-//                                .width(45.dp)
-//                                .height(50.dp),
-//
-//                            ) {
-////                            Column(modifier = Modifier.align(Alignment.Center).fillMaxSize()) {
-//                            Icon(
-//                                Icons.Filled.Person,
-//                                contentDescription = "Favorite Icon",
-//                                tint = MaterialTheme.colorScheme.primary,
-//                                modifier = Modifier
-//                                    .width(45.dp)
-//                                    .height(50.dp)
-//                            )
-//                            Text(
-//                                textAlign = TextAlign.Center,
-//                                text = "1200000",
-//                                color = Color.White,
-//                                fontSize = 8.sp,
-//                                fontWeight = FontWeight.Bold,
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .align(
-//                                        Alignment.BottomEnd
-//                                    )
-//                            )
-//                        }
-//
-//                    }
-//
-//
-//                }
-//
-//                Text(
-//                    text = "Stein;Gate $it",
-//                    textAlign = TextAlign.Center,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .basicMarquee(
-//                            iterations = Int.MAX_VALUE,
-//                            delayMillis = 2000,
-//                            initialDelayMillis = 2000,
-//                            velocity = 50.dp
-//                        )
-//                        .padding(end = 16.dp, top = 16.dp, bottom = 16.dp, start = 16.dp),
-//                    fontFamily = FontFamily.Monospace,
-//                    fontWeight = FontWeight(1000),
-//                    overflow = TextOverflow.Ellipsis,
-//                    maxLines = 1
-//                )
-//            }
-//        }
-//
-//    }
-//}
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ShowSection(
+    data: AnimeItem,
+    navController: NavController,
+    viewModelProvider: ViewModelProvider,
+    modifier: Modifier
+) {
+    val painter = rememberAsyncImagePainter(model = data.animeImage)
+    var isCardClicked by remember { mutableStateOf(false) }
+
+    val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
+    val value by rememberInfiniteTransition(label = "").animateFloat(
+        initialValue = if (isCardClicked) 0.99f else 1f, // Изменяем значение в зависимости от нажатия на Card
+        targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 600, easing = LinearEasing
+            ), repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
+        add(SvgDecoder.Factory())
+    }.build()
+
+    Card(
+        modifier = modifier
+            .height(300.dp)
+            .width(180.dp)
+            .shadow(20.dp)
+            .then(if (isCardClicked) {
+                modifier.graphicsLayer {
+                    scaleX = value
+                    scaleY = value
+                }
+            } else {
+                modifier
+            })
+            .clip(RoundedCornerShape(16.dp))
+            .combinedClickable(onLongClick = {
+                homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                    isCardClicked = true
+                    homeScreenViewModel.onDialogLongClick(data.id ?: 0)
+                    delay(3000L)
+                    isCardClicked = false
+                }
+
+            }) {
+                homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+                    navigateToDetailScreen(
+                        navController, data.id ?: 0
+                    )
+                }
+            },
+        colors = CardDefaults.cardColors(containerColor = LightCardColor),
+        shape = RectangleShape,
+    ) {
+        Box(contentAlignment = Alignment.BottomCenter) {
+            Box(
+                modifier = modifier.fillMaxSize()
+            ) {
+                // Coil image loader
+                Image(
+                    painter = painter,
+                    contentDescription = "Images for each Anime",
+                    modifier = modifier
+                        .aspectRatio(9f / 11f)
+                        .clip(RoundedCornerShape(10.dp)),
+                    contentScale = ContentScale.FillBounds
+                )
+
+                Column(
+                    modifier = modifier
+                        .width(50.dp)
+                        .clip(RoundedCornerShape(bottomEnd = 15.dp))
+                        .background(scoreBoardColor)
+                ) {
+                    Row(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+
+                        Text(
+                            text = data.score,
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Column(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Image(
+                            modifier = modifier.size(25.dp), painter = rememberAsyncImagePainter(
+                                model = R.drawable.usergroup, imageLoader = svgImageLoader
+                            ), contentDescription = null
+                        )
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = data.scored_by,
+                            color = Color.White,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = modifier
+                        )
+                    }
+                }
+
+            }
+            Column(
+                modifier = modifier
+            ) {
+                Text(
+                    text = data.animeName,
+                    textAlign = TextAlign.Start,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
+                    lineHeight = 16.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 16.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    minLines = 2,
+                    maxLines = 2
+                )
+
+                Row(
+                    modifier = modifier.fillMaxWidth(1f),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Status: " + data.status,
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Left,
+                        modifier = modifier.padding(start = 10.dp)
+                    )
+                }
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(1f)
+                        .padding(bottom = 10.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Type: " + data.type,
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Left,
+                        modifier = modifier.padding(start = 10.dp)
+                    )
+                }
+
+            }
+        }
+    }
+
+}
+
+@Composable
+private fun ShowSectionName(sectionName: String, modifier: Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth(0.85f)
+            .background(SectionColor)
+            .padding(bottom = 5.dp)
+    ) {
+        Box(
+            modifier = modifier
+        ) {
+            Text(
+                text = "    $sectionName   ",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Start,
+                textDecoration = TextDecoration.Underline
+            )
+        }
+    }
+    Spacer(modifier = modifier.height(20.dp))
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ShowTopAnime(
+    data: AnimeSearchData,
+    navController: NavController,
+    viewModelProvider: ViewModelProvider,
+    modifier: Modifier
+) {
+    val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
+    var isCardClicked by remember { mutableStateOf(false) }
+
+    val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
+    val value by rememberInfiniteTransition(label = "").animateFloat(
+        initialValue = if (isCardClicked) 0.99f else 1f, // Изменяем значение в зависимости от нажатия на Card
+        targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 600, easing = LinearEasing
+            ), repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
+        add(SvgDecoder.Factory())
+    }.build()
+
+
+    Card(
+        modifier = modifier
+            .height(300.dp)
+            .width(180.dp)
+            .shadow(20.dp)
+            .then(if (isCardClicked) {
+                modifier.graphicsLayer {
+                    scaleX = value
+                    scaleY = value
+                }
+            } else {
+                modifier
+            })
+            .clip(RoundedCornerShape(16.dp))
+            .combinedClickable(onLongClick = {
+                homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                    isCardClicked = true
+                    homeScreenViewModel.onDialogLongClick(data.mal_id ?: 0)
+                    delay(3000L)
+                    isCardClicked = false
+                }
+
+            }) {
+                homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+                    navigateToDetailScreen(
+                        navController, data.mal_id ?: 0
+                    )
+                }
+            },
+        colors = CardDefaults.cardColors(containerColor = LightCardColor),
+        shape = RectangleShape,
+    ) {
+        Box(contentAlignment = Alignment.BottomCenter) {
+            Box(
+                modifier = modifier.fillMaxSize()
+            ) {
+                // Coil image loader
+                Image(
+                    painter = painter,
+                    contentDescription = "Images for each Anime",
+                    modifier = modifier
+                        .aspectRatio(9f / 11f)
+                        .clip(RoundedCornerShape(10.dp)),
+                    contentScale = ContentScale.FillBounds
+                )
+
+                Column(
+                    modifier = modifier
+                        .width(50.dp)
+                        .clip(RoundedCornerShape(bottomEnd = 15.dp))
+                        .background(scoreBoardColor)
+                ) {
+                    Row(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+
+                        Text(
+                            text = formatScore(data.score),
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Column(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Image(
+                            modifier = modifier.size(25.dp), painter = rememberAsyncImagePainter(
+                                model = R.drawable.usergroup, imageLoader = svgImageLoader
+                            ), contentDescription = null
+                        )
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = formatScoredBy(data.scored_by),
+                            color = Color.White,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = modifier
+                        )
+                    }
+                }
+
+                AddFavorites(
+                    mal_id = data.mal_id,
+                    anime = data.title,
+                    score = formatScore(data.score),
+                    scoredBy = formatScoredBy(data.scored_by),
+                    animeImage = data.images.jpg.image_url,
+                    modifier = modifier,
+                    viewModelProvider = viewModelProvider,
+                    status = data.status,
+                    rating = data.rating ?: "N/A",
+                    secondName = data.title_japanese,
+                    airedFrom = data.aired.from,
+                    type = data.type ?: "N/A",
+                    imageLoader = svgImageLoader
+                )
+            }
+            Column(
+                modifier = modifier
+            ) {
+                Text(
+                    text = data.title,
+                    textAlign = TextAlign.Start,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
+                    lineHeight = 16.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 16.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    minLines = 2,
+                    maxLines = 2
+                )
+
+                Row(
+                    modifier = modifier.fillMaxWidth(1f),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Status: " + data.status,
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Left,
+                        modifier = modifier.padding(start = 10.dp)
+                    )
+                }
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(1f)
+                        .padding(bottom = 10.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Type: " + data.type,
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Left,
+                        modifier = modifier.padding(start = 10.dp)
+                    )
+                }
+
+            }
+        }
+    }
+}

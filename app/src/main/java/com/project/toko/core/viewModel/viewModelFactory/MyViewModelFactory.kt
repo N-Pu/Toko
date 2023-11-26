@@ -23,7 +23,7 @@ class MyViewModelFactory @Inject constructor(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(HomeScreenViewModel::class.java) -> HomeScreenViewModel(
-                malApiRepository
+                malApiRepository, dao
             ) as T
 
             modelClass.isAssignableFrom(DetailScreenViewModel::class.java) -> DetailScreenViewModel(

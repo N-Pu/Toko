@@ -1,14 +1,15 @@
 package com.project.toko.homeScreen.viewModel
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.toko.core.dao.Dao
 import com.project.toko.core.repository.MalApiService
+import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.homeScreen.model.linkChangerModel.OrderBy
 import com.project.toko.homeScreen.model.linkChangerModel.Rating
 import com.project.toko.homeScreen.model.linkChangerModel.Score
@@ -31,6 +32,7 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class)
 class HomeScreenViewModel @Inject constructor(
     private val malApiRepository: MalApiService,
+    private val dao: Dao
 ) : ViewModel() {
 
 
@@ -100,31 +102,28 @@ class HomeScreenViewModel @Inject constructor(
     }
 
 
-    private val pre_min_score =
-        MutableStateFlow<Score?>(null)
-    private val _min_score =
-        MutableStateFlow<Score?>(null)
+    private val _pre_min_score = MutableStateFlow<Score?>(null)
+    val pre_min_score = _pre_min_score
+    private val _min_score = MutableStateFlow<Score?>(null)
 
 
-    fun setSelectedMinScore(score: Score) {
-        pre_min_score.value = if (score == pre_min_score.value) null else score
-    }
+//    fun setSelectedMinScore(score: Score) {
+//        pre_min_score.value = if (score == pre_min_score.value) null else score
+//    }
 
-    private val pre_max_score =
-        MutableStateFlow<Score?>(null)
-    private val _max_score =
-        MutableStateFlow<Score?>(null)
+    private val _pre_max_score = MutableStateFlow<Score?>(null)
+    val pre_max_score = _pre_max_score
+    private val _max_score = MutableStateFlow<Score?>(null)
 
-    fun setSelectedMaxScore(score: Score) {
-        pre_max_score.value = if (score == pre_max_score.value) null else score
-    }
+//    fun setSelectedMaxScore(score: Score) {
+//        pre_max_score.value = if (score == pre_max_score.value) null else score
+//    }
 
-    private val preSelectedMinMax = mutableStateOf(false)
-    val selectedMinMax: MutableState<Boolean> = preSelectedMinMax
+//    private val preSelectedMinMax = mutableStateOf(false)
+//    val selectedMinMax: MutableState<Boolean> = preSelectedMinMax
 
     private val _scoreState = mutableIntStateOf(0)
     val scoreState = _scoreState
-
 
     private val _safeForWork = mutableStateOf(false)
     var safeForWork = _safeForWork
@@ -217,6 +216,40 @@ class HomeScreenViewModel @Inject constructor(
             Log.e("HomeScreenViewModel", "Failed to perform search: ${e.message}")
         } finally {
             _isPerformingSearch.value = false
+        }
+    }
+
+    private val _topTrendingAnime = MutableStateFlow(emptyNewAnimeSearchModel)
+    val topTrendingAnime = _topTrendingAnime.asStateFlow()
+
+    private val _topAiringAnime = MutableStateFlow(emptyNewAnimeSearchModel)
+    val topAiringAnime = _topAiringAnime.asStateFlow()
+
+    private val _topUpcomingAnime = MutableStateFlow(emptyNewAnimeSearchModel)
+    val topUpcomingAnime = _topUpcomingAnime.asStateFlow()
+
+
+    suspend fun getTopTrendingAnime(filter: String, limit: Int = 10) {
+        viewModelScope.launch(Dispatchers.IO) {
+//            delay(1000L)
+            _topTrendingAnime.value =
+                malApiRepository.getTenTopAnime(filter, limit).body() ?: emptyNewAnimeSearchModel
+        }
+    }
+
+    suspend fun getTopAiring(filter: String, limit: Int = 10) {
+        viewModelScope.launch(Dispatchers.IO) {
+//            delay(1000L)
+            _topAiringAnime.value =
+                malApiRepository.getTenTopAnime(filter, limit).body() ?: emptyNewAnimeSearchModel
+        }
+    }
+
+    suspend fun getTopUpcoming(filter: String, limit: Int = 10) {
+        viewModelScope.launch(Dispatchers.IO) {
+//            delay(1000L)
+            _topUpcomingAnime.value =
+                malApiRepository.getTenTopAnime(filter, limit).body() ?: emptyNewAnimeSearchModel
         }
     }
 
@@ -313,8 +346,8 @@ class HomeScreenViewModel @Inject constructor(
             _selectedOrderBy.value = pre_selectedOrderBy.value
         }.join()
         viewModelScope.async(Dispatchers.IO) {
-            _min_score.value = pre_min_score.value
-            _max_score.value = pre_max_score.value
+            _min_score.value = _pre_min_score.value
+            _max_score.value = _pre_max_score.value
         }.join()
 
         performSearch(searchText.value)
@@ -343,6 +376,22 @@ class HomeScreenViewModel @Inject constructor(
             isDialogShown = false
         }
     }
+
+
+//    private val _isNowWatchingSectingVisible = mutableStateOf(false)
+//    var isNowWatchingSectingVisible = _isNowWatchingSectingVisible
+
+    fun showListOfWatching(): Flow<List<AnimeItem>> {
+        return dao.getLastTenAnimeFromWatchingSection()
+    }
+
+//    private val _isNowJustAddedSectingVisible = mutableStateOf(false)
+//    var isNowJustAddedSectingVisible = _isNowJustAddedSectingVisible
+
+    fun showLastAdded(): Flow<List<AnimeItem>> {
+        return dao.getLastTenAddedAnime()
+    }
 }
+
 
 

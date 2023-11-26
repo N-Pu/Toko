@@ -8,7 +8,7 @@ import com.project.toko.personDetailedScreen.dao.PersonItem
 
 @Database(
     entities = [AnimeItem::class, CharacterItem::class, PersonItem::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class MainDb : RoomDatabase() {

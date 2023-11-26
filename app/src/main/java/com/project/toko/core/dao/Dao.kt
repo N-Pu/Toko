@@ -77,4 +77,15 @@ interface Dao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addPerson(personItem: PersonItem)
+
+
+
+    @Query("SELECT * FROM animeItems WHERE category = 'Watching' ORDER BY id DESC LIMIT 10")
+    fun getLastTenAnimeFromWatchingSection(): Flow<List<AnimeItem>>
+
+
+    @Query("SELECT * FROM animeItems ORDER BY createdAt DESC LIMIT 10")
+    fun getLastTenAddedAnime(): Flow<List<AnimeItem>>
+
+
 }

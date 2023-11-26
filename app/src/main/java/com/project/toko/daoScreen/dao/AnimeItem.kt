@@ -28,5 +28,6 @@ data class AnimeItem(
     @ColumnInfo(name = "category")
     val category: String? = null,
     @ColumnInfo(name = "type")
-    val type: String
+    val type: String,
+    val createdAt: Long = System.currentTimeMillis()
 )
