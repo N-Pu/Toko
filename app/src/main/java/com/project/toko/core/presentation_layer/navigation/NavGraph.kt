@@ -17,7 +17,6 @@ import com.project.toko.noId.presentation_layer.noId.NoId
 import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.castList.ShowWholeCast
 import com.project.toko.detailScreen.presentation_layer.detailScreen.sideContent.staffList.ShowWholeStaff
 import com.project.toko.characterDetailedScreen.presentation_layer.characterFull.DisplayCharacterFromId
-import com.project.toko.producerDetailedScreen.presentation_layer.producerFull.ShowScreen
 import com.project.toko.daoScreen.presentation_layer.DaoScreen
 import com.project.toko.personDetailedScreen.presentation_layer.staffMemberFull.DisplayPersonFullScreen
 import com.project.toko.randomAnimeScreen.presentation_layer.randomAnimeScreen.ShowRandomAnime
@@ -112,26 +111,26 @@ fun SetupNavGraph(
                 modifier = modifier
             )
         }
-        composable(
-            route = Screen.ProducerDetail.route,
-            arguments = listOf(navArgument("id") {
-                type = NavType.IntType
-            }
-//                , navArgument("studio_name") {
-//                type = NavType.StringType
+//        composable(
+//            route = Screen.ProducerDetail.route,
+//            arguments = listOf(navArgument("id") {
+//                type = NavType.IntType
+//            }
+////                , navArgument("studio_name") {
+////                type = NavType.StringType
+////
+////                }
+//            )
+//        ) { backStackEntry ->
+//            val id = backStackEntry.arguments!!.getInt("id")
+////            val studio_name = backStackEntry.arguments!!.getString("studio_name")!!
+//            ShowScreen(
+//                id = id, viewModelProvider = viewModelProvider,
 //
-//                }
-            )
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments!!.getInt("id")
-//            val studio_name = backStackEntry.arguments!!.getString("studio_name")!!
-            ShowScreen(
-                id = id, viewModelProvider = viewModelProvider,
-
-//                studio_name = studio_name,
-                modifier = modifier
-            )
-        }
+////                studio_name = studio_name,
+//                modifier = modifier
+//            )
+//        }
 
     }
 }
