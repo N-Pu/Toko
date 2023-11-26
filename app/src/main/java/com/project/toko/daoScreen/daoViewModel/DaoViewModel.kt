@@ -55,10 +55,6 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
         }
     }
 
-//    fun getAnimeInCategory(category: String): Flow<List<AnimeItem>> {
-//        return dao.getAnimeInCategory(category, searchText = _searchText.value ?: "")
-//    }
-
     fun getAnimeInCategory(
         category: String,
         searchText: String,
@@ -136,46 +132,4 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
         }
     }
 
-
-//    fun sorting(
-//        isSortedAlphabetically: MutableState<Boolean>,
-//        isSortedByScore: MutableState<Boolean>,
-//        isSortedByUsers: MutableState<Boolean>,
-//        isAiredFrom: MutableState<Boolean>,
-//        currentAnimeInSection: List<AnimeItem>
-//    ): List<AnimeItem> {
-//        var sortedList = currentAnimeInSection
-//
-//        if (isSortedAlphabetically.value) {
-//            isSortedByScore.value = false
-//            isSortedByUsers.value = false
-//            isAiredFrom.value = false
-//            sortedList = currentAnimeInSection.sortedBy { animeItem -> animeItem.animeName }
-//        }
-//
-//        if (isSortedByScore.value) {
-//            isSortedAlphabetically.value = false
-//            isSortedByUsers.value = false
-//            isAiredFrom.value = false
-//            sortedList =
-//                currentAnimeInSection.sortedByDescending { animeItem -> animeItem.score.toFloatOrNull() }
-//        }
-//        if (isSortedByUsers.value) {
-//            isSortedAlphabetically.value = false
-//            isSortedByScore.value = false
-//            isAiredFrom.value = false
-//            sortedList =
-//                currentAnimeInSection.sortedByDescending { animeItem -> animeItem.scored_by.toFloatOrNull() }
-//        }
-//
-//        if (isAiredFrom.value) {
-//            isSortedAlphabetically.value = false
-//            isSortedByScore.value = false
-//            isSortedByUsers.value = false
-//            sortedList =
-//                currentAnimeInSection.sortedByDescending { animeItem -> animeItem.airedFrom }
-//        }
-//
-//        return sortedList
-//    }
 }

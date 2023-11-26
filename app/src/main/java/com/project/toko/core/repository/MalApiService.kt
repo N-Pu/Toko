@@ -23,9 +23,8 @@ import retrofit2.http.Query
 import java.net.SocketTimeoutException
 
 
-
 interface MalApiService {
-    companion object{
+    companion object {
         const val BASE_URL = "https://api.jikan.moe/"
     }
 
@@ -43,6 +42,14 @@ interface MalApiService {
         @Query("sort") sort: String? = null,
     ): Response<NewAnimeSearchModel>
 
+    // Enum: "airing" "upcoming" "bypopularity" "favorite"
+    @GET("${BASE_URL}v4/top/anime?")
+    suspend fun getTenTopAnime(
+        @Query("filter") filter: String,
+        @Query("limit") limit: Int = 10
+    ): Response<NewAnimeSearchModel>
+
+
     @GET("${BASE_URL}v4/anime/{id}/full")
     suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<DetailScreenModel>
 
@@ -57,8 +64,7 @@ interface MalApiService {
     suspend fun getRandomAnime(): Response<AnimeRandomModel>
 
     @GET("${BASE_URL}v4/anime/{id}/characters")
-    suspend fun getCharactersFromId(@Path("id") id: Int): Response<CastModel>
-    {
+    suspend fun getCharactersFromId(@Path("id") id: Int): Response<CastModel> {
         try {
             return getCharactersFromId(id)
         } catch (e: HttpException) {
@@ -77,6 +83,7 @@ interface MalApiService {
 
     @GET("${BASE_URL}v4/people/{id}/pictures")
     suspend fun getPersonFullPictures(@Path("id") id: Int): Response<PersonPicturesModel>
+
     @GET("${BASE_URL}v4/anime/{id}/staff")
     suspend fun getStaffFromId(@Path("id") id: Int): Response<StaffModel> {
         try {
