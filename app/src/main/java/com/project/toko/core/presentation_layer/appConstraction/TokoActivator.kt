@@ -2,19 +2,30 @@ package com.project.toko.core.presentation_layer.appConstraction
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -27,8 +38,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.NavController
@@ -43,6 +57,7 @@ import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
 import com.project.toko.core.presentation_layer.theme.LightBottomBarColor
+import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
 
@@ -52,6 +67,9 @@ fun TokoAppActivator(
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
 ) {
+    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
+        add(SvgDecoder.Factory())
+    }.build()
 
     val currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedId
     val characterDetailScreenId = viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
@@ -89,16 +107,6 @@ fun TokoAppActivator(
                 false
             }
 
-//            Screen.DetailOnStaff.route -> {
-//                lastSelectedScreen = destination.route
-//                false
-//            }
-//
-//            Screen.DetailOnCast.route -> {
-//                lastSelectedScreen = destination.route
-//                false
-//            }
-
             else -> {
                 lastSelectedScreen = destination.route
                 true
@@ -106,51 +114,17 @@ fun TokoAppActivator(
         }
     }
 
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
-
     ModalNavigationDrawer(
         drawerContent = {
-            ModalDrawerSheet(
-                modifier = modifier
-//                .requiredHeight()
-            ) {
-                Text("Drawer title", modifier = Modifier.padding(16.dp))
-                Divider()
-                NavigationDrawerItem(
-                    label = { Text(text = "Drawer Item") },
-                    selected = false,
-                    onClick = {
-                    }
-                )
-                // ...other drawer items
-            }
+            ShowDrawerContent(
+                modifier = modifier,
+                imageLoader = svgImageLoader,
+                viewModelProvider = viewModelProvider
+            )
         }
-
     ) {
 
         Scaffold(bottomBar = {
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxWidth(1f)
-//                    .fillMaxHeight(1f)
-////                    .padding(bottom = 45.dp)
-//                ,
-//                verticalArrangement = Arrangement.Bottom,
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-
-//                Row {
-//                    MyFloatingButton(
-//                        showButton = showButton,
-//                        viewModelProvider = viewModelProvider,
-//                        modifier = modifier
-//                    )
-//                }
-
-//                Row {
-
 
             SecondBottomNavigationBar(
                 navController = navController,
@@ -163,20 +137,6 @@ fun TokoAppActivator(
                 imageLoader = svgImageLoader
             )
 
-//                    BottomNavigationBar(
-//                        navController = navController,
-//                        currentDetailScreenId = currentDetailScreenId,
-//                        characterDetailScreenId = characterDetailScreenId,
-//                        personDetailScreenId = personDetailScreenId,
-//                        producerDetailScreenId = producerDetailScreenId,
-//                        modifier = modifier,
-//                        lastSelectedScreen = lastSelectedScreen
-//                    )
-
-//                }
-
-
-//            }
         },
             snackbarHost = {
 
@@ -212,11 +172,10 @@ fun TokoAppActivator(
             }
         )
     }
-
 }
 
 @Composable
-fun SecondBottomNavigationBar(
+private fun SecondBottomNavigationBar(
     navController: NavController,
     currentDetailScreenId: MutableState<Int>,
     modifier: Modifier,
@@ -433,324 +392,167 @@ fun SecondBottomNavigationBar(
     }
 }
 
-//@Composable
-//fun BottomNavigationBar(
-//    navController: NavController,
-//    currentDetailScreenId: MutableState<Int>,
-//    modifier: Modifier,
-//    producerDetailScreenId: MutableState<Int>,
-//    characterDetailScreenId: MutableState<Int>,
-//    personDetailScreenId: MutableState<Int>,
-//    lastSelectedScreen: String?
-//
-//) {
-//
-//    val navBackStackEntry by navController.currentBackStackEntryAsState()
-//    val currentRoute = navBackStackEntry?.destination?.route
-//
-//    Row(
-//        modifier = modifier
-//            .clip(
-//                RoundedCornerShape(10.dp)
-//            )
-//            .fillMaxWidth(1f)
-//            .background(LightBottomBarColor)
-//            .height(50.dp),
-//
-//        horizontalArrangement = Arrangement.SpaceAround,
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//
-//        if (currentRoute != null) {
-//            Log.d("currentRoute", currentRoute)
-//
-//        }
-//
-//        Column(
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center,
-//            modifier = modifier
-//                .width(80.dp)
-//                .clickable {
-//                    try {
-//                        navController.navigate(Screen.Home.route) {
-//
-//                            // Avoid multiple copies of the same destination when
-//                            // reselecting the same item
-//                            navController.graph.startDestinationRoute?.let { _ ->
-//                                launchSingleTop = true
-//                                // Restore state when reselecting a previously selected item
-//                            }
-//
-//                        }
-//                    } catch (e: IllegalArgumentException) {
-//
-//                        Log.e("CATCH", Screen.Home.route + " " + e.message.toString())
-//
-//                    }
-//                }
-//                .padding(horizontal = 10.dp, vertical = 10.dp)
-//
-//        ) {
-//            Icon(
-//                imageVector = ImageVector.vectorResource(id = Screen.Home.iconId!!),
-//                contentDescription = Screen.Home.contentDescription,
-//                modifier = modifier
-//                    .size(30.dp),
-//                tint = LightIconTint
-//            )
-//        }
-//        Column(
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center,
-//            modifier = modifier
-//                .width(80.dp)
-//                .clickable {
-//                    try {
-//                        when (lastSelectedScreen) {
-//                            Screen.Detail.route -> {
-//                                navController.navigate("detail_screen/${currentDetailScreenId.value}") {
-//                                    navController.graph.startDestinationRoute?.let { _ ->
-//                                        launchSingleTop = true
-//                                    }
-//                                }
-//                            }
-//
-//                            Screen.CharacterDetail.route -> {
-//                                navController.navigate("detail_on_character/${characterDetailScreenId.value}") {
-//                                    navController.graph.startDestinationRoute?.let { _ ->
-//                                        launchSingleTop = true
-//                                    }
-//                                }
-//                            }
-//
-//                            Screen.StaffDetail.route -> {
-//                                navController.navigate("detail_on_staff/${personDetailScreenId.value}") {
-//                                    navController.graph.startDestinationRoute?.let { _ ->
-//                                        launchSingleTop = true
-//                                    }
-//                                }
-//                            }
-//
-//                            Screen.ProducerDetail.route -> {
-//                                navController.navigate("detail_on_producer/${producerDetailScreenId.value}/full") {
-//                                    navController.graph.startDestinationRoute?.let { _ ->
-//                                        launchSingleTop = true
-//                                    }
-//                                }
-//                            }
-//
-//                            else -> {
-//                                navController.navigate(Screen.Nothing.route) {
-//                                    launchSingleTop = true
-//                                }
-//                            }
-//                        }
-//                    } catch (e: IllegalArgumentException) {
-//                        Log.e("CATCH", Screen.Detail.route + " " + e.message.toString())
-//                    }
-//                }
-//                .padding(horizontal = 10.dp, vertical = 10.dp)
-//        ) {
-//            Icon(
-//                imageVector = ImageVector.vectorResource(id = Screen.Detail.iconId!!),
-//                contentDescription = Screen.Detail.contentDescription,
-//                modifier = modifier
-//                    .size(30.dp),
-//                tint = LightIconTint
-//
-//            )
-//        }
-//        Column(
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center,
-//            modifier = modifier
-//                .width(80.dp)
-//                .clickable {
-//                    try {
-//                        navController.navigate(Screen.Favorites.route) {
-//
-//                            // Avoid multiple copies of the same destination when
-//                            // reselecting the same item
-//                            navController.graph.startDestinationRoute?.let { _ ->
-//                                launchSingleTop = true
-//                                // Restore state when reselecting a previously selected item
-//                            }
-//
-//                        }
-//                    } catch (e: IllegalArgumentException) {
-//
-//                        Log.e("CATCH", Screen.Favorites.route + " " + e.message.toString())
-//
-//                    }
-//                }
-//                .padding(horizontal = 10.dp, vertical = 10.dp)
-//        ) {
-//            Icon(
-//                imageVector = ImageVector.vectorResource(id = Screen.Favorites.iconId!!),
-//                contentDescription = Screen.Favorites.contentDescription,
-//                modifier = modifier
-//                    .size(30.dp),
-//                tint = LightIconTint
-//
-//
-//            )
-//        }
-//        Column(
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center,
-//            modifier = modifier
-//                .width(80.dp)
-//                .clickable {
-//                    try {
-//                        navController.navigate(Screen.RandomAnimeOrManga.route) {
-//
-//                            // Avoid multiple copies of the same destination when
-//                            // reselecting the same item
-//                            navController.graph.startDestinationRoute?.let { _ ->
-//                                launchSingleTop = true
-//                                // Restore state when reselecting a previously selected item
-//                            }
-//
-//                        }
-//                    } catch (e: IllegalArgumentException) {
-//
-//                        Log.e(
-//                            "CATCH",
-//                            Screen.RandomAnimeOrManga.route + " " + e.message.toString()
-//                        )
-//
-//                    }
-//                }
-//                .padding(horizontal = 10.dp, vertical = 10.dp)
-//        ) {
-//            Icon(
-//                imageVector = ImageVector.vectorResource(id = Screen.RandomAnimeOrManga.iconId!!),
-//                contentDescription = Screen.RandomAnimeOrManga.contentDescription,
-//                modifier = modifier
-//                    .size(30.dp),
-//
-//                tint = LightIconTint
-//
-//            )
-//        }
-//    }
-//
-//}
-//
 
+@Composable
+private fun ShowDrawerContent(
+    modifier: Modifier,
+    imageLoader: ImageLoader,
+    viewModelProvider: ViewModelProvider
+) {
+    val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
+//    ModalDrawerSheet(
+//        modifier = modifier.background(androidx.compose.ui.graphics.Color.Transparent)
+////                .requiredHeight()
+//    ) {
+    Column {
+        Row {
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .background(Color.Transparent)
+            )
+        }
+        Column(
+            modifier = modifier
+                .fillMaxWidth(0.8f)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(topEnd = 20.dp))
+                .background(Color.White)
+        ) {
+//            Text(
+//                "Toko", fontWeight = FontWeight.ExtraBold,
+//                fontSize = 22.sp, modifier = Modifier.padding(16.dp)
+//            )
+            Divider(thickness = 3.dp)
+            NavigationDrawerItem(
+                label = {
+                    Text(
+                        text = "NSFW",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        modifier = modifier.padding(start = 20.dp)
+                    )
+                },
+                selected = false,
+                onClick = {
+                },
+                badge = {
+                    Switch(checked = homeScreenViewModel.safeForWork.value, onCheckedChange = {
+                        homeScreenViewModel.safeForWork.value = it
+                    }, colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color(65, 65, 65),
+                        checkedTrackColor = Color(251, 251, 251),
+                        checkedBorderColor = Color(65, 65, 65),
+                        uncheckedThumbColor = Color(65, 65, 65),
+                        uncheckedTrackColor = Color(251, 251, 251),
+                        uncheckedBorderColor = Color(65, 65, 65),
 
-//@Composable
-//fun MyFloatingButton(
-//    showButton: Boolean,
-//    viewModelProvider: ViewModelProvider,
-////    context: Context,
-//    modifier: Modifier
-//) {
-//
-//
-//    val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
-//    val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
-//    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
-//    val detailScreenState by viewModelProvider[DetailScreenViewModel::class.java]
-//        .animeDetails.collectAsStateWithLifecycle()
-//
-//    LaunchedEffect(key1 = null) {
-//        val flow = daoViewModel.containsInDataBase(detailScreenState?.mal_id ?: 0)
-//
-//        if (flow.first()) {
-//            items.add(4, "Delete")
-//        }
+                        ),
+                        thumbContent = if (homeScreenViewModel.safeForWork.value) {
+                            {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                                    tint = Color(251, 251, 251)
+                                )
+                            }
+                        } else {
+                            null
+                        })
+                },
+            )
+            Divider(thickness = 3.dp)
+            NavigationDrawerItem(
+                modifier = modifier.background(Color(104, 190, 174).copy(alpha = 0.24f)),
+                colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent),
+                label = {
+                    Text(
+                        text = "Help/FAQ",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        modifier = modifier.padding(start = 20.dp)
+                    )
+                },
+                selected = false,
+                onClick = {
+                },
+                badge = {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.arrowright, imageLoader = imageLoader
+                        ), contentDescription = null, modifier = modifier.size(17.dp)
+                    )
+                },
+            )
+            Divider(thickness = 3.dp)
+            NavigationDrawerItem(
+                label = {
+                    Text(
+                        text = "Contact Support",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        modifier = modifier.padding(start = 20.dp)
+                    )
+                },
+                selected = false,
+                onClick = {
+                },
+                badge = {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.openbrowser, imageLoader = imageLoader
+                        ), contentDescription = null, modifier = modifier.size(30.dp)
+                    )
+                },
+            )
+            Divider(thickness = 3.dp)
+            NavigationDrawerItem(
+                modifier = modifier.background(Color(104, 190, 174).copy(alpha = 0.24f)),
+                colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent),
+                label = {
+                    Text(
+                        text = "Legal",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        modifier = modifier.padding(start = 20.dp)
+                    )
+                },
+                selected = false,
+                onClick = {
+                },
+                badge = {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.arrowright, imageLoader = imageLoader
+                        ), contentDescription = null, modifier = modifier.size(17.dp)
+                    )
+                },
+            )
+            Divider(thickness = 3.dp)
+            NavigationDrawerItem(
+                label = {
+                    Text(
+                        text = "Export Data",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        modifier = modifier.padding(start = 20.dp)
+                    )
+                },
+                selected = false,
+                onClick = {
+                },
+                badge = {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.export, imageLoader = imageLoader
+                        ), contentDescription = null, modifier = modifier.size(30.dp)
+                    )
+                },
+            )
+            Divider(thickness = 3.dp)
+        }
 //    }
-//
-//
-//    var expanded by remember { mutableStateOf(false) }
-//    var selectedItem by remember { mutableStateOf("") }
-//
-//    AnimatedVisibility(
-//        visible = showButton,
-//        enter = slideInVertically(
-//            initialOffsetY = { -it },
-//            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
-//        ) + fadeIn(animationSpec = tween(durationMillis = 500)),
-//        exit = slideOutVertically(
-//            targetOffsetY = { -it },
-//            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
-//        ) + fadeOut(animationSpec = tween(durationMillis = 500))
-//    ) {
-//
-//        Box(
-//            modifier = modifier
-//                .height(70.dp)
-//                .width(70.dp),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            FloatingActionButton(
-//                onClick = {
-//                    detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-//                        expanded = !expanded
-//                    }
-//
-//                },
-//                containerColor = LightGreen.copy(alpha = 0.6f),
-//                modifier = modifier
-//                    .height(50.dp)
-//                    .width(50.dp)
-//            ) {
-//                if (expanded) {
-//                    Icon(
-//                        modifier = Modifier.size(30.dp),
-//                        imageVector = Icons.Filled.Close,
-//                        contentDescription = "Localized description"
-//                    )
-//                } else {
-//                    Icon(
-//                        modifier = Modifier.size(30.dp),
-//                        imageVector = Icons.Filled.Add,
-//                        contentDescription = "Localized description"
-//                    )
-//                }
-//            }
-//        }
-//    }
-//    DropdownMenu(
-//        expanded = expanded,
-//        onDismissRequest = { expanded = false },
-//        modifier = modifier
-//            .background(LightGreen),
-//        offset = DpOffset(x = (20).dp, y = (-250).dp)
-//    ) {
-//        items.forEach { item ->
-//            DropdownMenuItem(
-//                onClick = {
-//                    detailScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-//                        selectedItem = item
-//                        if (selectedItem == "Delete") {
-//                            detailScreenState?.let { data ->
-//                                daoViewModel.removeFromDataBase(data.mal_id)
-//                            }
-//                        } else {
-//                            detailScreenState?.let { data ->
-//                                daoViewModel.addToCategory(
-//                                    AnimeItem(
-//                                        data.mal_id,
-//                                        anime = data.title,
-//                                        score = formatScore(data.score),
-//                                        scored_by = formatScoredBy(data.scored_by),
-//                                        animeImage = data.images.jpg.large_image_url,
-//                                        category = selectedItem
-//                                    )
-//                                )
-//                            }
-//                        }
-//                        // on touched - dropDownMenu cancels
-//                        expanded = false
-//                    }
-//                },
-//                text = {
-//                    Text(text = item)
-//                })
-//        }
-//    }
-//
-//}
+    }
+}

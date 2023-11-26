@@ -141,7 +141,7 @@ import kotlinx.coroutines.launch
 
     @OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
     @Composable
-    fun TabSelectionMenu(
+  private  fun TabSelectionMenu(
         viewModel: HomeScreenViewModel,
         modifier: Modifier,
         isTabMenuOpen: MutableState<Boolean>
@@ -253,27 +253,10 @@ import kotlinx.coroutines.launch
                                     ShowOrderBy(viewModel, modifier)
                                 }
                             }
-//                    SafeFowWorkSwitch(viewModel)
-
                         }
                     )
                 }
             }
-        }
-    }
-
-    @Composable
-    private fun SafeFowWorkSwitch(viewModel: HomeScreenViewModel) {
-
-        var sfw by viewModel.safeForWork
-        Box(contentAlignment = Alignment.Center) {
-            Divider(thickness = 25.dp)
-            Text(text = "SFW content", textAlign = TextAlign.Center)
-        }
-        Box {
-            Switch(checked = sfw, onCheckedChange = {
-                sfw = it
-            })
         }
     }
 
