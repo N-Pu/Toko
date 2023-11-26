@@ -557,7 +557,6 @@ private fun ShowSection(
             .combinedClickable(onLongClick = {
                 homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
                     isCardClicked = true
-                    homeScreenViewModel.onDialogLongClick(data.id ?: 0)
                     delay(3000L)
                     isCardClicked = false
                 }
