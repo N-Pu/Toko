@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.net.SocketTimeoutException
@@ -27,9 +28,10 @@ interface MalApiService {
     companion object {
         const val BASE_URL = "https://api.jikan.moe/"
     }
-
+    //added header for caching (return here afterwards)
     @GET("${BASE_URL}v4/anime?")
     suspend fun getAnimeSearchByName(
+        @Header("If-None-Match") eTag: String?,
         @Query("sfw") sfw: Boolean,
         @Query("page") page: Int = 1,
         @Query("q") query: String? = null,

@@ -92,6 +92,7 @@ fun GridAdder(
         delay(2000L)
         viewModel.getTopUpcoming("upcoming", 25)
     }
+
     val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
     val getTopUpcoming by viewModel.topUpcomingAnime.collectAsStateWithLifecycle()
     val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
