@@ -193,7 +193,9 @@ class HomeScreenViewModel @Inject constructor(
             if (currentGenres == "") {
                 currentGenres = null
             }
+
             val response = malApiRepository.getAnimeSearchByName(
+                eTag = query + currentPage.value,
                 sfw = safeForWork.value,
                 query = currentQuery,
                 page = currentPage.value,
@@ -231,7 +233,6 @@ class HomeScreenViewModel @Inject constructor(
 
     suspend fun getTopTrendingAnime(filter: String, limit: Int = 10) {
         viewModelScope.launch(Dispatchers.IO) {
-//            delay(1000L)
             _topTrendingAnime.value =
                 malApiRepository.getTenTopAnime(filter, limit).body() ?: emptyNewAnimeSearchModel
         }
@@ -239,7 +240,6 @@ class HomeScreenViewModel @Inject constructor(
 
     suspend fun getTopAiring(filter: String, limit: Int = 10) {
         viewModelScope.launch(Dispatchers.IO) {
-//            delay(1000L)
             _topAiringAnime.value =
                 malApiRepository.getTenTopAnime(filter, limit).body() ?: emptyNewAnimeSearchModel
         }
@@ -247,7 +247,6 @@ class HomeScreenViewModel @Inject constructor(
 
     suspend fun getTopUpcoming(filter: String, limit: Int = 10) {
         viewModelScope.launch(Dispatchers.IO) {
-//            delay(1000L)
             _topUpcomingAnime.value =
                 malApiRepository.getTenTopAnime(filter, limit).body() ?: emptyNewAnimeSearchModel
         }
@@ -273,6 +272,7 @@ class HomeScreenViewModel @Inject constructor(
 
                 val response =
                     malApiRepository.getAnimeSearchByName(
+                        eTag = query + currentPage.value,
                         sfw = safeForWork.value,
                         query = currentQuery,
                         page = nextPage,
@@ -282,7 +282,6 @@ class HomeScreenViewModel @Inject constructor(
                         orderBy = pre_selectedOrderBy.value?.orderBy,
                         max_score = pre_max_score.value?.score,
                         min_score = pre_min_score.value?.score
-
                     ).body()
 
                 if (response != null) {

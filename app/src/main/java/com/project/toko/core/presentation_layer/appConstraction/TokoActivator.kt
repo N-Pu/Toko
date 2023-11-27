@@ -1,6 +1,7 @@
 package com.project.toko.core.presentation_layer.appConstraction
 
 import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -400,10 +401,9 @@ private fun ShowDrawerContent(
     viewModelProvider: ViewModelProvider
 ) {
     val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
-//    ModalDrawerSheet(
-//        modifier = modifier.background(androidx.compose.ui.graphics.Color.Transparent)
-////                .requiredHeight()
-//    ) {
+    var isHelpFAQOpen by remember { mutableStateOf(false) }
+    var isLegalOpen by remember { mutableStateOf(false) }
+
     Column {
         Row {
             Spacer(
@@ -420,10 +420,7 @@ private fun ShowDrawerContent(
                 .clip(RoundedCornerShape(topEnd = 20.dp))
                 .background(Color.White)
         ) {
-//            Text(
-//                "Toko", fontWeight = FontWeight.ExtraBold,
-//                fontSize = 22.sp, modifier = Modifier.padding(16.dp)
-//            )
+
             Divider(thickness = 3.dp)
             NavigationDrawerItem(
                 label = {
@@ -477,16 +474,132 @@ private fun ShowDrawerContent(
                 },
                 selected = false,
                 onClick = {
+                    isHelpFAQOpen = !isHelpFAQOpen
                 },
                 badge = {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = R.drawable.arrowright, imageLoader = imageLoader
-                        ), contentDescription = null, modifier = modifier.size(17.dp)
-                    )
+                    if (isHelpFAQOpen) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.arrowdown, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(17.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.arrowright, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(17.dp)
+                        )
+                    }
                 },
             )
             Divider(thickness = 3.dp)
+            if (isHelpFAQOpen) {
+                NavigationDrawerItem(
+                    label = {
+                        Text(
+                            text = "Known bugs",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 22.sp,
+                            modifier = modifier.padding(start = 20.dp)
+                        )
+                    },
+                    selected = false,
+                    onClick = {
+                    },
+                    badge = {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.openbrowser, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                        )
+                    },
+                )
+                Divider(thickness = 3.dp)
+                NavigationDrawerItem(
+                    label = {
+                        Text(
+                            text = "About the features of the app",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 22.sp,
+                            modifier = modifier.padding(start = 20.dp)
+                        )
+                    },
+                    selected = false,
+                    onClick = {
+                    },
+                    badge = {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.openbrowser, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                        )
+                    },
+                )
+                Divider(thickness = 3.dp)
+                NavigationDrawerItem(
+                    label = {
+                        Text(
+                            text = "My list functional problems",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 22.sp,
+                            modifier = modifier.padding(start = 20.dp)
+                        )
+                    },
+                    selected = false,
+                    onClick = {
+                    },
+                    badge = {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.openbrowser, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                        )
+                    },
+                )
+                Divider(thickness = 3.dp)
+                NavigationDrawerItem(
+                    label = {
+                        Text(
+                            text = "Database problems",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 22.sp,
+                            modifier = modifier.padding(start = 20.dp)
+                        )
+                    },
+                    selected = false,
+                    onClick = {
+                    },
+                    badge = {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.openbrowser, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                        )
+                    },
+                )
+                Divider(thickness = 3.dp)
+                NavigationDrawerItem(
+                    label = {
+                        Text(
+                            text = "Technical problems",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 22.sp,
+                            modifier = modifier.padding(start = 20.dp)
+                        )
+                    },
+                    selected = false,
+                    onClick = {
+                    },
+                    badge = {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.openbrowser, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                        )
+                    },
+                )
+                Divider(thickness = 3.dp)
+            }
             NavigationDrawerItem(
                 label = {
                     Text(
@@ -521,16 +634,69 @@ private fun ShowDrawerContent(
                 },
                 selected = false,
                 onClick = {
+                    isLegalOpen = !isLegalOpen
                 },
                 badge = {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = R.drawable.arrowright, imageLoader = imageLoader
-                        ), contentDescription = null, modifier = modifier.size(17.dp)
-                    )
+                    if (isLegalOpen) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.arrowdown, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(17.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.arrowright, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(17.dp)
+                        )
+                    }
                 },
             )
             Divider(thickness = 3.dp)
+            if (isLegalOpen) {
+                NavigationDrawerItem(
+                    label = {
+                        Text(
+                            text = "Terms of use",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 22.sp,
+                            modifier = modifier.padding(start = 20.dp)
+                        )
+                    },
+                    selected = false,
+                    onClick = {
+                    },
+                    badge = {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.openbrowser, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                        )
+                    },
+                )
+                Divider(thickness = 3.dp)
+                NavigationDrawerItem(
+                    label = {
+                        Text(
+                            text = "Resource",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 22.sp,
+                            modifier = modifier.padding(start = 20.dp)
+                        )
+                    },
+                    selected = false,
+                    onClick = {
+                    },
+                    badge = {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.openbrowser, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                        )
+                    },
+                )
+                Divider(thickness = 3.dp)
+            }
             NavigationDrawerItem(
                 label = {
                     Text(
@@ -553,6 +719,5 @@ private fun ShowDrawerContent(
             )
             Divider(thickness = 3.dp)
         }
-//    }
     }
 }
