@@ -1,14 +1,19 @@
 package com.project.toko.core.presentation_layer.appConstraction
 
+import android.os.Environment
 import android.util.Log
-import androidx.compose.animation.animateContentSize
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,6 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -44,7 +51,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -58,9 +68,13 @@ import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
 import com.project.toko.core.presentation_layer.theme.LightBottomBarColor
+import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun TokoAppActivator(
@@ -139,19 +153,16 @@ fun TokoAppActivator(
             )
 
         },
-            snackbarHost = {
-
-                // нижний бар уведомлений
+//            snackbarHost = {
+//
+//                // нижний бар уведомлений
 //            Snackbar {
-//                Box(
-//                    Modifier
-//                        .fillMaxSize()
-//                        .background(Color.Red)) {
 //                        Text("TEXT")
-//                }
 //            }
-
-            }, floatingActionButtonPosition = FabPosition.Center,
+//
+//            }
+//            ,
+            floatingActionButtonPosition = FabPosition.Center,
             content = { padding ->
                 padding.calculateTopPadding()
                 SetupNavGraph(
@@ -403,6 +414,8 @@ private fun ShowDrawerContent(
     val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
     var isHelpFAQOpen by remember { mutableStateOf(false) }
     var isLegalOpen by remember { mutableStateOf(false) }
+    var isExportDataPopUpDialogOpen by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column {
         Row {
@@ -708,6 +721,7 @@ private fun ShowDrawerContent(
                 },
                 selected = false,
                 onClick = {
+                    isExportDataPopUpDialogOpen = true
                 },
                 badge = {
                     Image(
@@ -718,6 +732,110 @@ private fun ShowDrawerContent(
                 },
             )
             Divider(thickness = 3.dp)
+        }
+    }
+
+
+    if (isExportDataPopUpDialogOpen) {
+        Dialog(
+            onDismissRequest = {
+                isExportDataPopUpDialogOpen = false
+            }, properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+            )
+        ) {
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.4f), contentAlignment = Alignment.Center
+            ) {
+                Card(modifier = modifier.fillMaxSize()) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceAround,
+                        modifier = modifier.fillMaxSize()
+                    ) {
+                        Row(
+                            modifier = modifier
+                                .fillMaxHeight(0.4f),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Export Data?",
+                                fontSize = 35.sp,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+                        Row(
+                            modifier = modifier
+                                .fillMaxWidth(0.8f)
+                                .height(70.dp)
+                                .clip(CardDefaults.shape)
+                                .background(LightGreen)
+                                .clickable {
+                                    val dbFile = context.getDatabasePath("Main.db")
+                                    val destinationDir =
+                                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                                    val destinationFile = File(destinationDir, "Main.db")
+                                    try {
+                                        homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                            dbFile.copyTo(destinationFile, overwrite = true)
+                                        }
+                                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "Database is saved!",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        }
+                                        // Успешно скопировано
+                                    } catch (e: Exception) {
+                                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    e.message,
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        }
+                                    }
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Save Data",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White
+                            )
+                        }
+                        Spacer(modifier = modifier.height(10.dp))
+                        Row(
+                            modifier = modifier
+                                .fillMaxWidth(0.8f)
+                                .height(70.dp)
+                                .clip(CardDefaults.shape)
+                                .border(4.dp, LightGreen, CardDefaults.shape)
+                                .clickable { },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Upload Data",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+                        Spacer(modifier = modifier.height(20.dp))
+                    }
+                }
+            }
         }
     }
 }

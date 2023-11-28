@@ -1,5 +1,7 @@
 package com.project.toko.daoScreen.daoViewModel
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
+class DaoViewModel @Inject constructor(private val dao: Dao, private val context: Context) :
+    ViewModel() {
     private val _searchText = MutableStateFlow<String?>(null)
     val searchText = _searchText.asStateFlow()
 
@@ -53,6 +56,13 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             dao.addToCategory(animeItem)
         }
+        viewModelScope.launch(Dispatchers.Main) {
+            Toast.makeText(
+                context,
+                "${animeItem.animeName} is in ${animeItem.category} category!",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     fun getAnimeInCategory(
@@ -76,15 +86,22 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
     }
 
 
-    suspend fun removeFromDataBase(id: Int) {
+    suspend fun removeFromDataBase(animeItem: AnimeItem) {
         viewModelScope.launch(Dispatchers.IO) {
-            dao.removeFromDataBase(id)
+            dao.removeFromDataBase(animeItem.id!!)
+        }
+        viewModelScope.launch(Dispatchers.Main) {
+            Toast.makeText(
+                context,
+                "${animeItem.animeName} was removed from ${animeItem.category} category!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
-    fun containsInDataBase(id: Int): Flow<Boolean> {
-        return dao.containsInDataBase(id)
-    }
+//    fun containsInDataBase(id: Int): Flow<Boolean> {
+//        return dao.containsInDataBase(id)
+//    }
 
     fun containsItemIdInCategory(id: Int, categoryId: String): Flow<Boolean> {
         return dao.containsItemIdInCategory(id, categoryId)
@@ -95,9 +112,16 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
         return dao.isCharacterInDao(id)
     }
 
-    suspend fun removeCharacterFromDataBase(id: Int) {
+    suspend fun removeCharacterFromDataBase(characterItem: CharacterItem) {
         viewModelScope.launch(Dispatchers.IO) {
-            dao.removeCharacterFromDataBase(id)
+            dao.removeCharacterFromDataBase(characterItem.id!!)
+        }
+        viewModelScope.launch(Dispatchers.Main) {
+            Toast.makeText(
+                context,
+                "${characterItem.name} was removed to database!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -109,6 +133,13 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             dao.addCharacter(characterItem)
         }
+        viewModelScope.launch(Dispatchers.Main) {
+            Toast.makeText(
+                context,
+                "${characterItem.name} was added to database!",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     // Person
@@ -116,9 +147,16 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
         return dao.isPersonInDao(id)
     }
 
-    suspend fun removePersonFromDataBase(id: Int) {
+    suspend fun removePersonFromDataBase(personItem: PersonItem) {
         viewModelScope.launch(Dispatchers.IO) {
-            dao.removePersonFromDataBase(id)
+            dao.removePersonFromDataBase(personItem.id!!)
+        }
+        viewModelScope.launch(Dispatchers.Main) {
+            Toast.makeText(
+                context,
+                "${personItem.name} was removed from database!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -130,6 +168,15 @@ class DaoViewModel @Inject constructor(private val dao: Dao) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             dao.addPerson(personItem)
         }
+        viewModelScope.launch(Dispatchers.Main) {
+            Toast.makeText(
+                context,
+                "${personItem.name} was added from database!",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
-
+    fun getCategoryForId(id: Int): Flow<String?> {
+        return dao.getCategoryForId(id)
+    }
 }

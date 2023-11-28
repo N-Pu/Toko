@@ -6,7 +6,5 @@ import dagger.Component
 
 @Component(modules = [ModifierModule::class])
 interface ModifierComponent {
-
     fun providesModifier(): Modifier
-
 }

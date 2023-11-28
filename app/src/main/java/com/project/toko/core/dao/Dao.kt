@@ -43,8 +43,8 @@ interface Dao {
     suspend fun removeFromDataBase(id: Int)
 
     // Функция для проверки наличия ID в базе данных
-    @Query("SELECT EXISTS(SELECT 1 FROM animeItems WHERE id = :id LIMIT 1)")
-    fun containsInDataBase(id: Int): Flow<Boolean>
+//    @Query("SELECT EXISTS(SELECT 1 FROM animeItems WHERE id = :id LIMIT 1)")
+//    fun containsInDataBase(id: Int): Flow<Boolean>
 
     @Query("SELECT EXISTS(SELECT 1 FROM animeItems WHERE id = :id AND category = :categoryId LIMIT 1)")
     fun containsItemIdInCategory(id: Int, categoryId: String): Flow<Boolean>

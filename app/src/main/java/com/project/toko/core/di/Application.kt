@@ -19,4 +19,6 @@ class Application @Inject constructor() : Application() {
     val malApiComponent: MalApiComponent =
         DaggerMalApiComponent.builder().malApiModule(MalApiModule(this)).build()
 //    val svgComponent: SvgComponent = DaggerSvgComponent.builder().build()
+
+    val context = this
 }

@@ -11,4 +11,5 @@ import javax.inject.Singleton
 interface DatabaseComponent {
 
     fun provideDao(): Dao
+
 }

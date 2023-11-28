@@ -71,7 +71,21 @@ fun AddToFavorites(
                         AnimeListType.FAVORITE.route
                     ).first()
                 ) {
-                    daoViewModel.removeFromDataBase(detailScreenState?.mal_id ?: 0)
+                    daoViewModel.removeFromDataBase(
+                        AnimeItem(
+                            id = detailScreenState?.mal_id,
+                            animeName = detailScreenState?.title ?: "",
+                            score = formatScore(detailScreenState?.score),
+                            scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
+                            animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
+                            category = AnimeListType.FAVORITE.route,
+                            status = detailScreenState?.status ?: "",
+                            rating = detailScreenState?.rating ?: "",
+                            secondName = detailScreenState?.title_japanese ?: "",
+                            airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                            type = detailScreenState?.type ?: "N/A"
+                        )
+                    )
                 } else {
                     daoViewModel.addToCategory(
                         AnimeItem(
@@ -85,7 +99,7 @@ fun AddToFavorites(
                             rating = detailScreenState?.rating ?: "",
                             secondName = detailScreenState?.title_japanese ?: "",
                             airedFrom = detailScreenState?.aired?.from ?: "N/A",
-                            type = detailScreenState?.type ?:"N/A"
+                            type = detailScreenState?.type ?: "N/A"
                         )
                     )
                 }
@@ -111,7 +125,21 @@ fun AddToFavorites(
                         AnimeListType.PLANNED.route
                     ).first()
                 ) {
-                    daoViewModel.removeFromDataBase(detailScreenState?.mal_id ?: 0)
+                    daoViewModel.removeFromDataBase(
+                        AnimeItem(
+                            id = detailScreenState?.mal_id,
+                            animeName = detailScreenState?.title ?: "",
+                            score = formatScore(detailScreenState?.score),
+                            scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
+                            animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
+                            category = AnimeListType.PLANNED.route,
+                            status = detailScreenState?.status ?: "",
+                            rating = detailScreenState?.rating ?: "",
+                            secondName = detailScreenState?.title_japanese ?: "",
+                            airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                            type = detailScreenState?.type ?: "N/A"
+                        )
+                    )
                 } else {
                     daoViewModel.addToCategory(
                         AnimeItem(
@@ -125,7 +153,7 @@ fun AddToFavorites(
                             rating = detailScreenState?.rating ?: "",
                             secondName = detailScreenState?.title_japanese ?: "",
                             airedFrom = detailScreenState?.aired?.from ?: "N/A",
-                            type = detailScreenState?.type ?:"N/A"
+                            type = detailScreenState?.type ?: "N/A"
                         )
 
                     )
@@ -220,21 +248,41 @@ fun AddToFavorites(
                                 AnimeListType.COMPLETED.route
                             ).first()
                         ) {
-                            daoViewModel.removeFromDataBase(detailScreenState?.mal_id ?: 0)
+                            daoViewModel.removeFromDataBase(
+                                AnimeItem(
+                                    id = detailScreenState?.mal_id,
+                                    animeName = detailScreenState?.title ?: "",
+                                    score = formatScore(detailScreenState?.score),
+                                    scored_by = formatScoredBy(
+                                        detailScreenState?.scored_by ?: 0.0f
+                                    ),
+                                    animeImage = detailScreenState?.images?.jpg?.large_image_url
+                                        ?: "",
+                                    category = AnimeListType.COMPLETED.route,
+                                    status = detailScreenState?.status ?: "",
+                                    rating = detailScreenState?.rating ?: "",
+                                    secondName = detailScreenState?.title_japanese ?: "",
+                                    airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                                    type = detailScreenState?.type ?: "N/A"
+                                )
+                            )
                         } else {
                             daoViewModel.addToCategory(
                                 AnimeItem(
                                     id = detailScreenState?.mal_id,
                                     animeName = detailScreenState?.title ?: "",
                                     score = formatScore(detailScreenState?.score),
-                                    scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
-                                    animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
+                                    scored_by = formatScoredBy(
+                                        detailScreenState?.scored_by ?: 0.0f
+                                    ),
+                                    animeImage = detailScreenState?.images?.jpg?.large_image_url
+                                        ?: "",
                                     category = AnimeListType.COMPLETED.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
                                     secondName = detailScreenState?.title_japanese ?: "",
                                     airedFrom = detailScreenState?.aired?.from ?: "N/A",
-                                    type = detailScreenState?.type ?:"N/A"
+                                    type = detailScreenState?.type ?: "N/A"
                                 )
 
                             )
@@ -284,7 +332,24 @@ fun AddToFavorites(
                                 AnimeListType.DROPPED.route
                             ).first()
                         ) {
-                            daoViewModel.removeFromDataBase(detailScreenState?.mal_id ?: 0)
+                            daoViewModel.removeFromDataBase(
+                                AnimeItem(
+                                    id = detailScreenState?.mal_id,
+                                    animeName = detailScreenState?.title ?: "",
+                                    score = formatScore(detailScreenState?.score),
+                                    scored_by = formatScoredBy(
+                                        detailScreenState?.scored_by ?: 0.0f
+                                    ),
+                                    animeImage = detailScreenState?.images?.jpg?.large_image_url
+                                        ?: "",
+                                    category = AnimeListType.DROPPED.route,
+                                    status = detailScreenState?.status ?: "",
+                                    rating = detailScreenState?.rating ?: "",
+                                    secondName = detailScreenState?.title_japanese ?: "",
+                                    airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                                    type = detailScreenState?.type ?: "N/A"
+                                )
+                            )
                         } else {
 
                             daoViewModel.addToCategory(
@@ -292,14 +357,17 @@ fun AddToFavorites(
                                     id = detailScreenState?.mal_id,
                                     animeName = detailScreenState?.title ?: "",
                                     score = formatScore(detailScreenState?.score),
-                                    scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
-                                    animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
+                                    scored_by = formatScoredBy(
+                                        detailScreenState?.scored_by ?: 0.0f
+                                    ),
+                                    animeImage = detailScreenState?.images?.jpg?.large_image_url
+                                        ?: "",
                                     category = AnimeListType.DROPPED.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
                                     secondName = detailScreenState?.title_japanese ?: "",
                                     airedFrom = detailScreenState?.aired?.from ?: "N/A",
-                                    type = detailScreenState?.type ?:"N/A"
+                                    type = detailScreenState?.type ?: "N/A"
                                 )
 
                             )
@@ -350,21 +418,41 @@ fun AddToFavorites(
                                 AnimeListType.WATCHING.route
                             ).first()
                         ) {
-                            daoViewModel.removeFromDataBase(detailScreenState?.mal_id ?: 0)
+                            daoViewModel.removeFromDataBase(
+                                AnimeItem(
+                                    id = detailScreenState?.mal_id,
+                                    animeName = detailScreenState?.title ?: "",
+                                    score = formatScore(detailScreenState?.score),
+                                    scored_by = formatScoredBy(
+                                        detailScreenState?.scored_by ?: 0.0f
+                                    ),
+                                    animeImage = detailScreenState?.images?.jpg?.large_image_url
+                                        ?: "",
+                                    category = AnimeListType.WATCHING.route,
+                                    status = detailScreenState?.status ?: "",
+                                    rating = detailScreenState?.rating ?: "",
+                                    secondName = detailScreenState?.title_japanese ?: "",
+                                    airedFrom = detailScreenState?.aired?.from ?: "N/A",
+                                    type = detailScreenState?.type ?: "N/A"
+                                )
+                            )
                         } else {
                             daoViewModel.addToCategory(
                                 AnimeItem(
                                     id = detailScreenState?.mal_id,
                                     animeName = detailScreenState?.title ?: "",
                                     score = formatScore(detailScreenState?.score),
-                                    scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
-                                    animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
+                                    scored_by = formatScoredBy(
+                                        detailScreenState?.scored_by ?: 0.0f
+                                    ),
+                                    animeImage = detailScreenState?.images?.jpg?.large_image_url
+                                        ?: "",
                                     category = AnimeListType.WATCHING.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
                                     secondName = detailScreenState?.title_japanese ?: "",
                                     airedFrom = detailScreenState?.aired?.from ?: "N/A",
-                                    type = detailScreenState?.type ?:"N/A"
+                                    type = detailScreenState?.type ?: "N/A"
                                 )
 
                             )

@@ -43,10 +43,6 @@ fun ShowNamesAndInteractionIcons(
     val isPersonInDao by daoViewModel.isPersonInDao(data.mal_id).collectAsStateWithLifecycle(
         initialValue = false
     )
-//    val containsInCategory by daoViewModel.containsItemIdInCategory(
-//        data.mal_id,
-//        AnimeListType.PERSON.route
-//    ).collectAsStateWithLifecycle(initialValue = false)
 
     Column(
         modifier = modifier
@@ -121,7 +117,15 @@ fun ShowNamesAndInteractionIcons(
                             personViewModel.viewModelScope.launch {
                                 if (isPersonInDao
                                 ) {
-                                    daoViewModel.removePersonFromDataBase(data.mal_id)
+                                    daoViewModel.removePersonFromDataBase(
+                                        PersonItem(
+                                            id = data.mal_id,
+                                            name = data.name,
+                                            givenName = data.given_name,
+                                            familyName = data.family_name,
+                                            image = data.images.jpg.image_url
+                                        )
+                                    )
                                 } else {
                                     daoViewModel.addPerson(
                                         PersonItem(

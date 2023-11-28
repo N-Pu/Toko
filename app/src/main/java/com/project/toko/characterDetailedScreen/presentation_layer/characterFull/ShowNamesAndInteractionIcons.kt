@@ -94,7 +94,12 @@ fun ShowNamesAndInteractionIcons(
                         .clickable {
                             characterViewModel.viewModelScope.launch {
                                 if (isCharacterInDao) {
-                                    daoViewModel.removeCharacterFromDataBase(data.mal_id)
+                                    daoViewModel.removeCharacterFromDataBase(    CharacterItem(
+                                        id = data.mal_id,
+                                        name = data.name,
+                                        anime = data.anime[0].anime.title,
+                                        image = data.images.jpg.image_url
+                                    ))
                                 } else {
                                     daoViewModel.addCharacter(
                                         CharacterItem(

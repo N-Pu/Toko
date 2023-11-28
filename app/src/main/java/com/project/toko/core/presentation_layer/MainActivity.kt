@@ -56,13 +56,15 @@ class MainActivity : ComponentActivity() {
         val modifierComponent = (application as Application).modifierComponent
         val databaseComponent = (application as Application).daoComponent
         val malApiComponent = (application as Application).malApiComponent
+        val context = (application as Application).context.context
         modifier = modifierComponent.providesModifier()
         dao = databaseComponent.provideDao()
         malApi = malApiComponent.provideMalApiService()
         val myViewModelFactory =
             MyViewModelFactory(
                 malApiRepository = malApi,
-                dao = dao
+                dao = dao,
+                context = context
             )
         val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
         setContent {
