@@ -185,11 +185,12 @@ fun ActivateDetailScreen(
 //                LocalLifecycleOwner.current,
 //                modifier
 //            )
-            YoutubePlayer(
-                detailData?.trailer?.youtube_id ?: "",
-                LocalLifecycleOwner.current,
-                modifier
-            )
+
+//            YoutubePlayer(
+//                detailData?.trailer?.youtube_id ?: "",
+//                LocalLifecycleOwner.current,
+//                modifier
+//            )
 
             ShowMoreInformation(modifier = modifier, detailData = detailData)
             ShowBackground(detailData = detailData, modifier = modifier)

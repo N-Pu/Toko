@@ -1,5 +1,6 @@
 package com.project.toko.daoScreen.presentation_layer
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -291,9 +292,11 @@ private fun FavoriteAnimeListButton(
         .clickable { onClick() }
         .fillMaxHeight(1f)
         .background(favoriteTopBarColors[colorIndex])
+        .animateContentSize()
     else modifier
         .clickable { onClick() }
         .background(favoriteTopBarColors[colorIndex])
+        .animateContentSize()
 
     Box(modifier = customModifier) {
         TextButton(
@@ -370,15 +373,9 @@ private fun FavoriteAnimeList(
     }
 }
 
-
-//private fun scoresToFloat(currentScore: String): Float {
-//    return  currentScore.toFloat()
-//}
 @Composable
 private fun ShowCharacter(
     navController: NavController,
-//    viewModelProvider: ViewModelProvider,
-//    scrollState: LazyGridState,
     modifier: Modifier,
     daoViewModel: DaoViewModel
 ) {
@@ -465,7 +462,6 @@ private fun CharacterCardBox(
 private fun ShowPerson(
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-//    scrollState: LazyGridState,
     modifier: Modifier
 ) {
 
