@@ -107,11 +107,8 @@ fun CustomDialog(
     Dialog(
         onDismissRequest = {
             onDismiss.invoke()
-        },
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true,
-            usePlatformDefaultWidth = false
+        }, properties = DialogProperties(
+            dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false
         )
     ) {
         Box(
@@ -135,8 +132,7 @@ fun CustomDialog(
 //                        offsetY += delta
 //                    },
 //                )
-                ,
-                colors = CardDefaults.cardColors(containerColor = DialogColor)
+                , colors = CardDefaults.cardColors(containerColor = DialogColor)
             ) {
                 Column(
                     modifier = modifier
@@ -164,8 +160,7 @@ fun CustomDialog(
                     }
                 }
                 Row(
-                    modifier = modifier
-                        .padding(15.dp, 0.dp),
+                    modifier = modifier.padding(15.dp, 0.dp),
                 ) {
                     Column(
                         modifier = modifier
@@ -180,8 +175,7 @@ fun CustomDialog(
                         )
                     }
                     Column(
-                        modifier = modifier
-                            .fillMaxWidth(1f)
+                        modifier = modifier.fillMaxWidth(1f)
                     ) {
 
                         ScoreLabel(modifier = modifier)
@@ -212,9 +206,7 @@ fun CustomDialog(
                 }
 
                 CheckGenresSize(
-                    numbOfGenres = data.genres.size,
-                    genres = data.genres,
-                    modifier = modifier
+                    numbOfGenres = data.genres.size, genres = data.genres, modifier = modifier
                 )
                 Synopsis(
                     modifier = modifier,
@@ -244,9 +236,7 @@ private fun ScoreLabel(modifier: Modifier) {
 
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
 
                 Text(
@@ -279,8 +269,7 @@ private fun ScoreNumber(modifier: Modifier, score: Float) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(35.dp),
-        horizontalArrangement = Arrangement.Center
+            .height(35.dp), horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = scoreNumb(),
@@ -385,8 +374,7 @@ private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
 @Composable
 private fun YearTypeStudio(
-    data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData?,
-    modifier: Modifier
+    data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData?, modifier: Modifier
 ) {
     val isStudioEmpty = data?.studios.isNullOrEmpty()
     Column(
@@ -467,122 +455,116 @@ private fun AddToFavoriteRow(
 
     Spacer(modifier = modifier.height(10.dp))
     var isExpanded by remember { mutableStateOf(false) }
+//    val context = LocalContext.current
 
-
-    if (isExpanded) {
-
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = {
-                isExpanded = false
-            },
-            modifier = modifier
-                .background(DialogSideColor)
-                .height(78.dp)
-                .clip(RoundedCornerShape(80.dp)),
-            offset = DpOffset((-40).dp, (-40).dp),
-            properties = PopupProperties(clippingEnabled = true)
-        ) {
-
-
-            DropdownMenuItem(text = {
-                Text(
-                    text = "Watching", fontSize = 12.sp,
-                    fontWeight = FontWeight.Thin,
-                )
-            }, modifier = modifier.height(20.dp), onClick = {
-                daoViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    daoViewModel.addToCategory(
-                        AnimeItem(
-                            data.mal_id,
-                            data.title,
-                            data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
-                            data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
-                            category = AnimeListType.WATCHING.route,
-                            type = data.type
-                        )
+    DropdownMenu(
+        expanded = isExpanded,
+        onDismissRequest = {
+            isExpanded = false
+        },
+        modifier = modifier
+            .background(DialogSideColor)
+            .height(78.dp)
+            .clip(RoundedCornerShape(80.dp)),
+        offset = DpOffset((-40).dp, (-40).dp),
+        properties = PopupProperties(clippingEnabled = true)
+    ) {
+        DropdownMenuItem(text = {
+            Text(
+                text = "Watching", fontSize = 12.sp,
+                fontWeight = FontWeight.Thin,
+            )
+        }, modifier = modifier.height(20.dp), onClick = {
+            daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                daoViewModel.addToCategory(
+                    AnimeItem(
+                        data.mal_id,
+                        data.title,
+                        data.score.toString(),
+                        data.scored_by.toInt().toString(),
+                        data.images.jpg.large_image_url,
+                        data.status,
+                        data.rating ?: "N/A",
+                        data.title_japanese,
+                        airedFrom = data.aired.from,
+                        category = AnimeListType.WATCHING.route,
+                        type = data.type
                     )
-                }
-            }, colors = MenuDefaults.itemColors(
-                textColor = Color.White, trailingIconColor = Color.White
-            ), trailingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Star, contentDescription = "Button 'Rating'"
                 )
-            })
-            DropdownMenuItem(text = {
-                Text(
-                    text = "Completed", fontSize = 12.sp,
-                    fontWeight = FontWeight.Thin,
-                )
-            }, modifier = modifier.height(20.dp), onClick = {
-                daoViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    daoViewModel.addToCategory(
-                        AnimeItem(
-                            data.mal_id,
-                            data.title,
-                            data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
-                            data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
-                            category = AnimeListType.COMPLETED.route,
-                            type = data.type
-                        )
+            }
+        }, colors = MenuDefaults.itemColors(
+            textColor = Color.White, trailingIconColor = Color.White
+        ), trailingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.Star, contentDescription = "Button 'Rating'"
+            )
+        })
+        DropdownMenuItem(text = {
+            Text(
+                text = "Completed", fontSize = 12.sp,
+                fontWeight = FontWeight.Thin,
+            )
+        }, modifier = modifier.height(20.dp), onClick = {
+            daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                daoViewModel.addToCategory(
+                    AnimeItem(
+                        data.mal_id,
+                        data.title,
+                        data.score.toString(),
+                        data.scored_by.toInt().toString(),
+                        data.images.jpg.large_image_url,
+                        data.status,
+                        data.rating ?: "N/A",
+                        data.title_japanese,
+                        airedFrom = data.aired.from,
+                        category = AnimeListType.COMPLETED.route,
+                        type = data.type
                     )
-                }
-            }, colors = MenuDefaults.itemColors(
-                textColor = Color.White, trailingIconColor = Color.White
-            ), trailingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Place,
-                    contentDescription = "Button 'Completed'"
                 )
-            })
-            DropdownMenuItem(text = {
-                Text(
-                    text = "Not Interesting", fontSize = 12.sp,
-                    fontWeight = FontWeight.Thin,
-                )
-            }, modifier = modifier.height(20.dp), onClick = {
-                daoViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    daoViewModel.addToCategory(
-                        AnimeItem(
-                            data.mal_id,
-                            data.title,
-                            data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
-                            data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
-                            category = AnimeListType.DROPPED.route,
-                            type = data.type
-                        )
+            }
+        }, colors = MenuDefaults.itemColors(
+            textColor = Color.White, trailingIconColor = Color.White
+        ), trailingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.Place,
+                contentDescription = "Button 'Completed'"
+            )
+        })
+        DropdownMenuItem(text = {
+            Text(
+                text = "Not Interesting", fontSize = 12.sp,
+                fontWeight = FontWeight.Thin,
+            )
+        }, modifier = modifier.height(20.dp), onClick = {
+            daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                daoViewModel.addToCategory(
+                    AnimeItem(
+                        data.mal_id,
+                        data.title,
+                        data.score.toString(),
+                        data.scored_by.toInt().toString(),
+                        data.images.jpg.large_image_url,
+                        data.status,
+                        data.rating ?: "N/A",
+                        data.title_japanese,
+                        airedFrom = data.aired.from,
+                        category = AnimeListType.DROPPED.route,
+                        type = data.type
                     )
-                }
-            }, colors = MenuDefaults.itemColors(
-                textColor = Color.White, trailingIconColor = Color.White
-            ), trailingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Close,
-                    contentDescription = "Button 'Not Interesting'",
-                    modifier = modifier
                 )
-            })
-
-        }
-
+            }
+        }, colors = MenuDefaults.itemColors(
+            textColor = Color.White, trailingIconColor = Color.White
+        ), trailingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.Close,
+                contentDescription = "Button 'Not Interesting'",
+                modifier = modifier
+            )
+        })
 
     }
+
 
     Row(
         modifier = modifier
@@ -688,16 +670,10 @@ private fun RatingLine(rating: String, modifier: Modifier) {
     ) {
 
         Text(
-            text = ("Rating: "),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Thin,
-            color = Color.White
+            text = ("Rating: "), fontSize = 12.sp, fontWeight = FontWeight.Thin, color = Color.White
         )
         Text(
-            text = (rating),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.W400,
-            color = Color.White
+            text = (rating), fontSize = 12.sp, fontWeight = FontWeight.W400, color = Color.White
         )
     }
 }
@@ -725,8 +701,7 @@ private fun ColoredBox(
 
 @Composable
 private fun DisplayCustomGenres(
-    genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>,
-    modifier: Modifier
+    genres: List<com.project.toko.homeScreen.model.newAnimeSearchModel.Genre>, modifier: Modifier
 ) {
     Row(
         modifier = modifier
@@ -735,8 +710,7 @@ private fun DisplayCustomGenres(
             .horizontalScroll(
                 rememberScrollState()
             )
-            .padding(0.dp, 10.dp, 0.dp, 0.dp),
-        horizontalArrangement = Arrangement.Center
+            .padding(0.dp, 10.dp, 0.dp, 0.dp), horizontalArrangement = Arrangement.Center
     ) {
         genres.forEachIndexed { index, genre ->
             if (index != 0) {
@@ -796,10 +770,7 @@ private fun Synopsis(
 
 @Composable
 private fun DisplayDialogPicture(
-    painter: Painter,
-    mal_id: Int,
-    navController: NavController,
-    modifier: Modifier
+    painter: Painter, mal_id: Int, navController: NavController, modifier: Modifier
 ) {
 
 
@@ -832,8 +803,7 @@ private fun CheckGenresSize(
             )
         } else {
             DisplayCustomGenres(
-                genres = genres.take(3),
-                modifier = modifier
+                genres = genres.take(3), modifier = modifier
             )
         }
     }

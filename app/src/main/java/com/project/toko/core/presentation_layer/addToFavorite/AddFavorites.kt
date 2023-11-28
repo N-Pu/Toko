@@ -64,16 +64,15 @@ fun AddFavorites(
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     val items = mutableListOf("Planned", "Watching", "Watched", "Dropped")
     var expanded by remember { mutableStateOf(false) }
-    val containsInDao = daoViewModel.containsInDataBase(
-        id = mal_id
-    ).collectAsStateWithLifecycle(initialValue = false).value
-    if (containsInDao
+
+    val getAnimeCategory by daoViewModel.getCategoryForId(mal_id).collectAsStateWithLifecycle(
+        initialValue = null
+    )
+
+    if (getAnimeCategory != null
     ) {
         items.add(4, "Delete")
     }
-
-    // Keep track of the selected item
-    var selectedItem by remember { mutableStateOf("") }
 
     // Fetch data when the button is clicked on a specific item
     BoxWithConstraints(
@@ -86,7 +85,9 @@ fun AddFavorites(
                 .padding(horizontal = 10.dp, vertical = 10.dp)
         ) {
             Image(
-                modifier = modifier.size(38.dp).clickable { expanded = true },
+                modifier = modifier
+                    .size(38.dp)
+                    .clickable { expanded = true },
                 painter = rememberAsyncImagePainter(
                     model = R.drawable.addpluscircle,
                     imageLoader = imageLoader
@@ -107,9 +108,20 @@ fun AddFavorites(
             items.forEach { item ->
                 DropdownMenuItem(onClick = {
                     daoViewModel.viewModelScope.launch(Dispatchers.IO) {
-                        selectedItem = item
-                        if (selectedItem == "Delete") {
-                            daoViewModel.removeFromDataBase(mal_id)
+                        if (item == "Delete") {
+                            daoViewModel.removeFromDataBase(AnimeItem(
+                                id = mal_id,
+                                animeName = anime,
+                                score = score,
+                                scored_by = scoredBy,
+                                animeImage = animeImage,
+                                category = getAnimeCategory,
+                                status = status,
+                                secondName = secondName ?: "N/A",
+                                rating = rating,
+                                airedFrom = airedFrom ?: "N/A",
+                                type = type
+                            ))
                         } else {
                             daoViewModel.addToCategory(
                                 AnimeItem(
@@ -118,13 +130,12 @@ fun AddFavorites(
                                     score = score,
                                     scored_by = scoredBy,
                                     animeImage = animeImage,
-                                    category = selectedItem,
+                                    category = item,
                                     status = status,
                                     secondName = secondName ?: "N/A",
                                     rating = rating,
                                     airedFrom = airedFrom ?: "N/A",
                                     type = type
-
                                 )
                             )
                         }
@@ -132,11 +143,27 @@ fun AddFavorites(
                         expanded = false
                     }
 
-
+//                    daoViewModel.viewModelScope.launch(Dispatchers.Main) {
+//                        if (item == "Delete") {
+//                            Toast.makeText(
+//                                context,
+//                                "$anime is removed from database!",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        } else {
+//                            Toast.makeText(
+//                                context,
+//                                "$anime is in $item category!",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+//                    }
                 },
                     colors = MenuDefaults.itemColors(textColor = Color.White),
                     text = { Text(text = item) })
             }
         }
     }
+
+
 }

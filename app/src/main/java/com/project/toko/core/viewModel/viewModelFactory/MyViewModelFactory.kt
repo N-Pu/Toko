@@ -1,5 +1,6 @@
 package com.project.toko.core.viewModel.viewModelFactory
 
+import android.content.Context
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class MyViewModelFactory @Inject constructor(
     private val malApiRepository: MalApiService,
     private val dao: Dao,
+    private val context: Context
 ) : ViewModelProvider.Factory {
 
 
@@ -46,7 +48,7 @@ class MyViewModelFactory @Inject constructor(
                 malApiRepository
             ) as T
 
-            modelClass.isAssignableFrom(DaoViewModel::class.java) -> DaoViewModel(dao) as T
+            modelClass.isAssignableFrom(DaoViewModel::class.java) -> DaoViewModel(dao,context) as T
 
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

@@ -96,6 +96,7 @@ fun DaoScreen(
     val isOnaSelected = daoViewModel.isOnaSelected
     val isMusicSelected = daoViewModel.isMusicSelected
 
+
     Column(
         modifier = modifier
             .fillMaxWidth(1f)
@@ -343,15 +344,13 @@ private fun FavoriteAnimeList(
         type = type.value ?: ""
     )
         .collectAsStateWithLifecycle(initialValue = emptyList())
-
-//    val sorted =
-//        daoViewModel.sorting(
-//            isSortedAlphabetically = isSortedAlphabetically,
-//            isSortedByScore = isSortedByScore,
-//            isSortedByUsers = isSortedByUsers,
-//            currentAnimeInSection = currentAnimeInSection,
-//            isAiredFrom = isAiredFrom
-//        )
+//    val coroutineScope = rememberCoroutineScope()
+//    val offsetY  =  remember { Animatable(0f) }
+//    val draggableState = rememberDraggableState{ delta ->
+//        coroutineScope.launch {
+//            offsetY.snapTo(offsetY.value + delta)
+//        }
+//    }
 
     Column(
         modifier = modifier
@@ -367,11 +366,13 @@ private fun FavoriteAnimeList(
                     animeItem = animeItem,
                     navController = navController,
                     modifier = modifier
+//                        .draggable(state = draggableState, orientation = Orientation.Horizontal)
                 )
             }
         }
     }
 }
+
 
 @Composable
 private fun ShowCharacter(
