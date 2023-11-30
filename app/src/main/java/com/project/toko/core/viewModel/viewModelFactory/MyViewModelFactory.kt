@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
-import com.project.toko.core.dao.Dao
+import com.project.toko.core.dao.MainDb
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @Suppress("UNCHECKED_CAST")
 class MyViewModelFactory @Inject constructor(
     private val malApiRepository: MalApiService,
-    private val dao: Dao,
+    private val mainDb: MainDb,
     private val context: Context
 ) : ViewModelProvider.Factory {
 
@@ -25,7 +25,7 @@ class MyViewModelFactory @Inject constructor(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(HomeScreenViewModel::class.java) -> HomeScreenViewModel(
-                malApiRepository, dao
+                malApiRepository, mainDb, context
             ) as T
 
             modelClass.isAssignableFrom(DetailScreenViewModel::class.java) -> DetailScreenViewModel(
@@ -48,7 +48,7 @@ class MyViewModelFactory @Inject constructor(
                 malApiRepository
             ) as T
 
-            modelClass.isAssignableFrom(DaoViewModel::class.java) -> DaoViewModel(dao,context) as T
+            modelClass.isAssignableFrom(DaoViewModel::class.java) -> DaoViewModel(mainDb,context) as T
 
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

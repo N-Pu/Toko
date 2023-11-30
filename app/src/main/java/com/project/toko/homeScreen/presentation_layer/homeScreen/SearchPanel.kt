@@ -371,7 +371,11 @@ private fun ShowGenres(
                     onClick = {
                         viewModel.viewModelScope.launch(Dispatchers.IO) {
                             genreForUI.isSelected.value = !genreForUI.isSelected.value
+                        }
+                        viewModel.viewModelScope.launch(Dispatchers.IO) {
                             viewModel.tappingOnGenre(genreForUI.id)
+                        }
+                        viewModel.viewModelScope.launch(Dispatchers.IO) {
                             viewModel.addAllParams()
                         }
                     },
