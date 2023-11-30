@@ -30,7 +30,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,7 +42,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.theme.LightGreen
@@ -62,6 +66,11 @@ fun MainScreen(
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
     val isTabMenuOpen = remember { mutableStateOf(true) }
+    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
+        add(SvgDecoder.Factory())
+    }.build()
+
+    val switchIndicator = viewModel.switchIndicator
 
     Column(
         modifier = modifier
@@ -108,6 +117,21 @@ fun MainScreen(
                     prefix = {
                         Icon(Icons.Filled.Search, "Search Icon", tint = iconColorInSearchPanel)
                     },
+                    suffix = {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.switchinsearch,
+                                imageLoader = svgImageLoader
+                            ),
+                            contentDescription = null,
+                            colorFilter = if (switchIndicator.value) ColorFilter.tint(LightGreen) else null,
+                            modifier = modifier
+                                .size(40.dp)
+                                .clickable {
+                                    switchIndicator.value = !switchIndicator.value
+                                }
+                        )
+                    },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = iconColorInSearchPanel,
@@ -129,7 +153,8 @@ fun MainScreen(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
                 modifier = modifier,
-                isTabMenuOpen = isTabMenuOpen
+                isTabMenuOpen = isTabMenuOpen,
+                switch = switchIndicator
             )
         } else {
             LoadingAnimation()

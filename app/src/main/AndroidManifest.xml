@@ -4,13 +4,20 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android:enableOnBackInvokedCallback=true" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32"
-        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<!--    <uses-permission-->
+<!--        android:name="android.permission.READ_EXTERNAL_STORAGE"-->
+<!--        android:maxSdkVersion="32"-->
+<!--        tools:ignore="ScopedStorage" />-->
+<!--    <uses-permission-->
+<!--        android:name="android.permission.WRITE_EXTERNAL_STORAGE"-->
+<!--        android:maxSdkVersion="32"-->
+<!--        tools:ignore="ScopedStorage" />-->
 
     <application
+        android:requestLegacyExternalStorage="true"
+        android:name=".core.di.Application"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
@@ -19,7 +26,6 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_toko_round"
         android:supportsRtl="true"
-        android:name=".core.di.Application"
         android:theme="@style/Theme.Toko.BarColors"
         tools:targetApi="tiramisu">
         <activity
@@ -37,9 +43,9 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-<!--        <activity android:name=".detailScreen.presentation_layer.detailScreen.mainPage.custom.youtubePlayer.FullScreenYoutubeActivity">-->
+        <!--        <activity android:name=".detailScreen.presentation_layer.detailScreen.mainPage.custom.youtubePlayer.FullScreenYoutubeActivity">-->
 
-<!--        </activity>-->
+        <!--        </activity>-->
     </application>
 
 </manifest>

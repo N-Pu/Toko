@@ -99,10 +99,6 @@ class DaoViewModel @Inject constructor(private val dao: Dao, private val context
         }
     }
 
-//    fun containsInDataBase(id: Int): Flow<Boolean> {
-//        return dao.containsInDataBase(id)
-//    }
-
     fun containsItemIdInCategory(id: Int, categoryId: String): Flow<Boolean> {
         return dao.containsItemIdInCategory(id, categoryId)
     }

@@ -1,5 +1,8 @@
 package com.project.toko.core.presentation_layer.appConstraction
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
@@ -47,40 +50,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ComponentActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavHostController
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
+import com.project.toko.core.dao.MainDb
 import com.project.toko.core.presentation_layer.backArrowButton.BackButton
-import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
 import com.project.toko.core.presentation_layer.theme.LightBottomBarColor
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
-import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
+import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
 
 @Composable
 fun TokoAppActivator(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
+    componentActivity: ComponentActivity,
+    mainDb: MainDb
 ) {
     val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
         add(SvgDecoder.Factory())
@@ -134,7 +149,9 @@ fun TokoAppActivator(
             ShowDrawerContent(
                 modifier = modifier,
                 imageLoader = svgImageLoader,
-                viewModelProvider = viewModelProvider
+                viewModelProvider = viewModelProvider,
+                componentActivity = componentActivity,
+                mainDb = mainDb
             )
         }
     ) {
@@ -409,13 +426,91 @@ private fun SecondBottomNavigationBar(
 private fun ShowDrawerContent(
     modifier: Modifier,
     imageLoader: ImageLoader,
-    viewModelProvider: ViewModelProvider
+    viewModelProvider: ViewModelProvider,
+    componentActivity: ComponentActivity,
+    mainDb: MainDb
 ) {
     val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
     var isHelpFAQOpen by remember { mutableStateOf(false) }
     var isLegalOpen by remember { mutableStateOf(false) }
-    var isExportDataPopUpDialogOpen by remember { mutableStateOf(false) }
+    val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    val customModifier =
+        modifier
+            .fillMaxWidth(0.8f)
+            .height(70.dp)
+            .clip(CardDefaults.shape)
+            .background(LightGreen)
+//            .clickable {
+//                try {
+//                    val saveDb = homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+//                        // Получение пути к базе данных
+//                        val dbFile = context.getDatabasePath("Main.db")
+//                        // Копирование базы данных
+//                        val destinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//                        val destinationFile = File(destinationDir, "Main.db")
+//                        dbFile.copyTo(destinationFile, overwrite = destinationFile.delete())
+//
+//                        // Повторное открытие базы данных после копирования
+//                        mainDb.openHelper.writableDatabase
+//                    }
+//                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+//                        // Ожидание завершения сохранения базы данных
+//                        saveDb.join()
+//
+//                        // Отображение уведомления
+//                        Toast.makeText(context, "Database is saved!", Toast.LENGTH_SHORT).show()
+//                    }
+//                    // Успешно скопировано
+//                } catch (e: Exception) {
+//                    homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+//                        Toast
+//                            .makeText(
+//                                context,
+//                                e.message,
+//                                Toast.LENGTH_SHORT
+//                            )
+//                            .show()
+//                    }
+//                }
+//            }
+
+                .clickable {
+                    try {
+                        val saveDb = homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                            // Получение пути к базе данных
+                            val dbFile = context.getDatabasePath("Main.db")
+                            // Копирование базы данных
+                            val destinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                            val destinationFile = File(destinationDir, "Main.db")
+
+                            copyFile(dbFile, destinationFile)
+
+                            // Повторное открытие базы данных после копирования
+                            mainDb.openHelper.writableDatabase
+                        }
+
+                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+                            // Ожидание завершения сохранения базы данных
+                            saveDb.join()
+
+                            // Отображение уведомления
+                            Toast.makeText(context, "Database is saved!", Toast.LENGTH_SHORT).show()
+                        }
+                        // Успешно скопировано
+                    } catch (e: Exception) {
+                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+                            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+            }
+//            .clickable {
+//                onClickSaveData(context, homeScreenViewModel)
+//            }
+
+
+
 
     Column {
         Row {
@@ -524,6 +619,8 @@ private fun ShowDrawerContent(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
                             ), contentDescription = null, modifier = modifier.size(30.dp)
+                            ,
+                            colorFilter = ColorFilter.tint(Color(114, 114, 114, 255))
                         )
                     },
                 )
@@ -721,7 +818,7 @@ private fun ShowDrawerContent(
                 },
                 selected = false,
                 onClick = {
-                    isExportDataPopUpDialogOpen = true
+                    onClickRequestPermission(componentActivity, isExportDataPopUpDialogOpen)
                 },
                 badge = {
                     Image(
@@ -736,10 +833,10 @@ private fun ShowDrawerContent(
     }
 
 
-    if (isExportDataPopUpDialogOpen) {
+    if (isExportDataPopUpDialogOpen.value) {
         Dialog(
             onDismissRequest = {
-                isExportDataPopUpDialogOpen = false
+                isExportDataPopUpDialogOpen.value = false
             }, properties = DialogProperties(
                 dismissOnBackPress = true,
                 dismissOnClickOutside = true,
@@ -750,7 +847,10 @@ private fun ShowDrawerContent(
                     .fillMaxWidth()
                     .fillMaxHeight(0.4f), contentAlignment = Alignment.Center
             ) {
-                Card(modifier = modifier.fillMaxSize()) {
+                Card(
+                    modifier = modifier.fillMaxSize(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.SpaceAround,
@@ -769,42 +869,7 @@ private fun ShowDrawerContent(
                             )
                         }
                         Row(
-                            modifier = modifier
-                                .fillMaxWidth(0.8f)
-                                .height(70.dp)
-                                .clip(CardDefaults.shape)
-                                .background(LightGreen)
-                                .clickable {
-                                    val dbFile = context.getDatabasePath("Main.db")
-                                    val destinationDir =
-                                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                                    val destinationFile = File(destinationDir, "Main.db")
-                                    try {
-                                        homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                            dbFile.copyTo(destinationFile, overwrite = true)
-                                        }
-                                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "Database is saved!",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
-                                        }
-                                        // Успешно скопировано
-                                    } catch (e: Exception) {
-                                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    e.message,
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
-                                        }
-                                    }
-                                },
+                            modifier = customModifier,
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
@@ -822,7 +887,9 @@ private fun ShowDrawerContent(
                                 .height(70.dp)
                                 .clip(CardDefaults.shape)
                                 .border(4.dp, LightGreen, CardDefaults.shape)
-                                .clickable { },
+                                .clickable {
+
+                                },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
@@ -837,5 +904,133 @@ private fun ShowDrawerContent(
                 }
             }
         }
+    }
+}
+
+// Storage Permissions
+private const val REQUEST_EXTERNAL_STORAGE = 1
+private val PERMISSIONS_STORAGE = arrayOf(
+    Manifest.permission.READ_EXTERNAL_STORAGE,
+    Manifest.permission.WRITE_EXTERNAL_STORAGE
+)
+
+private fun onClickRequestPermission(
+    componentActivity: ComponentActivity,
+    isExportDataPopUpDialogOpen: MutableState<Boolean>
+) {
+
+    when {
+        ContextCompat.checkSelfPermission(
+            componentActivity.applicationContext,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED -> {
+            isExportDataPopUpDialogOpen.value = true
+        }
+
+        ActivityCompat.shouldShowRequestPermissionRationale(
+            componentActivity,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) -> {
+            ActivityCompat.requestPermissions(
+                componentActivity,
+                PERMISSIONS_STORAGE,
+                REQUEST_EXTERNAL_STORAGE
+            )
+        }
+
+        else -> {
+            Toast
+                .makeText(
+                    componentActivity,
+                    "Permission Denied!",
+                    Toast.LENGTH_SHORT
+                )
+                .show()
+            ActivityCompat.requestPermissions(
+                componentActivity,
+                PERMISSIONS_STORAGE,
+                REQUEST_EXTERNAL_STORAGE
+            )
+        }
+    }
+}
+
+private fun onClickSaveData(context: Context, homeScreenViewModel: HomeScreenViewModel){
+    try {
+        val dbFile = context.getDatabasePath("Main.db")
+        Log.e("dbFile", dbFile.absolutePath)
+        val destinationDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        Log.e("destinationDir", destinationDir.absolutePath)
+        val destinationFile = File(destinationDir, "Main.db")
+
+        // Проверяем, существует ли файл базы данных
+        if (dbFile.exists()) {
+            FileInputStream(dbFile).use { inputStream ->
+                FileOutputStream(destinationFile).use { outputStream ->
+                    val buffer = ByteArray(1024)
+                    var length: Int
+                    // Читаем данные из исходного файла и записываем их в файл назначения
+                    while (inputStream
+                            .read(buffer)
+                            .also { length = it } > 0
+                    ) {
+                        outputStream.write(buffer, 0, length)
+                    }
+                }
+            }
+
+            // Если файл успешно скопирован, отображаем уведомление
+            homeScreenViewModel.viewModelScope.launch {
+                Toast
+                    .makeText(context, "Data was saved successfully!", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        } else {
+            // Если файл базы данных не найден, отображаем сообщение об ошибке
+            homeScreenViewModel.viewModelScope.launch {
+                Toast
+                    .makeText(
+                        context,
+                        "File was not found!",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+            }
+        }
+    } catch (e: Exception) {
+        // Обработка ошибок при копировании файла
+        homeScreenViewModel.viewModelScope.launch {
+            Toast
+                .makeText(
+                    context,
+                    "Error when copied data: ${e.message}",
+                    Toast.LENGTH_SHORT
+                )
+                .show()
+        }
+    }
+}
+
+//private suspend fun copyFile(sourceFile: File, destFile: File) = withContext(Dispatchers.IO) {
+//    FileInputStream(sourceFile).channel.use { source ->
+//        FileOutputStream(destFile).channel.use { destination ->
+//            destination.transferFrom(source, 0, source.size())
+//        }
+//    }
+//}
+
+private suspend fun copyFile(source: File, destination: File) {
+
+    suspendCoroutine<Unit> { continuation ->
+        val sourceChannel = FileInputStream(source).channel
+        val destChannel = FileOutputStream(destination).channel
+
+        destChannel.transferFrom(sourceChannel, 0, sourceChannel.size())
+
+        sourceChannel.close()
+        destChannel.close()
+
+        continuation.resume(Unit)
     }
 }
