@@ -48,7 +48,10 @@ class MyViewModelFactory @Inject constructor(
                 malApiRepository
             ) as T
 
-            modelClass.isAssignableFrom(DaoViewModel::class.java) -> DaoViewModel(mainDb,context) as T
+            modelClass.isAssignableFrom(DaoViewModel::class.java) -> DaoViewModel(
+                mainDb,
+                context
+            ) as T
 
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

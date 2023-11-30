@@ -1,5 +1,6 @@
 package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -21,6 +22,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.AddToFavorites
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.DisplayJapAndEnglishTitles
@@ -68,6 +70,7 @@ fun ActivateDetailScreen(
     val scrollState = viewModel.scrollState
     val picturesData by viewModel.picturesData.collectAsStateWithLifecycle()
     val isDialogShown = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = id) {
 
@@ -76,15 +79,23 @@ fun ActivateDetailScreen(
             scrollState.scrollTo(0)
             viewModel.previousId.value = id
         }
-        viewModel.onTapAnime(id)
-        delay(300)
-        viewModel.addStaffFromId(id)
-        delay(300)
-        viewModel.addCastFromId(id)
-        delay(1000L)
-        viewModel.addRecommendationsFromId(id)
-        delay(1000L)
-        viewModel.showPictures(id)
+        if (isInternetAvailable(context)) {
+            viewModel.onTapAnime(id)
+            delay(300)
+            viewModel.addStaffFromId(id)
+            delay(300)
+            viewModel.addCastFromId(id)
+            delay(1000L)
+            viewModel.addRecommendationsFromId(id)
+            delay(1000L)
+            viewModel.showPictures(id)
+        } else {
+            Toast.makeText(
+                context,
+                "No internet connection!",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
 
     }
 

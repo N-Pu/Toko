@@ -1,12 +1,20 @@
 package com.project.toko.characterDetailedScreen.presentation_layer.characterFull
 
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -14,8 +22,12 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
+import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.expandableText.ExpandableText
+import com.project.toko.core.presentation_layer.navigation.Screen
+import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
+import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.delay
 
@@ -29,12 +41,20 @@ fun DisplayCharacterFromId(
 ) {
     val characterViewModel = viewModelProvider[CharacterFullByIdViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
-
+    val context = LocalContext.current
     LaunchedEffect(mal_id) {
-        delay(300L)
-        characterViewModel.getCharacterFromId(mal_id)
-        delay(300L)
-        characterViewModel.getPicturesFromId(mal_id)
+        if (isInternetAvailable(context)) {
+            delay(300L)
+            characterViewModel.getCharacterFromId(mal_id)
+            delay(300L)
+            characterViewModel.getPicturesFromId(mal_id)
+        } else {
+            Toast.makeText(
+                context,
+                "No internet connection!",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     val isSearching by characterViewModel.isSearching.collectAsStateWithLifecycle()
@@ -49,21 +69,17 @@ fun DisplayCharacterFromId(
     val isDialogShown = remember { mutableStateOf(false) }
     if (isSearching.not() && characterFullState != null) {
 
+
         Column(
             modifier = modifier
                 .verticalScroll(rememberScrollState())
         ) {
+            Row(modifier = modifier.height(80.dp)) {}
             Row(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-            ) {}
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
                     .height(250.dp)
-//                    .background(Color.Red)
             ) {
+
                 ShowCharacterPicture(
                     painter = painter,
                     modifier = modifier,
@@ -81,8 +97,6 @@ fun DisplayCharacterFromId(
                     picturesData = characterPicturesState,
                     modifier = modifier
                 )
-
-
             }
             Row {
                 characterFullState?.about?.let { about ->
@@ -110,18 +124,42 @@ fun DisplayCharacterFromId(
                 )
 
             }
-//            characterFullState?.anime?.let { animeList ->
-//                ShowAnimeRelated(
-//                    modifier = modifier,
-//                    animes = animeList,
-//                    navController = navController
-//                )
-//
-//            }
-
         }
-
+        BackArrow(modifier, navController)
 
     } else LoadingAnimation()
+}
+
+
+@Composable
+private fun BackArrow(modifier: Modifier, navController: NavController) {
+
+    Column {
+        Spacer(modifier = modifier.height(20.dp))
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(BackArrowCastColor)
+        ) {
+            Text(
+                text = "   <    Character                    ",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Start,
+                textDecoration = TextDecoration.Underline,
+                modifier = modifier.clickable {
+                    navController.popBackStack()
+                }
+            )
+        }
+        Box(
+            modifier = modifier
+                .fillMaxWidth(0.7f)
+                .fillMaxHeight(0.02f)
+                .background(BackArrowSecondCastColor)
+        )
+
+        Spacer(modifier = modifier.height(20.dp))
+    }
 }
 

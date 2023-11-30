@@ -26,7 +26,7 @@ class PersonByIdViewModel @Inject constructor(malApiService: MalApiService) : Vi
     private val _loadedId = mutableIntStateOf(0)
     val loadedId = _loadedId
 
-    fun getPersonFromId(mal_id: Int) {
+   suspend fun getPersonFromId(mal_id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _isSearching.value = true

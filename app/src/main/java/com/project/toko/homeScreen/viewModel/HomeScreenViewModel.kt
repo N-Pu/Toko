@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.dao.MainDb
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.daoScreen.dao.AnimeItem
@@ -162,7 +163,6 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     init {
-//        try {
         viewModelScope.launch(Dispatchers.IO) {
             searchDebouncer
                 .debounce(1000L)
@@ -170,16 +170,6 @@ class HomeScreenViewModel @Inject constructor(
                     performSearch(searchQuery)
                 }
         }
-//        } catch (e: Exception) {
-//            viewModelScope.launch(Dispatchers.Main) {
-//                Toast.makeText(
-//                    context,
-//                    e.message,
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//            }
-//        }
-
     }
 
     private val _switchIndicator = mutableStateOf(false)
@@ -340,13 +330,6 @@ class HomeScreenViewModel @Inject constructor(
                 ).show()
             }
         }
-    }
-
-    private fun isInternetAvailable(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = connectivityManager.activeNetworkInfo
-        return networkInfo != null && networkInfo.isConnected
     }
 
 

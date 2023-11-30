@@ -1,6 +1,8 @@
 package com.project.toko.detailScreen.viewModel
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -22,7 +24,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DetailScreenViewModel @Inject constructor(
-    private val malApiService: MalApiService,
+    private val malApiService: MalApiService
 ) : ViewModel() {
 
     //detailData

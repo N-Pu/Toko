@@ -1,5 +1,6 @@
 package com.project.toko.homeScreen.presentation_layer.homeScreen
 
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import androidx.compose.animation.core.LinearEasing
@@ -52,6 +53,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
+import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
 import com.project.toko.core.presentation_layer.theme.LightCardColor
 import com.project.toko.core.presentation_layer.theme.SectionColor
@@ -70,7 +72,7 @@ fun GridAdder(
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
     isTabMenuOpen: MutableState<Boolean>,
-    switch : MutableState<Boolean>
+    switch: MutableState<Boolean>
 ) {
 
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
@@ -86,15 +88,23 @@ fun GridAdder(
             initialValue = emptyList()
         )
 
-
+    val context = LocalContext.current
 
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.getTopTrendingAnime("bypopularity", 25)
-        delay(2000L)
-        viewModel.getTopAiring("airing", 25)
-        delay(2000L)
-        viewModel.getTopUpcoming("upcoming", 25)
+        if (isInternetAvailable(context)) {
+            viewModel.getTopTrendingAnime("bypopularity", 25)
+            delay(2000L)
+            viewModel.getTopAiring("airing", 25)
+            delay(2000L)
+            viewModel.getTopUpcoming("upcoming", 25)
+        } else {
+            Toast.makeText(
+                context,
+                "No internet connection!",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
