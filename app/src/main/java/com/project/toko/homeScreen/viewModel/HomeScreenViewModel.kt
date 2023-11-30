@@ -168,10 +168,13 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
+    private val _switchIndicator = mutableStateOf(false)
+    val switchIndicator = _switchIndicator
     fun onSearchTextChange(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _searchText.value = text
             searchDebouncer.emit(text)
+            _switchIndicator.value = true
         }
     }
 

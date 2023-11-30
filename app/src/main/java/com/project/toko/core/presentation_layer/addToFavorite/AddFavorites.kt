@@ -86,7 +86,7 @@ fun AddFavorites(
         ) {
             Image(
                 modifier = modifier
-                    .size(38.dp)
+                    .size(30.dp)
                     .clickable { expanded = true },
                 painter = rememberAsyncImagePainter(
                     model = R.drawable.addpluscircle,

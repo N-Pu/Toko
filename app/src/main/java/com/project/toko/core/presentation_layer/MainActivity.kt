@@ -1,6 +1,7 @@
 package com.project.toko.core.presentation_layer
 
 
+
 import android.os.Bundle
 import android.view.Window
 import androidx.activity.ComponentActivity
@@ -50,15 +51,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 //        navigationBarColorChanger()
 
-
         requestWindowFeature(Window.FEATURE_NO_TITLE)
+
+
 //        WindowCompat.setDecorFitsSystemWindows(window,false)
         val modifierComponent = (application as Application).modifierComponent
         val databaseComponent = (application as Application).daoComponent
         val malApiComponent = (application as Application).malApiComponent
         val context = (application as Application).context.context
         modifier = modifierComponent.providesModifier()
-        dao = databaseComponent.provideDao()
+        dao = databaseComponent.provideDao().getDao()
         malApi = malApiComponent.provideMalApiService()
         val myViewModelFactory =
             MyViewModelFactory(
@@ -81,9 +83,8 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         viewModelProvider = viewModelProvider,
                         modifier = modifier,
-//                        exoPlayer = exoPlayer,
-//                        playerView = playerView
-
+                        componentActivity = this,
+                        mainDb = databaseComponent.provideDao()
                     )
                 }
             }
@@ -124,4 +125,7 @@ class MainActivity : ComponentActivity() {
 //        DataCacheSingleton.dataCache.clear()
 //    }
 
+
+
 }
+

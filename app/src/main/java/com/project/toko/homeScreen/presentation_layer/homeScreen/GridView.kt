@@ -69,7 +69,8 @@ fun GridAdder(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
-    isTabMenuOpen: MutableState<Boolean>
+    isTabMenuOpen: MutableState<Boolean>,
+    switch : MutableState<Boolean>
 ) {
 
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
@@ -85,6 +86,9 @@ fun GridAdder(
             initialValue = emptyList()
         )
 
+
+
+
     LaunchedEffect(key1 = Unit) {
         viewModel.getTopTrendingAnime("bypopularity", 25)
         delay(2000L)
@@ -98,7 +102,8 @@ fun GridAdder(
     val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
 
     var log by remember { mutableStateOf("") }
-    if (listData.data.isNotEmpty()) {
+//    if (listData.data.isNotEmpty()) {
+    if (switch.value) {
         LazyVerticalStaggeredGrid(
             state = if (scrollGridState.firstVisibleItemIndex >= 4) {
                 log = scrollGridState.firstVisibleItemIndex.toString()

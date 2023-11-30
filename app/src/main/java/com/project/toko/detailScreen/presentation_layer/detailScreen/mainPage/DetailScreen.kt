@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,7 +44,6 @@ import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.cu
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ShowMoreInformation
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ShowPictureAlbum
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.YearTypeEpisodesTimeStatusStudio
-import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.youtubePlayer.YoutubePlayer
 import kotlinx.coroutines.delay
 
 
@@ -70,7 +68,6 @@ fun ActivateDetailScreen(
     val scrollState = viewModel.scrollState
     val picturesData by viewModel.picturesData.collectAsStateWithLifecycle()
     val isDialogShown = remember { mutableStateOf(false) }
-//    val blurEverything = remember { mutableIntStateOf(1) }
 
     LaunchedEffect(key1 = id) {
 
@@ -118,7 +115,6 @@ fun ActivateDetailScreen(
                     .fillMaxSize()
                     .combinedClickable(onClick = {}, onLongClick = {
                         isDialogShown.value = true
-//                        blurEverything.value = 25
                     })
             )
 
