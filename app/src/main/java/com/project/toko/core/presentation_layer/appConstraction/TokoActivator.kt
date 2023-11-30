@@ -104,44 +104,12 @@ fun TokoAppActivator(
     val characterDetailScreenId = viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
     val personDetailScreenId = viewModelProvider[PersonByIdViewModel::class.java].loadedId
     val producerDetailScreenId = viewModelProvider[ProducerFullViewModel::class.java].loadedId
-//    var showBackArrow by remember { mutableStateOf(false) }
     var lastSelectedScreen by rememberSaveable { mutableStateOf<String?>(null) }
 
     navController.addOnDestinationChangedListener { _, destination, arguments ->
         if (destination.route == Screen.Detail.route) {
             currentDetailScreenId.intValue = arguments?.getInt("id") ?: 0
         }
-
-//        showBackArrow = when (destination.route) {
-//            Screen.Home.route -> false
-//            Screen.RandomAnimeOrManga.route -> false
-//            Screen.Favorites.route -> false
-//            Screen.DetailOnWholeCast.route -> {
-//                lastSelectedScreen = destination.route
-//                false
-//            }
-//
-//            Screen.DetailOnWholeStaff.route -> {
-//                lastSelectedScreen = destination.route
-//                false
-//            }
-//
-//            Screen.Detail.route -> {
-//                lastSelectedScreen = destination.route
-//                false
-//            }
-//
-//            Screen.Nothing.route -> {
-//                lastSelectedScreen = destination.route
-//                false
-//            }
-//
-//            else -> {
-//                lastSelectedScreen = destination.route
-//                true
-//            }
-//        }
-
         when (destination.route) {
             Screen.Home.route -> null
             Screen.RandomAnimeOrManga.route -> null

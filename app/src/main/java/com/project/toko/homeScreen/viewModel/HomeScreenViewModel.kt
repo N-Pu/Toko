@@ -1,7 +1,6 @@
 package com.project.toko.homeScreen.viewModel
 
 import android.content.Context
-import android.net.ConnectivityManager
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue

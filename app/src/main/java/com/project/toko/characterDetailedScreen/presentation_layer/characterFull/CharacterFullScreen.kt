@@ -25,7 +25,6 @@ import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewM
 import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.expandableText.ExpandableText
-import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
