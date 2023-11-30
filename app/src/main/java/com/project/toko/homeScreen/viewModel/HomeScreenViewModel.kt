@@ -1,13 +1,16 @@
 package com.project.toko.homeScreen.viewModel
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.toko.core.dao.Dao
+import com.project.toko.core.dao.MainDb
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.homeScreen.model.linkChangerModel.OrderBy
@@ -32,9 +35,9 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class)
 class HomeScreenViewModel @Inject constructor(
     private val malApiRepository: MalApiService,
-    private val dao: Dao
+    private val dao: MainDb,
+    private val context: Context
 ) : ViewModel() {
-
 
     private val emptyItem = Items(0, 0, 0)
     private val emptyNewAnimeSearchModel =
@@ -159,6 +162,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     init {
+//        try {
         viewModelScope.launch(Dispatchers.IO) {
             searchDebouncer
                 .debounce(1000L)
@@ -166,15 +170,35 @@ class HomeScreenViewModel @Inject constructor(
                     performSearch(searchQuery)
                 }
         }
+//        } catch (e: Exception) {
+//            viewModelScope.launch(Dispatchers.Main) {
+//                Toast.makeText(
+//                    context,
+//                    e.message,
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//            }
+//        }
+
     }
 
     private val _switchIndicator = mutableStateOf(false)
     val switchIndicator = _switchIndicator
     fun onSearchTextChange(text: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _searchText.value = text
-            searchDebouncer.emit(text)
-            _switchIndicator.value = true
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                _searchText.value = text
+                searchDebouncer.emit(text)
+                _switchIndicator.value = true
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -235,25 +259,96 @@ class HomeScreenViewModel @Inject constructor(
 
 
     suspend fun getTopTrendingAnime(filter: String, limit: Int = 10) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _topTrendingAnime.value =
-                malApiRepository.getTenTopAnime(filter, limit).body() ?: emptyNewAnimeSearchModel
+        try {
+            if (isInternetAvailable(context)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _topTrendingAnime.value =
+                        malApiRepository.getTenTopAnime(filter, limit).body()
+                            ?: emptyNewAnimeSearchModel
+                }
+            } else {
+                viewModelScope.launch(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        "No internet connection!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
     suspend fun getTopAiring(filter: String, limit: Int = 10) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _topAiringAnime.value =
-                malApiRepository.getTenTopAnime(filter, limit).body() ?: emptyNewAnimeSearchModel
+        try {
+            if (isInternetAvailable(context)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _topAiringAnime.value =
+                        malApiRepository.getTenTopAnime(filter, limit).body()
+                            ?: emptyNewAnimeSearchModel
+                }
+            } else {
+                viewModelScope.launch(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        "No internet connection!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
     suspend fun getTopUpcoming(filter: String, limit: Int = 10) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _topUpcomingAnime.value =
-                malApiRepository.getTenTopAnime(filter, limit).body() ?: emptyNewAnimeSearchModel
+        try {
+            if (isInternetAvailable(context)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _topUpcomingAnime.value =
+                        malApiRepository.getTenTopAnime(filter, limit).body()
+                            ?: emptyNewAnimeSearchModel
+                }
+            } else {
+                viewModelScope.launch(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        "No internet connection!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
+
+    private fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
+
 
     fun loadNextPage() {
         val query = searchText.value
@@ -306,7 +401,6 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-
     fun tappingOnGenre(number: Int) {
         if (arrayOfGenres.value.contains(number)) {
             arrayOfGenres.value.remove(number)
@@ -334,25 +428,35 @@ class HomeScreenViewModel @Inject constructor(
 
 
     suspend fun addAllParams() {
-        viewModelScope.async(Dispatchers.IO) {
-            pre_genres = makeArrayToLinkWithCommas(arrayOfGenres.value)
-            _genres.value = pre_genres
-        }.join()
-        viewModelScope.async(Dispatchers.IO) {
-            _selectedRating.value = preSelectedRating.value
-        }.join()
-        viewModelScope.async(Dispatchers.IO) {
-            _selectedType.value = pre_selectedType.value
-        }.join()
-        viewModelScope.async(Dispatchers.IO) {
-            _selectedOrderBy.value = pre_selectedOrderBy.value
-        }.join()
-        viewModelScope.async(Dispatchers.IO) {
-            _min_score.value = _pre_min_score.value
-            _max_score.value = _pre_max_score.value
-        }.join()
+        try {
+            viewModelScope.async(Dispatchers.IO) {
+                pre_genres = makeArrayToLinkWithCommas(arrayOfGenres.value)
+                _genres.value = pre_genres
+            }.join()
+            viewModelScope.async(Dispatchers.IO) {
+                _selectedRating.value = preSelectedRating.value
+            }.join()
+            viewModelScope.async(Dispatchers.IO) {
+                _selectedType.value = pre_selectedType.value
+            }.join()
+            viewModelScope.async(Dispatchers.IO) {
+                _selectedOrderBy.value = pre_selectedOrderBy.value
+            }.join()
+            viewModelScope.async(Dispatchers.IO) {
+                _min_score.value = _pre_min_score.value
+                _max_score.value = _pre_max_score.value
+            }.join()
 
-        performSearch(searchText.value)
+            performSearch(searchText.value)
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
 
@@ -366,32 +470,45 @@ class HomeScreenViewModel @Inject constructor(
 
 
     fun onDialogLongClick(animeId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _selectedAnimeId.value = animeId
-            isDialogShown = true
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                _selectedAnimeId.value = animeId
+                isDialogShown = true
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
     fun onDialogDismiss() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _selectedAnimeId.value = null
-            isDialogShown = false
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                _selectedAnimeId.value = null
+                isDialogShown = false
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
-
-//    private val _isNowWatchingSectingVisible = mutableStateOf(false)
-//    var isNowWatchingSectingVisible = _isNowWatchingSectingVisible
-
     fun showListOfWatching(): Flow<List<AnimeItem>> {
-        return dao.getLastTenAnimeFromWatchingSection()
+        return dao.getDao().getLastTenAnimeFromWatchingSection()
     }
 
-//    private val _isNowJustAddedSectingVisible = mutableStateOf(false)
-//    var isNowJustAddedSectingVisible = _isNowJustAddedSectingVisible
-
     fun showLastAdded(): Flow<List<AnimeItem>> {
-        return dao.getLastTenAddedAnime()
+        return dao.getDao().getLastTenAddedAnime()
     }
 }
 

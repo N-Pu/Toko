@@ -142,4 +142,5 @@ interface MalApiService {
         }
         throw Exception("Failed to get response after $retryCount retries")
     }
+
 }

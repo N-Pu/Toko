@@ -1,7 +1,6 @@
 package com.project.toko.core.presentation_layer
 
 
-
 import android.os.Bundle
 import android.view.Window
 import androidx.activity.ComponentActivity
@@ -12,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.project.toko.core.dao.Dao
+import com.project.toko.core.dao.MainDb
 import com.project.toko.core.di.Application
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.core.presentation_layer.appConstraction.TokoAppActivator
@@ -27,7 +26,7 @@ class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
 
     @Inject
-    lateinit var dao: Dao
+    lateinit var mainDb: MainDb
 
     @Inject
     lateinit var modifier: Modifier
@@ -60,12 +59,12 @@ class MainActivity : ComponentActivity() {
         val malApiComponent = (application as Application).malApiComponent
         val context = (application as Application).context.context
         modifier = modifierComponent.providesModifier()
-        dao = databaseComponent.provideDao().getDao()
+        mainDb = databaseComponent.provideDao()
         malApi = malApiComponent.provideMalApiService()
         val myViewModelFactory =
             MyViewModelFactory(
                 malApiRepository = malApi,
-                dao = dao,
+                mainDb = mainDb,
                 context = context
             )
         val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
@@ -124,8 +123,6 @@ class MainActivity : ComponentActivity() {
 //        dataCache.clear()
 //        DataCacheSingleton.dataCache.clear()
 //    }
-
-
 
 }
 
