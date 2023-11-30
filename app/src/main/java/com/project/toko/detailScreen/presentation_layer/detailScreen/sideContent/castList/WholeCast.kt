@@ -30,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -272,45 +271,6 @@ private fun CurrentCast(
     }
 }
 
-@Preview
-@Composable
-fun PreviewBackArrow() {
-    Column(
-        Modifier
-
-    ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(BackArrowCastColor)
-//                .padding(bottom = 5.dp)
-        ) {
-
-            Text(
-                text = "   <    Cast                          ",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = TextAlign.Start,
-                textDecoration = TextDecoration.Underline,
-
-                )
-
-
-        }
-        Box(
-            modifier = Modifier
-
-                .fillMaxWidth(0.7f)
-                .fillMaxHeight(0.2f)
-                .background(BackArrowSecondCastColor)
-//                    .padding(bottom = 5.dp)
-        ) {}
-
-        Spacer(modifier = Modifier.height(20.dp))
-    }
-}
-
 @Composable
 private fun BackArrow(modifier: Modifier, navController: NavController, detailScreenMalId: Int) {
 
@@ -346,38 +306,6 @@ private fun BackArrow(modifier: Modifier, navController: NavController, detailSc
 
         Spacer(modifier = modifier.height(20.dp))
     }
-//    Column(
-//        modifier
-//
-//    ) {
-//        Spacer(modifier = modifier.height(20.dp))
-//        Box(
-//            modifier = modifier
-//                .fillMaxWidth()
-//                .background(BackArrowCastColor)
-//                .padding(bottom = 5.dp)
-//        ) {
-//
-//                Text(
-//                    text = "   <    Cast                          ",
-//                    fontSize = 24.sp,
-//                    fontWeight = FontWeight.ExtraBold,
-//                    textAlign = TextAlign.Start,
-//                    textDecoration = TextDecoration.Underline,
-//                    modifier = modifier.clickable {
-//                        navigateToDetailScreen(navController, detailScreenMalId)
-//                    }
-//                )
-//
-//
-//        }
-//        Box(
-//            modifier = modifier
-//                .fillMaxWidth(0.5f)
-////                    .padding(bottom = 5.dp)
-//        ) {}
-//        Spacer(modifier = modifier.height(20.dp))
-//    }
 }
 
 private fun hasJapVoiceActor(castList: List<CastData>): List<CastData> {

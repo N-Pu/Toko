@@ -18,7 +18,6 @@ class RandomAnimeViewModel @Inject constructor(private val malApiService: MalApi
 
    suspend fun onTapRandomAnime() {
         if (isSearching) return
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 isSearching = true

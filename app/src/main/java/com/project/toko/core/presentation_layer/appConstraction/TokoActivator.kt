@@ -71,7 +71,6 @@ import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
 import com.project.toko.core.dao.MainDb
-import com.project.toko.core.presentation_layer.backArrowButton.BackButton
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
 import com.project.toko.core.presentation_layer.theme.LightBottomBarColor
@@ -105,103 +104,62 @@ fun TokoAppActivator(
     val characterDetailScreenId = viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
     val personDetailScreenId = viewModelProvider[PersonByIdViewModel::class.java].loadedId
     val producerDetailScreenId = viewModelProvider[ProducerFullViewModel::class.java].loadedId
-    var showBackArrow by remember { mutableStateOf(false) }
     var lastSelectedScreen by rememberSaveable { mutableStateOf<String?>(null) }
 
     navController.addOnDestinationChangedListener { _, destination, arguments ->
         if (destination.route == Screen.Detail.route) {
             currentDetailScreenId.intValue = arguments?.getInt("id") ?: 0
         }
-
-        showBackArrow = when (destination.route) {
-            Screen.Home.route -> false
-            Screen.RandomAnimeOrManga.route -> false
-            Screen.Favorites.route -> false
-            Screen.DetailOnWholeCast.route -> {
-                lastSelectedScreen = destination.route
-                false
-            }
-
-            Screen.DetailOnWholeStaff.route -> {
-                lastSelectedScreen = destination.route
-                false
-            }
-
-            Screen.Detail.route -> {
-                lastSelectedScreen = destination.route
-                false
-            }
-
-            Screen.Nothing.route -> {
-                lastSelectedScreen = destination.route
-                false
-            }
-
+        when (destination.route) {
+            Screen.Home.route -> null
+            Screen.RandomAnimeOrManga.route -> null
+            Screen.Favorites.route -> null
             else -> {
                 lastSelectedScreen = destination.route
-                true
             }
         }
     }
 
-    ModalNavigationDrawer(
-        drawerContent = {
-            ShowDrawerContent(
-                modifier = modifier,
-                imageLoader = svgImageLoader,
-                viewModelProvider = viewModelProvider,
-                componentActivity = componentActivity,
-                mainDb = mainDb
-            )
-        }
-    ) {
 
-        Scaffold(bottomBar = {
-
-            SecondBottomNavigationBar(
-                navController = navController,
-                currentDetailScreenId = currentDetailScreenId,
-                characterDetailScreenId = characterDetailScreenId,
-                personDetailScreenId = personDetailScreenId,
-                producerDetailScreenId = producerDetailScreenId,
-                modifier = modifier,
-                lastSelectedScreen = lastSelectedScreen,
-                imageLoader = svgImageLoader
-            )
-
-        },
-//            snackbarHost = {
-//
-//                // нижний бар уведомлений
-//            Snackbar {
-//                        Text("TEXT")
-//            }
-//
-//            }
-//            ,
-            floatingActionButtonPosition = FabPosition.Center,
-            content = { padding ->
-                padding.calculateTopPadding()
-                SetupNavGraph(
-                    navController = navController, viewModelProvider = viewModelProvider,
-                    modifier = modifier,
-//                    exoPlayer = exoPlayer, playerView = playerView
-                )
-            },
-            topBar = {
-                if (showBackArrow)
-                    Box(
-                        contentAlignment = Alignment.BottomCenter,
-                        modifier = modifier.size(60.dp)
-                    ) {
-                        BackButton(modifier = modifier, onClick = {
-                            navController.popBackStack()
-                        })
-                    }
-            }
-        )
-    }
+ModalNavigationDrawer(
+drawerContent = {
+    ShowDrawerContent(
+        modifier = modifier,
+        imageLoader = svgImageLoader,
+        viewModelProvider = viewModelProvider,
+        componentActivity = componentActivity,
+        mainDb = mainDb
+    )
 }
+) {
+
+    Scaffold(bottomBar = {
+
+        SecondBottomNavigationBar(
+            navController = navController,
+            currentDetailScreenId = currentDetailScreenId,
+            characterDetailScreenId = characterDetailScreenId,
+            personDetailScreenId = personDetailScreenId,
+            producerDetailScreenId = producerDetailScreenId,
+            modifier = modifier,
+            lastSelectedScreen = lastSelectedScreen,
+            imageLoader = svgImageLoader
+        )
+
+    },
+        floatingActionButtonPosition = FabPosition.Center,
+        content = { padding ->
+            padding.calculateTopPadding()
+            SetupNavGraph(
+                navController = navController,
+                viewModelProvider = viewModelProvider,
+                modifier = modifier,
+            )
+        }
+    )
+}
+}
+
 
 @Composable
 private fun SecondBottomNavigationBar(
@@ -476,40 +434,43 @@ private fun ShowDrawerContent(
 //                }
 //            }
 
-                .clickable {
-                    try {
-                        val saveDb = homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                            // Получение пути к базе данных
-                            val dbFile = context.getDatabasePath("Main.db")
-                            // Копирование базы данных
-                            val destinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                            val destinationFile = File(destinationDir, "Main.db")
+            .clickable {
+                try {
+                    val saveDb = homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                        // Получение пути к базе данных
+                        val dbFile = context.getDatabasePath("Main.db")
+                        // Копирование базы данных
+                        val destinationDir =
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        val destinationFile = File(destinationDir, "Main.db")
 
-                            copyFile(dbFile, destinationFile)
+                        copyFile(dbFile, destinationFile)
 
-                            // Повторное открытие базы данных после копирования
-                            mainDb.openHelper.writableDatabase
-                        }
-
-                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                            // Ожидание завершения сохранения базы данных
-                            saveDb.join()
-
-                            // Отображение уведомления
-                            Toast.makeText(context, "Database is saved!", Toast.LENGTH_SHORT).show()
-                        }
-                        // Успешно скопировано
-                    } catch (e: Exception) {
-                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-                        }
+                        // Повторное открытие базы данных после копирования
+                        mainDb.openHelper.writableDatabase
                     }
+
+                    homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+                        // Ожидание завершения сохранения базы данных
+                        saveDb.join()
+
+                        // Отображение уведомления
+                        Toast
+                            .makeText(context, "Database is saved!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    // Успешно скопировано
+                } catch (e: Exception) {
+                    homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
+                        Toast
+                            .makeText(context, e.message, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
             }
 //            .clickable {
 //                onClickSaveData(context, homeScreenViewModel)
 //            }
-
-
 
 
     Column {
@@ -618,8 +579,7 @@ private fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp)
-                            ,
+                            ), contentDescription = null, modifier = modifier.size(30.dp),
                             colorFilter = ColorFilter.tint(Color(114, 114, 114, 255))
                         )
                     },
@@ -955,7 +915,7 @@ private fun onClickRequestPermission(
     }
 }
 
-private fun onClickSaveData(context: Context, homeScreenViewModel: HomeScreenViewModel){
+private fun onClickSaveData(context: Context, homeScreenViewModel: HomeScreenViewModel) {
     try {
         val dbFile = context.getDatabasePath("Main.db")
         Log.e("dbFile", dbFile.absolutePath)

@@ -1,5 +1,6 @@
 package com.project.toko.randomAnimeScreen.presentation_layer.randomAnimeScreen
 
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
@@ -31,6 +32,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
@@ -58,7 +60,7 @@ fun ShowRandomAnime(
     val cardIsShown = remember {
         mutableStateOf(true)
     }
-
+    val context = LocalContext.current
 
     Column(
         modifier
@@ -74,8 +76,22 @@ fun ShowRandomAnime(
                     .background(LightGreen)
                     .combinedClickable(onDoubleClick = {
                         randomViewModel.viewModelScope.launch(Dispatchers.IO) {
-                            randomViewModel.onTapRandomAnime()
+                            if (isInternetAvailable(context)) {
+                                randomViewModel.onTapRandomAnime()
+                            }
                         }
+                        randomViewModel.viewModelScope.launch {
+                            if (!isInternetAvailable(context)) {
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "No internet connection!",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                            }
+                        }
+
                     }) {}
                     .padding(20.dp, 20.dp, 20.dp, 20.dp)) {
                     Text(
@@ -692,11 +708,3 @@ private fun formatScoredBy(float: Float): String {
     }
 }
 
-
-//private fun formatScore(float: Float?): String {
-//    return if (float == null || float == 0f) {
-//        "N/A"
-//    } else {
-//        float.toString()
-//    }
-//}

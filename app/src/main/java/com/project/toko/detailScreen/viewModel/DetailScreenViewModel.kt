@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DetailScreenViewModel @Inject constructor(
-    private val malApiService: MalApiService,
+    private val malApiService: MalApiService
 ) : ViewModel() {
 
     //detailData
