@@ -451,7 +451,7 @@ private fun AnimeCardBox(
 
             AddFavorites(
                 mal_id = data.mal_id,
-                anime = data.title,
+                title = data.title,
                 score = formatScore(data.score),
                 scoredBy = formatScoredBy(data.scored_by),
                 animeImage = data.images.jpg.image_url,
@@ -834,7 +834,7 @@ private fun ShowTopAnime(
 
                 AddFavorites(
                     mal_id = data.mal_id,
-                    anime = data.title,
+                    title = data.title,
                     score = formatScore(data.score),
                     scoredBy = formatScoredBy(data.scored_by),
                     animeImage = data.images.jpg.image_url,

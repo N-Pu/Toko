@@ -55,6 +55,7 @@ import com.project.toko.core.presentation_layer.theme.SearchBarColor
 import com.project.toko.core.presentation_layer.theme.favoriteTopBarColors
 import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
 import com.project.toko.core.presentation_layer.theme.threeLines
+import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.daoScreen.model.AnimeListType
 import com.project.toko.personDetailedScreen.dao.PersonItem
@@ -75,7 +76,6 @@ fun DaoScreen(
     }.build()
 
     var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
-//    val scrollState = rememberLazyGridState()
     val arrayOfEntries = AnimeListType.values()
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     val searchText by daoViewModel.searchText.collectAsStateWithLifecycle()
@@ -198,7 +198,7 @@ fun DaoScreen(
                 .background(Color.White)
         ) {
             when (selectedListType) {
-                AnimeListType.WATCHING -> FavoriteAnimeList(
+                AnimeListType.WATCHING -> DataAnimeList(
                     navController = navController,
                     daoViewModel = daoViewModel,
                     modifier = modifier,
@@ -211,7 +211,7 @@ fun DaoScreen(
                     type = selectedType
                 )
 
-                AnimeListType.PLANNED -> FavoriteAnimeList(
+                AnimeListType.PLANNED -> DataAnimeList(
                     navController = navController,
                     daoViewModel = daoViewModel,
                     modifier = modifier,
@@ -224,7 +224,7 @@ fun DaoScreen(
                     type = selectedType
                 )
 
-                AnimeListType.COMPLETED -> FavoriteAnimeList(
+                AnimeListType.COMPLETED -> DataAnimeList(
                     navController = navController,
                     daoViewModel = daoViewModel,
                     modifier = modifier,
@@ -237,7 +237,7 @@ fun DaoScreen(
                     type = selectedType
                 )
 
-                AnimeListType.DROPPED -> FavoriteAnimeList(
+                AnimeListType.DROPPED -> DataAnimeList(
                     navController = navController,
                     daoViewModel = daoViewModel,
                     modifier = modifier,
@@ -250,11 +250,10 @@ fun DaoScreen(
                     type = selectedType
                 )
 
-                AnimeListType.FAVORITE -> FavoriteAnimeList(
+                AnimeListType.FAVORITE -> FavoriteList(
                     navController = navController,
                     daoViewModel = daoViewModel,
                     modifier = modifier,
-                    category = AnimeListType.FAVORITE.route,
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
                     isSortedByUsers = isSortedByUsers,
@@ -321,7 +320,7 @@ private fun FavoriteAnimeListButton(
 // List of anime in current category
 // (watching, planned, watched, dropped)
 @Composable
-private fun FavoriteAnimeList(
+private fun DataAnimeList(
     navController: NavController,
     daoViewModel: DaoViewModel,
     modifier: Modifier,
@@ -362,7 +361,7 @@ private fun FavoriteAnimeList(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(currentAnimeInSection) { animeItem ->
-                FavoriteScreenCardBox(
+                DataScreenCardBox(
                     animeItem = animeItem,
                     navController = navController,
                     modifier = modifier
@@ -373,6 +372,51 @@ private fun FavoriteAnimeList(
     }
 }
 
+
+@Composable
+private fun FavoriteList(
+    navController: NavController,
+    daoViewModel: DaoViewModel,
+    modifier: Modifier,
+    isSortedAlphabetically: MutableState<Boolean>,
+    isSortedByScore: MutableState<Boolean>,
+    isSortedByUsers: MutableState<Boolean>,
+    isAiredFrom: MutableState<Boolean>,
+    searchText: String,
+    type: MutableState<String?>
+
+) {
+    val currentAnimeInSection by daoViewModel.getAnimeInFavorite(
+        searchText = searchText,
+        isSortedByScore = isSortedByScore.value,
+        isAiredFrom = isAiredFrom.value,
+        isSortedAlphabetically = isSortedAlphabetically.value,
+        isSortedByUsers = isSortedByUsers.value,
+        type = type.value ?: ""
+    )
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+
+//    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize(1f)
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 265.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(currentAnimeInSection) { favoriteItem ->
+                FavoriteScreenCardBox(
+                    favoriteItem = favoriteItem,
+                    navController = navController,
+                    modifier = modifier
+                )
+            }
+        }
+    }
+}
 
 @Composable
 private fun ShowCharacter(
@@ -552,7 +596,7 @@ private fun PersonCardBox(
 // anime-card with "+" button
 
 @Composable
-private fun FavoriteScreenCardBox(
+private fun DataScreenCardBox(
     animeItem: AnimeItem,
     navController: NavController,
     modifier: Modifier
@@ -702,6 +746,157 @@ private fun FavoriteScreenCardBox(
     }
 }
 
+
+@Composable
+private fun FavoriteScreenCardBox(
+    favoriteItem: FavoriteItem,
+    navController: NavController,
+    modifier: Modifier
+) {
+    val painter = rememberAsyncImagePainter(model = favoriteItem.animeImage)
+
+    val score = if (favoriteItem.score.isNullOrEmpty()) "N/A" else favoriteItem.score
+    val scoredBy =
+        if (favoriteItem.scored_by.isNullOrEmpty()) "0 users" else "${favoriteItem.scored_by} users"
+    val status =
+        if (favoriteItem.status.isNullOrEmpty()) "Status: N/A" else "Status: " + favoriteItem.status
+    val rating =
+        if (favoriteItem.rating.isNullOrEmpty()) "Rating: N/A" else "Rating: " + favoriteItem.rating
+
+    Column(modifier = modifier.clickable {
+        favoriteItem.id?.let {
+            navigateToDetailScreen(navController, it)
+        }
+    }, verticalArrangement = Arrangement.SpaceBetween) {
+        Row {
+            Column(modifier = modifier.padding(vertical = 2.dp, horizontal = 10.dp)) {
+                Image(
+                    painter = painter,
+                    contentDescription = favoriteItem.animeImage,
+                    modifier = modifier
+                        .size(100.dp, 150.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    contentScale = ContentScale.FillBounds
+                )
+
+            }
+            Column {
+                Text(
+                    text = favoriteItem.animeName,
+                    modifier = modifier,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 25.sp
+                )
+//                Text(
+//                    text = animeItem.airedFrom,
+//                    modifier = modifier,
+//                    maxLines = 2,
+//                    overflow = TextOverflow.Ellipsis,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 25.sp
+//                )
+                if (!favoriteItem.secondName.isNullOrEmpty()) {
+                    Row(
+                        modifier = modifier
+                            .fillMaxWidth(0.7f)
+                            .height(60.dp)
+                    ) {
+                        Text(
+                            text = favoriteItem.secondName,
+                            modifier = Modifier,
+                            minLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(15.dp)
+        ) {
+
+        }
+        Row {
+            Column(
+                modifier = modifier
+                    .fillMaxWidth(0.3f)
+                    .wrapContentSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .height(25.dp)
+                            .width(80.dp)
+                            .background(LightGreen),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Text(
+                            text = "score",
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = modifier
+                        .fillMaxWidth(0.7f),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = score,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 26.sp,
+
+                        )
+                    Text(
+                        text = scoredBy,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 11.sp,
+
+                        )
+                }
+            }
+            Column(modifier = modifier.fillMaxWidth()) {
+                Text(
+                    text = status,
+                    modifier = Modifier,
+                    minLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = rating,
+                    modifier = Modifier,
+                    minLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 16.sp
+                )
+
+            }
+
+        }
+    }
+}
 
 @Composable
 private fun TwoSortingButtons(

@@ -24,14 +24,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
@@ -89,7 +87,7 @@ import kotlin.coroutines.suspendCoroutine
 
 
 @Composable
-fun TokoAppActivator(
+fun AppActivator(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
@@ -111,9 +109,11 @@ fun TokoAppActivator(
             currentDetailScreenId.intValue = arguments?.getInt("id") ?: 0
         }
         when (destination.route) {
-            Screen.Home.route -> null
-            Screen.RandomAnimeOrManga.route -> null
-            Screen.Favorites.route -> null
+            Screen.Home.route,
+            Screen.RandomAnimeOrManga.route,
+            Screen.Favorites.route -> {
+            }
+
             else -> {
                 lastSelectedScreen = destination.route
             }
@@ -121,48 +121,61 @@ fun TokoAppActivator(
     }
 
 
-ModalNavigationDrawer(
-drawerContent = {
-    ShowDrawerContent(
-        modifier = modifier,
-        imageLoader = svgImageLoader,
-        viewModelProvider = viewModelProvider,
-        componentActivity = componentActivity,
-        mainDb = mainDb
-    )
-}
-) {
+//    navController.addOnDestinationChangedListener { _, destination, arguments ->
+//        when (destination.route) {
+//            Screen.Detail.route -> {
+//                currentDetailScreenId.intValue = arguments?.getInt("id") ?: 0
+//            }
+//            Screen.Home.route, Screen.RandomAnimeOrManga.route, Screen.Favorites.route -> {}
+//            else -> {
+//                lastSelectedScreen = destination.route
+//            }
+//        }
+//    }
 
-    Scaffold(bottomBar = {
 
-        SecondBottomNavigationBar(
-            navController = navController,
-            currentDetailScreenId = currentDetailScreenId,
-            characterDetailScreenId = characterDetailScreenId,
-            personDetailScreenId = personDetailScreenId,
-            producerDetailScreenId = producerDetailScreenId,
-            modifier = modifier,
-            lastSelectedScreen = lastSelectedScreen,
-            imageLoader = svgImageLoader
-        )
-
-    },
-        floatingActionButtonPosition = FabPosition.Center,
-        content = { padding ->
-            padding.calculateTopPadding()
-            SetupNavGraph(
-                navController = navController,
-                viewModelProvider = viewModelProvider,
+    ModalNavigationDrawer(
+        drawerContent = {
+            ShowDrawerContent(
                 modifier = modifier,
+                imageLoader = svgImageLoader,
+                viewModelProvider = viewModelProvider,
+                componentActivity = componentActivity,
+                mainDb = mainDb
             )
         }
-    )
-}
+    ) {
+
+        Scaffold(bottomBar = {
+
+            BottomNavigationBar(
+                navController = navController,
+                currentDetailScreenId = currentDetailScreenId,
+                characterDetailScreenId = characterDetailScreenId,
+                personDetailScreenId = personDetailScreenId,
+                producerDetailScreenId = producerDetailScreenId,
+                modifier = modifier,
+                lastSelectedScreen = lastSelectedScreen,
+                imageLoader = svgImageLoader
+            )
+
+        },
+            floatingActionButtonPosition = FabPosition.Center,
+            content = { padding ->
+                padding.calculateTopPadding()
+                SetupNavGraph(
+                    navController = navController,
+                    viewModelProvider = viewModelProvider,
+                    modifier = modifier,
+                )
+            }
+        )
+    }
 }
 
 
 @Composable
-private fun SecondBottomNavigationBar(
+private fun BottomNavigationBar(
     navController: NavController,
     currentDetailScreenId: MutableState<Int>,
     modifier: Modifier,
@@ -182,35 +195,43 @@ private fun SecondBottomNavigationBar(
         else -> true
     }
 
-    BottomAppBar(
-        modifier = modifier
+    Row(
+        modifier
+            .fillMaxWidth()
             .clip(
                 RoundedCornerShape(10.dp)
             )
-            .blur(200.dp)
-            .height(50.dp),
-        containerColor = LightBottomBarColor.copy(0.6f)
+            .height(50.dp)
+            .background(LightBottomBarColor.copy(0.6f))
+            .blur(200.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        NavigationBarItem(selected = false, onClick = {
-            try {
-                navController.navigate(Screen.Home.route) {
+        Column(
+            modifier = modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .clickable {
+                    try {
+                        navController.navigate(Screen.Home.route) {
 
-                    // Avoid multiple copies of the same destination when
-                    // reselecting the same item
-                    navController.graph.startDestinationRoute?.let { _ ->
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            navController.graph.startDestinationRoute?.let { _ ->
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                            }
+
+                        }
+                    } catch (e: IllegalArgumentException) {
+
+                        Log.e("CATCH", Screen.Home.route + " " + e.message.toString())
+
                     }
-
-                }
-            } catch (e: IllegalArgumentException) {
-
-                Log.e("CATCH", Screen.Home.route + " " + e.message.toString())
-
-            }
-
-
-        }, icon = {
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
 
             if (currentRoute != Screen.Home.route) {
                 Image(
@@ -218,89 +239,107 @@ private fun SecondBottomNavigationBar(
                         model = R.drawable.home, imageLoader = imageLoader
                     ), contentDescription = null, modifier = modifier.size(35.dp)
                 )
+
+
             } else {
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.homefilled, imageLoader = imageLoader
                     ), contentDescription = null, modifier = modifier.size(35.dp)
+
                 )
+
+
             }
-        })
-        NavigationBarItem(selected = false, onClick = {
-            try {
-                when (lastSelectedScreen) {
-                    Screen.Detail.route -> {
-                        navController.navigate("detail_screen/${currentDetailScreenId.value}") {
-                            navController.graph.startDestinationRoute?.let { _ ->
-                                launchSingleTop = true
+        }
+        Column(
+            modifier = modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .clickable {
+                    try {
+                        when (lastSelectedScreen) {
+                            Screen.Detail.route -> {
+                                navController.navigate("detail_screen/${currentDetailScreenId.value}") {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+
+                                Log.d(
+                                    "last stack membor",
+                                    "detail_screen/${currentDetailScreenId.value}"
+                                )
+                            }
+
+                            Screen.CharacterDetail.route -> {
+                                navController.navigate("detail_on_character/${characterDetailScreenId.value}") {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                                Log.d(
+                                    "last stack membor",
+                                    "detail_on_character/${characterDetailScreenId.value}"
+                                )
+                            }
+
+                            Screen.StaffDetail.route -> {
+                                navController.navigate("detail_on_staff/${personDetailScreenId.value}") {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                                Log.d(
+                                    "last stack membor",
+                                    "detail_on_staff/${personDetailScreenId.value}"
+                                )
+                            }
+
+                            Screen.ProducerDetail.route -> {
+                                navController.navigate("detail_on_producer/${producerDetailScreenId.value}/full") {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                                Log.d(
+                                    "last stack membor",
+                                    "detail_on_producer/${producerDetailScreenId.value}/full"
+                                )
+                            }
+
+                            Screen.DetailOnWholeStaff.route -> {
+                                navController.navigate(Screen.DetailOnWholeStaff.route) {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                                Log.d("last stack membor", Screen.DetailOnWholeStaff.route)
+                            }
+
+                            Screen.DetailOnWholeCast.route -> {
+                                navController.navigate(Screen.DetailOnWholeCast.route) {
+                                    navController.graph.startDestinationRoute?.let { _ ->
+                                        launchSingleTop = true
+                                    }
+                                }
+                                Log.d("last stack membor", Screen.DetailOnWholeCast.route)
+                            }
+
+                            else -> {
+                                navController.navigate(Screen.Nothing.route) {
+                                    launchSingleTop = true
+                                    Log.d("last stack membor", Screen.Nothing.route)
+                                }
                             }
                         }
-
-                        Log.d("last stack membor", "detail_screen/${currentDetailScreenId.value}")
+                    } catch (e: IllegalArgumentException) {
+                        Log.e("CATCH", Screen.Detail.route + " " + e.message.toString())
                     }
-
-                    Screen.CharacterDetail.route -> {
-                        navController.navigate("detail_on_character/${characterDetailScreenId.value}") {
-                            navController.graph.startDestinationRoute?.let { _ ->
-                                launchSingleTop = true
-                            }
-                        }
-                        Log.d(
-                            "last stack membor",
-                            "detail_on_character/${characterDetailScreenId.value}"
-                        )
-                    }
-
-                    Screen.StaffDetail.route -> {
-                        navController.navigate("detail_on_staff/${personDetailScreenId.value}") {
-                            navController.graph.startDestinationRoute?.let { _ ->
-                                launchSingleTop = true
-                            }
-                        }
-                        Log.d("last stack membor", "detail_on_staff/${personDetailScreenId.value}")
-                    }
-
-                    Screen.ProducerDetail.route -> {
-                        navController.navigate("detail_on_producer/${producerDetailScreenId.value}/full") {
-                            navController.graph.startDestinationRoute?.let { _ ->
-                                launchSingleTop = true
-                            }
-                        }
-                        Log.d(
-                            "last stack membor",
-                            "detail_on_producer/${producerDetailScreenId.value}/full"
-                        )
-                    }
-
-                    Screen.DetailOnWholeStaff.route -> {
-                        navController.navigate(Screen.DetailOnWholeStaff.route) {
-                            navController.graph.startDestinationRoute?.let { _ ->
-                                launchSingleTop = true
-                            }
-                        }
-                        Log.d("last stack membor", Screen.DetailOnWholeStaff.route)
-                    }
-
-                    Screen.DetailOnWholeCast.route -> {
-                        navController.navigate(Screen.DetailOnWholeCast.route) {
-                            navController.graph.startDestinationRoute?.let { _ ->
-                                launchSingleTop = true
-                            }
-                        }
-                        Log.d("last stack membor", Screen.DetailOnWholeCast.route)
-                    }
-
-                    else -> {
-                        navController.navigate(Screen.Nothing.route) {
-                            launchSingleTop = true
-                            Log.d("last stack membor", Screen.Nothing.route)
-                        }
-                    }
-                }
-            } catch (e: IllegalArgumentException) {
-                Log.e("CATCH", Screen.Detail.route + " " + e.message.toString())
-            }
-        }, icon = {
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
 
             if (detailScreenButtonIsSelected) {
                 Image(
@@ -315,25 +354,32 @@ private fun SecondBottomNavigationBar(
                     ), contentDescription = null, modifier = modifier.size(30.dp)
                 )
             }
-        })
-        NavigationBarItem(selected = false, onClick = {
-            try {
-                navController.navigate(Screen.Favorites.route) {
+        }
+        Column(
+            modifier = modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .clickable {
+                    try {
+                        navController.navigate(Screen.Favorites.route) {
 
-                    // Avoid multiple copies of the same destination when
-                    // reselecting the same item
-                    navController.graph.startDestinationRoute?.let { _ ->
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            navController.graph.startDestinationRoute?.let { _ ->
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                            }
+
+                        }
+                    } catch (e: IllegalArgumentException) {
+
+                        Log.e("CATCH", Screen.Favorites.route + " " + e.message.toString())
+
                     }
-
-                }
-            } catch (e: IllegalArgumentException) {
-
-                Log.e("CATCH", Screen.Favorites.route + " " + e.message.toString())
-
-            }
-        }, icon = {
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
             if (currentRoute != Screen.Favorites.route) {
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -347,35 +393,42 @@ private fun SecondBottomNavigationBar(
                     ), contentDescription = null, modifier = modifier.size(30.dp)
                 )
             }
-        })
-        NavigationBarItem(selected = false, onClick = {
-            try {
-                navController.navigate(Screen.RandomAnimeOrManga.route) {
+        }
+        Column(
+            modifier = modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .clickable {
+                    try {
+                        navController.navigate(Screen.RandomAnimeOrManga.route) {
 
-                    // Avoid multiple copies of the same destination when
-                    // reselecting the same item
-                    navController.graph.startDestinationRoute?.let { _ ->
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            navController.graph.startDestinationRoute?.let { _ ->
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                            }
+
+                        }
+                    } catch (e: IllegalArgumentException) {
+
+                        Log.e(
+                            "CATCH",
+                            Screen.RandomAnimeOrManga.route + " " + e.message.toString()
+                        )
+
                     }
-
-                }
-            } catch (e: IllegalArgumentException) {
-
-                Log.e(
-                    "CATCH",
-                    Screen.RandomAnimeOrManga.route + " " + e.message.toString()
-                )
-
-            }
-        }, icon = {
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
             Image(
                 painter = rememberAsyncImagePainter(
                     model = R.drawable.shuffle, imageLoader = imageLoader
                 ), contentDescription = null, modifier = modifier.size(30.dp)
             )
+        }
 
-        })
     }
 }
 
@@ -513,7 +566,6 @@ private fun ShowDrawerContent(
                         uncheckedThumbColor = Color(65, 65, 65),
                         uncheckedTrackColor = Color(251, 251, 251),
                         uncheckedBorderColor = Color(65, 65, 65),
-
                         ),
                         thumbContent = if (homeScreenViewModel.safeForWork.value) {
                             {
@@ -982,7 +1034,7 @@ private fun onClickSaveData(context: Context, homeScreenViewModel: HomeScreenVie
 
 private suspend fun copyFile(source: File, destination: File) {
 
-    suspendCoroutine<Unit> { continuation ->
+    suspendCoroutine { continuation ->
         val sourceChannel = FileInputStream(source).channel
         val destChannel = FileOutputStream(destination).channel
 
