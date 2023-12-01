@@ -5,9 +5,11 @@ import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Query
 import com.project.toko.characterDetailedScreen.dao.CharacterItem
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.dao.MainDb
+import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.personDetailedScreen.dao.PersonItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -244,7 +246,72 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
         }
     }
 
-    fun getCategoryForId(id: Int): Flow<String?> {
-        return mainDb.getDao().getCategoryForId(id)
+
+    suspend fun removeFromFavorite(favoriteItem: FavoriteItem){
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                mainDb.getDao().removeFromFavorite(favoriteItem.id!!)
+            }
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    "${favoriteItem.animeName} was removed from FAVORITE category!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
+    suspend fun addToFavorite(favoriteItem: FavoriteItem) {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                mainDb.getDao().addToFavorite(favoriteItem)
+            }
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    "${favoriteItem.animeName} is in ${favoriteItem.category} category!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+    fun containsInFavorite(id: Int): Flow<Boolean>{
+        return mainDb.getDao().containsInFavorite(id)
+    }
+
+    fun getAnimeInFavorite(
+        searchText: String,
+        isSortedAlphabetically: Boolean,
+        isSortedByScore: Boolean,
+        isSortedByUsers: Boolean,
+        isAiredFrom: Boolean,
+        type: String
+    ): Flow<List<FavoriteItem>> {
+        return mainDb.getDao().getAnimeInFavorite(
+            searchText = searchText,
+            isSortedAlphabetically = isSortedAlphabetically,
+            isSortedByScore = isSortedByScore,
+            isSortedByUsers = isSortedByUsers,
+            isAiredFrom = isAiredFrom,
+            type = type ?: ""
+        )
+    }
+
+
 }

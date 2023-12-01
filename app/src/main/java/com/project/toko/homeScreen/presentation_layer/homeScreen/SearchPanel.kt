@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,7 +72,7 @@ fun MainScreen(
     }.build()
 
     val switchIndicator = viewModel.switchIndicator
-
+//    var active by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = modifier
             .fillMaxWidth(1f)
@@ -106,6 +107,37 @@ fun MainScreen(
                     .background(SearchBarColor),
                 verticalAlignment = Alignment.Bottom
             ) {
+
+//                DockedSearchBar(
+//                    placeholder = { Text(text = "Search...") },
+//                    query = searchText ?: "",
+//                    onQueryChange = viewModel::onSearchTextChange,
+//                    onSearch = {active = false},
+//                    active = active,
+//                    onActiveChange = {active = it}, trailingIcon = {
+//                        Image(
+//                            painter = rememberAsyncImagePainter(
+//                                model = R.drawable.switchinsearch,
+//                                imageLoader = svgImageLoader
+//                            ),
+//                            contentDescription = null,
+//                            colorFilter = if (switchIndicator.value) ColorFilter.tint(LightGreen) else null,
+//                            modifier = modifier
+//                                .size(40.dp)
+//                                .clickable {
+//                                    switchIndicator.value = !switchIndicator.value
+//                                }
+//                        )
+//                    }
+//                    , leadingIcon = {Icon(Icons.Filled.Search, "Search Icon", tint = iconColorInSearchPanel)},
+//                    modifier = modifier
+//                        .clip(RoundedCornerShape(30.dp))
+//                        .height(50.dp)
+//                        .fillMaxWidth(1f)
+//                ) {
+//
+//                }
+
                 OutlinedTextField(
                     placeholder = { Text(text = "Search...") },
                     value = searchText ?: "",

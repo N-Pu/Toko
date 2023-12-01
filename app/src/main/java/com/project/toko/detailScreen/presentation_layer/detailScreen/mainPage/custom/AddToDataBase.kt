@@ -37,6 +37,7 @@ import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.daoScreen.model.AnimeListType
@@ -66,13 +67,12 @@ fun AddToFavorites(
     ) {
         IconButton(onClick = {
             detailScreenViewModel.viewModelScope.launch {
-                if (daoViewModel.containsItemIdInCategory(
-                        detailScreenState?.mal_id ?: 0,
-                        AnimeListType.FAVORITE.route
+                if (daoViewModel.containsInFavorite(
+                        detailScreenState?.mal_id ?: 0
                     ).first()
                 ) {
-                    daoViewModel.removeFromDataBase(
-                        AnimeItem(
+                    daoViewModel.removeFromFavorite(
+                        FavoriteItem(
                             id = detailScreenState?.mal_id,
                             animeName = detailScreenState?.title ?: "",
                             score = formatScore(detailScreenState?.score),
@@ -87,8 +87,8 @@ fun AddToFavorites(
                         )
                     )
                 } else {
-                    daoViewModel.addToCategory(
-                        AnimeItem(
+                    daoViewModel.addToFavorite(
+                        FavoriteItem(
                             id = detailScreenState?.mal_id,
                             animeName = detailScreenState?.title ?: "",
                             score = formatScore(detailScreenState?.score),
@@ -111,9 +111,8 @@ fun AddToFavorites(
                     model = R.drawable.star, imageLoader = svgImageLoader
                 ),
                 contentDescription = null,
-                colorFilter = if (daoViewModel.containsItemIdInCategory(
-                        id = detailScreenState?.mal_id ?: 0,
-                        AnimeListType.FAVORITE.route
+                colorFilter = if (daoViewModel.containsInFavorite(
+                        id = detailScreenState?.mal_id ?: 0
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) ColorFilter.tint(LightGreen) else null
             )
@@ -170,7 +169,7 @@ fun AddToFavorites(
                         id = detailScreenState?.mal_id ?: 0,
                         AnimeListType.PLANNED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(LightGreen) else null
+                ) ColorFilter.tint(Color(255, 152, 0, 255)) else null
             )
         }
         IconButton(onClick = {
@@ -239,8 +238,6 @@ fun AddToFavorites(
                         )
                     }
                 }, onClick = {
-
-
                     detailScreenViewModel.viewModelScope.launch {
 
                         if (daoViewModel.containsItemIdInCategory(
@@ -288,7 +285,6 @@ fun AddToFavorites(
                             )
                         }
                     }
-
                 }, modifier = modifier
                     .height(35.dp)
                     .width(170.dp)
@@ -306,7 +302,7 @@ fun AddToFavorites(
                                     AnimeListType.DROPPED.route
 
                                 ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) LightGreen else Color.White,
+                            ) Color.Red else Color.White,
                             fontWeight = FontWeight.Light,
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center
@@ -320,7 +316,7 @@ fun AddToFavorites(
                                     id = detailScreenState?.mal_id ?: 0,
                                     AnimeListType.DROPPED.route
                                 ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) ColorFilter.tint(LightGreen) else null
+                            ) ColorFilter.tint(Color.Red) else null
 
                         )
                     }
@@ -385,7 +381,7 @@ fun AddToFavorites(
                             .fillMaxWidth(1f)
                     ) {
                         Text(
-                            text = "Add to list",
+                            text = "Watching",
 
                             color = if (daoViewModel.containsItemIdInCategory(
                                     id = detailScreenState?.mal_id ?: 0,

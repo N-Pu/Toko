@@ -19,16 +19,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,9 +34,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -57,16 +53,22 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import com.project.toko.R
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.DialogSideColor
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.daoScreen.model.AnimeListType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
@@ -108,7 +110,9 @@ fun CustomDialog(
         onDismissRequest = {
             onDismiss.invoke()
         }, properties = DialogProperties(
-            dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+            usePlatformDefaultWidth = false
         )
     ) {
         Box(
@@ -189,7 +193,7 @@ fun CustomDialog(
                         MembersLine(members = data.members, modifier = modifier)
                         YearTypeStudio(data = data, modifier = modifier)
                         EpisodesLabel(episodes = data.episodes, modifier = modifier)
-                        AddToFavoriteRow(
+                        AddToDataBaseRow(
                             modifier = modifier, data = data, viewModelProvider = viewModelProvider
                         )
                     }
@@ -446,120 +450,229 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 }
 
 @Composable
-private fun AddToFavoriteRow(
+private fun AddToDataBaseRow(
     modifier: Modifier,
     data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData,
     viewModelProvider: ViewModelProvider
 ) {
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
+    var isExpanded by remember { mutableStateOf(false) }
+    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
+        add(SvgDecoder.Factory())
+    }.build()
 
     Spacer(modifier = modifier.height(10.dp))
-    var isExpanded by remember { mutableStateOf(false) }
-//    val context = LocalContext.current
-
     DropdownMenu(
         expanded = isExpanded,
         onDismissRequest = {
-            isExpanded = false
+            isExpanded = !isExpanded
         },
         modifier = modifier
             .background(DialogSideColor)
-            .height(78.dp)
-            .clip(RoundedCornerShape(80.dp)),
+            .height(100.dp)
+            .width(170.dp),
         offset = DpOffset((-40).dp, (-40).dp),
         properties = PopupProperties(clippingEnabled = true)
     ) {
         DropdownMenuItem(text = {
             Text(
-                text = "Watching", fontSize = 12.sp,
-                fontWeight = FontWeight.Thin,
+                text = "Watching",
+                fontWeight = FontWeight.Light,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                color = if (daoViewModel.containsItemIdInCategory(
+                        id = data.mal_id,
+                        AnimeListType.WATCHING.route
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) Color.Yellow else Color.White,
             )
-        }, modifier = modifier.height(20.dp), onClick = {
+        }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
-                daoViewModel.addToCategory(
-                    AnimeItem(
+                if (daoViewModel.containsItemIdInCategory(
                         data.mal_id,
-                        data.title,
-                        data.score.toString(),
-                        data.scored_by.toInt().toString(),
-                        data.images.jpg.large_image_url,
-                        data.status,
-                        data.rating ?: "N/A",
-                        data.title_japanese,
-                        airedFrom = data.aired.from,
-                        category = AnimeListType.WATCHING.route,
-                        type = data.type
+                        AnimeListType.WATCHING.route
+                    ).first()
+                ) {
+                    daoViewModel.removeFromDataBase(
+                        AnimeItem(
+                            data.mal_id,
+                            data.title,
+                            data.score.toString(),
+                            data.scored_by.toInt().toString(),
+                            data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
+                            airedFrom = data.aired.from,
+                            category = AnimeListType.WATCHING.route,
+                            type = data.type
+                        )
                     )
-                )
+                } else {
+                    daoViewModel.addToCategory(
+                        AnimeItem(
+                            data.mal_id,
+                            data.title,
+                            data.score.toString(),
+                            data.scored_by.toInt().toString(),
+                            data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
+                            airedFrom = data.aired.from,
+                            category = AnimeListType.WATCHING.route,
+                            type = data.type
+                        )
+                    )
+                }
             }
         }, colors = MenuDefaults.itemColors(
             textColor = Color.White, trailingIconColor = Color.White
         ), trailingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.Star, contentDescription = "Button 'Rating'"
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = R.drawable.add, imageLoader = svgImageLoader
+                ), contentDescription = null, modifier = modifier.size(25.dp),
+                colorFilter =
+                if (daoViewModel.containsItemIdInCategory(
+                        id = data.mal_id,
+                        AnimeListType.WATCHING.route
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) ColorFilter.tint(Color.Yellow) else null
             )
         })
         DropdownMenuItem(text = {
             Text(
-                text = "Completed", fontSize = 12.sp,
-                fontWeight = FontWeight.Thin,
+                text = "Completed",
+                fontWeight = FontWeight.Light,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                color = if (daoViewModel.containsItemIdInCategory(
+                        id = data.mal_id,
+                        AnimeListType.COMPLETED.route
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) LightGreen else Color.White,
             )
-        }, modifier = modifier.height(20.dp), onClick = {
+        }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
-                daoViewModel.addToCategory(
-                    AnimeItem(
+                if (daoViewModel.containsItemIdInCategory(
                         data.mal_id,
-                        data.title,
-                        data.score.toString(),
-                        data.scored_by.toInt().toString(),
-                        data.images.jpg.large_image_url,
-                        data.status,
-                        data.rating ?: "N/A",
-                        data.title_japanese,
-                        airedFrom = data.aired.from,
-                        category = AnimeListType.COMPLETED.route,
-                        type = data.type
+                        AnimeListType.COMPLETED.route
+                    ).first()
+                ) {
+                    daoViewModel.removeFromDataBase(
+                        AnimeItem(
+                            data.mal_id,
+                            data.title,
+                            data.score.toString(),
+                            data.scored_by.toInt().toString(),
+                            data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
+                            airedFrom = data.aired.from,
+                            category = AnimeListType.COMPLETED.route,
+                            type = data.type
+                        )
                     )
-                )
+                } else {
+                    daoViewModel.addToCategory(
+                        AnimeItem(
+                            data.mal_id,
+                            data.title,
+                            data.score.toString(),
+                            data.scored_by.toInt().toString(),
+                            data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
+                            airedFrom = data.aired.from,
+                            category = AnimeListType.COMPLETED.route,
+                            type = data.type
+                        )
+                    )
+                }
             }
         }, colors = MenuDefaults.itemColors(
             textColor = Color.White, trailingIconColor = Color.White
         ), trailingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.Place,
-                contentDescription = "Button 'Completed'"
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = R.drawable.eyewhite, imageLoader = svgImageLoader
+                ), contentDescription = null, modifier = modifier.size(22.dp),
+                colorFilter =
+                if (daoViewModel.containsItemIdInCategory(
+                        id = data.mal_id,
+                        AnimeListType.COMPLETED.route
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) ColorFilter.tint(LightGreen) else null
             )
         })
         DropdownMenuItem(text = {
             Text(
-                text = "Not Interesting", fontSize = 12.sp,
-                fontWeight = FontWeight.Thin,
+                text = "Dropped",
+                fontWeight = FontWeight.Light,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                color = if (daoViewModel.containsItemIdInCategory(
+                        id = data.mal_id,
+                        AnimeListType.DROPPED.route
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) Color.Red else Color.White,
             )
-        }, modifier = modifier.height(20.dp), onClick = {
+        }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
-                daoViewModel.addToCategory(
-                    AnimeItem(
+                if (daoViewModel.containsItemIdInCategory(
                         data.mal_id,
-                        data.title,
-                        data.score.toString(),
-                        data.scored_by.toInt().toString(),
-                        data.images.jpg.large_image_url,
-                        data.status,
-                        data.rating ?: "N/A",
-                        data.title_japanese,
-                        airedFrom = data.aired.from,
-                        category = AnimeListType.DROPPED.route,
-                        type = data.type
+                        AnimeListType.DROPPED.route
+                    ).first()
+                ) {
+                    daoViewModel.removeFromDataBase(
+                        AnimeItem(
+                            data.mal_id,
+                            data.title,
+                            data.score.toString(),
+                            data.scored_by.toInt().toString(),
+                            data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
+                            airedFrom = data.aired.from,
+                            category = AnimeListType.DROPPED.route,
+                            type = data.type
+                        )
                     )
-                )
+                } else {
+                    daoViewModel.addToCategory(
+                        AnimeItem(
+                            data.mal_id,
+                            data.title,
+                            data.score.toString(),
+                            data.scored_by.toInt().toString(),
+                            data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
+                            airedFrom = data.aired.from,
+                            category = AnimeListType.DROPPED.route,
+                            type = data.type
+                        )
+                    )
+                }
             }
         }, colors = MenuDefaults.itemColors(
             textColor = Color.White, trailingIconColor = Color.White
         ), trailingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.Close,
-                contentDescription = "Button 'Not Interesting'",
-                modifier = modifier
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = R.drawable.dropped, imageLoader = svgImageLoader
+                ), contentDescription = null, modifier = modifier.size(25.dp),
+                colorFilter =
+                if (daoViewModel.containsItemIdInCategory(
+                        id = data.mal_id,
+                        AnimeListType.DROPPED.route
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) ColorFilter.tint(Color.Red) else null
             )
         })
 
@@ -569,15 +682,39 @@ private fun AddToFavoriteRow(
     Row(
         modifier = modifier
             .fillMaxWidth(1f)
-            .height(40.dp)
+            .height(40.dp), horizontalArrangement = Arrangement.SpaceAround
     ) {
-        Column(modifier = modifier.width(10.dp)) {}
-        Column(modifier = modifier.fillMaxWidth(0.7f)) {
-            Card(colors = CardDefaults.cardColors(containerColor = DialogSideColor),
-                modifier = modifier
-                    .height(30.dp)
-                    .clickable {
-                        daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+
+        Column(
+            modifier = modifier
+                .weight(1f)
+                .clickable {
+                    daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                        if (daoViewModel
+                                .containsItemIdInCategory(
+                                    data.mal_id,
+                                    AnimeListType.PLANNED.route
+                                )
+                                .first()
+                        ) {
+                            daoViewModel.removeFromDataBase(
+                                AnimeItem(
+                                    data.mal_id,
+                                    data.title,
+                                    data.score.toString(),
+                                    data.scored_by
+                                        .toInt()
+                                        .toString(),
+                                    data.images.jpg.large_image_url,
+                                    data.status,
+                                    data.rating ?: "N/A",
+                                    data.title_japanese,
+                                    airedFrom = data.aired.from,
+                                    category = AnimeListType.PLANNED.route,
+                                    type = data.type
+                                )
+                            )
+                        } else {
                             daoViewModel.addToCategory(
                                 AnimeItem(
                                     data.mal_id,
@@ -596,42 +733,163 @@ private fun AddToFavoriteRow(
                                 )
                             )
                         }
-                    }) {
-                Box(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "In the plans",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Thin,
-                        color = Color.White,
-                        textAlign = TextAlign.Center
+                    }
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = R.drawable.bookmarkfilled, imageLoader = svgImageLoader
+                ), contentDescription = null, modifier = modifier.size(38.dp),
+                colorFilter =
+                if (daoViewModel.containsItemIdInCategory(
+                        id = data.mal_id,
+                        AnimeListType.PLANNED.route
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) ColorFilter.tint(Color(255, 152, 0, 255)) else ColorFilter.tint(
+                    Color(
+                        211,
+                        211,
+                        211
                     )
-                }
-            }
+                )
+            )
         }
-        Column(modifier = modifier.width(5.dp)) {}
+
         Column(
-            modifier = modifier.fillMaxWidth(1f),
+            modifier = modifier
+                .weight(1f)
+                .clickable {
+                    daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                        if (daoViewModel
+                                .containsInFavorite(
+                                    data.mal_id
+                                )
+                                .first()
+                        ) {
+                            daoViewModel.removeFromFavorite(
+                                FavoriteItem(
+                                    data.mal_id,
+                                    data.title,
+                                    data.score.toString(),
+                                    data.scored_by
+                                        .toInt()
+                                        .toString(),
+                                    data.images.jpg.large_image_url,
+                                    data.status,
+                                    data.rating ?: "N/A",
+                                    data.title_japanese,
+                                    airedFrom = data.aired.from,
+                                    category = AnimeListType.FAVORITE.route,
+                                    type = data.type
+                                )
+                            )
+                        } else {
+                            daoViewModel.addToFavorite(
+                                FavoriteItem(
+                                    data.mal_id,
+                                    data.title,
+                                    data.score.toString(),
+                                    data.scored_by
+                                        .toInt()
+                                        .toString(),
+                                    data.images.jpg.large_image_url,
+                                    data.status,
+                                    data.rating ?: "N/A",
+                                    data.title_japanese,
+                                    airedFrom = data.aired.from,
+                                    category = AnimeListType.FAVORITE.route,
+                                    type = data.type
+                                )
+                            )
+                        }
+                    }
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = R.drawable.star, imageLoader = svgImageLoader
+                ), contentDescription = null, modifier = modifier.size(38.dp),
+                colorFilter =
+                if (daoViewModel.containsInFavorite(
+                        id = data.mal_id
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) ColorFilter.tint(LightGreen) else ColorFilter.tint(Color(211, 211, 211))
+            )
+        }
+        Column(
+            modifier = modifier
+                .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = DialogSideColor, contentColor = Color.White
-                ), modifier = Modifier.size(30.dp)
-            ) {
-                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Icon(imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "Add to favorite button",
-                        modifier = Modifier
-                            .size(15.dp)
+            when {
+                daoViewModel.containsItemIdInCategory(
+                    id = data.mal_id,
+                    AnimeListType.WATCHING.route
+                ).collectAsStateWithLifecycle(initialValue = false).value -> {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.add, imageLoader = svgImageLoader
+                        ),
+                        contentDescription = null,
+                        modifier = modifier
                             .clickable {
-                                isExpanded = true
+                                isExpanded = !isExpanded
+                            },
+                        colorFilter = ColorFilter.tint(Color.Yellow)
+                    )
+
+                }
+
+                daoViewModel.containsItemIdInCategory(
+                    id = data.mal_id,
+                    AnimeListType.COMPLETED.route
+                ).collectAsStateWithLifecycle(initialValue = false).value -> {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.eyewhite, imageLoader = svgImageLoader
+                        ),
+                        contentDescription = null,
+                        modifier = modifier
+                            .clickable {
+                                isExpanded = !isExpanded
+                            }
+                            .fillMaxSize(),
+                        colorFilter = ColorFilter.tint(LightGreen))
+
+                }
+
+                daoViewModel.containsItemIdInCategory(
+                    id = data.mal_id,
+                    AnimeListType.DROPPED.route
+                ).collectAsStateWithLifecycle(initialValue = false).value -> {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.dropped, imageLoader = svgImageLoader
+                        ),
+                        contentDescription = null,
+                        modifier = modifier
+                            .clickable {
+                                isExpanded = !isExpanded
+                            },
+                        colorFilter = ColorFilter.tint(Color.Red)
+                    )
+
+                }
+
+                else -> {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.threedotsgray, imageLoader = svgImageLoader
+                        ),
+                        contentDescription = null,
+                        modifier = modifier
+                            .clickable {
+                                isExpanded = !isExpanded
                             })
+
                 }
             }
         }

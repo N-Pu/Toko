@@ -14,7 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.project.toko.core.dao.MainDb
 import com.project.toko.core.di.Application
 import com.project.toko.core.repository.MalApiService
-import com.project.toko.core.presentation_layer.appConstraction.TokoAppActivator
+import com.project.toko.core.presentation_layer.appConstraction.AppActivator
 import com.project.toko.core.presentation_layer.theme.TokoTheme
 import com.project.toko.core.viewModel.viewModelFactory.MyViewModelFactory
 import javax.inject.Inject
@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = modifier.fillMaxSize(),
                 ) {
-                    TokoAppActivator(
+                    AppActivator(
                         navController = navController,
                         viewModelProvider = viewModelProvider,
                         modifier = modifier,
