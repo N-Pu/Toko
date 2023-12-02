@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import  com.project.toko.personDetailedScreen.model.personFullModel.Data
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.share.shareLink
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.personDetailedScreen.dao.PersonItem
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
@@ -43,7 +45,7 @@ fun ShowNamesAndInteractionIcons(
     val isPersonInDao by daoViewModel.isPersonInDao(data.mal_id).collectAsStateWithLifecycle(
         initialValue = false
     )
-
+    val context = LocalContext.current
     Column(
         modifier = modifier
             .fillMaxWidth(1f)
@@ -147,7 +149,11 @@ fun ShowNamesAndInteractionIcons(
                         model = R.drawable.links,
                         imageLoader = imageLoader
                     ), contentDescription = null,
-                    modifier = modifier.size(40.dp)
+                    modifier = modifier
+                        .size(40.dp)
+                        .clickable {
+                            context.shareLink(data.url)
+                        }
                 )
             }
         }
