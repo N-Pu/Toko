@@ -3,14 +3,12 @@ package com.project.toko.randomAnimeScreen.viewModel
 import androidx.lifecycle.ViewModel
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewModelScope
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
