@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId "com.project.toko"
-        minSdk 21
+        minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -161,5 +161,9 @@ dependencies {
 
     // cloudy (blur library for all android versions)
 //    implementation "com.github.skydoves:cloudy:0.1.2"
+
+
+    //page swiping
+    implementation 'com.alexstyl.swipeablecard:swipeablecard:0.1.0'
 
 }
