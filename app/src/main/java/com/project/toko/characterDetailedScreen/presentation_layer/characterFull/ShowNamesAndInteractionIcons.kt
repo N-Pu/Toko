@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import com.project.toko.characterDetailedScreen.dao.CharacterItem
 import com.project.toko.characterDetailedScreen.model.characterFullModel.Data
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.share.shareLink
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.launch
 
@@ -44,6 +46,7 @@ fun ShowNamesAndInteractionIcons(
         .collectAsStateWithLifecycle(
             initialValue = false
         )
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -94,12 +97,14 @@ fun ShowNamesAndInteractionIcons(
                         .clickable {
                             characterViewModel.viewModelScope.launch {
                                 if (isCharacterInDao) {
-                                    daoViewModel.removeCharacterFromDataBase(    CharacterItem(
-                                        id = data.mal_id,
-                                        name = data.name,
-                                        anime = data.anime[0].anime.title,
-                                        image = data.images.jpg.image_url
-                                    ))
+                                    daoViewModel.removeCharacterFromDataBase(
+                                        CharacterItem(
+                                            id = data.mal_id,
+                                            name = data.name,
+                                            anime = data.anime[0].anime.title,
+                                            image = data.images.jpg.image_url
+                                        )
+                                    )
                                 } else {
                                     daoViewModel.addCharacter(
                                         CharacterItem(
@@ -120,7 +125,11 @@ fun ShowNamesAndInteractionIcons(
                         model = R.drawable.links,
                         imageLoader = imageLoader
                     ), contentDescription = null,
-                    modifier = modifier.size(40.dp)
+                    modifier = modifier
+                        .size(40.dp)
+                        .clickable {
+                            context.shareLink(data.url)
+                        }
                 )
             }
         }

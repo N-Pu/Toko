@@ -3,6 +3,7 @@ package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.c
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,6 +38,7 @@ import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.share.shareLink
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
@@ -58,7 +60,7 @@ fun AddToFavorites(
     val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
         add(SvgDecoder.Factory())
     }.build()
-
+    val context = LocalContext.current
     Row(
         modifier = modifier
             .height(70.dp)
@@ -172,13 +174,17 @@ fun AddToFavorites(
                 ) ColorFilter.tint(Color(255, 152, 0, 255)) else null
             )
         }
-        IconButton(onClick = {
-        }) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = R.drawable.links, imageLoader = svgImageLoader
-                ), contentDescription = null
-            )
+        if (detailScreenState?.url?.isNotEmpty() == true) {
+            IconButton(onClick = {
+            }) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = R.drawable.links, imageLoader = svgImageLoader
+                    ), contentDescription = null, modifier = modifier.clickable {
+                        context.shareLink(detailScreenState!!.url)
+                    }
+                )
+            }
         }
         IconButton(
             onClick = {
