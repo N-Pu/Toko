@@ -2,8 +2,10 @@ package com.project.toko.randomAnimeScreen.viewModel
 
 import androidx.lifecycle.ViewModel
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.project.toko.core.repository.MalApiService
+import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,10 +15,14 @@ import javax.inject.Inject
 class RandomAnimeViewModel @Inject constructor(private val malApiService: MalApiService) :
     ViewModel() {
     private var isSearching = false
-    private val _animeDetails = MutableStateFlow<com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData?>(null)
-    val animeDetails: StateFlow<com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData?> get() = _animeDetails
+    private val _animeDetails = MutableStateFlow<AnimeSearchData?>(null)
+    val animeDetails: StateFlow<AnimeSearchData?> get() = _animeDetails
 
-   suspend fun onTapRandomAnime() {
+
+    private val _cardIsShown = mutableStateOf(false)
+    val cardIsShown = _cardIsShown
+
+    suspend fun onTapRandomAnime() {
         if (isSearching) return
         viewModelScope.launch(Dispatchers.IO) {
             try {
