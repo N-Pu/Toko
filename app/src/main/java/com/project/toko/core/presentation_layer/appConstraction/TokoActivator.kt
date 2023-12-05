@@ -21,7 +21,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
@@ -541,6 +543,7 @@ private fun ShowDrawerContent(
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(topEnd = 20.dp))
                 .background(Color.White)
+                .verticalScroll(rememberScrollState())
         ) {
 
             Divider(thickness = 3.dp)
@@ -566,7 +569,7 @@ private fun ShowDrawerContent(
                         uncheckedThumbColor = Color(65, 65, 65),
                         uncheckedTrackColor = Color(251, 251, 251),
                         uncheckedBorderColor = Color(65, 65, 65),
-                        ),
+                    ),
                         thumbContent = if (homeScreenViewModel.safeForWork.value) {
                             {
                                 Icon(
