@@ -5,12 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
@@ -207,8 +206,8 @@ fun AddFavorites(
             },
             modifier = modifier
                 .background(MaterialTheme.colorScheme.onPrimary)
-                .height(130.dp)
-                .width(170.dp),
+                .fillMaxHeight(0.15f)
+                .fillMaxWidth(0.48f),
             offset = DpOffset((-40).dp, (-40).dp),
             properties = PopupProperties(clippingEnabled = true)
         ) {
@@ -224,7 +223,7 @@ fun AddFavorites(
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) Color(255, 152, 0, 255) else MaterialTheme.colorScheme.error,
                 )
-            }, modifier = modifier.weight(1f), onClick = {
+            }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                     if (daoViewModel.containsItemIdInCategory(
                             mal_id,
@@ -266,7 +265,8 @@ fun AddFavorites(
                     }
                 }
             }, colors = MenuDefaults.itemColors(
-                textColor = MaterialTheme.colorScheme.error, trailingIconColor = MaterialTheme.colorScheme.error
+                textColor = MaterialTheme.colorScheme.error,
+                trailingIconColor = MaterialTheme.colorScheme.error
             ), trailingIcon = {
 
                 Image(
@@ -301,7 +301,7 @@ fun AddFavorites(
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) Color.Yellow else MaterialTheme.colorScheme.error,
                 )
-            }, modifier = modifier.weight(1f), onClick = {
+            }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                     if (daoViewModel.containsItemIdInCategory(
                             mal_id,
@@ -343,7 +343,8 @@ fun AddFavorites(
                     }
                 }
             }, colors = MenuDefaults.itemColors(
-                textColor = MaterialTheme.colorScheme.error, trailingIconColor = MaterialTheme.colorScheme.error
+                textColor = MaterialTheme.colorScheme.error,
+                trailingIconColor = MaterialTheme.colorScheme.error
             ), trailingIcon = {
 
                 Image(
@@ -370,7 +371,7 @@ fun AddFavorites(
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
                 )
-            }, modifier = modifier.weight(1f), onClick = {
+            }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                     if (daoViewModel.containsItemIdInCategory(
                             mal_id,
@@ -411,7 +412,8 @@ fun AddFavorites(
                     }
                 }
             }, colors = MenuDefaults.itemColors(
-                textColor = MaterialTheme.colorScheme.error, trailingIconColor = MaterialTheme.colorScheme.error
+                textColor = MaterialTheme.colorScheme.error,
+                trailingIconColor = MaterialTheme.colorScheme.error
             ), trailingIcon = {
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -422,7 +424,9 @@ fun AddFavorites(
                             id = mal_id,
                             AnimeListType.COMPLETED.route
                         ).collectAsStateWithLifecycle(initialValue = false).value
-                    ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(MaterialTheme.colorScheme.error)
+                    ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                        MaterialTheme.colorScheme.error
+                    )
                 )
             })
             DropdownMenuItem(text = {
@@ -437,7 +441,7 @@ fun AddFavorites(
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) Color.Red else MaterialTheme.colorScheme.error,
                 )
-            }, modifier = modifier.weight(1f), onClick = {
+            }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                     if (daoViewModel.containsItemIdInCategory(
                             mal_id,
@@ -478,7 +482,8 @@ fun AddFavorites(
                     }
                 }
             }, colors = MenuDefaults.itemColors(
-                textColor = MaterialTheme.colorScheme.error, trailingIconColor = MaterialTheme.colorScheme.error
+                textColor = MaterialTheme.colorScheme.error,
+                trailingIconColor = MaterialTheme.colorScheme.error
             ), trailingIcon = {
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -504,7 +509,7 @@ fun AddFavorites(
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
                 )
-            }, modifier = modifier.weight(1f), onClick = {
+            }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                     if (daoViewModel.containsInFavorite(mal_id).first()) {
                         daoViewModel.removeFromFavorite(
@@ -541,7 +546,8 @@ fun AddFavorites(
                     }
                 }
             }, colors = MenuDefaults.itemColors(
-                textColor = MaterialTheme.colorScheme.error, trailingIconColor = MaterialTheme.colorScheme.error
+                textColor = MaterialTheme.colorScheme.error,
+                trailingIconColor = MaterialTheme.colorScheme.error
             ), trailingIcon = {
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -551,7 +557,9 @@ fun AddFavorites(
                     if (daoViewModel.containsInFavorite(
                             id = mal_id
                         ).collectAsStateWithLifecycle(initialValue = false).value
-                    ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(MaterialTheme.colorScheme.error)
+                    ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                        MaterialTheme.colorScheme.error
+                    )
                 )
             })
         }
