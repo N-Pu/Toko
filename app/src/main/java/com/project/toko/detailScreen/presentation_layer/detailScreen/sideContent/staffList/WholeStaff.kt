@@ -7,6 +7,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,15 +45,15 @@ import coil.compose.rememberAsyncImagePainter
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.detailScreen.model.staffModel.Person
 
 
 @Composable
 fun ShowWholeStaff(
-    navController: NavController,
-    viewModel: DetailScreenViewModel,
-    modifier: Modifier
+    navController: NavController, viewModel: DetailScreenViewModel, modifier: Modifier
 ) {
 
     val staffState by viewModel.staffList.collectAsStateWithLifecycle()
@@ -59,35 +61,38 @@ fun ShowWholeStaff(
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 265.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier.background(MaterialTheme.colorScheme.primary)
     ) {
         item { Spacer(modifier = modifier.height(70.dp)) }
         items(staffState) { data ->
             SingleStaffMember(
                 person = data.person,
                 positions = data.positions,
-                navController = navController, modifier = modifier
+                navController = navController,
+                modifier = modifier
             )
         }
         item { Spacer(modifier = modifier.height(50.dp)) }
 
     }
     BackArrow(
-        modifier,
-        navController,
-        viewModel.animeDetails.value?.mal_id ?: 0
+        modifier, navController, viewModel.animeDetails.value?.mal_id ?: 0
     )
 }
 
 @Composable
 private fun BackArrow(modifier: Modifier, navController: NavController, detailScreenMalId: Int) {
-
+    val backArrowFirstColor =
+        if (isSystemInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
+    val backArrowSecondColor =
+        if (isSystemInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
         Spacer(modifier = modifier.height(20.dp))
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(BackArrowCastColor)
+                .background(backArrowFirstColor)
         ) {
             Text(
                 text = "   <    Staff                         ",
@@ -102,14 +107,15 @@ private fun BackArrow(modifier: Modifier, navController: NavController, detailSc
                             inclusive = true
                         }
                     }
-                }
+                },
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         Box(
             modifier = modifier
                 .fillMaxWidth(0.7f)
                 .fillMaxHeight(0.02f)
-                .background(BackArrowSecondCastColor)
+                .background(backArrowSecondColor)
         )
 
         Spacer(modifier = modifier.height(20.dp))
@@ -119,10 +125,7 @@ private fun BackArrow(modifier: Modifier, navController: NavController, detailSc
 
 @Composable
 private fun SingleStaffMember(
-    person: Person,
-    positions: List<String>,
-    navController: NavController,
-    modifier: Modifier
+    person: Person, positions: List<String>, navController: NavController, modifier: Modifier
 ) {
 
     var isVisible by remember {
@@ -131,11 +134,9 @@ private fun SingleStaffMember(
     val painter = rememberAsyncImagePainter(model = person.images.jpg.image_url)
     val stringPositions = positions.joinToString(separator = ", ")
     AnimatedVisibility(
-        visible = isVisible,
-        enter = slideInHorizontally(
+        visible = isVisible, enter = slideInHorizontally(
             animationSpec = TweenSpec(durationMillis = 500)
-        ),
-        exit = slideOutHorizontally(
+        ), exit = slideOutHorizontally(
             animationSpec = TweenSpec(durationMillis = 500)
         )
     ) {
@@ -162,7 +163,8 @@ private fun SingleStaffMember(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 25.sp
+                        fontSize = 25.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                     Row(
                         modifier = modifier
@@ -174,7 +176,8 @@ private fun SingleStaffMember(
                             modifier = Modifier,
                             minLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
 

@@ -31,6 +31,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
@@ -39,6 +40,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,8 +75,6 @@ import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewM
 import com.project.toko.core.dao.MainDb
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
-import com.project.toko.core.presentation_layer.theme.LightBottomBarColor
-import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
@@ -190,21 +190,41 @@ private fun BottomNavigationBar(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val detailScreenButtonIsSelected = when (currentRoute) {
-        Screen.Home.route -> false
-        Screen.Favorites.route -> false
-        Screen.RandomAnimeOrManga.route -> false
-        else -> true
+    var detailScreenButtonIsSelected = false
+    LaunchedEffect(key1 = currentRoute) {
+        when (currentRoute) {
+            Screen.Home.route -> {
+                detailScreenButtonIsSelected = false
+            }
+
+            Screen.Favorites.route -> {
+                detailScreenButtonIsSelected = false
+            }
+
+            Screen.RandomAnimeOrManga.route -> {
+                detailScreenButtonIsSelected = false
+            }
+
+            else -> {
+                detailScreenButtonIsSelected = true
+            }
+        }
     }
+//    val detailScreenButtonIsSelected = when (currentRoute) {
+//        Screen.Home.route -> false
+//        Screen.Favorites.route -> false
+//        Screen.RandomAnimeOrManga.route -> false
+//        else -> true
+//    }
 
     Row(
         modifier
             .fillMaxWidth()
             .clip(
-                RoundedCornerShape(10.dp)
+                RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp)
             )
             .height(50.dp)
-            .background(LightBottomBarColor.copy(0.6f))
+            .background(MaterialTheme.colorScheme.onBackground)
             .blur(200.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
@@ -239,7 +259,8 @@ private fun BottomNavigationBar(
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.home, imageLoader = imageLoader
-                    ), contentDescription = null, modifier = modifier.size(35.dp)
+                    ), contentDescription = null, modifier = modifier.size(35.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surface)
                 )
 
 
@@ -247,7 +268,8 @@ private fun BottomNavigationBar(
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.homefilled, imageLoader = imageLoader
-                    ), contentDescription = null, modifier = modifier.size(35.dp)
+                    ), contentDescription = null, modifier = modifier.size(35.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surface)
 
                 )
 
@@ -347,13 +369,15 @@ private fun BottomNavigationBar(
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.detailfilled, imageLoader = imageLoader
-                    ), contentDescription = null, modifier = modifier.size(30.dp)
+                    ), contentDescription = null, modifier = modifier.size(30.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surface)
                 )
             } else {
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.detail, imageLoader = imageLoader
-                    ), contentDescription = null, modifier = modifier.size(30.dp)
+                    ), contentDescription = null, modifier = modifier.size(30.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surface)
                 )
             }
         }
@@ -386,13 +410,15 @@ private fun BottomNavigationBar(
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.bookmarkempty, imageLoader = imageLoader
-                    ), contentDescription = null, modifier = modifier.size(30.dp)
+                    ), contentDescription = null, modifier = modifier.size(30.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surface)
                 )
             } else {
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.bookmarkfilled, imageLoader = imageLoader
-                    ), contentDescription = null, modifier = modifier.size(30.dp)
+                    ), contentDescription = null, modifier = modifier.size(30.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surface)
                 )
             }
         }
@@ -427,7 +453,8 @@ private fun BottomNavigationBar(
             Image(
                 painter = rememberAsyncImagePainter(
                     model = R.drawable.shuffle, imageLoader = imageLoader
-                ), contentDescription = null, modifier = modifier.size(30.dp)
+                ), contentDescription = null, modifier = modifier.size(30.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surface)
             )
         }
 
@@ -454,7 +481,7 @@ private fun ShowDrawerContent(
             .fillMaxWidth(0.8f)
             .height(70.dp)
             .clip(CardDefaults.shape)
-            .background(LightGreen)
+            .background(MaterialTheme.colorScheme.onPrimaryContainer)
 //            .clickable {
 //                try {
 //                    val saveDb = homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
@@ -542,18 +569,22 @@ private fun ShowDrawerContent(
                 .fillMaxWidth(0.8f)
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(topEnd = 20.dp))
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surfaceTint)
                 .verticalScroll(rememberScrollState())
         ) {
-
-            Divider(thickness = 3.dp)
+            Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
             NavigationDrawerItem(
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                    unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                ),
                 label = {
                     Text(
                         text = "NSFW",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp)
+                        modifier = modifier.padding(start = 20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 selected = false,
@@ -563,12 +594,12 @@ private fun ShowDrawerContent(
                     Switch(checked = homeScreenViewModel.safeForWork.value, onCheckedChange = {
                         homeScreenViewModel.safeForWork.value = it
                     }, colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color(65, 65, 65),
-                        checkedTrackColor = Color(251, 251, 251),
-                        checkedBorderColor = Color(65, 65, 65),
-                        uncheckedThumbColor = Color(65, 65, 65),
-                        uncheckedTrackColor = Color(251, 251, 251),
-                        uncheckedBorderColor = Color(65, 65, 65),
+                        checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                        checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                        checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
                     ),
                         thumbContent = if (homeScreenViewModel.safeForWork.value) {
                             {
@@ -576,7 +607,7 @@ private fun ShowDrawerContent(
                                     imageVector = Icons.Filled.Check,
                                     contentDescription = null,
                                     modifier = Modifier.size(SwitchDefaults.IconSize),
-                                    tint = Color(251, 251, 251)
+                                    tint = MaterialTheme.colorScheme.onTertiaryContainer
                                 )
                             }
                         } else {
@@ -584,16 +615,20 @@ private fun ShowDrawerContent(
                         })
                 },
             )
-            Divider(thickness = 3.dp)
+            Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
             NavigationDrawerItem(
-                modifier = modifier.background(Color(104, 190, 174).copy(alpha = 0.24f)),
-                colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent),
+                modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = Color.Transparent,
+                    unselectedContainerColor = Color.Transparent
+                ),
                 label = {
                     Text(
                         text = "Help/FAQ",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp)
+                        modifier = modifier.padding(start = 20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 selected = false,
@@ -605,26 +640,33 @@ private fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowdown, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp)
+                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowright, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp)
+                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
                 },
             )
-            Divider(thickness = 3.dp)
+            Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
             if (isHelpFAQOpen) {
                 NavigationDrawerItem(
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                    ),
                     label = {
                         Text(
                             text = "Known bugs",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp)
+                            modifier = modifier.padding(start = 20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     selected = false,
@@ -635,18 +677,23 @@ private fun ShowDrawerContent(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
                             ), contentDescription = null, modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(Color(114, 114, 114, 255))
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
                 )
-                Divider(thickness = 3.dp)
+                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
                 NavigationDrawerItem(
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                    ),
                     label = {
                         Text(
                             text = "About the features of the app",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp)
+                            modifier = modifier.padding(start = 20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     selected = false,
@@ -656,18 +703,24 @@ private fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
                 )
-                Divider(thickness = 3.dp)
+                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
                 NavigationDrawerItem(
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                    ),
                     label = {
                         Text(
                             text = "My list functional problems",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp)
+                            modifier = modifier.padding(start = 20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     selected = false,
@@ -677,18 +730,24 @@ private fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
                 )
-                Divider(thickness = 3.dp)
+                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
                 NavigationDrawerItem(
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                    ),
                     label = {
                         Text(
                             text = "Database problems",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp)
+                            modifier = modifier.padding(start = 20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     selected = false,
@@ -698,18 +757,24 @@ private fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
                 )
-                Divider(thickness = 3.dp)
+                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
                 NavigationDrawerItem(
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                    ),
                     label = {
                         Text(
                             text = "Technical problems",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp)
+                            modifier = modifier.padding(start = 20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     selected = false,
@@ -719,19 +784,25 @@ private fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
                 )
-                Divider(thickness = 3.dp)
+                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
             }
             NavigationDrawerItem(
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                    unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                ),
                 label = {
                     Text(
                         text = "Contact Support",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp)
+                        modifier = modifier.padding(start = 20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 selected = false,
@@ -741,20 +812,25 @@ private fun ShowDrawerContent(
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.openbrowser, imageLoader = imageLoader
-                        ), contentDescription = null, modifier = modifier.size(30.dp)
+                        ), contentDescription = null, modifier = modifier.size(30.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                     )
                 },
             )
-            Divider(thickness = 3.dp)
+            Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
             NavigationDrawerItem(
-                modifier = modifier.background(Color(104, 190, 174).copy(alpha = 0.24f)),
-                colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent),
+                modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = Color.Transparent,
+                    unselectedContainerColor = Color.Transparent
+                ),
                 label = {
                     Text(
                         text = "Legal",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp)
+                        modifier = modifier.padding(start = 20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 selected = false,
@@ -766,26 +842,33 @@ private fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowdown, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp)
+                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowright, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp)
+                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
                 },
             )
-            Divider(thickness = 3.dp)
+            Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
             if (isLegalOpen) {
                 NavigationDrawerItem(
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                    ),
                     label = {
                         Text(
                             text = "Terms of use",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp)
+                            modifier = modifier.padding(start = 20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     selected = false,
@@ -795,18 +878,24 @@ private fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
                 )
-                Divider(thickness = 3.dp)
+                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
                 NavigationDrawerItem(
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                    ),
                     label = {
                         Text(
                             text = "Resource",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp)
+                            modifier = modifier.padding(start = 20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     selected = false,
@@ -816,19 +905,25 @@ private fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp)
+                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
                 )
-                Divider(thickness = 3.dp)
+                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
             }
             NavigationDrawerItem(
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                    unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+                ),
                 label = {
                     Text(
                         text = "Export Data",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp)
+                        modifier = modifier.padding(start = 20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 selected = false,
@@ -839,11 +934,12 @@ private fun ShowDrawerContent(
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.export, imageLoader = imageLoader
-                        ), contentDescription = null, modifier = modifier.size(30.dp)
+                        ), contentDescription = null, modifier = modifier.size(30.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                     )
                 },
             )
-            Divider(thickness = 3.dp)
+            Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 
@@ -864,7 +960,7 @@ private fun ShowDrawerContent(
             ) {
                 Card(
                     modifier = modifier.fillMaxSize(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint)
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -880,7 +976,8 @@ private fun ShowDrawerContent(
                             Text(
                                 text = "Export Data?",
                                 fontSize = 35.sp,
-                                fontWeight = FontWeight.ExtraBold
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                         Row(
@@ -901,7 +998,11 @@ private fun ShowDrawerContent(
                                 .fillMaxWidth(0.8f)
                                 .height(70.dp)
                                 .clip(CardDefaults.shape)
-                                .border(4.dp, LightGreen, CardDefaults.shape)
+                                .border(
+                                    4.dp,
+                                    MaterialTheme.colorScheme.onPrimaryContainer,
+                                    CardDefaults.shape
+                                )
                                 .clickable {
 
                                 },
@@ -911,7 +1012,8 @@ private fun ShowDrawerContent(
                             Text(
                                 text = "Upload Data",
                                 fontSize = 22.sp,
-                                fontWeight = FontWeight.ExtraBold
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                         Spacer(modifier = modifier.height(20.dp))

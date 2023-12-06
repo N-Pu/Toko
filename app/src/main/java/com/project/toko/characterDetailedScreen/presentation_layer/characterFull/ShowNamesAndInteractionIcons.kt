@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -61,7 +62,8 @@ fun ShowNamesAndInteractionIcons(
             modifier = modifier.fillMaxWidth(),
             minLines = 1,
             fontWeight = FontWeight.ExtraBold,
-            lineHeight = 20.sp
+            lineHeight = 20.sp,
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Spacer(modifier = modifier.size(2.dp))
 
@@ -73,7 +75,8 @@ fun ShowNamesAndInteractionIcons(
                 modifier = modifier.fillMaxWidth(),
                 minLines = 1,
                 fontWeight = FontWeight.ExtraBold,
-                lineHeight = 20.sp
+                lineHeight = 20.sp,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         Column(
@@ -118,12 +121,15 @@ fun ShowNamesAndInteractionIcons(
                                 }
                             }
                         },
-                    colorFilter = if (isCharacterInDao) ColorFilter.tint(LightGreen) else null
+                    colorFilter = if (isCharacterInDao) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                        MaterialTheme.colorScheme.onError
+                    )
                 )
                 Image(
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onError),
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.links,
-                        imageLoader = imageLoader
+                        imageLoader = imageLoader,
                     ), contentDescription = null,
                     modifier = modifier
                         .size(40.dp)

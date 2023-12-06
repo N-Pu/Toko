@@ -5,6 +5,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,7 +24,7 @@ private fun ColorBox(
 
     Box(
         modifier = modifier
-            .background(LightGreen, shape = RoundedCornerShape(size =  14.dp) )
+            .background(MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(size =  14.dp) )
             .padding(horizontal = 14.dp, vertical = 6.dp)
     ) {
         Text(

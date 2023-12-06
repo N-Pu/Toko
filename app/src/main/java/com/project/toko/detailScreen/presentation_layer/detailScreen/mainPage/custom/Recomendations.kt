@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,6 +40,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import com.project.toko.core.presentation_layer.theme.DarkSectionColor
 import com.project.toko.core.presentation_layer.theme.SectionColor
 import com.project.toko.detailScreen.model.recommendationsModel.RecommendationsData
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
@@ -62,7 +65,7 @@ fun Recommendations(
             Box(
                 modifier = modifier
                     .fillMaxWidth(0.85f)
-                    .background(SectionColor)
+                    .background(if (isSystemInDarkTheme()) DarkSectionColor else SectionColor)
                     .padding(bottom = 5.dp)
             ) {
                 Box(
@@ -73,7 +76,8 @@ fun Recommendations(
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.Start,
-                        textDecoration = TextDecoration.Underline
+                        textDecoration = TextDecoration.Underline,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -126,7 +130,7 @@ fun SingleRecommendationCard(
                     )
                 }
             },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onTertiaryContainer),
         shape = RectangleShape,
     ) {
 
@@ -153,7 +157,8 @@ fun SingleRecommendationCard(
             fontSize = 16.sp,
             overflow = TextOverflow.Ellipsis,
             minLines = 2,
-            maxLines = 2
+            maxLines = 2,
+            color = MaterialTheme.colorScheme.onPrimary
         )
 
 

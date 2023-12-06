@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -64,14 +66,16 @@ fun DisplayCast(
 
             Column {
                 Text(
-                    text = "Cast", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold
+                    text = "Cast", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             Column {
                 Text(
                     text = " $numCharacterAndActors>",
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -110,7 +114,7 @@ private fun AddCast(
                     .clip(RoundedCornerShape(10.dp))
                     .width(320.dp)
                     .height(440.dp)
-                    .background(Color.White),
+                    .background(MaterialTheme.colorScheme.onTertiaryContainer),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -136,7 +140,7 @@ private fun AddCast(
                 .clip(RoundedCornerShape(5.dp))
                 .width(160.dp)
                 .height(440.dp)
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.onTertiaryContainer),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -146,7 +150,7 @@ private fun AddCast(
                 modifier = modifier
                     .size(100.dp)
                     .clip(CircleShape)
-                    .background(Color(198, 198, 198))
+                    .background(MaterialTheme.colorScheme.onSecondary)
                     .clickable {
 //                        navController.navigate(Screen.DetailOnWholeCast.route)
                         navController.navigate("detail_on_whole_cast/${detailMalId}")
@@ -155,7 +159,8 @@ private fun AddCast(
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.vector),
                     contentDescription = "More cast",
-                    modifier = modifier.fillMaxSize(0.7f)
+                    modifier = modifier.fillMaxSize(0.7f),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                 )
 
             }
@@ -163,8 +168,7 @@ private fun AddCast(
 
             Text(
                 text = "More Cast",
-                textAlign = TextAlign.Left,
-                color = Color.Black,
+                textAlign = TextAlign.Left, color = MaterialTheme.colorScheme.onPrimary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp,
                 modifier = modifier
@@ -225,7 +229,7 @@ private fun CurrentCast(
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.personplaceholder, imageLoader = svgImageLoader
-                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp)
+                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp), colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                     )
                 }
             } else {
@@ -254,7 +258,8 @@ private fun CurrentCast(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
                 Row {
@@ -263,7 +268,8 @@ private fun CurrentCast(
                         modifier = Modifier,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 11.sp
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.inversePrimary
                     )
                 }
             }
@@ -282,7 +288,8 @@ private fun CurrentCast(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
                 Row {
@@ -292,7 +299,8 @@ private fun CurrentCast(
                         textAlign = TextAlign.End,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 11.sp
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.inversePrimary
                     )
                 }
             }
@@ -316,7 +324,7 @@ private fun CurrentCast(
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.personplaceholder, imageLoader = svgImageLoader
-                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp)
+                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp), colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                     )
                 }
             } else {

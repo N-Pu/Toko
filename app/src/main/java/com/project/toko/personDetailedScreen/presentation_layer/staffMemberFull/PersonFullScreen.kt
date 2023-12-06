@@ -4,6 +4,7 @@ package com.project.toko.personDetailedScreen.presentation_layer.staffMemberFull
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +18,7 @@ import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +35,8 @@ import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
 import com.project.toko.core.presentation_layer.expandableText.ExpandableText
 import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.delay
 
@@ -75,7 +79,7 @@ fun DisplayPersonFullScreen(
     if (isSearching.not() && personFullState != null) {
 
         Column(
-            modifier = modifier
+            modifier = modifier.background(MaterialTheme.colorScheme.primary)
                 .verticalScroll(rememberScrollState())
         ) {
             Row(
@@ -145,13 +149,14 @@ fun DisplayPersonFullScreen(
 
 @Composable
 private fun BackArrow(modifier: Modifier, navController: NavController) {
-
+    val backArrowFirstColor = if (isSystemInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
+    val backArrowSecondColor =if (isSystemInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
         Spacer(modifier = modifier.height(20.dp))
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(BackArrowCastColor)
+                .background(backArrowFirstColor)
         ) {
             Text(
                 text = "   <    Person                       ",
@@ -161,14 +166,15 @@ private fun BackArrow(modifier: Modifier, navController: NavController) {
                 textDecoration = TextDecoration.Underline,
                 modifier = modifier.clickable {
                     navController.popBackStack()
-                }
+                },
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         Box(
             modifier = modifier
                 .fillMaxWidth(0.7f)
                 .fillMaxHeight(0.02f)
-                .background(BackArrowSecondCastColor)
+                .background(backArrowSecondColor)
         )
 
         Spacer(modifier = modifier.height(20.dp))

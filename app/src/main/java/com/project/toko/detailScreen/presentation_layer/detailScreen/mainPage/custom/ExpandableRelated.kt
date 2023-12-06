@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,7 +44,8 @@ fun ShowRelation(relation: String, modifier: Modifier) {
     Row(
         modifier = modifier.padding(start = 20.dp, bottom = 5.dp, end = 20.dp)
     ) {
-        Text(fontWeight = FontWeight.Medium, text = "$relation: ")
+        Text(fontWeight = FontWeight.Medium, text = "$relation: ",
+            color = MaterialTheme.colorScheme.onPrimary)
     }
 }
 
@@ -59,7 +61,8 @@ fun CurrentRelation(
         Row(
             modifier = modifier.padding(start = 20.dp, bottom = 5.dp, end = 20.dp)
         ) {
-            Text(color = LightGreen,
+            Text(
+                color = MaterialTheme.colorScheme.secondary,
                 text = entry.name + " (" + entry.type + ")",
                 modifier = modifier.clickable {
                     viewModel.viewModelScope.launch {
@@ -72,7 +75,7 @@ fun CurrentRelation(
             modifier = modifier.padding(start = 20.dp, bottom = 5.dp)
         ) {
             Text(
-                color = Color.LightGray,
+                color = MaterialTheme.colorScheme.inversePrimary,
                 text = entry.name + " (" + entry.type + ")",
                 modifier = modifier
             )
@@ -111,7 +114,8 @@ fun ExpandableRelated(
                     text = "Related anime",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Start
+                    textAlign = TextAlign.Start,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
@@ -143,7 +147,7 @@ fun ExpandableRelated(
                     Spacer(
                         modifier = modifier
                             .fillMaxWidth()
-                            .background(Color.Black.copy(0.3f))
+                            .background(MaterialTheme.colorScheme.inversePrimary.copy(0.3f))
                             .height(1.dp)
                     )
                     Row(
@@ -158,11 +162,12 @@ fun ExpandableRelated(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             modifier = modifier.clickable(onClick = toggleExpanded),
-                            color = Color(0xB2000000)
+                            color = MaterialTheme.colorScheme.inversePrimary
                         )
                         Icon(
                             imageVector = if (itemsToShow == maxItemsToShow) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
                             contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }

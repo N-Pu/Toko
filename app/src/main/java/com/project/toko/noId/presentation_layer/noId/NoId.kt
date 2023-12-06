@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,7 +24,8 @@ fun NoId() {
 
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -31,12 +33,15 @@ fun NoId() {
             modifier = Modifier
                 .clip(CardDefaults.shape)
                 .background(
-                    LightGreen
-                ).
-                    padding(20.dp, 20.dp, 20.dp, 20.dp)
+                    MaterialTheme.colorScheme.secondary
+                )
+                .padding(20.dp, 20.dp, 20.dp, 20.dp)
         ) {
             Text(
-                text = "No ID", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color.White
+                text = "No ID",
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 

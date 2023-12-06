@@ -4,6 +4,7 @@ package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.c
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,7 +39,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.daoScreen.dao.AnimeItem
-import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.share.shareLink
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
@@ -61,6 +62,11 @@ fun AddToFavorites(
         add(SvgDecoder.Factory())
     }.build()
     val context = LocalContext.current
+    val threeDots = if (isSystemInDarkTheme()) {
+        R.drawable.three_dots_white
+    } else {
+        R.drawable.three_dots_gray
+    }
     Row(
         modifier = modifier
             .height(70.dp)
@@ -116,7 +122,7 @@ fun AddToFavorites(
                 colorFilter = if (daoViewModel.containsInFavorite(
                         id = detailScreenState?.mal_id ?: 0
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(LightGreen) else null
+                ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(MaterialTheme.colorScheme.onError)
             )
         }
         IconButton(onClick = {
@@ -171,7 +177,7 @@ fun AddToFavorites(
                         id = detailScreenState?.mal_id ?: 0,
                         AnimeListType.PLANNED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(Color(255, 152, 0, 255)) else null
+                ) ColorFilter.tint(Color(255, 152, 0, 255)) else ColorFilter.tint(MaterialTheme.colorScheme.onError)
             )
         }
         if (detailScreenState?.url?.isNotEmpty() == true) {
@@ -182,7 +188,8 @@ fun AddToFavorites(
                         model = R.drawable.links, imageLoader = svgImageLoader
                     ), contentDescription = null, modifier = modifier.clickable {
                         context.shareLink(detailScreenState!!.url)
-                    }
+                    },
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onError)
                 )
             }
         }
@@ -194,14 +201,14 @@ fun AddToFavorites(
                 }
 
             },
-            colors = IconButtonDefaults.iconButtonColors(containerColor = LightGreen),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.secondary),
             modifier = modifier
                 .height(50.dp)
                 .width(50.dp)
         ) {
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = R.drawable.threedots, imageLoader = svgImageLoader
+                    model = threeDots, imageLoader = svgImageLoader
                 ), contentDescription = null
             )
             DropdownMenu(
@@ -209,7 +216,7 @@ fun AddToFavorites(
                 onDismissRequest = { isExpanded = false }, modifier = modifier
                     .height(120.dp)
                     .width(170.dp)
-                    .background(Color(65, 65, 65))
+                    .background(MaterialTheme.colorScheme.onPrimary)
             ) {
                 DropdownMenuItem(text = {
                     Row(
@@ -225,7 +232,7 @@ fun AddToFavorites(
                                     AnimeListType.COMPLETED.route
 
                                 ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) LightGreen else Color.White,
+                            ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
                             fontWeight = FontWeight.Light,
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center,
@@ -240,7 +247,7 @@ fun AddToFavorites(
                                     id = detailScreenState?.mal_id ?: 0,
                                     AnimeListType.COMPLETED.route
                                 ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) ColorFilter.tint(LightGreen) else null
+                            ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(MaterialTheme.colorScheme.error)
                         )
                     }
                 }, onClick = {
@@ -308,7 +315,7 @@ fun AddToFavorites(
                                     AnimeListType.DROPPED.route
 
                                 ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) Color.Red else Color.White,
+                            ) Color.Red else MaterialTheme.colorScheme.error,
                             fontWeight = FontWeight.Light,
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center
@@ -322,7 +329,7 @@ fun AddToFavorites(
                                     id = detailScreenState?.mal_id ?: 0,
                                     AnimeListType.DROPPED.route
                                 ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) ColorFilter.tint(Color.Red) else null
+                            ) ColorFilter.tint(Color.Red) else ColorFilter.tint(MaterialTheme.colorScheme.error)
 
                         )
                     }
@@ -394,7 +401,7 @@ fun AddToFavorites(
                                     AnimeListType.WATCHING.route
 
                                 ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) LightGreen else Color.White,
+                            ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
                             fontWeight = FontWeight.Light,
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center
@@ -408,7 +415,7 @@ fun AddToFavorites(
                                     id = detailScreenState?.mal_id ?: 0,
                                     AnimeListType.WATCHING.route
                                 ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) ColorFilter.tint(LightGreen) else null
+                            ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(MaterialTheme.colorScheme.error)
 
                         )
                     }

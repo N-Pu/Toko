@@ -3,6 +3,7 @@ package com.project.toko.detailScreen.presentation_layer.detailScreen.sideConten
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +45,8 @@ import com.project.toko.R
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.detailScreen.model.castModel.CastData
 import com.project.toko.detailScreen.model.castModel.ImagesX
@@ -60,7 +65,7 @@ fun ShowWholeCast(
     viewModel.castList.collectAsStateWithLifecycle()
     val castWithJapVoiceActors = hasJapVoiceActor(castList)
 
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = modifier.background(MaterialTheme.colorScheme.primary)) {
         item { Spacer(modifier = modifier.height(70.dp)) }
         itemsIndexed(castWithJapVoiceActors) { _, data ->
             AddCast(
@@ -148,14 +153,16 @@ private fun CurrentCast(
                     modifier = Modifier
                         .fillMaxSize(0.9f)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(Color(102, 102, 102)),
-                    contentAlignment =  Alignment.Center
+                        .background(MaterialTheme.colorScheme.onSecondary),
+                    contentAlignment = Alignment.Center
 
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.personplaceholder, imageLoader = svgImageLoader
-                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp)
+                        ), contentDescription = null, modifier = modifier
+                            .fillMaxSize(0.6f)
+                            .padding(bottom = 10.dp)
                     )
                 }
             } else {
@@ -181,8 +188,6 @@ private fun CurrentCast(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(top = 5.dp)
-
-
             ) {
                 Text(
                     text = voiceActor.person.name,
@@ -190,14 +195,16 @@ private fun CurrentCast(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
                     text = voiceActor.language,
                     modifier = Modifier,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 11.sp
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             Column(
@@ -216,14 +223,16 @@ private fun CurrentCast(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
                     text = data.role,
                     modifier = Modifier,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 11.sp
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -242,30 +251,32 @@ private fun CurrentCast(
                     modifier = Modifier
                         .fillMaxSize(0.9f)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(Color(102, 102, 102)),
-                    contentAlignment =  Alignment.Center
+                        .background(MaterialTheme.colorScheme.onSecondary),
+                    contentAlignment = Alignment.Center
 
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.personplaceholder, imageLoader = svgImageLoader
-                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp)
+                        ), contentDescription = null, modifier = modifier
+                            .fillMaxSize(0.6f)
+                            .padding(bottom = 10.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                     )
                 }
             } else {
-            Image(
-                painter = characterPainter,
-                contentDescription = "Character name: ${data.character.name}",
-                modifier = Modifier
-                    .fillMaxSize(0.9f)
-                    .clip(RoundedCornerShape(2.dp))
-                    .clickable {
-                        navController.navigate(route = "detail_on_character/${data.character.mal_id}") {
-
-                        }
-                    },
-                contentScale = ContentScale.FillBounds
-            )}
+                Image(
+                    painter = characterPainter,
+                    contentDescription = "Character name: ${data.character.name}",
+                    modifier = Modifier
+                        .fillMaxSize(0.9f)
+                        .clip(RoundedCornerShape(2.dp))
+                        .clickable {
+                            navController.navigate(route = "detail_on_character/${data.character.mal_id}")
+                        },
+                    contentScale = ContentScale.FillBounds
+                )
+            }
         }
 
     }
@@ -273,13 +284,14 @@ private fun CurrentCast(
 
 @Composable
 private fun BackArrow(modifier: Modifier, navController: NavController, detailScreenMalId: Int) {
-
+    val backArrowFirstColor = if (isSystemInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
+    val backArrowSecondColor =if (isSystemInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
         Spacer(modifier = modifier.height(20.dp))
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(BackArrowCastColor)
+                .background(backArrowFirstColor)
         ) {
             Text(
                 text = "   <    Cast                          ",
@@ -294,14 +306,15 @@ private fun BackArrow(modifier: Modifier, navController: NavController, detailSc
                             inclusive = true
                         }
                     }
-                }
+                },
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         Box(
             modifier = modifier
                 .fillMaxWidth(0.7f)
                 .fillMaxHeight(0.02f)
-                .background(BackArrowSecondCastColor)
+                .background(backArrowSecondColor)
         )
 
         Spacer(modifier = modifier.height(20.dp))

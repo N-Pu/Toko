@@ -3,6 +3,7 @@ package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.c
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,7 +28,7 @@ fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
     ) {
         Text(
             text = scoreByNumb() + " users",
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center,
             fontSize = 10.sp

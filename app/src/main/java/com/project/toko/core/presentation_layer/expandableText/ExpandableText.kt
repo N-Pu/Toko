@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,105 +38,111 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
     val maxLines = if (expanded) Int.MAX_VALUE else 6
     val toggleExpanded: () -> Unit = { expanded = !expanded }
 
-        if (wordCount != null) {
-            if (wordCount <= 40) {
-                Column(
-                    modifier = modifier
-                        .fillMaxWidth(1f)
-                        .padding(start = 20.dp, bottom = 25.dp, end = 20.dp),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Top
-                ) {
-                    Text(
-                        text = title,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    Spacer(modifier = modifier.height(10.dp))
-                    Text(
-                        text = text,
-                        maxLines = maxLines,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = modifier,
-                        softWrap = true
-                    )
-                }
-                return
-            }
-
-
-
-
+    if (wordCount != null) {
+        if (wordCount <= 40) {
             Column(
                 modifier = modifier
                     .fillMaxWidth(1f)
-                    .padding(start = 20.dp, bottom = 0.dp, end = 20.dp),
+                    .padding(start = 20.dp, bottom = 25.dp, end = 20.dp),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Top
             ) {
                 Text(
                     text = title,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
-
                 Spacer(modifier = modifier.height(10.dp))
                 Text(
                     text = text,
                     maxLines = maxLines,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = modifier
-                        .clickable(onClick = toggleExpanded)
-                        .animateContentSize(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioLowBouncy,
-                                stiffness = Spring.StiffnessLow
-                            )
-                        ),
-                    softWrap = true
+                    modifier = modifier,
+                    softWrap = true,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
-                Spacer(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .height(10.dp)
-                )
-                Spacer(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .background(Color.Black.copy(0.3f))
-                        .height(1.dp)
-                )
-                Row(
-                    modifier = Modifier,
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Text(
-                        text = "Details",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = modifier.clickable(onClick = toggleExpanded),
-                        color = Color(0xB2000000)
-                    )
-                    if (expanded) {
-                        Icon(
-                            imageVector = Icons.Filled.KeyboardArrowUp,
-                            contentDescription = null,
-                            modifier = modifier
-                                .clickable(onClick = toggleExpanded)
-                                .align(Alignment.CenterVertically)
+            }
+            return
+        }
 
+
+
+
+        Column(
+            modifier = modifier
+                .fillMaxWidth(1f)
+                .padding(start = 20.dp, bottom = 0.dp, end = 20.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
+        ) {
+            Text(
+                text = title,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+
+            Spacer(modifier = modifier.height(10.dp))
+            Text(
+                text = text,
+                maxLines = maxLines,
+                overflow = TextOverflow.Ellipsis,
+                modifier = modifier
+                    .clickable(onClick = toggleExpanded)
+                    .animateContentSize(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessLow
                         )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Filled.KeyboardArrowDown,
-                            contentDescription = null,
-                            modifier = modifier
-                                .clickable(onClick = toggleExpanded)
-                                .align(Alignment.CenterVertically)
-                        )
-                    }
+                    ),
+                softWrap = true,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Spacer(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+            )
+            Spacer(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.inversePrimary.copy(0.3f))
+                    .height(1.dp)
+            )
+            Row(
+                modifier = Modifier,
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = "Details",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = modifier.clickable(onClick = toggleExpanded),
+                    color = MaterialTheme.colorScheme.inversePrimary
+                )
+                if (expanded) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = null,
+                        modifier = modifier
+                            .clickable(onClick = toggleExpanded)
+                            .align(Alignment.CenterVertically),
+                        tint = MaterialTheme.colorScheme.inversePrimary
+
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = modifier
+                            .clickable(onClick = toggleExpanded)
+                            .align(Alignment.CenterVertically),
+                        tint = MaterialTheme.colorScheme.inversePrimary
+                    )
                 }
             }
         }
+    }
 }

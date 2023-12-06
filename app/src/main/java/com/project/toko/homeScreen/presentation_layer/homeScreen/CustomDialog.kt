@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -120,23 +122,9 @@ fun CustomDialog(
                 .width(weight)
                 .height(height())
         ) {
-
-
             Card(
-                modifier = modifier
-//                . width(weight)
-
-
-//                .size(weight, height())
-
-//                .offset { IntOffset(0, offsetY.roundToInt()) }
-//                .draggable(
-//                    orientation = Orientation.Vertical,
-//                    state = rememberDraggableState { delta ->
-//                        offsetY += delta
-//                    },
-//                )
-                , colors = CardDefaults.cardColors(containerColor = DialogColor)
+                modifier = modifier,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Column(
                     modifier = modifier
@@ -147,7 +135,8 @@ fun CustomDialog(
                     Text(
                         text = data.title,
                         fontSize = 18.sp,
-                        color = Color.White,
+
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -156,7 +145,7 @@ fun CustomDialog(
                         Text(
                             text = data.title_english,
                             fontSize = 10.sp,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             lineHeight = 10.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -235,7 +224,7 @@ private fun ScoreLabel(modifier: Modifier) {
     ) {
         Card(
             modifier = modifier.size(90.dp, 25.dp),
-            colors = CardDefaults.cardColors(containerColor = LightGreen),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
             shape = RoundedCornerShape(5.dp)
 
         ) {
@@ -277,7 +266,7 @@ private fun ScoreNumber(modifier: Modifier, score: Float) {
     ) {
         Text(
             text = scoreNumb(),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             fontSize = 30.sp
@@ -296,13 +285,13 @@ private fun RankedLine(rank: Int, modifier: Modifier) {
             text = ("       Ranked "),
             fontSize = 12.sp,
             fontWeight = FontWeight.ExtraLight,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
             text = "#$rank",
             fontWeight = FontWeight.ExtraBold,
             fontSize = 12.sp,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -318,13 +307,13 @@ private fun PopularityLine(popularity: Int, modifier: Modifier) {
             text = ("       Popularity "),
             fontSize = 12.sp,
             fontWeight = FontWeight.Thin,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
             text = "#$popularity",
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -341,13 +330,13 @@ private fun MembersLine(members: Int, modifier: Modifier) {
             text = ("       Members "),
             fontSize = 12.sp,
             fontWeight = FontWeight.Thin,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
             text = members.toString(),
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -368,7 +357,7 @@ private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
     ) {
         Text(
             text = scoreByNumb() + " users",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center,
             fontSize = 10.sp
@@ -388,17 +377,29 @@ private fun YearTypeStudio(
     ) {
         val yearSeasonText = buildAnnotatedString {
             if (data?.year != 0 && data?.season != null) {
-                withStyle(style = SpanStyle(color = LightGreen)) {
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
                     append("${data.season} ${data.year}")
                 }
                 append(" | ")
             }
-            withStyle(style = SpanStyle(color = LightGreen)) {
+            withStyle(
+                style = SpanStyle(
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            ) {
                 append(data?.type ?: "N/A")
             }
             if (!isStudioEmpty) {
                 append(" | ")
-                withStyle(style = SpanStyle(color = LightGreen)) {
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
                     append(data?.studios?.component1()?.name ?: "N/A")
                 }
             }
@@ -411,7 +412,8 @@ private fun YearTypeStudio(
             maxLines = 3,
             fontWeight = FontWeight.Thin,
             fontSize = 12.sp,
-            lineHeight = 12.sp
+            lineHeight = 12.sp,
+            color = MaterialTheme.colorScheme.inversePrimary
         )
     }
 }
@@ -432,7 +434,7 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
                 .fillMaxWidth(1f)
                 .height(35.dp)
                 .clip(CardDefaults.shape)
-                .background(DialogSideColor)
+                .background(MaterialTheme.colorScheme.onError)
                 .padding(10.dp, 10.dp, 0.dp, 5.dp),
 
             ) {
@@ -440,7 +442,7 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
                 text = ("Episodes: $episodes"),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Thin,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Start
             )
         }
@@ -460,7 +462,11 @@ private fun AddToDataBaseRow(
     val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
         add(SvgDecoder.Factory())
     }.build()
-
+    val threeDots = if (isSystemInDarkTheme()) {
+        R.drawable.three_dots_white
+    } else {
+        R.drawable.three_dots_gray
+    }
     Spacer(modifier = modifier.height(10.dp))
     DropdownMenu(
         expanded = isExpanded,
@@ -468,7 +474,7 @@ private fun AddToDataBaseRow(
             isExpanded = !isExpanded
         },
         modifier = modifier
-            .background(DialogSideColor)
+            .background(MaterialTheme.colorScheme.background)
             .height(100.dp)
             .width(170.dp),
         offset = DpOffset((-40).dp, (-40).dp),
@@ -484,7 +490,7 @@ private fun AddToDataBaseRow(
                         id = data.mal_id,
                         AnimeListType.WATCHING.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) Color.Yellow else Color.White,
+                ) Color.Yellow else MaterialTheme.colorScheme.primary,
             )
         }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
@@ -527,7 +533,8 @@ private fun AddToDataBaseRow(
                 }
             }
         }, colors = MenuDefaults.itemColors(
-            textColor = Color.White, trailingIconColor = Color.White
+            textColor = MaterialTheme.colorScheme.onPrimary,
+            trailingIconColor = MaterialTheme.colorScheme.onPrimary
         ), trailingIcon = {
             Image(
                 painter = rememberAsyncImagePainter(
@@ -538,7 +545,7 @@ private fun AddToDataBaseRow(
                         id = data.mal_id,
                         AnimeListType.WATCHING.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(Color.Yellow) else null
+                ) ColorFilter.tint(Color.Yellow) else ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
         })
         DropdownMenuItem(text = {
@@ -551,7 +558,7 @@ private fun AddToDataBaseRow(
                         id = data.mal_id,
                         AnimeListType.COMPLETED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) LightGreen else Color.White,
+                ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
             )
         }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
@@ -594,7 +601,8 @@ private fun AddToDataBaseRow(
                 }
             }
         }, colors = MenuDefaults.itemColors(
-            textColor = Color.White, trailingIconColor = Color.White
+            textColor = MaterialTheme.colorScheme.onPrimary,
+            trailingIconColor = MaterialTheme.colorScheme.onPrimary
         ), trailingIcon = {
             Image(
                 painter = rememberAsyncImagePainter(
@@ -605,7 +613,9 @@ private fun AddToDataBaseRow(
                         id = data.mal_id,
                         AnimeListType.COMPLETED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(LightGreen) else null
+                ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                    MaterialTheme.colorScheme.primary
+                )
             )
         })
         DropdownMenuItem(text = {
@@ -618,7 +628,7 @@ private fun AddToDataBaseRow(
                         id = data.mal_id,
                         AnimeListType.DROPPED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) Color.Red else Color.White,
+                ) Color.Red else MaterialTheme.colorScheme.primary,
             )
         }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
@@ -661,7 +671,8 @@ private fun AddToDataBaseRow(
                 }
             }
         }, colors = MenuDefaults.itemColors(
-            textColor = Color.White, trailingIconColor = Color.White
+            textColor = MaterialTheme.colorScheme.onPrimary,
+            trailingIconColor = MaterialTheme.colorScheme.onPrimary
         ), trailingIcon = {
             Image(
                 painter = rememberAsyncImagePainter(
@@ -672,7 +683,7 @@ private fun AddToDataBaseRow(
                         id = data.mal_id,
                         AnimeListType.DROPPED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(Color.Red) else null
+                ) ColorFilter.tint(Color.Red) else ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
         })
 
@@ -746,13 +757,15 @@ private fun AddToDataBaseRow(
                         id = data.mal_id,
                         AnimeListType.PLANNED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(Color(255, 152, 0, 255)) else ColorFilter.tint(
+                ) ColorFilter.tint(
                     Color(
-                        211,
-                        211,
-                        211
+                        255,
+                        152,
+                        0,
+                        255
                     )
-                )
+                ) else ColorFilter.tint(MaterialTheme.colorScheme.onError)
+
             )
         }
 
@@ -815,7 +828,9 @@ private fun AddToDataBaseRow(
                 if (daoViewModel.containsInFavorite(
                         id = data.mal_id
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(LightGreen) else ColorFilter.tint(Color(211, 211, 211))
+                ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                    MaterialTheme.colorScheme.onError
+                )
             )
         }
         Column(
@@ -857,7 +872,7 @@ private fun AddToDataBaseRow(
                                 isExpanded = !isExpanded
                             }
                             .fillMaxSize(),
-                        colorFilter = ColorFilter.tint(LightGreen))
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary))
 
                 }
 
@@ -882,7 +897,7 @@ private fun AddToDataBaseRow(
                 else -> {
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = R.drawable.threedotsgray, imageLoader = svgImageLoader
+                            model =threeDots, imageLoader = svgImageLoader
                         ),
                         contentDescription = null,
                         modifier = modifier
@@ -908,10 +923,16 @@ private fun StatusLine(status: String, modifier: Modifier) {
     ) {
 
         Text(
-            text = ("Status: "), fontSize = 12.sp, fontWeight = FontWeight.Thin, color = Color.White
+            text = ("Status: "),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Thin,
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
-            text = status, fontWeight = FontWeight.W400, fontSize = 12.sp, color = LightGreen
+            text = status,
+            fontWeight = FontWeight.W400,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.secondary
         )
     }
 }
@@ -928,10 +949,16 @@ private fun RatingLine(rating: String, modifier: Modifier) {
     ) {
 
         Text(
-            text = ("Rating: "), fontSize = 12.sp, fontWeight = FontWeight.Thin, color = Color.White
+            text = ("Rating: "),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Thin,
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
-            text = (rating), fontSize = 12.sp, fontWeight = FontWeight.W400, color = Color.White
+            text = (rating),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.W400,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -943,7 +970,7 @@ private fun ColoredBox(
 
     Box(
         modifier = modifier
-            .background(LightGreen, shape = RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(10.dp))
             .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         Text(
@@ -1005,7 +1032,11 @@ private fun Synopsis(
                     .padding(start = 15.dp)
 
             ) {
-                Text(text = "Synopsis", fontWeight = FontWeight.ExtraBold, color = Color.White)
+                Text(
+                    text = "Synopsis",
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
             Column(
                 modifier = modifier
@@ -1018,8 +1049,11 @@ private fun Synopsis(
 
             ) {
                 Text(
-                    text = synopsis ?: "", color = Color.White, fontSize = 12.sp,
-                    fontWeight = FontWeight.Thin, lineHeight = 12.sp,
+                    text = synopsis ?: "",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Thin,
+                    lineHeight = 12.sp,
                 )
             }
         }

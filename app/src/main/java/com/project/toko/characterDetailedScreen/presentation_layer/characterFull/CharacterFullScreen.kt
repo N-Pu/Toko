@@ -3,9 +3,11 @@ package com.project.toko.characterDetailedScreen.presentation_layer.characterFul
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -27,6 +29,8 @@ import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.expandableText.ExpandableText
 import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.delay
 
@@ -70,7 +74,7 @@ fun DisplayCharacterFromId(
 
 
         Column(
-            modifier = modifier
+            modifier = modifier.background(MaterialTheme.colorScheme.primary)
                 .verticalScroll(rememberScrollState())
         ) {
             Row(modifier = modifier.height(80.dp)) {}
@@ -132,13 +136,14 @@ fun DisplayCharacterFromId(
 
 @Composable
 private fun BackArrow(modifier: Modifier, navController: NavController) {
-
+    val backArrowFirstColor = if (isSystemInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
+    val backArrowSecondColor =if (isSystemInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
         Spacer(modifier = modifier.height(20.dp))
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(BackArrowCastColor)
+                .background(backArrowFirstColor)
         ) {
             Text(
                 text = "   <    Character                    ",
@@ -148,14 +153,15 @@ private fun BackArrow(modifier: Modifier, navController: NavController) {
                 textDecoration = TextDecoration.Underline,
                 modifier = modifier.clickable {
                     navController.popBackStack()
-                }
+                },
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         Box(
             modifier = modifier
                 .fillMaxWidth(0.7f)
                 .fillMaxHeight(0.02f)
-                .background(BackArrowSecondCastColor)
+                .background(backArrowSecondColor)
         )
 
         Spacer(modifier = modifier.height(20.dp))

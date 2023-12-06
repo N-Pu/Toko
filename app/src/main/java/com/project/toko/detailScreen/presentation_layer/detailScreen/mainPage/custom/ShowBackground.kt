@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,7 +24,7 @@ fun ShowBackground(detailData: DetailData?, modifier: Modifier) {
             Row {
                 Text(
                     text = "Background",
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 22.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold
@@ -32,7 +33,8 @@ fun ShowBackground(detailData: DetailData?, modifier: Modifier) {
             Spacer(modifier = Modifier.height(10.dp))
 
             Row {
-                Text(text = detailData.background)
+                Text(text = detailData.background,
+                    color = MaterialTheme.colorScheme.onPrimary)
             }
             Spacer(modifier = Modifier.height(10.dp))
         }

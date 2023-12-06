@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,7 +56,7 @@ import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
-import com.project.toko.core.presentation_layer.theme.LightCardColor
+import com.project.toko.core.presentation_layer.theme.DarkSectionColor
 import com.project.toko.core.presentation_layer.theme.SectionColor
 import com.project.toko.core.presentation_layer.theme.scoreBoardColor
 import com.project.toko.daoScreen.dao.AnimeItem
@@ -127,7 +128,7 @@ fun GridAdder(
             columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
             modifier = modifier
                 .fillMaxSize()
-                .background(Color(0xFFF4F4F4))
+                .background(MaterialTheme.colorScheme.primary)
                 .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow)),
             horizontalArrangement = Arrangement.spacedBy(22.dp),
             verticalItemSpacing = 20.dp,
@@ -160,7 +161,7 @@ fun GridAdder(
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color(0xFFF4F4F4))
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             if (lastTenAnimeFromWatchingSection.value.isNotEmpty()) {
                 item {
@@ -390,7 +391,7 @@ private fun AnimeCardBox(
                     )
                 }
             },
-        colors = CardDefaults.cardColors(containerColor = LightCardColor),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onTertiaryContainer),
         shape = RectangleShape,
     ) {
         Box(
@@ -479,7 +480,8 @@ private fun AnimeCardBox(
             fontSize = 16.sp,
             overflow = TextOverflow.Ellipsis,
             minLines = 2,
-            maxLines = 2
+            maxLines = 2,
+            color = MaterialTheme.colorScheme.onPrimary
         )
 
         Row(modifier = modifier.fillMaxWidth(1f), horizontalArrangement = Arrangement.Start) {
@@ -487,7 +489,8 @@ private fun AnimeCardBox(
                 text = "Status: " + data.status,
                 fontSize = 10.sp,
                 textAlign = TextAlign.Left,
-                modifier = modifier.padding(start = 10.dp)
+                modifier = modifier.padding(start = 10.dp),
+                color = MaterialTheme.colorScheme.inversePrimary
             )
         }
         Row(
@@ -500,7 +503,8 @@ private fun AnimeCardBox(
                 text = "Type: " + data.type,
                 fontSize = 10.sp,
                 textAlign = TextAlign.Left,
-                modifier = modifier.padding(start = 10.dp)
+                modifier = modifier.padding(start = 10.dp),
+                color = MaterialTheme.colorScheme.inversePrimary
             )
         }
 
@@ -584,12 +588,12 @@ private fun ShowSection(
                     )
                 }
             },
-        colors = CardDefaults.cardColors(containerColor = LightCardColor),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RectangleShape,
     ) {
-        Box(contentAlignment = Alignment.BottomCenter) {
+        Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.background(MaterialTheme.colorScheme.primary)) {
             Box(
-                modifier = modifier.fillMaxSize()
+                modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)
             ) {
                 // Coil image loader
                 Image(
@@ -618,7 +622,7 @@ private fun ShowSection(
                             text = data.score,
                             color = Color.White,
                             fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                     Column(
@@ -659,7 +663,8 @@ private fun ShowSection(
                     fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
                     minLines = 2,
-                    maxLines = 2
+                    maxLines = 2,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
                 Row(
@@ -670,7 +675,8 @@ private fun ShowSection(
                         text = "Status: " + data.status,
                         fontSize = 10.sp,
                         textAlign = TextAlign.Left,
-                        modifier = modifier.padding(start = 10.dp)
+                        modifier = modifier.padding(start = 10.dp),
+                        color = MaterialTheme.colorScheme.inversePrimary
                     )
                 }
                 Row(
@@ -683,7 +689,8 @@ private fun ShowSection(
                         text = "Type: " + data.type,
                         fontSize = 10.sp,
                         textAlign = TextAlign.Left,
-                        modifier = modifier.padding(start = 10.dp)
+                        modifier = modifier.padding(start = 10.dp),
+                        color = MaterialTheme.colorScheme.inversePrimary
                     )
                 }
 
@@ -698,7 +705,7 @@ private fun ShowSectionName(sectionName: String, modifier: Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth(0.85f)
-            .background(SectionColor)
+            .background(if (isSystemInDarkTheme()) DarkSectionColor else SectionColor)
             .padding(bottom = 5.dp)
     ) {
         Box(
@@ -709,7 +716,8 @@ private fun ShowSectionName(sectionName: String, modifier: Modifier) {
                 fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Start,
-                textDecoration = TextDecoration.Underline
+                textDecoration = TextDecoration.Underline,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -772,12 +780,12 @@ private fun ShowTopAnime(
                     )
                 }
             },
-        colors = CardDefaults.cardColors(containerColor = LightCardColor),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RectangleShape,
     ) {
-        Box(contentAlignment = Alignment.BottomCenter) {
+        Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.background(MaterialTheme.colorScheme.primary)) {
             Box(
-                modifier = modifier.fillMaxSize()
+                modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)
             ) {
                 // Coil image loader
                 Image(
@@ -862,7 +870,8 @@ private fun ShowTopAnime(
                     fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
                     minLines = 2,
-                    maxLines = 2
+                    maxLines = 2,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
                 Row(
@@ -873,7 +882,8 @@ private fun ShowTopAnime(
                         text = "Status: " + data.status,
                         fontSize = 10.sp,
                         textAlign = TextAlign.Left,
-                        modifier = modifier.padding(start = 10.dp)
+                        modifier = modifier.padding(start = 10.dp),
+                        color = MaterialTheme.colorScheme.inversePrimary
                     )
                 }
                 Row(
@@ -886,7 +896,8 @@ private fun ShowTopAnime(
                         text = "Type: " + data.type,
                         fontSize = 10.sp,
                         textAlign = TextAlign.Left,
-                        modifier = modifier.padding(start = 10.dp)
+                        modifier = modifier.padding(start = 10.dp),
+                        color = MaterialTheme.colorScheme.inversePrimary
                     )
                 }
 

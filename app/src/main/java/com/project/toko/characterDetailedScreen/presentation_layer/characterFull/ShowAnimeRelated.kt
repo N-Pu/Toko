@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +28,8 @@ import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetai
 fun ShowAnimeRelated(modifier: Modifier, animes: List<Anime>, navController: NavController) {
 
     Row(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
-        Text(text = "Animeography", fontSize = 24.sp)
+        Text(text = "Animeography", fontSize = 24.sp,
+            color = MaterialTheme.colorScheme.onPrimary)
     }
 
     Column(
@@ -63,8 +65,10 @@ fun ShowAnimeRelated(modifier: Modifier, animes: List<Anime>, navController: Nav
                         .padding(top = 0.dp, start = 10.dp)
 
                 ) {
-                    Text(text = animes[i].anime.title, fontSize = 18.sp)
-                    Text(text = animes[i].role)
+                    Text(text = animes[i].anime.title, fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onPrimary)
+                    Text(text = animes[i].role,
+                        color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,7 +30,8 @@ import com.project.toko.characterDetailedScreen.model.characterFullModel.Voice
 fun ShowVoiceActors(modifier: Modifier, actors: List<Voice>, navController: NavController) {
 
     Row(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
-        Text(text = "Voice Actors", fontSize = 24.sp)
+        Text(text = "Voice Actors", fontSize = 24.sp,
+            color = MaterialTheme.colorScheme.onPrimary)
     }
 
     Column(
@@ -66,8 +68,10 @@ fun ShowVoiceActors(modifier: Modifier, actors: List<Voice>, navController: NavC
                         .padding(top = 0.dp, start = 10.dp)
 
                 ) {
-                    Text(text = actors[i].person.name, fontSize = 18.sp)
-                    Text(text = actors[i].language)
+                    Text(text = actors[i].person.name, fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onPrimary)
+                    Text(text = actors[i].language,
+                        color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -77,46 +81,4 @@ fun ShowVoiceActors(modifier: Modifier, actors: List<Voice>, navController: NavC
 }
 
 
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewTopSection() {
-    Column(modifier = Modifier.padding(start = 20.dp, top = 10.dp)) {
-        Text(text = "Voice Actors", fontSize = 24.sp)
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-    ) {
-        repeat(7) {
-            Row(Modifier.background(Color.Green)) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(0.3f)
-                        .background(Color.Red)
-                ) {
-//                    Image(
-//                        painter = rememberAsyncImagePainter(model = actors[i].person.images.jpg.image_url),
-//                        contentDescription = actors[i].person.name,
-//                        contentScale = ContentScale.Fit,
-//                        modifier = modifier
-//                            .height(200.dp)
-//                            .width(120.dp)
-//                            .clip(RoundedCornerShape(8.dp))
-//                    )
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 15.dp, start = 10.dp)
-                        .background(Color.Blue)
-                ) {
-                    Text(text = "ctors[i].person.name", fontSize = 18.sp)
-                    Text(text = "actors[i].language")
-                }
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-    }
-}
 

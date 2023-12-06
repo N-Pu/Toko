@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -70,14 +72,16 @@ private fun ListEditor(
             Text(
                 text = "Staff",
                 fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         Column {
             Text(
                 text = " $minListSize>",
                 fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -110,7 +114,7 @@ private fun ListEditor(
                 .clip(RoundedCornerShape(5.dp))
                 .width(160.dp)
                 .height(160.dp)
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.onTertiaryContainer),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -119,7 +123,7 @@ private fun ListEditor(
                 modifier = modifier
                     .size(100.dp)
                     .clip(CircleShape)
-                    .background(Color(198, 198, 198))
+                    .background(MaterialTheme.colorScheme.onSecondary)
                     .clickable {
                         navController.navigate(Screen.DetailOnWholeStaff.route)
                     }
@@ -128,7 +132,8 @@ private fun ListEditor(
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.vector),
                     contentDescription = "More cast",
-                    modifier = modifier.fillMaxSize(0.7f)
+                    modifier = modifier.fillMaxSize(0.7f),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                 )
 
             }
@@ -136,7 +141,7 @@ private fun ListEditor(
             Text(
                 text = "More Staff",
                 textAlign = TextAlign.Left,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 modifier = modifier
@@ -162,7 +167,7 @@ private fun StaffComponentsCard(
             .height(160.dp)
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
             .clip(RoundedCornerShape(10.dp))
-            .background(Color.White),
+            .background(MaterialTheme.colorScheme.onTertiaryContainer),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -206,7 +211,8 @@ private fun StaffComponentsCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             Row(
@@ -222,7 +228,8 @@ private fun StaffComponentsCard(
                     minLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 11.sp,
-                    lineHeight = 10.sp
+                    lineHeight = 10.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
 
