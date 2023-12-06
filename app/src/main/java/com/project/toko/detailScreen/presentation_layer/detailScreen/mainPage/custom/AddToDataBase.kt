@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -122,7 +123,9 @@ fun AddToFavorites(
                 colorFilter = if (daoViewModel.containsInFavorite(
                         id = detailScreenState?.mal_id ?: 0
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(MaterialTheme.colorScheme.onError)
+                ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                    MaterialTheme.colorScheme.onError
+                )
             )
         }
         IconButton(onClick = {
@@ -177,7 +180,14 @@ fun AddToFavorites(
                         id = detailScreenState?.mal_id ?: 0,
                         AnimeListType.PLANNED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(Color(255, 152, 0, 255)) else ColorFilter.tint(MaterialTheme.colorScheme.onError)
+                ) ColorFilter.tint(
+                    Color(
+                        255,
+                        152,
+                        0,
+                        255
+                    )
+                ) else ColorFilter.tint(MaterialTheme.colorScheme.onError)
             )
         }
         if (detailScreenState?.url?.isNotEmpty() == true) {
@@ -214,11 +224,25 @@ fun AddToFavorites(
             DropdownMenu(
                 expanded = isExpanded,
                 onDismissRequest = { isExpanded = false }, modifier = modifier
-                    .height(120.dp)
-                    .width(170.dp)
+                    .fillMaxHeight(0.15f)
+                    .fillMaxWidth(0.48f)
                     .background(MaterialTheme.colorScheme.onPrimary)
             ) {
-                DropdownMenuItem(text = {
+                DropdownMenuItem(trailingIcon = {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.eyewhite, imageLoader = svgImageLoader
+                        ), contentDescription = null, modifier = modifier.size(30.dp),
+                        colorFilter =
+                        if (daoViewModel.containsItemIdInCategory(
+                                id = detailScreenState?.mal_id ?: 0,
+                                AnimeListType.COMPLETED.route
+                            ).collectAsStateWithLifecycle(initialValue = false).value
+                        ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                            MaterialTheme.colorScheme.error
+                        )
+                    )
+                }, text = {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -235,19 +259,7 @@ fun AddToFavorites(
                             ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
                             fontWeight = FontWeight.Light,
                             fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-
-                            )
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.eyewhite, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp),
-                            colorFilter =
-                            if (daoViewModel.containsItemIdInCategory(
-                                    id = detailScreenState?.mal_id ?: 0,
-                                    AnimeListType.COMPLETED.route
-                                ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(MaterialTheme.colorScheme.error)
+                            textAlign = TextAlign.Center
                         )
                     }
                 }, onClick = {
@@ -298,11 +310,22 @@ fun AddToFavorites(
                             )
                         }
                     }
-                }, modifier = modifier
-                    .height(35.dp)
-                    .width(170.dp)
+                }
                 )
-                DropdownMenuItem(text = {
+                DropdownMenuItem(trailingIcon = {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.dropped, imageLoader = svgImageLoader
+                        ), contentDescription = null, modifier = modifier.size(30.dp),
+                        colorFilter =
+                        if (daoViewModel.containsItemIdInCategory(
+                                id = detailScreenState?.mal_id ?: 0,
+                                AnimeListType.DROPPED.route
+                            ).collectAsStateWithLifecycle(initialValue = false).value
+                        ) ColorFilter.tint(Color.Red) else ColorFilter.tint(MaterialTheme.colorScheme.error)
+
+                    )
+                }, text = {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -320,18 +343,7 @@ fun AddToFavorites(
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center
                         )
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.dropped, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp),
-                            colorFilter =
-                            if (daoViewModel.containsItemIdInCategory(
-                                    id = detailScreenState?.mal_id ?: 0,
-                                    AnimeListType.DROPPED.route
-                                ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) ColorFilter.tint(Color.Red) else ColorFilter.tint(MaterialTheme.colorScheme.error)
 
-                        )
                     }
                 }, onClick = {
                     detailScreenViewModel.viewModelScope.launch {
@@ -382,11 +394,24 @@ fun AddToFavorites(
                             )
                         }
                     }
-                }, modifier = modifier
-                    .height(35.dp)
-                    .width(170.dp)
+                }
                 )
-                DropdownMenuItem(text = {
+                DropdownMenuItem(trailingIcon = {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.add, imageLoader = svgImageLoader
+                        ), contentDescription = null, modifier = modifier.size(28.dp),
+                        colorFilter =
+                        if (daoViewModel.containsItemIdInCategory(
+                                id = detailScreenState?.mal_id ?: 0,
+                                AnimeListType.WATCHING.route
+                            ).collectAsStateWithLifecycle(initialValue = false).value
+                        ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                            MaterialTheme.colorScheme.error
+                        )
+
+                    )
+                }, text = {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -406,18 +431,7 @@ fun AddToFavorites(
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center
                         )
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.add, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp),
-                            colorFilter =
-                            if (daoViewModel.containsItemIdInCategory(
-                                    id = detailScreenState?.mal_id ?: 0,
-                                    AnimeListType.WATCHING.route
-                                ).collectAsStateWithLifecycle(initialValue = false).value
-                            ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(MaterialTheme.colorScheme.error)
 
-                        )
                     }
 
                 }, onClick = {
@@ -467,9 +481,7 @@ fun AddToFavorites(
                             )
                         }
                     }
-                }, modifier = modifier
-                    .height(35.dp)
-                    .width(170.dp)
+                }
                 )
             }
         }
