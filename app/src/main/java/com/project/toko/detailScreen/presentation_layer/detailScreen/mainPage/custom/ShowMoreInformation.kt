@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.detailScreen.model.detailModel.DetailData
 
 @Composable
@@ -42,7 +42,8 @@ fun ShowMoreInformation(
             Text(
                 text = "More Information",
                 fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onPrimary
             )
 
         }
@@ -50,58 +51,95 @@ fun ShowMoreInformation(
 
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
-            Text(text = "Aired: ")
-            Text(text = "from $airedFrom to $airedTo", color = LightGreen)
+            Text(
+                text = "Aired: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(
+                text = "from $airedFrom to $airedTo",
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
 
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
             val licensor = if (licensors?.isEmpty() == true)
                 "N/A"
             else licensors
-            Text(text = "Licensors: ")
-            Text(text =  licensor.toString(), color = LightGreen)
+            Text(
+                text = "Licensors: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(text = licensor.toString(), color = MaterialTheme.colorScheme.secondary)
 
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
             val synonym = if (synonyms?.isEmpty() == true)
                 "N/A"
             else synonyms
-            Text(text = "Synonyms: ")
-            Text(text =  synonym.toString(), color = LightGreen)
+            Text(
+                text = "Synonyms: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(text = synonym.toString(), color = MaterialTheme.colorScheme.secondary)
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
             val studio = if (studios?.isEmpty() == true)
                 "N/A"
             else studios
-            Text(text = "Studios: ")
-            Text(text =  studio.toString(), color = LightGreen)
+            Text(
+                text = "Studios: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(text = studio.toString(), color = MaterialTheme.colorScheme.secondary)
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
-            Text(text = "Source: ")
-            Text(text = detailData?.source ?: "N/A", color = LightGreen)
+            Text(
+                text = "Source: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(text = detailData?.source ?: "N/A", color = MaterialTheme.colorScheme.secondary)
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
             val demo = if (demographic?.isEmpty() == true)
                 "N/A"
             else demographic
-            Text(text = "Demographic: ")
-            Text(text =  demo.toString(), color = LightGreen)
+            Text(
+                text = "Demographic: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(text = demo.toString(), color = MaterialTheme.colorScheme.secondary)
 
         }
         Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
-            Text(text = "Rating: ")
-            Text(text = detailData?.rating ?: "N/A", minLines = 1, color = LightGreen)
+            Text(
+                text = "Rating: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(
+                text = detailData?.rating ?: "N/A",
+                minLines = 1,
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
         Row {
-            Text(text = "Broadcast: " )
-            Text(text =  (detailData?.broadcast?.string ?: "N/A").toString(), color = LightGreen)
+            Text(
+                text = "Broadcast: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(
+                text = (detailData?.broadcast?.string ?: "N/A").toString(),
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
         Row {
             val producer = if (demographic?.isEmpty() == true)
                 "N/A"
             else producers
-            Text(text = "Producers: ")
-            Text(text =  producer.toString(), color = LightGreen)
+            Text(
+                text = "Producers: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(text = producer.toString(), color = MaterialTheme.colorScheme.secondary)
         }
 
 
@@ -109,8 +147,11 @@ fun ShowMoreInformation(
             val title = if (titles?.isEmpty() == true) {
                 "N/A"
             } else titles
-            Text(text = "Titles: ")
-            Text(text =  title.toString(), color = LightGreen)
+            Text(
+                text = "Titles: ",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(text = title.toString(), color = MaterialTheme.colorScheme.secondary)
 
         }
 

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +27,6 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import  com.project.toko.personDetailedScreen.model.personFullModel.Data
-import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.share.shareLink
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.personDetailedScreen.dao.PersonItem
@@ -59,7 +59,8 @@ fun ShowNamesAndInteractionIcons(
             modifier = modifier.fillMaxWidth(),
             minLines = 1,
             fontWeight = FontWeight.ExtraBold,
-            lineHeight = 10.sp
+            lineHeight = 10.sp,
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Spacer(modifier = modifier.size(2.dp))
         if (!data.given_name.isNullOrBlank()) {
@@ -70,7 +71,8 @@ fun ShowNamesAndInteractionIcons(
                 modifier = modifier.fillMaxWidth(),
                 minLines = 1,
                 fontWeight = FontWeight.Medium,
-                lineHeight = 14.sp
+                lineHeight = 14.sp,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         Spacer(modifier = modifier.size(2.dp))
@@ -82,7 +84,8 @@ fun ShowNamesAndInteractionIcons(
                 modifier = modifier.fillMaxWidth(),
                 minLines = 1,
                 fontWeight = FontWeight.Medium,
-                lineHeight = 14.sp
+                lineHeight = 14.sp,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         Spacer(modifier = modifier.size(2.dp))
@@ -94,7 +97,8 @@ fun ShowNamesAndInteractionIcons(
                 modifier = modifier.fillMaxWidth(),
                 minLines = 1,
                 fontWeight = FontWeight.Medium,
-                lineHeight = 14.sp
+                lineHeight = 14.sp,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         Column(
@@ -142,7 +146,9 @@ fun ShowNamesAndInteractionIcons(
                                 }
                             }
                         },
-                    colorFilter = if (isPersonInDao) ColorFilter.tint(LightGreen) else null
+                    colorFilter = if (isPersonInDao) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                        MaterialTheme.colorScheme.onError
+                    )
                 )
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -153,7 +159,8 @@ fun ShowNamesAndInteractionIcons(
                         .size(40.dp)
                         .clickable {
                             context.shareLink(data.url)
-                        }
+                        },
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onError)
                 )
             }
         }

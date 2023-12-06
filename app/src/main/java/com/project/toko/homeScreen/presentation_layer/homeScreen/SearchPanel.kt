@@ -8,6 +8,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
@@ -24,7 +25,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +48,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
-import com.project.toko.core.presentation_layer.theme.LightGreen
+import com.project.toko.core.presentation_layer.theme.DarkSearchBarColor
 import com.project.toko.core.presentation_layer.theme.SearchBarColor
 import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
 import com.project.toko.homeScreen.model.linkChangerModel.Score
@@ -75,8 +75,8 @@ fun MainScreen(
 //    var active by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = modifier
-            .fillMaxWidth(1f)
-            .background(Color(0xFFF4F4F4))
+            .background(MaterialTheme.colorScheme.primary)
+
     ) {
         Column(
             modifier = modifier
@@ -84,9 +84,11 @@ fun MainScreen(
                 .height(140.dp)
                 .shadow(20.dp)
                 .fillMaxWidth(1f)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.error)
                 .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 0.dp)
+
         ) {
+            // Logotype on the top left
             Row(
                 verticalAlignment = Alignment.Top
             ) {
@@ -96,7 +98,8 @@ fun MainScreen(
                     modifier = modifier
                         .height(50.dp)
                         .width(70.dp),
-                    alpha = 0.8f
+                    alpha = 0.8f,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
                 )
             }
             Row(
@@ -104,7 +107,8 @@ fun MainScreen(
                     .wrapContentSize()
                     .padding(top = 10.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(SearchBarColor),
+                    .background(if (isSystemInDarkTheme()) DarkSearchBarColor else SearchBarColor)
+                ,
                 verticalAlignment = Alignment.Bottom
             ) {
 
@@ -139,7 +143,7 @@ fun MainScreen(
 //                }
 
                 OutlinedTextField(
-                    placeholder = { Text(text = "Search...") },
+                    placeholder = { Text(text = "Search...", color = Color.Gray) },
                     value = searchText ?: "",
                     onValueChange = viewModel::onSearchTextChange,
                     modifier = modifier
@@ -156,7 +160,7 @@ fun MainScreen(
                                 imageLoader = svgImageLoader
                             ),
                             contentDescription = null,
-                            colorFilter = if (switchIndicator.value) ColorFilter.tint(LightGreen) else null,
+                            colorFilter = if (switchIndicator.value) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else null,
                             modifier = modifier
                                 .size(40.dp)
                                 .clickable {
@@ -166,10 +170,10 @@ fun MainScreen(
                     },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = iconColorInSearchPanel,
-                        focusedPlaceholderColor = iconColorInSearchPanel,
-                        unfocusedPlaceholderColor = iconColorInSearchPanel,
-                        cursorColor = iconColorInSearchPanel,
+                        focusedTextColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        cursorColor = MaterialTheme.colorScheme.onTertiaryContainer,
                         unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = Color.Transparent
 
@@ -229,19 +233,19 @@ private fun TabSelectionMenu(
     Row(
         horizontalArrangement = Arrangement.Center, modifier = modifier
             .fillMaxWidth()
-            .background(Color(0xFFF4F4F4))
+            .background(MaterialTheme.colorScheme.primary)
     ) {
         ScrollableTabRow(
             modifier = modifier
                 .fillMaxWidth(0.85f),
             selectedTabIndex = selectedTabIndex,
-            contentColor = Color.Black,
-            containerColor = Color(0xFFF4F4F4),
+            contentColor = Color.Transparent,
+            containerColor = Color.Transparent,
             indicator = { tabPositions ->
                 if (selectedTabIndex < tabPositions.size) {
                     TabRowDefaults.Indicator(
                         modifier = modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                        color = LightGreen
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             },
@@ -249,7 +253,8 @@ private fun TabSelectionMenu(
         ) {
             tabItems.forEachIndexed { index, item ->
                 Tab(
-                    selected = index == selectedTabIndex, onClick = {
+                    selected = index == selectedTabIndex,
+                    onClick = {
                         if (selectedTabIndex == index) {
                             isTabMenuOpen.value = !isTabMenuOpen.value
                         } else {
@@ -257,9 +262,16 @@ private fun TabSelectionMenu(
                             isTabMenuOpen.value = true
                         }
                     },
-                    modifier = modifier.background(Color(0xFFF4F4F4))
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = MaterialTheme.colorScheme.primary,
+//                    modifier = modifier.background(MaterialTheme.colorScheme.primary)
                 ) {
-                    Text(text = item.title, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(
+                        text = item.title,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                     Spacer(modifier = modifier.height(5.dp))
                 }
             }
@@ -271,7 +283,7 @@ private fun TabSelectionMenu(
             modifier = modifier
                 .height(20.dp)
                 .fillMaxWidth()
-                .background(Color(0xFFF4F4F4))
+                .background(MaterialTheme.colorScheme.primary)
         )
         Box(modifier = modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow))) {
 
@@ -285,7 +297,7 @@ private fun TabSelectionMenu(
             ) { index ->
                 FlowRow(
                     modifier = modifier
-                        .background(Color(0xFFF4F4F4))
+                        .background(MaterialTheme.colorScheme.primary)
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                     content = {
@@ -334,7 +346,7 @@ private fun ScoreBar(
     val circleColor = when (items[pagerState.currentPage]) {
         items[1], items[2], items[3] -> Color(255, 77, 87)
         items[4], items[5], items[6] -> Color(255, 160, 0)
-        items[7], items[8], items[9], items[10] -> LightGreen
+        items[7], items[8], items[9], items[10] -> MaterialTheme.colorScheme.onPrimaryContainer
         else -> Color(0f, 0f, 0f, 0.3f)
     }
     val circleRadius = 75.dp
@@ -355,7 +367,11 @@ private fun ScoreBar(
         flingBehavior = fling
     ) { page ->
         val colorText =
-            if (pagerState.currentPage == page) Color.White else Color(189, 189, 189)
+            if (pagerState.currentPage == page) MaterialTheme.colorScheme.primary else Color(
+                189,
+                189,
+                189
+            )
         Box(
             contentAlignment = Alignment.Center, modifier = modifier.fillMaxSize()
         ) {
@@ -436,9 +452,9 @@ private fun ButtonCreator(
             .clip(CircleShape)
             .background(
                 if (isTouched) {
-                    Color(104, 190, 174)
+                    MaterialTheme.colorScheme.onPrimaryContainer
                 } else {
-                    Color(222, 222, 222)
+                    MaterialTheme.colorScheme.primaryContainer
                 }
             )
             .clickable(onClick = onClick),
@@ -446,7 +462,7 @@ private fun ButtonCreator(
         content = {
             Text(
                 text = text,
-                color = if (isTouched) Color.White else Color.Black,
+                color = if (isTouched) MaterialTheme.colorScheme.outlineVariant else MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
                 modifier = modifier.padding(8.dp),
                 fontSize = 18.sp

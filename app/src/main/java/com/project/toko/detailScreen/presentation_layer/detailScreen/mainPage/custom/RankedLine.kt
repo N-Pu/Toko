@@ -4,6 +4,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,7 +27,7 @@ fun RankedLine(rank: Int, modifier: Modifier) {
             text = ("Ranked "),
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onPrimary,
             style = TextStyle(
                 shadow = Shadow(
                     offset = Offset(x = 0f, y = 6f),
@@ -39,7 +40,7 @@ fun RankedLine(rank: Int, modifier: Modifier) {
             text = "#$rank",
             fontWeight = FontWeight.ExtraBold,
             fontSize = 14.sp,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onPrimary,
             style = TextStyle(
                 shadow = Shadow(
                     offset = Offset(x = 0f, y = 6f),

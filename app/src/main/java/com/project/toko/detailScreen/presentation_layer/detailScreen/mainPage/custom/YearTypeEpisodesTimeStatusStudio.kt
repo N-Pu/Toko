@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +18,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.detailScreen.model.detailModel.DetailData
 
 @Composable
@@ -40,29 +40,29 @@ fun YearTypeEpisodesTimeStatusStudio(
         ) {
             val yearSeasonText = buildAnnotatedString {
                 if (data?.year != 0 && data?.season != null) {
-                    withStyle(style = SpanStyle(color = LightGreen)) {
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                         append("${data.season} ${data.year}")
                     }
                     append("|")
                 }
-                withStyle(style = SpanStyle(color = LightGreen)) {
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                     append(data?.type ?: "N/A")
                 }
                 withStyle(style = SpanStyle(color = Color.Gray.copy(0.5f))) {
                     append("|")
                 }
                 if (data?.episodes != 0 && data?.duration != null) {
-                    withStyle(style = SpanStyle(color = LightGreen)) {
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                         append("${data.episodes} ep/${data.duration}")
                     }
                     append("|")
                 }
-                withStyle(style = SpanStyle(color = LightGreen)) {
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                     append(data?.status ?: "N/A")
                 }
                 if (!isStudioEmpty) {
                     append("|")
-                    withStyle(style = SpanStyle(color = LightGreen)) {
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                         append(data?.studios?.component1()?.name ?: "N/A")
                     }
                 }
@@ -73,7 +73,7 @@ fun YearTypeEpisodesTimeStatusStudio(
                 fontWeight = FontWeight.Medium,
                 fontSize = 20.sp,
                 lineHeight = 20.sp,
-                color = Color.Gray.copy(0.5f),
+                color = MaterialTheme.colorScheme.onPrimary.copy(0.5f),
                 textAlign = TextAlign.Center
             )
 

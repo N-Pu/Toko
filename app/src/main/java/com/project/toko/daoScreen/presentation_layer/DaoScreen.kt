@@ -5,17 +5,19 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -23,17 +25,28 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -43,21 +56,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.characterDetailedScreen.dao.CharacterItem
-import com.project.toko.core.presentation_layer.theme.LightGreen
-import com.project.toko.daoScreen.dao.AnimeItem
-import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
+import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
+import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
+import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
+import com.project.toko.core.presentation_layer.theme.DarkSearchBarColor
 import com.project.toko.core.presentation_layer.theme.SearchBarColor
-import com.project.toko.core.presentation_layer.theme.favoriteTopBarColors
+import com.project.toko.core.presentation_layer.theme.darkFavoriteTopBarColors
 import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
-import com.project.toko.core.presentation_layer.theme.threeLines
+import com.project.toko.core.presentation_layer.theme.lightFavoriteTopBarColors
+import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.daoScreen.model.AnimeListType
+import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.personDetailedScreen.dao.PersonItem
 
 //class DaoScreen
@@ -100,6 +118,7 @@ fun DaoScreen(
     Column(
         modifier = modifier
             .fillMaxWidth(1f)
+            .background(MaterialTheme.colorScheme.primary)
     ) {
         Column(
             modifier = modifier
@@ -107,7 +126,7 @@ fun DaoScreen(
                 .height(140.dp)
                 .shadow(20.dp)
                 .fillMaxWidth(1f)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.error)
                 .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 0.dp)
         ) {
             Row(
@@ -119,7 +138,8 @@ fun DaoScreen(
                     modifier = modifier
                         .height(50.dp)
                         .width(70.dp),
-                    alpha = 0.8f
+                    alpha = 0.8f,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
                 )
             }
             Row(
@@ -127,11 +147,11 @@ fun DaoScreen(
                     .wrapContentSize()
                     .padding(top = 10.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(SearchBarColor),
+                    .background(if (isSystemInDarkTheme()) DarkSearchBarColor else SearchBarColor),
                 verticalAlignment = Alignment.Bottom
             ) {
                 OutlinedTextField(
-                    placeholder = { Text(text = "Search...") },
+                    placeholder = { Text(text = "Search...", color = Color.Gray) },
                     value = searchText ?: "",
                     onValueChange = daoViewModel::onSearchTextChange,
                     modifier = modifier
@@ -195,7 +215,7 @@ fun DaoScreen(
         Row(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             when (selectedListType) {
                 AnimeListType.WATCHING -> DataAnimeList(
@@ -286,16 +306,16 @@ private fun FavoriteAnimeListButton(
     modifier: Modifier,
     colorIndex: Int
 ) {
-
+    val colors = if (isSystemInDarkTheme()) darkFavoriteTopBarColors else lightFavoriteTopBarColors
     val customModifier = if (selectedListType == listType) modifier
         .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
         .clickable { onClick() }
         .fillMaxHeight(1f)
-        .background(favoriteTopBarColors[colorIndex])
+        .background(colors[colorIndex])
         .animateContentSize()
     else modifier
         .clickable { onClick() }
-        .background(favoriteTopBarColors[colorIndex])
+        .background(colors[colorIndex])
         .animateContentSize()
 
     Box(modifier = customModifier) {
@@ -303,7 +323,7 @@ private fun FavoriteAnimeListButton(
             modifier = modifier.padding(horizontal = 20.dp),
             onClick = onClick,
             colors = ButtonDefaults.buttonColors(
-                contentColor = Color.Black,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 containerColor = Color.Transparent,
             )
         ) {
@@ -311,7 +331,8 @@ private fun FavoriteAnimeListButton(
                 text = listType.name,
                 maxLines = 1,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -480,7 +501,8 @@ private fun CharacterCardBox(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp
+                    fontSize = 25.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 if (!characterItem.anime.isNullOrEmpty()) {
                     Row(
@@ -493,7 +515,8 @@ private fun CharacterCardBox(
                             modifier = Modifier,
                             minLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -570,21 +593,24 @@ private fun PersonCardBox(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp
+                    fontSize = 25.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
                     text = familyName,
                     modifier = Modifier,
                     minLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
                     text = givenName,
                     modifier = Modifier,
                     minLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -635,7 +661,7 @@ private fun DataScreenCardBox(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp
+                    fontSize = 25.sp, color = MaterialTheme.colorScheme.onPrimary
                 )
 //                Text(
 //                    text = animeItem.airedFrom,
@@ -656,7 +682,7 @@ private fun DataScreenCardBox(
                             modifier = Modifier,
                             minLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontSize = 16.sp
+                            fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -687,7 +713,7 @@ private fun DataScreenCardBox(
                             .clip(RoundedCornerShape(6.dp))
                             .height(25.dp)
                             .width(80.dp)
-                            .background(LightGreen),
+                            .background(MaterialTheme.colorScheme.secondary),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.SpaceAround
                     ) {
@@ -712,16 +738,16 @@ private fun DataScreenCardBox(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = 26.sp,
+                        fontSize = 26.sp, color = MaterialTheme.colorScheme.onPrimary
 
-                        )
+                    )
                     Text(
                         text = scoredBy,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 11.sp,
+                        fontSize = 11.sp, color = MaterialTheme.colorScheme.onPrimary
 
-                        )
+                    )
                 }
             }
             Column(modifier = modifier.fillMaxWidth()) {
@@ -730,14 +756,14 @@ private fun DataScreenCardBox(
                     modifier = Modifier,
                     minLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 16.sp
+                    fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
                     text = rating,
                     modifier = Modifier,
                     minLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 16.sp
+                    fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary
                 )
 
             }
@@ -787,7 +813,7 @@ private fun FavoriteScreenCardBox(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp
+                    fontSize = 25.sp, color = MaterialTheme.colorScheme.onPrimary
                 )
 //                Text(
 //                    text = animeItem.airedFrom,
@@ -808,7 +834,7 @@ private fun FavoriteScreenCardBox(
                             modifier = Modifier,
                             minLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontSize = 16.sp
+                            fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -839,7 +865,7 @@ private fun FavoriteScreenCardBox(
                             .clip(RoundedCornerShape(6.dp))
                             .height(25.dp)
                             .width(80.dp)
-                            .background(LightGreen),
+                            .background(MaterialTheme.colorScheme.secondary),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.SpaceAround
                     ) {
@@ -847,8 +873,8 @@ private fun FavoriteScreenCardBox(
                             text = "score",
                             fontSize = 19.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -864,16 +890,16 @@ private fun FavoriteScreenCardBox(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = 26.sp,
+                        fontSize = 26.sp, color = MaterialTheme.colorScheme.onPrimary
 
-                        )
+                    )
                     Text(
                         text = scoredBy,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 11.sp,
+                        fontSize = 11.sp, color = MaterialTheme.colorScheme.onPrimary
 
-                        )
+                    )
                 }
             }
             Column(modifier = modifier.fillMaxWidth()) {
@@ -882,14 +908,14 @@ private fun FavoriteScreenCardBox(
                     modifier = Modifier,
                     minLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 16.sp
+                    fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
                     text = rating,
                     modifier = Modifier,
                     minLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 16.sp
+                    fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimary
                 )
 
             }
@@ -916,18 +942,22 @@ private fun TwoSortingButtons(
     isMusicSelected: MutableState<Boolean>,
     selectedType: MutableState<String?>
 ) {
+    val backArrowFirstColor =
+        if (isSystemInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
+    val backArrowSecondColor =
+        if (isSystemInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight(0.07f),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Box {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = R.drawable.sidelinegreen, imageLoader = svgImageLoader
-                ), contentDescription = null
-            )
+        Box(
+            modifier = modifier
+//                .fillMaxWidth()
+                .background(backArrowFirstColor)
+        ) {
             if (leftSortingMenu.value) {
                 Text(
                     text = "All v",
@@ -937,7 +967,7 @@ private fun TwoSortingButtons(
                         .padding(start = 20.dp)
                         .clickable {
                             leftSortingMenu.value = !leftSortingMenu.value
-                        }
+                        }, color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
                 Text(
@@ -948,33 +978,44 @@ private fun TwoSortingButtons(
                         .padding(start = 20.dp)
                         .clickable {
                             leftSortingMenu.value = !leftSortingMenu.value
-                        }
+                        }, color = MaterialTheme.colorScheme.onPrimary
                 )
             }
+            Box(
+                modifier = modifier
+                    .fillMaxWidth(0.7f)
+                    .fillMaxHeight(0.02f)
+                    .background(backArrowSecondColor)
+            )
         }
 
         DropdownMenu(
             modifier = modifier
-                .background(threeLines),
+                .background(MaterialTheme.colorScheme.error),
             expanded = leftSortingMenu.value,
             onDismissRequest = { leftSortingMenu.value = false }) {
             DropdownMenuItem(
                 text = {
-                    Text(text = "TV", fontSize = 22.sp, color = Color.White)
-
+                    Text(text = "TV", fontSize = 22.sp, color = MaterialTheme.colorScheme.onPrimary)
                 },
                 trailingIcon = {
                     if (isTvSelected.value) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.circle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
                 },
@@ -995,7 +1036,11 @@ private fun TwoSortingButtons(
                 })
             DropdownMenuItem(
                 text = {
-                    Text(text = "ONA", fontSize = 22.sp, color = Color.White)
+                    Text(
+                        text = "ONA",
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
 
                 },
                 trailingIcon = {
@@ -1003,13 +1048,19 @@ private fun TwoSortingButtons(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.circle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
                 },
@@ -1028,7 +1079,11 @@ private fun TwoSortingButtons(
                 })
             DropdownMenuItem(
                 text = {
-                    Text(text = "OVA", fontSize = 22.sp, color = Color.White)
+                    Text(
+                        text = "OVA",
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
 
                 },
                 trailingIcon = {
@@ -1036,13 +1091,19 @@ private fun TwoSortingButtons(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.circle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
                 },
@@ -1062,7 +1123,11 @@ private fun TwoSortingButtons(
                 })
             DropdownMenuItem(
                 text = {
-                    Text(text = "Movie", fontSize = 22.sp, color = Color.White)
+                    Text(
+                        text = "Movie",
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
 
                 },
                 trailingIcon = {
@@ -1070,13 +1135,19 @@ private fun TwoSortingButtons(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.circle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
                 },
@@ -1097,7 +1168,11 @@ private fun TwoSortingButtons(
                 })
             DropdownMenuItem(
                 text = {
-                    Text(text = "Special", fontSize = 22.sp, color = Color.White)
+                    Text(
+                        text = "Special",
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
 
                 },
                 trailingIcon = {
@@ -1105,13 +1180,19 @@ private fun TwoSortingButtons(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.circle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
                 },
@@ -1132,7 +1213,11 @@ private fun TwoSortingButtons(
                 })
             DropdownMenuItem(
                 text = {
-                    Text(text = "Music", fontSize = 22.sp, color = Color.White)
+                    Text(
+                        text = "Music",
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
 
                 },
                 trailingIcon = {
@@ -1140,13 +1225,19 @@ private fun TwoSortingButtons(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.circle, imageLoader = svgImageLoader
-                            ), contentDescription = null, modifier = modifier.size(22.dp)
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(22.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
                 },
@@ -1179,7 +1270,7 @@ private fun TwoSortingButtons(
                     .size(22.dp)
                     .clickable {
                         rightSortingMenu.value = true
-                    }
+                    }, colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
             )
 
             DropdownMenu(
@@ -1187,12 +1278,16 @@ private fun TwoSortingButtons(
                 onDismissRequest = { rightSortingMenu.value = false },
                 modifier = modifier
                     .fillMaxWidth(0.58f)
-                    .background(threeLines)
+                    .background(MaterialTheme.colorScheme.error)
 
             ) {
                 DropdownMenuItem(
                     text = {
-                        Text(text = "Alphabetical", fontSize = 22.sp, color = Color.White)
+                        Text(
+                            text = "Alphabetical",
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
 
                     },
                     trailingIcon = {
@@ -1200,13 +1295,19 @@ private fun TwoSortingButtons(
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(22.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.circle, imageLoader = svgImageLoader
-                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(22.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         }
                     },
@@ -1218,20 +1319,30 @@ private fun TwoSortingButtons(
                     })
                 DropdownMenuItem(
                     text = {
-                        Text(text = "Score", fontSize = 22.sp, color = Color.White)
+                        Text(
+                            text = "Score",
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     },
                     trailingIcon = {
                         if (isSortedByScore.value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(22.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.circle, imageLoader = svgImageLoader
-                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(22.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         }
                     },
@@ -1244,20 +1355,30 @@ private fun TwoSortingButtons(
                     })
                 DropdownMenuItem(
                     text = {
-                        Text(text = "Users", fontSize = 22.sp, color = Color.White)
+                        Text(
+                            text = "Users",
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     },
                     trailingIcon = {
                         if (isSortedByUsers.value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(22.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.circle, imageLoader = svgImageLoader
-                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(22.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         }
                     },
@@ -1271,7 +1392,11 @@ private fun TwoSortingButtons(
                 DropdownMenuItem(
                     text = {
 
-                        Text(text = "Aired Start Date", fontSize = 22.sp, color = Color.White)
+                        Text(
+                            text = "Aired Start Date",
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
 
                     },
                     trailingIcon = {
@@ -1279,13 +1404,19 @@ private fun TwoSortingButtons(
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.filledcircle, imageLoader = svgImageLoader
-                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(22.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.circle, imageLoader = svgImageLoader
-                                ), contentDescription = null, modifier = modifier.size(22.dp)
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(22.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         }
                     },
