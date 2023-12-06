@@ -39,7 +39,6 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
-import com.project.toko.core.presentation_layer.theme.DialogSideColor
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.daoScreen.dao.FavoriteItem

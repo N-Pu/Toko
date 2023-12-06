@@ -67,12 +67,10 @@ import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.DarkSearchBarColor
-import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.presentation_layer.theme.SearchBarColor
 import com.project.toko.core.presentation_layer.theme.darkFavoriteTopBarColors
 import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
 import com.project.toko.core.presentation_layer.theme.lightFavoriteTopBarColors
-import com.project.toko.core.presentation_layer.theme.threeLines
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel

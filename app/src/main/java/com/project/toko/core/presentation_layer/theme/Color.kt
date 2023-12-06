@@ -39,7 +39,6 @@ sealed class ThemeColors(
         touchedButton = LightPink,
         secondaryText = darkSecondaryText,
         primary = LightPink,
-//        scoreCircleColors = ScoreColors,
         scoreCircleSideNumber = scoreCircleSideNumber,
         searchBackground = blackSearchBackground,
         castAndStaffCard = darkCastAndStaffColor,
@@ -137,25 +136,19 @@ val darkFavoriteTopBarColors = listOf(
 
 // unchangeable colors
 val scoreCircleSideNumber = Color(188, 188, 188, 255)
-val Red = Color(255, 77, 87)
 val Yellow = Color(255, 160, 0)
 val Green = Color(104, 190, 174)
 val Blank = Color(0xFFA2ADB1)
 object ScoreColors {
     val Red = Color(255, 77, 87)
     val Yellow = Color(255, 160, 0)
-    val Green = Color(104, 190, 174)
     val Blank = Color(0xFFA2ADB1)
 }
 
 
 // Light
-val MainBackgroundColor = Color(0x99FFFFFF)
 val DialogColor = Color(0xE5494949)
-val DialogSideColor = Color(0xFF343434)
 
-
-val threeLines = Color(65, 65, 65)
 
 
 val scoreBoardColor = Brush.linearGradient(
@@ -173,7 +166,6 @@ private val DarkFirstBarColor = Color(193, 116, 175, 255)
 
 val SearchBarColor = Brush.linearGradient(
     0.0f to FirstBarColor,
-//    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
     end = Offset(600.0f, 0.0f)
@@ -181,7 +173,6 @@ val SearchBarColor = Brush.linearGradient(
 
 val DarkSearchBarColor = Brush.linearGradient(
     0.0f to DarkFirstBarColor,
-//    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
     end = Offset(600.0f, 0.0f)
@@ -190,14 +181,12 @@ val DarkSearchBarColor = Brush.linearGradient(
 
 val SectionColor = Brush.linearGradient(
     0.0f to FirstBarColor,
-//    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
     end = Offset(750.0f, 0.0f)
 )
 val DarkSectionColor = Brush.linearGradient(
     0.0f to DarkFirstBarColor,
-//    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
     end = Offset(750.0f, 0.0f)
@@ -206,7 +195,6 @@ val DarkSectionColor = Brush.linearGradient(
 
 val BackArrowCastColor = Brush.linearGradient(
     0.0f to FirstBarColor,
-//    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
     end = Offset(450.0f, 0.0f)
@@ -214,7 +202,6 @@ val BackArrowCastColor = Brush.linearGradient(
 
 val DarkBackArrowCastColor = Brush.linearGradient(
     0.0f to DarkFirstBarColor,
-//    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
     end = Offset(450.0f, 0.0f)
@@ -222,7 +209,6 @@ val DarkBackArrowCastColor = Brush.linearGradient(
 
 val BackArrowSecondCastColor = Brush.linearGradient(
     0.0f to FirstBarColor,
-//    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
     end = Offset(450.0f, 0.0f)
@@ -231,7 +217,6 @@ val BackArrowSecondCastColor = Brush.linearGradient(
 
 val DarkBackArrowSecondCastColor = Brush.linearGradient(
     0.0f to DarkFirstBarColor,
-//    0.3f to SecondBarColor,
     1.0f to SecondBarColor,
     start = Offset(0.0f, 0.0f),
     end = Offset(450.0f, 0.0f)

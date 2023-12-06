@@ -324,7 +324,7 @@ private fun AnimeCard(
                     Box(
                         modifier = Modifier
                             .background(
-                                ScoreColor(data?.score ?: 0.0f), scoreRoundedCornerShape
+                                scoreColor(data?.score ?: 0.0f), scoreRoundedCornerShape
                             )
                             .size(75.dp), contentAlignment = Alignment.Center
                     ) {

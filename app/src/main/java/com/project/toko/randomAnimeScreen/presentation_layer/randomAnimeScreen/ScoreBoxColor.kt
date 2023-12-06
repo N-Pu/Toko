@@ -7,7 +7,7 @@ import com.project.toko.core.presentation_layer.theme.ScoreColors
 
 
 @Composable
-fun ScoreColor(selectedRating: Float): Color {
+fun scoreColor(selectedRating: Float): Color {
     return when (selectedRating) {
         in 0.01..3.99 -> {
             ScoreColors.Red

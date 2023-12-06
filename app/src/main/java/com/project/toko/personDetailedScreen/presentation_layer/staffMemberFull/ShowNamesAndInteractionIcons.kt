@@ -27,7 +27,6 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import  com.project.toko.personDetailedScreen.model.personFullModel.Data
-import com.project.toko.core.presentation_layer.theme.LightGreen
 import com.project.toko.core.share.shareLink
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.personDetailedScreen.dao.PersonItem
