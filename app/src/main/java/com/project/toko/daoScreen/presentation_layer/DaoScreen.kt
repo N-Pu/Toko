@@ -86,7 +86,7 @@ import com.project.toko.personDetailedScreen.dao.PersonItem
 fun DaoScreen(
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier, isInDarkTheme :Boolean
 ) {
 
     val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
@@ -147,7 +147,7 @@ fun DaoScreen(
                     .wrapContentSize()
                     .padding(top = 10.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(if (isSystemInDarkTheme()) DarkSearchBarColor else SearchBarColor),
+                    .background(if (isInDarkTheme) DarkSearchBarColor else SearchBarColor),
                 verticalAlignment = Alignment.Bottom
             ) {
                 OutlinedTextField(
@@ -188,7 +188,8 @@ fun DaoScreen(
                     selectedListType = selectedListType,
                     onClick = { selectedListType = entry },
                     modifier = modifier,
-                    colorIndex = i
+                    colorIndex = i,
+                    isInDarkTheme = isInDarkTheme
                 )
             }
         }
@@ -209,7 +210,8 @@ fun DaoScreen(
                 isSpecialSelected = isSpecialSelected,
                 isOnaSelected = isOnaSelected,
                 isMusicSelected = isMusicSelected,
-                selectedType = selectedType
+                selectedType = selectedType,
+                isInDarkTheme = isInDarkTheme
             )
         }
         Row(
@@ -304,9 +306,10 @@ private fun FavoriteAnimeListButton(
     selectedListType: AnimeListType,
     onClick: () -> Unit,
     modifier: Modifier,
-    colorIndex: Int
+    colorIndex: Int,
+    isInDarkTheme : Boolean
 ) {
-    val colors = if (isSystemInDarkTheme()) darkFavoriteTopBarColors else lightFavoriteTopBarColors
+    val colors = if ( isInDarkTheme ) darkFavoriteTopBarColors else lightFavoriteTopBarColors
     val customModifier = if (selectedListType == listType) modifier
         .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
         .clickable { onClick() }
@@ -940,12 +943,13 @@ private fun TwoSortingButtons(
     isSpecialSelected: MutableState<Boolean>,
     isOnaSelected: MutableState<Boolean>,
     isMusicSelected: MutableState<Boolean>,
-    selectedType: MutableState<String?>
+    selectedType: MutableState<String?>,
+    isInDarkTheme: Boolean
 ) {
     val backArrowFirstColor =
-        if (isSystemInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
+        if ( isInDarkTheme) DarkBackArrowCastColor else BackArrowCastColor
     val backArrowSecondColor =
-        if (isSystemInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
+        if ( isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
 
     Row(
         modifier = modifier

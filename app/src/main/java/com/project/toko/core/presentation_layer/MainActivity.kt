@@ -16,6 +16,7 @@ import com.project.toko.core.di.Application
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.core.presentation_layer.appConstraction.AppActivator
 import com.project.toko.core.presentation_layer.theme.TokoTheme
+import com.project.toko.core.settings.SaveDarkMode
 import com.project.toko.core.viewModel.viewModelFactory.MyViewModelFactory
 import javax.inject.Inject
 
@@ -34,26 +35,13 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var malApi: MalApiService
 
-
+    private lateinit var darkTheme: SaveDarkMode
     override fun onCreate(savedInstanceState: Bundle?) {
-
-//        enableEdgeToEdge(
-//            statusBarStyle = SystemBarStyle.light(
-//                android.graphics.Color.TRANSPARENT,
-//                android.graphics.Color.TRANSPARENT
-//            ),
-//            navigationBarStyle = SystemBarStyle.light(
-//                android.graphics.Color.TRANSPARENT,
-//                android.graphics.Color.TRANSPARENT
-//            )
-//        )
         super.onCreate(savedInstanceState)
-//        navigationBarColorChanger()
-
         requestWindowFeature(Window.FEATURE_NO_TITLE)
+        darkTheme = SaveDarkMode(this)
+        darkTheme.loadData()
 
-
-//        WindowCompat.setDecorFitsSystemWindows(window,false)
         val modifierComponent = (application as Application).modifierComponent
         val databaseComponent = (application as Application).daoComponent
         val malApiComponent = (application as Application).malApiComponent
@@ -68,11 +56,11 @@ class MainActivity : ComponentActivity() {
                 context = context
             )
         val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
+
         setContent {
-//            HideStatusBar()
             navController = rememberNavController()
 
-            TokoTheme {
+            TokoTheme(darkTheme.isDarkThemeActive.value) {
 
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -83,46 +71,16 @@ class MainActivity : ComponentActivity() {
                         viewModelProvider = viewModelProvider,
                         modifier = modifier,
                         componentActivity = this,
-                        mainDb = databaseComponent.provideDao()
+                        mainDb = databaseComponent.provideDao(),
+                        onThemeChange = {
+                            darkTheme.isDarkThemeActive.value = !darkTheme.isDarkThemeActive.value
+                            darkTheme.saveData(darkTheme.isDarkThemeActive.value)
+                        },
+                        isInDarkTheme = darkTheme.isDarkThemeActive.value
                     )
                 }
             }
         }
     }
-
-
-//    private fun navigationBarColorChanger() {
-//        window.navigationBarColor = LightGreen.copy(alpha = 1f).toArgb()
-//    }
-
-//    @Composable
-//    private fun HideStatusBar() {
-//        SideEffect {
-//            MainScope().launch {
-//                window.statusBarColor = Color.Transparent.toArgb()
-//            }
-//        }
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
-//
-//            window.decorView.doOnLayout {
-//                WindowCompat.setDecorFitsSystemWindows(window, false)
-//                windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
-//            }
-//        } else {
-//            window.setFlags(
-//                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-//                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-//            )
-//        }
-//    }
-
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        dataCache.clear()
-//        DataCacheSingleton.dataCache.clear()
-//    }
-
 }
 

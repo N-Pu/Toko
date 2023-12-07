@@ -8,7 +8,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
@@ -61,7 +60,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     navController: NavHostController, viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier, isInDarkTheme: Boolean
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
@@ -72,7 +71,8 @@ fun MainScreen(
     }.build()
 
     val switchIndicator = viewModel.switchIndicator
-//    var active by rememberSaveable { mutableStateOf(false) }
+//    val isInDarkMode = SaveDarkMode(LocalContext.current).isDarkThemeActive
+
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.primary)
@@ -107,7 +107,10 @@ fun MainScreen(
                     .wrapContentSize()
                     .padding(top = 10.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(if (isSystemInDarkTheme()) DarkSearchBarColor else SearchBarColor)
+                    .background(
+                        if (isInDarkTheme) DarkSearchBarColor else SearchBarColor
+
+                    )
                 ,
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -190,7 +193,8 @@ fun MainScreen(
                 viewModelProvider = viewModelProvider,
                 modifier = modifier,
                 isTabMenuOpen = isTabMenuOpen,
-                switch = switchIndicator
+                switch = switchIndicator,
+                isInDarkTheme = isInDarkTheme
             )
         } else {
             LoadingAnimation()

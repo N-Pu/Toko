@@ -55,7 +55,7 @@ fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
     navController: NavController,
     id: Int,
-    modifier: Modifier
+    modifier: Modifier, isInDarkTheme : Boolean
 ) {
 
     val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
@@ -217,7 +217,7 @@ fun ActivateDetailScreen(
                 navController = navController,
                 viewModel = viewModel
             )
-            Recommendations(recommendationsData, navController, viewModelProvider, modifier)
+            Recommendations(recommendationsData, navController, viewModelProvider, modifier, isInDarkTheme)
             Spacer(modifier = modifier.height(20.dp))
 
         }

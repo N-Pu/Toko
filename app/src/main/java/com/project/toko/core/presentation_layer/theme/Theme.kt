@@ -1,9 +1,9 @@
 package com.project.toko.core.presentation_layer.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+
 
 
 private val DarkColorScheme = darkColorScheme(
@@ -62,16 +62,53 @@ private val LightColorScheme = lightColorScheme(
 
 )
 
+//@Composable
+//fun TokoTheme(
+//    darkTheme: Boolean = isSystemInDarkTheme(),
+//    // Dynamic color is available on Android 12+
+//    dynamicColor: Boolean = true,
+//    content: @Composable () -> Unit
+//) {
+//    val systemUiController = rememberSystemUiController()
+//    if (darkTheme) {
+//
+//        systemUiController.setSystemBarsColor(
+//            color = LightColorScheme.onPrimary,
+//            darkIcons = false
+//        )
+//        systemUiController.setNavigationBarColor(
+//            color = LightColorScheme.onPrimary,
+//            darkIcons = false
+//        )
+//
+//
+//    } else {
+//        systemUiController.setSystemBarsColor(
+//            color = DarkColorScheme.onPrimary,
+//            darkIcons = true
+//        )
+//        systemUiController.setNavigationBarColor(
+//            color = DarkColorScheme.onPrimary,
+//            darkIcons = true
+//        )
+//    }
+//
+//    MaterialTheme(
+//        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
+//        typography = Typography,
+//        content = content
+//    )
+//
+//}
+
+
 @Composable
 fun TokoTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-
-
-
     val systemUiController = rememberSystemUiController()
     if (darkTheme) {
 

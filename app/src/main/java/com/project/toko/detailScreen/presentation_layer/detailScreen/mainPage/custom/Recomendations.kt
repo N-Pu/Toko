@@ -52,7 +52,8 @@ fun Recommendations(
     recommendationsDataList: List<RecommendationsData>,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier,
+    isInDarkTheme: Boolean
 ) {
     if (recommendationsDataList.isNotEmpty()) {
         Column(
@@ -64,7 +65,7 @@ fun Recommendations(
             Box(
                 modifier = modifier
                     .fillMaxWidth(0.85f)
-                    .background(if (isSystemInDarkTheme()) DarkSectionColor else SectionColor)
+                    .background(if (isInDarkTheme) DarkSectionColor else SectionColor)
                     .padding(bottom = 5.dp)
             ) {
                 Box(
