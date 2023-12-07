@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 
 @Composable
 fun RankedLine(rank: Int, modifier: Modifier) {
@@ -47,7 +48,8 @@ fun RankedLine(rank: Int, modifier: Modifier) {
                     blurRadius = 5f,
                     color = Color.Black.copy(alpha = 0.5f)
                 )
-            )
+            ),
+            fontFamily = evolventaBoldFamily
         )
     }
 }

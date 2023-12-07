@@ -47,6 +47,7 @@ import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.detailScreen.model.staffModel.Person
 
@@ -108,7 +109,8 @@ private fun BackArrow(modifier: Modifier, navController: NavController, detailSc
                         }
                     }
                 },
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
             )
         }
         Box(
@@ -164,7 +166,8 @@ private fun SingleStaffMember(
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.Bold,
                         fontSize = 25.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                     Row(
                         modifier = modifier

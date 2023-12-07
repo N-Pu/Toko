@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 
 @Composable
 fun ScoreNumber(modifier: Modifier, score: Float) {
@@ -35,7 +36,8 @@ fun ScoreNumber(modifier: Modifier, score: Float) {
             color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
-            fontSize = 35.sp
+            fontSize = 35.sp,
+            fontFamily = evolventaBoldFamily
         )
     }
 }

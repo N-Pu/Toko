@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 
 @Composable
 fun ExpandableText(text: String?, title: String, modifier: Modifier) {
@@ -50,7 +51,8 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
                     text = title,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
                 Spacer(modifier = modifier.height(10.dp))
                 Text(

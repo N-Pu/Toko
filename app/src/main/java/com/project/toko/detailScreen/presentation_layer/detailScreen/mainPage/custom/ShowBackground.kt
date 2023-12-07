@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.model.detailModel.DetailData
 
 @Composable
@@ -26,7 +27,8 @@ fun ShowBackground(detailData: DetailData?, modifier: Modifier) {
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 22.sp,
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = evolventaBoldFamily
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
