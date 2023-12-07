@@ -94,7 +94,9 @@ fun AppActivator(
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
     componentActivity: ComponentActivity,
-    mainDb: MainDb
+    mainDb: MainDb,
+    onThemeChange:  () -> Unit,
+    isInDarkTheme: Boolean
 ) {
     val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
         add(SvgDecoder.Factory())
@@ -143,7 +145,9 @@ fun AppActivator(
                 imageLoader = svgImageLoader,
                 viewModelProvider = viewModelProvider,
                 componentActivity = componentActivity,
-                mainDb = mainDb
+                mainDb = mainDb,
+                onThemeChange = onThemeChange,
+                darkTheme = isInDarkTheme
             )
         }
     ) {
@@ -169,6 +173,7 @@ fun AppActivator(
                     navController = navController,
                     viewModelProvider = viewModelProvider,
                     modifier = modifier,
+                    isInDarkTheme = isInDarkTheme
                 )
             }
         )
@@ -468,14 +473,20 @@ private fun ShowDrawerContent(
     imageLoader: ImageLoader,
     viewModelProvider: ViewModelProvider,
     componentActivity: ComponentActivity,
-    mainDb: MainDb
+    mainDb: MainDb,
+    onThemeChange: () -> Unit,
+    darkTheme: Boolean
 ) {
     val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
     var isHelpFAQOpen by remember { mutableStateOf(false) }
     var isLegalOpen by remember { mutableStateOf(false) }
     val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
     val context = LocalContext.current
-
+    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
+        add(SvgDecoder.Factory())
+    }.build()
+//    val saveDarkMode = SaveDarkMode(LocalContext.current)
+//    val currentTheme = saveDarkMode.loadData()
     val customModifier =
         modifier
             .fillMaxWidth(0.8f)
@@ -567,7 +578,7 @@ private fun ShowDrawerContent(
         Column(
             modifier = modifier
                 .fillMaxWidth(0.8f)
-                .fillMaxHeight()
+                .fillMaxHeight(0.9f)
                 .clip(RoundedCornerShape(topEnd = 20.dp))
                 .background(MaterialTheme.colorScheme.surfaceTint)
                 .verticalScroll(rememberScrollState())
@@ -940,6 +951,28 @@ private fun ShowDrawerContent(
                 },
             )
             Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+
+        }
+        Column(
+            modifier = modifier
+                .fillMaxHeight()
+                .fillMaxWidth(0.8f)
+                .background(MaterialTheme.colorScheme.surfaceTint),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = if (darkTheme) R.drawable.sun else R.drawable.moon,
+                    imageLoader = svgImageLoader
+                ),
+                contentDescription = null,
+                modifier = modifier
+                    .size(50.dp)
+                    .padding(bottom = 10.dp, end = 5.dp).clickable {
+                        onThemeChange()
+                    }
+            )
         }
     }
 

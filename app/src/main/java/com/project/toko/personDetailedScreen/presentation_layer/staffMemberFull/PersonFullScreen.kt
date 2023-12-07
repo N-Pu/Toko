@@ -46,7 +46,7 @@ fun DisplayPersonFullScreen(
     mal_id: Int,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier, isInDarkTheme: Boolean
 ) {
     val personViewModel = viewModelProvider[PersonByIdViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
@@ -79,7 +79,8 @@ fun DisplayPersonFullScreen(
     if (isSearching.not() && personFullState != null) {
 
         Column(
-            modifier = modifier.background(MaterialTheme.colorScheme.primary)
+            modifier = modifier
+                .background(MaterialTheme.colorScheme.primary)
                 .verticalScroll(rememberScrollState())
         ) {
             Row(
@@ -141,16 +142,17 @@ fun DisplayPersonFullScreen(
         }
         BackArrow(
             modifier,
-            navController
+            navController, isInDarkTheme
         )
 
     } else LoadingAnimation()
 }
 
 @Composable
-private fun BackArrow(modifier: Modifier, navController: NavController) {
-    val backArrowFirstColor = if (isSystemInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
-    val backArrowSecondColor =if (isSystemInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
+private fun BackArrow(modifier: Modifier, navController: NavController, isInDarkTheme: Boolean) {
+    val backArrowFirstColor = if (isInDarkTheme) DarkBackArrowCastColor else BackArrowCastColor
+    val backArrowSecondColor =
+        if (isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
         Spacer(modifier = modifier.height(20.dp))
         Box(

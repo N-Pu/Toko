@@ -73,7 +73,8 @@ fun GridAdder(
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
     isTabMenuOpen: MutableState<Boolean>,
-    switch: MutableState<Boolean>
+    switch: MutableState<Boolean>,
+    isInDarkTheme: Boolean
 ) {
 
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
@@ -165,7 +166,11 @@ fun GridAdder(
         ) {
             if (lastTenAnimeFromWatchingSection.value.isNotEmpty()) {
                 item {
-                    ShowSectionName(sectionName = "Now Watching ", modifier = modifier)
+                    ShowSectionName(
+                        sectionName = "Now Watching ",
+                        modifier = modifier,
+                        isInDarkTheme = isInDarkTheme
+                    )
                 }
                 item {
                     Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
@@ -187,7 +192,11 @@ fun GridAdder(
             }
             if (getTrendingAnime.data.isNotEmpty()) {
                 item {
-                    ShowSectionName(sectionName = "Trending", modifier = modifier)
+                    ShowSectionName(
+                        sectionName = "Trending",
+                        modifier = modifier,
+                        isInDarkTheme = isInDarkTheme
+                    )
                 }
                 item {
                     Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
@@ -210,7 +219,11 @@ fun GridAdder(
             }
             if (getJustTenAddedAnime.value.isNotEmpty()) {
                 item {
-                    ShowSectionName(sectionName = "Just Added", modifier = modifier)
+                    ShowSectionName(
+                        sectionName = "Just Added",
+                        modifier = modifier,
+                        isInDarkTheme = isInDarkTheme
+                    )
                 }
                 item {
                     Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
@@ -233,7 +246,11 @@ fun GridAdder(
             }
             if (getTopAiring.data.isNotEmpty()) {
                 item {
-                    ShowSectionName(sectionName = "Top Airing", modifier = modifier)
+                    ShowSectionName(
+                        sectionName = "Top Airing",
+                        modifier = modifier,
+                        isInDarkTheme = isInDarkTheme
+                    )
                 }
                 item {
                     Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
@@ -256,7 +273,11 @@ fun GridAdder(
             }
             if (getTopUpcoming.data.isNotEmpty()) {
                 item {
-                    ShowSectionName(sectionName = "Top Upcoming", modifier = modifier)
+                    ShowSectionName(
+                        sectionName = "Top Upcoming",
+                        modifier = modifier,
+                        isInDarkTheme = isInDarkTheme
+                    )
                 }
                 item {
                     Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
@@ -591,9 +612,14 @@ private fun ShowSection(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RectangleShape,
     ) {
-        Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.background(MaterialTheme.colorScheme.primary)) {
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = modifier.background(MaterialTheme.colorScheme.primary)
+        ) {
             Box(
-                modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary)
             ) {
                 // Coil image loader
                 Image(
@@ -701,11 +727,11 @@ private fun ShowSection(
 }
 
 @Composable
-private fun ShowSectionName(sectionName: String, modifier: Modifier) {
+private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkTheme: Boolean) {
     Box(
         modifier = modifier
             .fillMaxWidth(0.85f)
-            .background(if (isSystemInDarkTheme()) DarkSectionColor else SectionColor)
+            .background(if (isInDarkTheme) DarkSectionColor else SectionColor)
             .padding(bottom = 5.dp)
     ) {
         Box(
@@ -783,9 +809,14 @@ private fun ShowTopAnime(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RectangleShape,
     ) {
-        Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.background(MaterialTheme.colorScheme.primary)) {
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = modifier.background(MaterialTheme.colorScheme.primary)
+        ) {
             Box(
-                modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary)
             ) {
                 // Coil image loader
                 Image(

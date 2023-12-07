@@ -1,7 +1,6 @@
 package com.project.toko.core.presentation_layer.navigation
 
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
@@ -25,14 +24,16 @@ import com.project.toko.randomAnimeScreen.presentation_layer.randomAnimeScreen.S
 fun SetupNavGraph(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier,
+    isInDarkTheme: Boolean
 ) {
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
             MainScreen(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier
+                modifier = modifier,
+                isInDarkTheme = isInDarkTheme
             )
         }
         composable(
@@ -46,9 +47,8 @@ fun SetupNavGraph(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
                 id = id,
-                modifier = modifier
+                modifier = modifier, isInDarkTheme = isInDarkTheme
             )
-            Log.d("CATCHED ID = ", id.toString())
         }
 
         composable(route = Screen.Nothing.route) {
@@ -58,7 +58,7 @@ fun SetupNavGraph(
             DaoScreen(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier
+                modifier = modifier, isInDarkTheme = isInDarkTheme
             )
         }
         composable(route = Screen.RandomAnimeOrManga.route) {
@@ -73,14 +73,14 @@ fun SetupNavGraph(
             ShowWholeCast(
                 navController,
                 viewModelProvider[DetailScreenViewModel::class.java],
-                modifier
+                modifier, isInDarkTheme = isInDarkTheme
             )
         }
         composable(route = Screen.DetailOnWholeStaff.route) {
             ShowWholeStaff(
                 navController,
                 viewModelProvider[DetailScreenViewModel::class.java],
-                modifier = modifier
+                modifier = modifier, isInDarkTheme = isInDarkTheme
             )
         }
         composable(
@@ -94,7 +94,7 @@ fun SetupNavGraph(
                 mal_id = id,
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier
+                modifier = modifier, isInDarkTheme = isInDarkTheme
             )
         }
         composable(
@@ -108,7 +108,7 @@ fun SetupNavGraph(
                 mal_id = id,
                 navController = navController,
                 viewModelProvider = viewModelProvider,
-                modifier = modifier
+                modifier = modifier, isInDarkTheme = isInDarkTheme
             )
         }
 //        composable(

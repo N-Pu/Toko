@@ -1,0 +1,25 @@
+<svg width="156"
+    height="156"
+    viewBox="0 0 156 156"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+    <g id="Group 201">
+        <g id="Vector">
+            <path
+                d="M43 78C43 97.33 58.67 113 78 113C97.33 113 113 97.33 113 78C113 58.67 97.33 43 78 43C58.67 43 43 58.67 43 78Z"
+                fill="white" />
+            <path
+                d="M78 22V8M78 134V148M38.8995 38.8995L29 29M118.096 118.096L127.996 127.996M22 78H8M134 78H148M118.1 38.8995L127.999 29M38.9029 118.096L29.0034 127.996M78 113C58.67 113 43 97.33 43 78C43 58.67 58.67 43 78 43C97.33 43 113 58.67 113 78C113 97.33 97.33 113 78 113Z"
+                stroke="white"
+                stroke-width="15"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+        </g>
+        <circle
+            id="Ellipse 86"
+            cx="78"
+            cy="78"
+            r="38"
+            fill="white" />
+    </g>
+</svg>
