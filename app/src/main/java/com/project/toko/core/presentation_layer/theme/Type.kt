@@ -51,10 +51,10 @@ val evolventaBoldFamily = FontFamily (
 )
 
 
-val montserratMedium = FontFamily (
-    Font(R.font.montserrat_medium, FontWeight.ExtraLight),
-    Font(R.font.montserrat_medium, FontWeight.Normal),
-    Font(R.font.montserrat_medium, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.montserrat_medium, FontWeight.Medium),
-    Font(R.font.montserrat_medium, FontWeight.ExtraBold)
-)
+//val montserratMedium = FontFamily (
+//    Font(R.font.montserrat_medium, FontWeight.ExtraLight),
+//    Font(R.font.montserrat_medium, FontWeight.Normal),
+//    Font(R.font.montserrat_medium, FontWeight.Normal, FontStyle.Italic),
+//    Font(R.font.montserrat_medium, FontWeight.Medium),
+//    Font(R.font.montserrat_medium, FontWeight.ExtraBold)
+//)
