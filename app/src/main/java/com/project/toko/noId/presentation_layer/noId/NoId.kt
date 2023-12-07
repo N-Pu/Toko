@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 
 @Composable
 fun NoId() {
@@ -40,7 +41,8 @@ fun NoId() {
                 text = "No ID",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
+                fontFamily = evolventaBoldFamily
             )
         }
     }

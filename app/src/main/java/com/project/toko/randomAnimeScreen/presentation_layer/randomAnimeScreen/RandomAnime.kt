@@ -39,6 +39,7 @@ import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.core.presentation_layer.theme.DialogColor
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.daoScreen.model.AnimeListType
 import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
@@ -94,7 +95,8 @@ fun ShowRandomAnime(
                         text = "Tap 2 times",
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
-                        color =    Color.White
+                        color =    Color.White,
+                        fontFamily = evolventaBoldFamily
                     )
                 }
             }
@@ -265,7 +267,8 @@ private fun AnimeCard(
                     letterSpacing = 3.sp,
                     lineHeight = 1.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    fontFamily = evolventaBoldFamily
                 )
 
             }
@@ -463,7 +466,8 @@ private fun ColoredBox(
             color = Color.White,
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
-            modifier = modifier.padding(4.dp)
+            modifier = modifier.padding(4.dp),
+            fontFamily = evolventaBoldFamily
         )
     }
 }

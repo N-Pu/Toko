@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 
 @Composable
 fun ScoreLabel(modifier: Modifier) {
@@ -47,7 +48,8 @@ fun ScoreLabel(modifier: Modifier) {
                     fontWeight = FontWeight.ExtraBold,
                     textAlign = TextAlign.Center,
                     color = Color.White,
-                    fontSize = 23.sp
+                    fontSize = 23.sp,
+                    fontFamily = evolventaBoldFamily
 
                 )
 

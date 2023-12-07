@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.characterDetailedScreen.model.characterFullModel.Anime
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 
 @Composable
@@ -29,7 +30,9 @@ fun ShowAnimeRelated(modifier: Modifier, animes: List<Anime>, navController: Nav
 
     Row(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
         Text(text = "Animeography", fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.onPrimary)
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily
+        )
     }
 
     Column(
@@ -66,7 +69,8 @@ fun ShowAnimeRelated(modifier: Modifier, animes: List<Anime>, navController: Nav
 
                 ) {
                     Text(text = animes[i].anime.title, fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onPrimary)
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily)
                     Text(text = animes[i].role,
                         color = MaterialTheme.colorScheme.onPrimary)
                 }

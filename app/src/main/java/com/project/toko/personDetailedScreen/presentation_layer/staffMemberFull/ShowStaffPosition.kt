@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.personDetailedScreen.model.personFullModel.Anime
 
@@ -30,7 +31,9 @@ fun ShowStaffPosition(modifier: Modifier, animes: List<Anime>, navController: Na
 
     Row(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
         Text(text = "Anime Staff Positions", fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.onPrimary)
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily
+        )
     }
 
     Column(
@@ -67,7 +70,8 @@ fun ShowStaffPosition(modifier: Modifier, animes: List<Anime>, navController: Na
                         .padding(top = 0.dp, start = 10.dp)
 
                 ) {
-                    Text(text = animes[i].position, fontSize = 18.sp, minLines = 1,
+                    Text(text = animes[i].position,
+                        fontFamily = evolventaBoldFamily, fontSize = 18.sp, minLines = 1,
                         color = MaterialTheme.colorScheme.onPrimary)
 //                    Text(text = animes[i].position)
                 }

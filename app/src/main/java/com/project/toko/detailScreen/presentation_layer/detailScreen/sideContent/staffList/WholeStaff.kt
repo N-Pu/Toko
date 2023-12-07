@@ -7,7 +7,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,6 +46,7 @@ import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.detailScreen.model.staffModel.Person
 
@@ -108,7 +108,8 @@ private fun BackArrow(modifier: Modifier, navController: NavController, detailSc
                         }
                     }
                 },
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
             )
         }
         Box(
@@ -164,7 +165,8 @@ private fun SingleStaffMember(
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.Bold,
                         fontSize = 25.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                     Row(
                         modifier = modifier

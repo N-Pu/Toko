@@ -75,6 +75,7 @@ import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewM
 import com.project.toko.core.dao.MainDb
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
@@ -595,7 +596,8 @@ private fun ShowDrawerContent(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
                         modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                 },
                 selected = false,
@@ -639,7 +641,8 @@ private fun ShowDrawerContent(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
                         modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                 },
                 selected = false,
@@ -677,7 +680,8 @@ private fun ShowDrawerContent(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
                             modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = evolventaBoldFamily
                         )
                     },
                     selected = false,
@@ -704,7 +708,8 @@ private fun ShowDrawerContent(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
                             modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = evolventaBoldFamily
                         )
                     },
                     selected = false,
@@ -731,7 +736,8 @@ private fun ShowDrawerContent(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
                             modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = evolventaBoldFamily
                         )
                     },
                     selected = false,
@@ -758,7 +764,8 @@ private fun ShowDrawerContent(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
                             modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = evolventaBoldFamily
                         )
                     },
                     selected = false,
@@ -785,7 +792,8 @@ private fun ShowDrawerContent(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
                             modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = evolventaBoldFamily
                         )
                     },
                     selected = false,
@@ -813,7 +821,8 @@ private fun ShowDrawerContent(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
                         modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                 },
                 selected = false,
@@ -841,7 +850,8 @@ private fun ShowDrawerContent(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
                         modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                 },
                 selected = false,
@@ -879,7 +889,8 @@ private fun ShowDrawerContent(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
                             modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = evolventaBoldFamily
                         )
                     },
                     selected = false,
@@ -906,7 +917,8 @@ private fun ShowDrawerContent(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
                             modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = evolventaBoldFamily
                         )
                     },
                     selected = false,
@@ -934,7 +946,8 @@ private fun ShowDrawerContent(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
                         modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                 },
                 selected = false,

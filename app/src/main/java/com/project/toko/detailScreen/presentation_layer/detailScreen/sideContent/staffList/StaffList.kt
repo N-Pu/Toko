@@ -38,6 +38,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import com.project.toko.core.presentation_layer.navigation.Screen
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.model.staffModel.StaffData
 import java.lang.Integer.min
 
@@ -72,7 +73,8 @@ private fun ListEditor(
                 text = "Staff",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
             )
         }
         Column {
@@ -80,7 +82,8 @@ private fun ListEditor(
                 text = " $minListSize>",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
             )
         }
     }
@@ -130,7 +133,7 @@ private fun ListEditor(
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.vector),
-                    contentDescription = "More cast",
+                    contentDescription = "More staff",
                     modifier = modifier.fillMaxSize(0.7f),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                 )
@@ -143,7 +146,8 @@ private fun ListEditor(
                 color = MaterialTheme.colorScheme.onPrimary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                modifier = modifier
+                modifier = modifier,
+                fontFamily = evolventaBoldFamily
             )
         }
         Column(modifier = modifier.width(20.dp)) {
@@ -211,7 +215,8 @@ private fun StaffComponentsCard(
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
             }
             Row(

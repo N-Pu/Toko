@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +40,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.core.presentation_layer.theme.DarkSectionColor
 import com.project.toko.core.presentation_layer.theme.SectionColor
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.model.recommendationsModel.RecommendationsData
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
@@ -77,7 +77,8 @@ fun Recommendations(
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.Start,
                         textDecoration = TextDecoration.Underline,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                 }
 
@@ -158,7 +159,8 @@ fun SingleRecommendationCard(
             overflow = TextOverflow.Ellipsis,
             minLines = 2,
             maxLines = 2,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily
         )
 
 

@@ -26,6 +26,7 @@ import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import  com.project.toko.personDetailedScreen.model.personFullModel.Data
 import com.project.toko.core.share.shareLink
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
@@ -60,7 +61,8 @@ fun ShowNamesAndInteractionIcons(
             minLines = 1,
             fontWeight = FontWeight.ExtraBold,
             lineHeight = 10.sp,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily
         )
         Spacer(modifier = modifier.size(2.dp))
         if (!data.given_name.isNullOrBlank()) {

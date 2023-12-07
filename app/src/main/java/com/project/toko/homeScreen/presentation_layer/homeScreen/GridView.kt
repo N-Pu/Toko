@@ -58,6 +58,7 @@ import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
 import com.project.toko.core.presentation_layer.theme.DarkSectionColor
 import com.project.toko.core.presentation_layer.theme.SectionColor
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.core.presentation_layer.theme.scoreBoardColor
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
@@ -309,12 +310,17 @@ fun GridAdder(
 
         if (selectedAnime != null) {
             CustomDialog(
-                data = selectedAnime, navController = navController, onDismiss = {
+                data = selectedAnime,
+                navController = navController,
+                onDismiss = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.onDialogDismiss()
                     }
 
-                }, modifier = modifier, viewModelProvider = viewModelProvider
+                },
+                modifier = modifier,
+                viewModelProvider = viewModelProvider,
+                isInDarkTheme = isInDarkTheme
             )
         }
 
@@ -323,24 +329,34 @@ fun GridAdder(
 
         if (selectedTrending != null) {
             CustomDialog(
-                data = selectedTrending, navController = navController, onDismiss = {
+                data = selectedTrending,
+                navController = navController,
+                onDismiss = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.onDialogDismiss()
                     }
 
-                }, modifier = modifier, viewModelProvider = viewModelProvider
+                },
+                modifier = modifier,
+                viewModelProvider = viewModelProvider,
+                isInDarkTheme = isInDarkTheme
             )
         }
         val selectedAiring = getTopAiring.data.find { it.mal_id == viewModel.selectedAnimeId.value }
 
         if (selectedAiring != null) {
             CustomDialog(
-                data = selectedAiring, navController = navController, onDismiss = {
+                data = selectedAiring,
+                navController = navController,
+                onDismiss = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.onDialogDismiss()
                     }
 
-                }, modifier = modifier, viewModelProvider = viewModelProvider
+                },
+                modifier = modifier,
+                viewModelProvider = viewModelProvider,
+                isInDarkTheme = isInDarkTheme
             )
         }
         val selectedUpcoming =
@@ -348,12 +364,17 @@ fun GridAdder(
 
         if (selectedUpcoming != null) {
             CustomDialog(
-                data = selectedUpcoming, navController = navController, onDismiss = {
+                data = selectedUpcoming,
+                navController = navController,
+                onDismiss = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.onDialogDismiss()
                     }
 
-                }, modifier = modifier, viewModelProvider = viewModelProvider
+                },
+                modifier = modifier,
+                viewModelProvider = viewModelProvider,
+                isInDarkTheme = isInDarkTheme
             )
         }
     }
@@ -743,7 +764,8 @@ private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkThe
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Start,
                 textDecoration = TextDecoration.Underline,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
             )
         }
     }

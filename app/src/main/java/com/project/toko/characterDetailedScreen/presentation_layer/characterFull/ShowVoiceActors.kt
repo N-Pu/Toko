@@ -22,13 +22,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.characterDetailedScreen.model.characterFullModel.Voice
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 
 @Composable
 fun ShowVoiceActors(modifier: Modifier, actors: List<Voice>, navController: NavController) {
 
     Row(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
         Text(text = "Voice Actors", fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.onPrimary)
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily
+        )
     }
 
     Column(
@@ -66,7 +69,8 @@ fun ShowVoiceActors(modifier: Modifier, actors: List<Voice>, navController: NavC
 
                 ) {
                     Text(text = actors[i].person.name, fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onPrimary)
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily)
                     Text(text = actors[i].language,
                         color = MaterialTheme.colorScheme.onPrimary)
                 }

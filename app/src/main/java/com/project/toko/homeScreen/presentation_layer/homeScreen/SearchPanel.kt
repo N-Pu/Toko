@@ -49,6 +49,7 @@ import com.project.toko.R
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.theme.DarkSearchBarColor
 import com.project.toko.core.presentation_layer.theme.SearchBarColor
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
 import com.project.toko.homeScreen.model.linkChangerModel.Score
 import com.project.toko.homeScreen.model.linkChangerModel.getMinMaxScore
@@ -274,7 +275,8 @@ private fun TabSelectionMenu(
                         text = item.title,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                     Spacer(modifier = modifier.height(5.dp))
                 }
@@ -386,7 +388,8 @@ private fun ScoreBar(
                 fontWeight = if ((pagerState.currentPage == page)) FontWeight.ExtraBold else FontWeight.Bold,
                 modifier = modifier,
                 maxLines = 1,
-                overflow = TextOverflow.Visible
+                overflow = TextOverflow.Visible,
+                fontFamily = evolventaBoldFamily
             )
         }
     }

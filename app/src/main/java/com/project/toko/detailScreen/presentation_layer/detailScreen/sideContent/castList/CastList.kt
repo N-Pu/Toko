@@ -39,6 +39,7 @@ import coil.ImageLoader
 import coil.compose.AsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.model.castModel.CastData
 import com.project.toko.detailScreen.model.castModel.ImagesX
 import com.project.toko.detailScreen.model.castModel.JpgX
@@ -67,7 +68,8 @@ fun DisplayCast(
             Column {
                 Text(
                     text = "Cast", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
             }
             Column {
@@ -75,7 +77,8 @@ fun DisplayCast(
                     text = " $numCharacterAndActors>",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
             }
         }
@@ -171,7 +174,8 @@ private fun AddCast(
                 textAlign = TextAlign.Left, color = MaterialTheme.colorScheme.onPrimary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp,
-                modifier = modifier
+                modifier = modifier,
+                fontFamily = evolventaBoldFamily
             )
         }
         Column(
@@ -259,7 +263,8 @@ private fun CurrentCast(
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                 }
                 Row {
@@ -289,7 +294,8 @@ private fun CurrentCast(
                         overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
                     )
                 }
                 Row {

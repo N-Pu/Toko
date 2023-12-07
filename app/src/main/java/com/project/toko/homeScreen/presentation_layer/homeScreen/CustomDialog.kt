@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,6 +61,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
@@ -76,7 +76,8 @@ fun CustomDialog(
     data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData,
     navController: NavController,
     modifier: Modifier,
-    viewModelProvider: ViewModelProvider
+    viewModelProvider: ViewModelProvider,
+    isInDarkTheme: Boolean
 ) {
 
     val painter = rememberAsyncImagePainter(model = data.images.jpg.large_image_url)
@@ -136,7 +137,8 @@ fun CustomDialog(
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        fontFamily = evolventaBoldFamily
                     )
                     if (!data.title_english.isNullOrEmpty()) {
                         Text(
@@ -180,7 +182,7 @@ fun CustomDialog(
                         YearTypeStudio(data = data, modifier = modifier)
                         EpisodesLabel(episodes = data.episodes, modifier = modifier)
                         AddToDataBaseRow(
-                            modifier = modifier, data = data, viewModelProvider = viewModelProvider
+                            modifier = modifier, data = data, viewModelProvider = viewModelProvider, isInDarkTheme = isInDarkTheme
                         )
                     }
 
@@ -234,7 +236,8 @@ private fun ScoreLabel(modifier: Modifier) {
                     fontWeight = FontWeight.ExtraBold,
                     textAlign = TextAlign.Center,
                     color = Color.White,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    fontFamily = evolventaBoldFamily
 
                 )
 
@@ -266,7 +269,8 @@ private fun ScoreNumber(modifier: Modifier, score: Float) {
             color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
-            fontSize = 30.sp
+            fontSize = 30.sp,
+            fontFamily = evolventaBoldFamily
         )
     }
 }
@@ -288,7 +292,8 @@ private fun RankedLine(rank: Int, modifier: Modifier) {
             text = "#$rank",
             fontWeight = FontWeight.ExtraBold,
             fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily
         )
     }
 }
@@ -310,7 +315,8 @@ private fun PopularityLine(popularity: Int, modifier: Modifier) {
             text = "#$popularity",
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily
         )
     }
 }
@@ -333,7 +339,8 @@ private fun MembersLine(members: Int, modifier: Modifier) {
             text = members.toString(),
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily
         )
     }
 }
@@ -452,14 +459,14 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 private fun AddToDataBaseRow(
     modifier: Modifier,
     data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData,
-    viewModelProvider: ViewModelProvider
+    viewModelProvider: ViewModelProvider, isInDarkTheme: Boolean
 ) {
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     var isExpanded by remember { mutableStateOf(false) }
     val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
         add(SvgDecoder.Factory())
     }.build()
-    val threeDots = if (isSystemInDarkTheme()) {
+    val threeDots = if (isInDarkTheme) {
         R.drawable.three_dots_white
     } else {
         R.drawable.three_dots_gray
@@ -976,7 +983,8 @@ private fun ColoredBox(
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
             modifier = modifier.padding(2.dp),
-            fontWeight = FontWeight.ExtraBold
+            fontWeight = FontWeight.ExtraBold,
+            fontFamily = evolventaBoldFamily
         )
     }
 }
@@ -1032,7 +1040,8 @@ private fun Synopsis(
                 Text(
                     text = "Synopsis",
                     fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
             }
             Column(

@@ -185,7 +185,7 @@ fun ActivateDetailScreen(
                 genres = detailData?.genres ?: listOf(),
                 modifier = modifier
             )
-            AddToFavorites(viewModelProvider, modifier)
+            AddToFavorites(viewModelProvider, modifier, isInDarkTheme)
             ExpandableText(text = detailData!!.synopsis, title = "Synopsis", modifier = modifier)
 //            FullScreenYoutubeActivity().YoutubePlayerSecond(
 //                detailData?.trailer?.youtube_id ?: "",

@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,6 +68,7 @@ import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastCol
 import com.project.toko.core.presentation_layer.theme.DarkSearchBarColor
 import com.project.toko.core.presentation_layer.theme.SearchBarColor
 import com.project.toko.core.presentation_layer.theme.darkFavoriteTopBarColors
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
 import com.project.toko.core.presentation_layer.theme.lightFavoriteTopBarColors
 import com.project.toko.daoScreen.dao.AnimeItem
@@ -816,7 +816,8 @@ private fun FavoriteScreenCardBox(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp, color = MaterialTheme.colorScheme.onPrimary
+                    fontSize = 25.sp, color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
 //                Text(
 //                    text = animeItem.airedFrom,
@@ -982,7 +983,8 @@ private fun TwoSortingButtons(
                         .padding(start = 20.dp)
                         .clickable {
                             leftSortingMenu.value = !leftSortingMenu.value
-                        }, color = MaterialTheme.colorScheme.onPrimary
+                        }, color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
             }
             Box(

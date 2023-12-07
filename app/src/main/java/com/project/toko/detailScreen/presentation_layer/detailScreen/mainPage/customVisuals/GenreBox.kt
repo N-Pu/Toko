@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 
 @Composable
 private fun ColorBox(
@@ -32,7 +33,8 @@ private fun ColorBox(
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
             modifier = modifier.padding(4.dp),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            fontFamily = evolventaBoldFamily
         )
     }
 }

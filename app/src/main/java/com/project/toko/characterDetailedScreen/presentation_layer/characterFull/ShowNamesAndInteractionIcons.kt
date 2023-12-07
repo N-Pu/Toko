@@ -29,6 +29,7 @@ import com.project.toko.R
 import com.project.toko.characterDetailedScreen.dao.CharacterItem
 import com.project.toko.characterDetailedScreen.model.characterFullModel.Data
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.core.share.shareLink
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.launch
@@ -62,7 +63,8 @@ fun ShowNamesAndInteractionIcons(
             minLines = 1,
             fontWeight = FontWeight.ExtraBold,
             lineHeight = 20.sp,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily
         )
         Spacer(modifier = modifier.size(2.dp))
 

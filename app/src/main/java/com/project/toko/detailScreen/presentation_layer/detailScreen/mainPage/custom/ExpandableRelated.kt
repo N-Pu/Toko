@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.model.detailModel.Entry
 import com.project.toko.detailScreen.model.detailModel.Relation
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
@@ -113,7 +114,8 @@ fun ExpandableRelated(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
                     textAlign = TextAlign.Start,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
             }
 
