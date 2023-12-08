@@ -50,7 +50,7 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
                 Text(
                     text = title,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = FontWeight.W900,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = evolventaBoldFamily
                 )
@@ -80,8 +80,9 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
             Text(
                 text = title,
                 fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onPrimary
+                fontWeight = FontWeight.W900,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
             )
 
             Spacer(modifier = modifier.height(10.dp))

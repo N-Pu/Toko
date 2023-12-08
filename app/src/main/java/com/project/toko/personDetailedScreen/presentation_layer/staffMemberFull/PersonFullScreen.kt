@@ -37,6 +37,7 @@ import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
+import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.delay
 
@@ -163,13 +164,14 @@ private fun BackArrow(modifier: Modifier, navController: NavController, isInDark
             Text(
                 text = "   <    Person                       ",
                 fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Start,
                 textDecoration = TextDecoration.Underline,
                 modifier = modifier.clickable {
                     navController.popBackStack()
                 },
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily,
+                fontWeight = FontWeight.W900
             )
         }
         Box(
