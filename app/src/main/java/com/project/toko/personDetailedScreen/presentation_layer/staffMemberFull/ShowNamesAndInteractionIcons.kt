@@ -60,7 +60,7 @@ fun ShowNamesAndInteractionIcons(
             modifier = modifier.fillMaxWidth(),
             minLines = 1,
             fontWeight = FontWeight.ExtraBold,
-            lineHeight = 10.sp,
+            lineHeight = 20.sp,
             color = MaterialTheme.colorScheme.onPrimary,
             fontFamily = evolventaBoldFamily
         )

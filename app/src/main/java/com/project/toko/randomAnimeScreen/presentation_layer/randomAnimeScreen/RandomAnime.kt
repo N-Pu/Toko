@@ -95,7 +95,7 @@ fun ShowRandomAnime(
                         text = "Tap 2 times",
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
-                        color =    Color.White,
+                        color = Color.White,
                         fontFamily = evolventaBoldFamily
                     )
                 }
@@ -115,20 +115,7 @@ fun ShowRandomAnime(
                                     Direction.Left -> {
                                         randomViewModel.viewModelScope.launch(Dispatchers.IO) {
                                             randomViewModel.onTapRandomAnime()
-//                                cardIsShown.value = !cardIsShown.value
                                             cardIsShown.value = false
-//                                cardIsShown.value = true
-                                        }
-                                        randomViewModel.viewModelScope.launch {
-//                        if (!isInternetAvailable(context)) {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "The card was swiped to $direction",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
-//                        }
                                         }
                                     }
 
@@ -155,36 +142,12 @@ fun ShowRandomAnime(
                                         }
                                         randomViewModel.viewModelScope.launch(Dispatchers.IO) {
                                             randomViewModel.onTapRandomAnime()
-//                                cardIsShown.value = !cardIsShown.value
                                             cardIsShown.value = false
-//                                cardIsShown.value = true
-                                        }
-                                        randomViewModel.viewModelScope.launch {
-//                        if (!isInternetAvailable(context)) {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "The card was swiped to $direction",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
-//                        }
                                         }
                                     }
 
                                     Direction.Up -> {
                                         navigateToDetailScreen(navController, data?.mal_id ?: 0)
-                                        randomViewModel.viewModelScope.launch {
-//                        if (!isInternetAvailable(context)) {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "The card was swiped to $direction",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
-//                        }
-                                        }
                                     }
 
                                     else -> {}
@@ -197,7 +160,7 @@ fun ShowRandomAnime(
                                         Toast
                                             .makeText(
                                                 context,
-                                                "The swiping was cancelled",
+                                                "No internet connection!",
                                                 Toast.LENGTH_SHORT
                                             )
                                             .show()
@@ -213,7 +176,9 @@ fun ShowRandomAnime(
 
         LaunchedEffect(data?.mal_id) {
             swipeState.offset.animateTo(Offset(0.0f, 1000.0f))
+//            if (swipeState.offset.value != Offset(0.0f, 0.0f)) {
             swipeState.offset.animateTo(Offset(0.0f, 0.0f))
+//            }
         }
 
     }
@@ -335,7 +300,8 @@ private fun AnimeCard(
                         Text(
                             text = if (data?.score.toString() == "0.0") "N/A" else data?.score.toString(),
                             color = Color.White,
-                            fontSize = 25.sp
+                            fontSize = 25.sp,
+                            overflow = TextOverflow.Ellipsis,
                         )
 
                     }
@@ -387,23 +353,29 @@ private fun AnimeCard(
 
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                text = "   Status: ", fontSize = 12.sp, color = Color.White
+                                text = "   Status: ", fontSize = 12.sp, color = Color.White,
+                                overflow = TextOverflow.Ellipsis,
                             )
 
                             Text(
-                                text = data?.status ?: "", fontSize = 12.sp, color =     MaterialTheme.colorScheme.secondary
+                                text = data?.status ?: "",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.secondary,
+                                overflow = TextOverflow.Ellipsis,
                             )
 
                         }
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                text = "   Rating: ", fontSize = 12.sp, color = Color.White
+                                text = "   Rating: ", fontSize = 12.sp, color = Color.White,
+                                overflow = TextOverflow.Ellipsis,
                             )
 
                             Text(
                                 text = data?.rating ?: "N/A",
                                 fontSize = 12.sp,
-                                color = Color.White
+                                color = Color.White,
+                                overflow = TextOverflow.Ellipsis,
                             )
 
                         }
@@ -413,7 +385,8 @@ private fun AnimeCard(
                             Text(
                                 text = "   Episodes: " + data?.episodes,
                                 fontSize = 12.sp,
-                                color = Color.White
+                                color = Color.White,
+                                overflow = TextOverflow.Ellipsis,
                             )
 
                         }
@@ -436,15 +409,23 @@ private fun AnimeCard(
         ) {
             if (data?.year != 0 && data?.season != null) {
 
-                Text(data.season + " " + data.year.toString(), color =     MaterialTheme.colorScheme.secondary)
+                Text(
+                    data.season + " " + data.year.toString(),
+                    color = MaterialTheme.colorScheme.secondary,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
                 Text(" | ", color = DialogColor)
             }
-            Text(data?.type ?: "N/A", color =     MaterialTheme.colorScheme.secondary)
+            Text(data?.type ?: "N/A", color = MaterialTheme.colorScheme.secondary)
             if (!isStudioEmpty) {
                 Text(" | ", color = DialogColor)
 
-                Text(data?.studios?.component1()?.name ?: "N/A", color =     MaterialTheme.colorScheme.secondary)
+                Text(
+                    data?.studios?.component1()?.name ?: "N/A",
+                    color = MaterialTheme.colorScheme.secondary,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
 
@@ -458,7 +439,7 @@ private fun ColoredBox(
 
     Box(
         modifier = modifier
-            .background(    MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(15.dp))
+            .background(MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(15.dp))
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(

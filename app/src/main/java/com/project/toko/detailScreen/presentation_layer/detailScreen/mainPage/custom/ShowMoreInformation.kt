@@ -43,11 +43,10 @@ fun ShowMoreInformation(
             Text(
                 text = "More Information",
                 fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
+                fontWeight = FontWeight.W900,
                 color = MaterialTheme.colorScheme.onPrimary,
                 fontFamily = evolventaBoldFamily
             )
-
         }
         Row(modifier = modifier.height(20.dp), horizontalArrangement = Arrangement.Start) {
 

@@ -518,12 +518,13 @@ private fun AnimeCardBox(
                 .fillMaxWidth()
                 .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
             lineHeight = 16.sp,
-            fontWeight = FontWeight.ExtraBold,
             fontSize = 16.sp,
             overflow = TextOverflow.Ellipsis,
             minLines = 2,
             maxLines = 2,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontFamily = evolventaBoldFamily,
+            fontWeight = FontWeight.W900
         )
 
         Row(modifier = modifier.fillMaxWidth(1f), horizontalArrangement = Arrangement.Start) {
@@ -549,8 +550,6 @@ private fun AnimeCardBox(
                 color = MaterialTheme.colorScheme.inversePrimary
             )
         }
-
-
     }
 }
 
@@ -706,12 +705,13 @@ private fun ShowSection(
                         .fillMaxWidth()
                         .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
                     lineHeight = 16.sp,
-                    fontWeight = FontWeight.ExtraBold,
                     fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
                     minLines = 2,
                     maxLines = 2,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily,
+                    fontWeight = FontWeight.W900
                 )
 
                 Row(
@@ -761,11 +761,11 @@ private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkThe
             Text(
                 text = "    $sectionName   ",
                 fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Start,
                 textDecoration = TextDecoration.Underline,
                 color = MaterialTheme.colorScheme.onPrimary,
-                fontFamily = evolventaBoldFamily
+                fontFamily = evolventaBoldFamily,
+                fontWeight = FontWeight.W900
             )
         }
     }
@@ -919,12 +919,13 @@ private fun ShowTopAnime(
                         .fillMaxWidth()
                         .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
                     lineHeight = 16.sp,
-                    fontWeight = FontWeight.ExtraBold,
                     fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
                     minLines = 2,
                     maxLines = 2,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily,
+                    fontWeight = FontWeight.W900
                 )
 
                 Row(

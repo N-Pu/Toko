@@ -166,4 +166,7 @@ dependencies {
     //page swiping
     implementation 'com.alexstyl.swipeablecard:swipeablecard:0.1.0'
 
+    //
+    implementation "me.saket.swipe:swipe:1.2.0"
+
 }

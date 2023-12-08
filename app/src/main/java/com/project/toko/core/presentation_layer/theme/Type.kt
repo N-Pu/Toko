@@ -24,37 +24,12 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
 )
 
 val evolventaBoldFamily = FontFamily (
-    Font(R.font.evolventa_bold, FontWeight.ExtraLight),
-    Font(R.font.evolventa_bold, FontWeight.Normal),
-    Font(R.font.evolventa_bold, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.evolventa_bold, FontWeight.Medium),
-    Font(R.font.evolventa_bold, FontWeight.ExtraBold)
+//    Font(R.font.evolventa_bold, FontWeight.ExtraLight),
+//    Font(R.font.evolventa_bold, FontWeight.Normal),
+//    Font(R.font.evolventa_bold, FontWeight.Normal, FontStyle.Italic),
+//    Font(R.font.evolventa_bold, FontWeight.Medium),
+    Font(R.font.evolventa_bold, FontWeight.W900)
 )
-
-
-//val montserratMedium = FontFamily (
-//    Font(R.font.montserrat_medium, FontWeight.ExtraLight),
-//    Font(R.font.montserrat_medium, FontWeight.Normal),
-//    Font(R.font.montserrat_medium, FontWeight.Normal, FontStyle.Italic),
-//    Font(R.font.montserrat_medium, FontWeight.Medium),
-//    Font(R.font.montserrat_medium, FontWeight.ExtraBold)
-//)

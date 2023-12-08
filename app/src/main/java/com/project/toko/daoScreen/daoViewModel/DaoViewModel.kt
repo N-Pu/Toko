@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.Query
 import com.project.toko.characterDetailedScreen.dao.CharacterItem
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.dao.MainDb
@@ -48,6 +47,38 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
     val isOnaSelected = _isOnaSelected
     private val _isMusicSelected = mutableStateOf(false)
     val isMusicSelected = _isMusicSelected
+
+
+    private val _lastSwipedAnime = mutableStateOf(AnimeItem(
+        id = null,
+        animeName = "",
+        score = "",
+        scored_by = "",
+        animeImage = "",
+        status = "",
+        rating = "",
+        secondName = "",
+        airedFrom = "",
+        category = null,
+        type = "",
+        createdAt = 0
+    ))
+    var lastSwipedAnime = _lastSwipedAnime
+
+    private val _lastSwipedInFavorite = mutableStateOf(FavoriteItem(
+        id = null,
+        animeName = "",
+        score = "",
+        scored_by = "",
+        animeImage = "",
+        status = "",
+        rating = "",
+        secondName = "",
+        airedFrom = "",
+        type = "",
+        createdAt = 0
+    ))
+    var lastSwipedInFavorite = _lastSwipedInFavorite
     fun onSearchTextChange(text: String) {
         try {
             viewModelScope.launch(Dispatchers.IO) {

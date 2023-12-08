@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +25,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.twotone.Delete
+import androidx.compose.material.icons.twotone.List
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -34,6 +39,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -53,8 +60,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -66,6 +76,7 @@ import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.DarkSearchBarColor
+import com.project.toko.core.presentation_layer.theme.ScoreColors.Red
 import com.project.toko.core.presentation_layer.theme.SearchBarColor
 import com.project.toko.core.presentation_layer.theme.darkFavoriteTopBarColors
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
@@ -77,6 +88,10 @@ import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.daoScreen.model.AnimeListType
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.personDetailedScreen.dao.PersonItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import me.saket.swipe.SwipeAction
+import me.saket.swipe.SwipeableActionsBox
 
 //class DaoScreen
 
@@ -86,7 +101,7 @@ import com.project.toko.personDetailedScreen.dao.PersonItem
 fun DaoScreen(
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme :Boolean
+    modifier: Modifier, isInDarkTheme: Boolean
 ) {
 
     val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
@@ -307,9 +322,9 @@ private fun FavoriteAnimeListButton(
     onClick: () -> Unit,
     modifier: Modifier,
     colorIndex: Int,
-    isInDarkTheme : Boolean
+    isInDarkTheme: Boolean
 ) {
-    val colors = if ( isInDarkTheme ) darkFavoriteTopBarColors else lightFavoriteTopBarColors
+    val colors = if (isInDarkTheme) darkFavoriteTopBarColors else lightFavoriteTopBarColors
     val customModifier = if (selectedListType == listType) modifier
         .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
         .clickable { onClick() }
@@ -357,6 +372,11 @@ private fun DataAnimeList(
     type: MutableState<String?>
 
 ) {
+    val customModifier = modifier
+        .fillMaxWidth(0.8f)
+        .clip(CardDefaults.shape)
+        .background(MaterialTheme.colorScheme.onPrimaryContainer)
+
     val currentAnimeInSection by daoViewModel.getAnimeInCategory(
         category = category,
         searchText = searchText,
@@ -365,19 +385,21 @@ private fun DataAnimeList(
         isSortedAlphabetically = isSortedAlphabetically.value,
         isSortedByUsers = isSortedByUsers.value,
         type = type.value ?: ""
-    )
-        .collectAsStateWithLifecycle(initialValue = emptyList())
-//    val coroutineScope = rememberCoroutineScope()
-//    val offsetY  =  remember { Animatable(0f) }
-//    val draggableState = rememberDraggableState{ delta ->
-//        coroutineScope.launch {
-//            offsetY.snapTo(offsetY.value + delta)
-//        }
-//    }
+    ).collectAsStateWithLifecycle(initialValue = emptyList())
+
+
+    var selectedAnime by daoViewModel.lastSwipedAnime
+    var isDialogOpen by remember { mutableStateOf(false) }
+    var listOfCategory = AnimeListType.values().dropLast(2)
+
+    LaunchedEffect(key1 = category) {
+        val trimmedList = listOfCategory
+        listOfCategory = trimmedList.filter { it.route != category }
+    }
 
     Column(
         modifier = modifier
-            .fillMaxSize(1f)
+            .fillMaxSize()
     ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 265.dp),
@@ -385,12 +407,137 @@ private fun DataAnimeList(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(currentAnimeInSection) { animeItem ->
-                DataScreenCardBox(
-                    animeItem = animeItem,
-                    navController = navController,
-                    modifier = modifier
-//                        .draggable(state = draggableState, orientation = Orientation.Horizontal)
+
+
+                val archive = SwipeAction(
+                    icon = rememberVectorPainter(Icons.TwoTone.Delete),
+                    background = Red,
+                    isUndo = true,
+                    onSwipe = {
+                        daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                            daoViewModel.removeFromDataBase(animeItem)
+                        }
+                    }
                 )
+                val snooze = SwipeAction(
+                    icon = rememberVectorPainter(Icons.TwoTone.List),
+                    background = MaterialTheme.colorScheme.secondary,
+                    isUndo = true,
+                    onSwipe = {
+                        selectedAnime = animeItem
+                        isDialogOpen = !isDialogOpen
+                    },
+                )
+
+
+                SwipeableActionsBox(
+                    endActions = listOf(archive), startActions = listOf(snooze)
+                ) {
+                    DataScreenCardBox(
+                        animeItem = animeItem,
+                        navController = navController,
+                        modifier = modifier.background(MaterialTheme.colorScheme.primary)
+                    )
+                }
+            }
+        }
+        if (isDialogOpen) {
+            Dialog(
+                onDismissRequest = {
+                    isDialogOpen = false
+                }, properties = DialogProperties(
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = true,
+                )
+            ) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.5f), contentAlignment = Alignment.Center
+                ) {
+                    Card(
+                        modifier = modifier.fillMaxSize(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceAround,
+                            modifier = modifier.fillMaxSize()
+                        ) {
+                            Row(
+                                modifier = modifier
+                                    .fillMaxHeight(0.5f)
+                                    .fillMaxWidth(0.8f)
+                                    .weight(1f),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "Add to category?",
+                                    fontSize = 24.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    fontFamily = evolventaBoldFamily
+                                )
+                            }
+                            listOfCategory.forEach { category ->
+                                Row(
+                                    modifier = customModifier
+                                        .weight(1f)
+                                        .clickable {
+                                            daoViewModel.viewModelScope.launch {
+                                                isDialogOpen = false
+                                                if (category == AnimeListType.FAVORITE) {
+                                                    daoViewModel.addToFavorite(
+                                                        FavoriteItem(
+                                                            id = selectedAnime.id,
+                                                            animeName = selectedAnime.animeName,
+                                                            score = selectedAnime.score,
+                                                            scored_by = selectedAnime.scored_by,
+                                                            animeImage = selectedAnime.animeImage,
+                                                            status = selectedAnime.status,
+                                                            rating = selectedAnime.rating,
+                                                            secondName = selectedAnime.secondName,
+                                                            airedFrom = selectedAnime.airedFrom,
+                                                            type = selectedAnime.type,
+                                                            createdAt = selectedAnime.createdAt
+                                                        )
+                                                    )
+                                                } else {
+                                                    daoViewModel.addToCategory(
+                                                        AnimeItem(
+                                                            id = selectedAnime.id,
+                                                            animeName = selectedAnime.animeName,
+                                                            score = selectedAnime.score,
+                                                            scored_by = selectedAnime.scored_by,
+                                                            animeImage = selectedAnime.animeImage,
+                                                            status = selectedAnime.status,
+                                                            rating = selectedAnime.rating,
+                                                            secondName = selectedAnime.secondName,
+                                                            airedFrom = selectedAnime.airedFrom,
+                                                            type = selectedAnime.type,
+                                                            createdAt = selectedAnime.createdAt,
+                                                            category = category.route
+                                                        )
+                                                    )
+                                                }
+                                            }
+                                        },
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = category.route,
+                                        fontSize = 22.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.White,
+                                        fontFamily = evolventaBoldFamily
+                                    )
+                                }
+                                Spacer(modifier = modifier.height(10.dp))
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -410,6 +557,12 @@ private fun FavoriteList(
     type: MutableState<String?>
 
 ) {
+
+    val customModifier = modifier
+        .fillMaxWidth(0.8f)
+        .clip(CardDefaults.shape)
+        .background(MaterialTheme.colorScheme.onPrimaryContainer)
+    var favoriteItemSelected by daoViewModel.lastSwipedInFavorite
     val currentAnimeInSection by daoViewModel.getAnimeInFavorite(
         searchText = searchText,
         isSortedByScore = isSortedByScore.value,
@@ -420,11 +573,12 @@ private fun FavoriteList(
     )
         .collectAsStateWithLifecycle(initialValue = emptyList())
 
-//    }
+    var isDialogOpen by remember { mutableStateOf(false) }
+    val listOfCategory = AnimeListType.values().dropLast(2).filter { it.route != "Favorite" }
 
     Column(
         modifier = modifier
-            .fillMaxSize(1f)
+            .fillMaxSize()
     ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 265.dp),
@@ -432,11 +586,130 @@ private fun FavoriteList(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(currentAnimeInSection) { favoriteItem ->
-                FavoriteScreenCardBox(
-                    favoriteItem = favoriteItem,
-                    navController = navController,
-                    modifier = modifier
+                val archive = SwipeAction(
+                    icon = rememberVectorPainter(Icons.TwoTone.Delete),
+                    background = Red,
+                    isUndo = true,
+                    onSwipe = {
+                        daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                            daoViewModel.removeFromFavorite(favoriteItem)
+                        }
+                    }
                 )
+                val snooze = SwipeAction(
+                    icon = rememberVectorPainter(Icons.TwoTone.List),
+                    background = MaterialTheme.colorScheme.secondary,
+                    isUndo = true,
+                    onSwipe = {
+                        favoriteItemSelected = favoriteItem
+                        isDialogOpen = !isDialogOpen
+                    },
+                )
+                SwipeableActionsBox(
+                    endActions = listOf(archive), startActions = listOf(snooze)
+                ) {
+                    FavoriteScreenCardBox(
+                        favoriteItem = favoriteItem,
+                        navController = navController,
+                        modifier = modifier
+                    )
+                }
+            }
+        }
+        if (isDialogOpen) {
+            Dialog(
+                onDismissRequest = {
+                    isDialogOpen = false
+                }, properties = DialogProperties(
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = true,
+                )
+            ) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.5f), contentAlignment = Alignment.Center
+                ) {
+                    Card(
+                        modifier = modifier.fillMaxSize(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceAround,
+                            modifier = modifier.fillMaxSize()
+                        ) {
+                            Row(
+                                modifier = modifier
+                                    .fillMaxHeight(0.5f)
+                                    .fillMaxWidth(0.8f)
+                                    .weight(1f),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "Add to category?",
+                                    fontSize = 24.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    fontFamily = evolventaBoldFamily
+                                )
+                            }
+                            listOfCategory.forEach { category ->
+                                Row(
+                                    modifier = customModifier
+                                        .weight(1f)
+                                        .clickable {
+                                            daoViewModel.viewModelScope.launch {
+                                                isDialogOpen = false
+                                                daoViewModel.addToCategory(
+                                                    AnimeItem(
+                                                        id = favoriteItemSelected.id,
+                                                        animeName = favoriteItemSelected.animeName,
+                                                        score = favoriteItemSelected.score,
+                                                        scored_by = favoriteItemSelected.scored_by,
+                                                        animeImage = favoriteItemSelected.animeImage,
+                                                        status = favoriteItemSelected.status,
+                                                        rating = favoriteItemSelected.rating,
+                                                        secondName = favoriteItemSelected.secondName,
+                                                        airedFrom = favoriteItemSelected.airedFrom,
+                                                        type = favoriteItemSelected.type,
+                                                        createdAt = favoriteItemSelected.createdAt,
+                                                        category = category.route
+                                                    )
+                                                )
+                                                daoViewModel.removeFromFavorite(
+                                                    FavoriteItem(
+                                                        id = favoriteItemSelected.id,
+                                                        animeName = favoriteItemSelected.animeName,
+                                                        score = favoriteItemSelected.score,
+                                                        scored_by = favoriteItemSelected.scored_by,
+                                                        animeImage = favoriteItemSelected.animeImage,
+                                                        status = favoriteItemSelected.status,
+                                                        rating = favoriteItemSelected.rating,
+                                                        secondName = favoriteItemSelected.secondName,
+                                                        airedFrom = favoriteItemSelected.airedFrom,
+                                                        type = favoriteItemSelected.type,
+                                                        createdAt = favoriteItemSelected.createdAt
+                                                    )
+                                                )
+                                            }
+                                        },
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = category.route,
+                                        fontSize = 22.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.White,
+                                        fontFamily = evolventaBoldFamily
+                                    )
+                                }
+                                Spacer(modifier = modifier.height(10.dp))
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -463,11 +736,27 @@ private fun ShowCharacter(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(animeListState) { characterItem ->
-                CharacterCardBox(
-                    characterItem = characterItem,
-                    navController = navController,
-                    modifier = modifier
+
+                val archive = SwipeAction(
+                    icon = rememberVectorPainter(Icons.TwoTone.Delete),
+                    background = Red,
+                    isUndo = true,
+                    onSwipe = {
+                        daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                            daoViewModel.removeCharacterFromDataBase(characterItem)
+                        }
+                    }
                 )
+
+                SwipeableActionsBox(
+                    endActions = listOf(archive)
+                ) {
+                    CharacterCardBox(
+                        characterItem = characterItem,
+                        navController = navController,
+                        modifier = modifier
+                    )
+                }
             }
         }
     }
@@ -550,11 +839,25 @@ private fun ShowPerson(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(personList) { personItem ->
-                PersonCardBox(
-                    personItem = personItem,
-                    navController = navController,
-                    modifier = modifier
+                val archive = SwipeAction(
+                    icon = rememberVectorPainter(Icons.TwoTone.Delete),
+                    background = Red,
+                    isUndo = true,
+                    onSwipe = {
+                        daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                            daoViewModel.removePersonFromDataBase(personItem)
+                        }
+                    }
                 )
+                SwipeableActionsBox(
+                    endActions = listOf(archive)
+                ) {
+                    PersonCardBox(
+                        personItem = personItem,
+                        navController = navController,
+                        modifier = modifier
+                    )
+                }
             }
         }
     }
@@ -640,6 +943,9 @@ private fun DataScreenCardBox(
     val rating =
         if (animeItem.rating.isNullOrEmpty()) "Rating: N/A" else "Rating: " + animeItem.rating
 
+
+
+
     Column(modifier = modifier.clickable {
         animeItem.id?.let {
             navigateToDetailScreen(navController, it)
@@ -666,14 +972,6 @@ private fun DataScreenCardBox(
                     fontWeight = FontWeight.Bold,
                     fontSize = 25.sp, color = MaterialTheme.colorScheme.onPrimary
                 )
-//                Text(
-//                    text = animeItem.airedFrom,
-//                    modifier = modifier,
-//                    maxLines = 2,
-//                    overflow = TextOverflow.Ellipsis,
-//                    fontWeight = FontWeight.Bold,
-//                    fontSize = 25.sp
-//                )
                 if (!animeItem.secondName.isNullOrEmpty()) {
                     Row(
                         modifier = modifier
@@ -948,9 +1246,9 @@ private fun TwoSortingButtons(
     isInDarkTheme: Boolean
 ) {
     val backArrowFirstColor =
-        if ( isInDarkTheme) DarkBackArrowCastColor else BackArrowCastColor
+        if (isInDarkTheme) DarkBackArrowCastColor else BackArrowCastColor
     val backArrowSecondColor =
-        if ( isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
+        if (isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
 
     Row(
         modifier = modifier
