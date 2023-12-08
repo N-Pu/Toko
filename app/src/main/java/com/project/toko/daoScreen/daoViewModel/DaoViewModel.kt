@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.Query
 import com.project.toko.characterDetailedScreen.dao.CharacterItem
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.dao.MainDb
