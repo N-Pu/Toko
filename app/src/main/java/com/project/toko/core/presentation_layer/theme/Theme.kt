@@ -2,8 +2,8 @@ package com.project.toko.core.presentation_layer.theme
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-
 
 
 private val DarkColorScheme = darkColorScheme(
@@ -23,15 +23,15 @@ private val DarkColorScheme = darkColorScheme(
     background = ThemeColors.Night.addDialog,
     onBackground = ThemeColors.Night.systemBar,
     surface = ThemeColors.Night.systemBarIcon,
-    onSurface =ThemeColors.Night.dividerColor,
+    onSurface = ThemeColors.Night.dividerColor,
     surfaceVariant = ThemeColors.Night.customDialog,
     onSurfaceVariant = ThemeColors.Night.textDelimiter,
     surfaceTint = ThemeColors.Night.sideBackground,
-    inverseSurface =ThemeColors.Night.sideBarCustomRow,
-    onError =ThemeColors.Night.iconColor,
-    errorContainer =ThemeColors.Night.backgroundDetailScreen,
-    error =ThemeColors.Night.topSearchColor,
-    outlineVariant =ThemeColors.Day.white,
+    inverseSurface = ThemeColors.Night.sideBarCustomRow,
+    onError = ThemeColors.Night.iconColor,
+    errorContainer = ThemeColors.Night.backgroundDetailScreen,
+    error = ThemeColors.Night.topSearchColor,
+    outlineVariant = ThemeColors.Day.white,
 )
 private val LightColorScheme = lightColorScheme(
     primary = ThemeColors.Day.background,
@@ -50,66 +50,29 @@ private val LightColorScheme = lightColorScheme(
     background = ThemeColors.Day.addDialog,
     onBackground = ThemeColors.Day.systemBar,
     surface = ThemeColors.Day.systemBarIcon,
-    onSurface =ThemeColors.Day.dividerColor,
+    onSurface = ThemeColors.Day.dividerColor,
     surfaceVariant = ThemeColors.Day.customDialog,
     onSurfaceVariant = ThemeColors.Day.textDelimiter,
     surfaceTint = ThemeColors.Day.sideBackground,
-    inverseSurface =ThemeColors.Day.sideBarCustomRow,
-    onError =ThemeColors.Day.iconColor,
-    errorContainer =ThemeColors.Day.backgroundDetailScreen,
-    error =ThemeColors.Day.topSearchColor,
-    outlineVariant =ThemeColors.Day.white,
+    inverseSurface = ThemeColors.Day.sideBarCustomRow,
+    onError = ThemeColors.Day.iconColor,
+    errorContainer = ThemeColors.Day.backgroundDetailScreen,
+    error = ThemeColors.Day.topSearchColor,
+    outlineVariant = ThemeColors.Day.white,
 
-)
-
-//@Composable
-//fun TokoTheme(
-//    darkTheme: Boolean = isSystemInDarkTheme(),
-//    // Dynamic color is available on Android 12+
-//    dynamicColor: Boolean = true,
-//    content: @Composable () -> Unit
-//) {
-//    val systemUiController = rememberSystemUiController()
-//    if (darkTheme) {
-//
-//        systemUiController.setSystemBarsColor(
-//            color = LightColorScheme.onPrimary,
-//            darkIcons = false
-//        )
-//        systemUiController.setNavigationBarColor(
-//            color = LightColorScheme.onPrimary,
-//            darkIcons = false
-//        )
-//
-//
-//    } else {
-//        systemUiController.setSystemBarsColor(
-//            color = DarkColorScheme.onPrimary,
-//            darkIcons = true
-//        )
-//        systemUiController.setNavigationBarColor(
-//            color = DarkColorScheme.onPrimary,
-//            darkIcons = true
-//        )
-//    }
-//
-//    MaterialTheme(
-//        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
-//        typography = Typography,
-//        content = content
-//    )
-//
-//}
+    )
 
 
 @Composable
-fun TokoTheme(
+fun Theme(
     darkTheme: Boolean,
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
-) {
-    val systemUiController = rememberSystemUiController()
+//    dynamicColor: Boolean = true,
+    systemUiController: SystemUiController,
+    content: @Composable () -> Unit,
+
+    ) {
+//    val systemUiController = rememberSystemUiController()
     if (darkTheme) {
 
         systemUiController.setSystemBarsColor(
@@ -120,7 +83,6 @@ fun TokoTheme(
             color = LightColorScheme.onPrimary,
             darkIcons = false
         )
-
 
     } else {
         systemUiController.setSystemBarsColor(
@@ -139,4 +101,38 @@ fun TokoTheme(
         content = content
     )
 
+}
+
+
+@Composable
+fun SplashTheme(
+    darkTheme: Boolean,
+    systemUiController: SystemUiController,
+    content: @Composable () -> Unit,
+) {
+    if (darkTheme) {
+        systemUiController.setSystemBarsColor(
+            color = DarkColorScheme.secondary,
+            darkIcons = true
+        )
+        systemUiController.setNavigationBarColor(
+            color = DarkColorScheme.secondary,
+            darkIcons = true
+        )
+    } else {
+        systemUiController.setSystemBarsColor(
+            color = LightColorScheme.secondary,
+            darkIcons = false
+        )
+        systemUiController.setNavigationBarColor(
+            color = LightColorScheme.secondary,
+            darkIcons = false
+        )
+    }
+
+    MaterialTheme(
+        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
+        typography = Typography,
+        content = content
+    )
 }

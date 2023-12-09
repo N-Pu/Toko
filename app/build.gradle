@@ -117,6 +117,7 @@ dependencies {
     implementation 'io.coil-kt:coil-svg:2.4.0'
 
 
+
     //ExoPlayer
 //    implementation 'androidx.media3:media3-exoplayer:1.0.0'
 //    implementation 'androidx.media3:media3-exoplayer-dash:1.0.0'
@@ -166,7 +167,11 @@ dependencies {
     //page swiping
     implementation 'com.alexstyl.swipeablecard:swipeablecard:0.1.0'
 
-    //
+    //swiping in dao screen
     implementation "me.saket.swipe:swipe:1.2.0"
+
+    //lottie animations
+//    def lottie_version = '6.2.0'
+//    implementation 'com.airbnb.android:lttie:' + lottie_version
 
 }

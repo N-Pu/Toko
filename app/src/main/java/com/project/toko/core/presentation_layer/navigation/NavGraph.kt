@@ -32,6 +32,7 @@ fun SetupNavGraph(
     svgImageLoader: ImageLoader
 ) {
     NavHost(navController = navController, startDestination = Screen.Home.route) {
+
         composable(route = Screen.Home.route) {
             MainScreen(
                 navController = navController,

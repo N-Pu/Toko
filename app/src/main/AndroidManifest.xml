@@ -23,7 +23,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/logo"
+        android:icon="@mipmap/ic_toko"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_toko_round"
         android:supportsRtl="true"
@@ -32,8 +32,7 @@
         <activity
             android:name=".core.presentation_layer.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Toko.Splash">
-
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
