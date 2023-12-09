@@ -40,7 +40,7 @@ fun DisplayCharacterFromId(
     mal_id: Int,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme : Boolean
+    modifier: Modifier, isInDarkTheme : Boolean, svgImageLoader : ImageLoader
 ) {
     val characterViewModel = viewModelProvider[CharacterFullByIdViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
@@ -66,9 +66,7 @@ fun DisplayCharacterFromId(
     val characterPicturesState by
     characterViewModel.picturesList.collectAsStateWithLifecycle()
     val painter = rememberAsyncImagePainter(model = characterFullState?.images?.jpg?.image_url)
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
+
     val isDialogShown = remember { mutableStateOf(false) }
     if (isSearching.not() && characterFullState != null) {
 

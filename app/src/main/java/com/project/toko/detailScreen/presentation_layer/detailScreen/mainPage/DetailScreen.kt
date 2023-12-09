@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
@@ -55,7 +56,7 @@ fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
     navController: NavController,
     id: Int,
-    modifier: Modifier, isInDarkTheme : Boolean
+    modifier: Modifier, isInDarkTheme : Boolean, svgImageLoader : ImageLoader
 ) {
 
     val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
@@ -185,7 +186,7 @@ fun ActivateDetailScreen(
                 genres = detailData?.genres ?: listOf(),
                 modifier = modifier
             )
-            AddToFavorites(viewModelProvider, modifier, isInDarkTheme)
+            AddToFavorites(viewModelProvider, modifier, isInDarkTheme, svgImageLoader = svgImageLoader)
             ExpandableText(text = detailData!!.synopsis, title = "Synopsis", modifier = modifier)
 //            FullScreenYoutubeActivity().YoutubePlayerSecond(
 //                detailData?.trailer?.youtube_id ?: "",

@@ -75,7 +75,8 @@ fun GridAdder(
     modifier: Modifier,
     isTabMenuOpen: MutableState<Boolean>,
     switch: MutableState<Boolean>,
-    isInDarkTheme: Boolean
+    isInDarkTheme: Boolean,
+    svgImageLoader: ImageLoader
 ) {
 
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
@@ -115,7 +116,7 @@ fun GridAdder(
     val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
 
     var log by remember { mutableStateOf("") }
-//    if (listData.data.isNotEmpty()) {
+
     if (switch.value) {
         LazyVerticalStaggeredGrid(
             state = if (scrollGridState.firstVisibleItemIndex >= 4) {
@@ -180,7 +181,8 @@ fun GridAdder(
                             ShowSection(
                                 data = data, navController = navController,
                                 viewModelProvider = viewModelProvider,
-                                modifier = modifier
+                                modifier = modifier,
+                                svgImageLoader = svgImageLoader
                             )
                         }
                         Spacer(modifier = modifier.width(20.dp))
@@ -207,7 +209,8 @@ fun GridAdder(
                             ShowTopAnime(
                                 data = data, navController = navController,
                                 viewModelProvider = viewModelProvider,
-                                modifier = modifier
+                                modifier = modifier,
+                                svgImageLoader = svgImageLoader
                             )
                         }
                         Spacer(modifier = modifier.width(20.dp))
@@ -234,7 +237,7 @@ fun GridAdder(
                             ShowSection(
                                 data = data, navController = navController,
                                 viewModelProvider = viewModelProvider,
-                                modifier = modifier
+                                modifier = modifier, svgImageLoader = svgImageLoader
                             )
                         }
                         Spacer(modifier = modifier.width(20.dp))
@@ -261,7 +264,8 @@ fun GridAdder(
                             ShowTopAnime(
                                 data = data, navController = navController,
                                 viewModelProvider = viewModelProvider,
-                                modifier = modifier
+                                modifier = modifier,
+                                svgImageLoader = svgImageLoader
                             )
                         }
                         Spacer(modifier = modifier.width(20.dp))
@@ -288,7 +292,8 @@ fun GridAdder(
                             ShowTopAnime(
                                 data = data, navController = navController,
                                 viewModelProvider = viewModelProvider,
-                                modifier = modifier
+                                modifier = modifier,
+                                svgImageLoader = svgImageLoader
                             )
                         }
                         Spacer(modifier = modifier.width(20.dp))
@@ -320,7 +325,7 @@ fun GridAdder(
                 },
                 modifier = modifier,
                 viewModelProvider = viewModelProvider,
-                isInDarkTheme = isInDarkTheme
+                isInDarkTheme = isInDarkTheme, svgImageLoader = svgImageLoader
             )
         }
 
@@ -339,7 +344,7 @@ fun GridAdder(
                 },
                 modifier = modifier,
                 viewModelProvider = viewModelProvider,
-                isInDarkTheme = isInDarkTheme
+                isInDarkTheme = isInDarkTheme, svgImageLoader = svgImageLoader
             )
         }
         val selectedAiring = getTopAiring.data.find { it.mal_id == viewModel.selectedAnimeId.value }
@@ -356,7 +361,7 @@ fun GridAdder(
                 },
                 modifier = modifier,
                 viewModelProvider = viewModelProvider,
-                isInDarkTheme = isInDarkTheme
+                isInDarkTheme = isInDarkTheme, svgImageLoader = svgImageLoader
             )
         }
         val selectedUpcoming =
@@ -374,7 +379,7 @@ fun GridAdder(
                 },
                 modifier = modifier,
                 viewModelProvider = viewModelProvider,
-                isInDarkTheme = isInDarkTheme
+                isInDarkTheme = isInDarkTheme, svgImageLoader = svgImageLoader
             )
         }
     }
@@ -582,7 +587,8 @@ private fun ShowSection(
     data: AnimeItem,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier,
+    svgImageLoader: ImageLoader
 ) {
     val painter = rememberAsyncImagePainter(model = data.animeImage)
     var isCardClicked by remember { mutableStateOf(false) }
@@ -597,9 +603,6 @@ private fun ShowSection(
             ), repeatMode = RepeatMode.Reverse
         ), label = ""
     )
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
 
     Card(
         modifier = modifier
@@ -779,7 +782,8 @@ private fun ShowTopAnime(
     data: AnimeSearchData,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier
+    modifier: Modifier,
+    svgImageLoader: ImageLoader
 ) {
     val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
     var isCardClicked by remember { mutableStateOf(false) }
@@ -794,10 +798,6 @@ private fun ShowTopAnime(
             ), repeatMode = RepeatMode.Reverse
         ), label = ""
     )
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
-
 
     Card(
         modifier = modifier

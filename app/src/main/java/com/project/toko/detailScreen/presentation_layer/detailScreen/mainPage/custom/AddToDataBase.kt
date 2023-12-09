@@ -52,15 +52,13 @@ import java.util.Locale
 
 @Composable
 fun AddToFavorites(
-    viewModelProvider: ViewModelProvider, modifier: Modifier, isDarkTheme: Boolean
+    viewModelProvider: ViewModelProvider, modifier: Modifier, isDarkTheme: Boolean, svgImageLoader : ImageLoader
 ) {
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     val detailScreenState by detailScreenViewModel.animeDetails.collectAsStateWithLifecycle()
     var isExpanded by remember { mutableStateOf(false) }
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
+
     val context = LocalContext.current
     val threeDots = if (isDarkTheme) {
         R.drawable.three_dots_white

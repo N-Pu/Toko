@@ -24,12 +24,14 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.twotone.Delete
 import androidx.compose.material.icons.twotone.List
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -44,6 +46,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -101,34 +104,32 @@ import me.saket.swipe.SwipeableActionsBox
 fun DaoScreen(
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme: Boolean
+    modifier: Modifier, isInDarkTheme: Boolean, drawerState: DrawerState, svgImageLoader : ImageLoader
 ) {
 
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
+
 
     var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
     val arrayOfEntries = AnimeListType.values()
-    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
-    val searchText by daoViewModel.searchText.collectAsStateWithLifecycle()
+    val viewModel = viewModelProvider[DaoViewModel::class.java]
+    val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val rightSortingMenu = remember { mutableStateOf(false) }
     val leftSortingMenu = remember { mutableStateOf(false) }
 
-    val isSortedAlphabetically = daoViewModel.isSortedAlphabetically
-    val isSortedByScore = daoViewModel.isSortedByScore
-    val isSortedByUsers = daoViewModel.isSortedByUsers
-    val isAiredFrom = daoViewModel.isAiredFrom
+    val isSortedAlphabetically = viewModel.isSortedAlphabetically
+    val isSortedByScore = viewModel.isSortedByScore
+    val isSortedByUsers = viewModel.isSortedByUsers
+    val isAiredFrom = viewModel.isAiredFrom
 
+    val selectedType = viewModel.selectedType
+    val isTvSelected = viewModel.isTvSelected
+    val isMovieSelected = viewModel.isMovieSelected
+    val isOvaSelected = viewModel.isOvaSelected
+    val isSpecialSelected = viewModel.isSpecialSelected
+    val isOnaSelected = viewModel.isOnaSelected
+    val isMusicSelected = viewModel.isMusicSelected
 
-    val selectedType = daoViewModel.selectedType
-    val isTvSelected = daoViewModel.isTvSelected
-    val isMovieSelected = daoViewModel.isMovieSelected
-    val isOvaSelected = daoViewModel.isOvaSelected
-    val isSpecialSelected = daoViewModel.isSpecialSelected
-    val isOnaSelected = daoViewModel.isOnaSelected
-    val isMusicSelected = daoViewModel.isMusicSelected
-
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = modifier
@@ -145,8 +146,16 @@ fun DaoScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 0.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.Bottom
             ) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.inversePrimary,
+                    modifier = modifier
+                        .size(30.dp)
+                        .clickable { scope.launch{ drawerState.open() } }
+                )
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),
                     contentDescription = "None",
@@ -168,7 +177,7 @@ fun DaoScreen(
                 OutlinedTextField(
                     placeholder = { Text(text = "Search...", color = Color.Gray) },
                     value = searchText ?: "",
-                    onValueChange = daoViewModel::onSearchTextChange,
+                    onValueChange = viewModel::onSearchTextChange,
                     modifier = modifier
                         .clip(RoundedCornerShape(30.dp))
                         .height(50.dp)
@@ -237,7 +246,7 @@ fun DaoScreen(
             when (selectedListType) {
                 AnimeListType.WATCHING -> DataAnimeList(
                     navController = navController,
-                    daoViewModel = daoViewModel,
+                    daoViewModel = viewModel,
                     modifier = modifier,
                     category = AnimeListType.WATCHING.route,
                     isSortedAlphabetically = isSortedAlphabetically,
@@ -250,7 +259,7 @@ fun DaoScreen(
 
                 AnimeListType.PLANNED -> DataAnimeList(
                     navController = navController,
-                    daoViewModel = daoViewModel,
+                    daoViewModel = viewModel,
                     modifier = modifier,
                     category = AnimeListType.PLANNED.route,
                     isSortedAlphabetically = isSortedAlphabetically,
@@ -263,7 +272,7 @@ fun DaoScreen(
 
                 AnimeListType.COMPLETED -> DataAnimeList(
                     navController = navController,
-                    daoViewModel = daoViewModel,
+                    daoViewModel = viewModel,
                     modifier = modifier,
                     category = AnimeListType.COMPLETED.route,
                     isSortedAlphabetically = isSortedAlphabetically,
@@ -276,7 +285,7 @@ fun DaoScreen(
 
                 AnimeListType.DROPPED -> DataAnimeList(
                     navController = navController,
-                    daoViewModel = daoViewModel,
+                    daoViewModel = viewModel,
                     modifier = modifier,
                     category = AnimeListType.DROPPED.route,
                     isSortedAlphabetically = isSortedAlphabetically,
@@ -289,7 +298,7 @@ fun DaoScreen(
 
                 AnimeListType.FAVORITE -> FavoriteList(
                     navController = navController,
-                    daoViewModel = daoViewModel,
+                    daoViewModel = viewModel,
                     modifier = modifier,
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
@@ -308,7 +317,7 @@ fun DaoScreen(
                 AnimeListType.CHARACTER -> ShowCharacter(
                     navController = navController,
                     modifier = modifier,
-                    daoViewModel = daoViewModel,
+                    daoViewModel = viewModel,
                 )
             }
         }
@@ -968,9 +977,9 @@ private fun DataScreenCardBox(
                     text = animeItem.animeName,
                     modifier = modifier,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp, color = MaterialTheme.colorScheme.onPrimary
+                    fontSize = 25.sp, color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
                 if (!animeItem.secondName.isNullOrEmpty()) {
                     Row(
@@ -1023,7 +1032,8 @@ private fun DataScreenCardBox(
                             fontSize = 19.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            fontFamily = evolventaBoldFamily
                         )
                     }
                 }
@@ -1176,7 +1186,8 @@ private fun FavoriteScreenCardBox(
                             fontSize = 19.sp,
                             fontWeight = FontWeight.ExtraBold,
                             textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = Color.White,
+                            fontFamily = evolventaBoldFamily
                         )
                     }
                 }
@@ -1270,7 +1281,8 @@ private fun TwoSortingButtons(
                         .padding(start = 20.dp)
                         .clickable {
                             leftSortingMenu.value = !leftSortingMenu.value
-                        }, color = MaterialTheme.colorScheme.onPrimary
+                        }, color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
                 )
             } else {
                 Text(

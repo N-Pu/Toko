@@ -46,7 +46,7 @@ fun DisplayPersonFullScreen(
     mal_id: Int,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme: Boolean
+    modifier: Modifier, isInDarkTheme: Boolean, svgImageLoader : ImageLoader
 ) {
     val personViewModel = viewModelProvider[PersonByIdViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
@@ -72,9 +72,7 @@ fun DisplayPersonFullScreen(
     val personPicturesState by
     personViewModel.picturesList.collectAsStateWithLifecycle()
     val painter = rememberAsyncImagePainter(model = personFullState?.images?.jpg?.image_url)
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
+
     val isDialogShown = remember { mutableStateOf(false) }
     if (isSearching.not() && personFullState != null) {
 

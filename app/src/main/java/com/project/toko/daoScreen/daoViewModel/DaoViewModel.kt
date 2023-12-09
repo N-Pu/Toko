@@ -308,7 +308,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
             viewModelScope.launch(Dispatchers.Main) {
                 Toast.makeText(
                     context,
-                    "${favoriteItem.animeName} is in ${favoriteItem.category} category!",
+                    "${favoriteItem.animeName} is in Favorite category!",
                     Toast.LENGTH_SHORT
                 ).show()
             }

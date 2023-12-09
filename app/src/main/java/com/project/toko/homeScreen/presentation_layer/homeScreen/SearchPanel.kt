@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -61,18 +62,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     navController: NavHostController, viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme: Boolean
+    modifier: Modifier, isInDarkTheme: Boolean, drawerState: DrawerState, svgImageLoader: ImageLoader
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
     val isTabMenuOpen = remember { mutableStateOf(true) }
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
-
     val switchIndicator = viewModel.switchIndicator
 //    val isInDarkMode = SaveDarkMode(LocalContext.current).isDarkThemeActive
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = modifier
@@ -91,11 +89,19 @@ fun MainScreen(
         ) {
             // Logotype on the top left
             Row(
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.Bottom
             ) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.inversePrimary,
+                    modifier = modifier
+                        .size(30.dp)
+                        .clickable { scope.launch { drawerState.open() } }
+                )
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),
-                    contentDescription = "None",
+                    contentDescription = null,
                     modifier = modifier
                         .height(50.dp)
                         .width(70.dp),
@@ -111,8 +117,7 @@ fun MainScreen(
                     .background(
                         if (isInDarkTheme) DarkSearchBarColor else SearchBarColor
 
-                    )
-                ,
+                    ),
                 verticalAlignment = Alignment.Bottom
             ) {
 
@@ -195,7 +200,8 @@ fun MainScreen(
                 modifier = modifier,
                 isTabMenuOpen = isTabMenuOpen,
                 switch = switchIndicator,
-                isInDarkTheme = isInDarkTheme
+                isInDarkTheme = isInDarkTheme,
+                svgImageLoader = svgImageLoader
             )
         } else {
             LoadingAnimation()
