@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -59,7 +58,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.dao.AnimeItem
@@ -77,7 +75,8 @@ fun CustomDialog(
     navController: NavController,
     modifier: Modifier,
     viewModelProvider: ViewModelProvider,
-    isInDarkTheme: Boolean
+    isInDarkTheme: Boolean,
+    svgImageLoader: ImageLoader
 ) {
 
     val painter = rememberAsyncImagePainter(model = data.images.jpg.large_image_url)
@@ -182,7 +181,11 @@ fun CustomDialog(
                         YearTypeStudio(data = data, modifier = modifier)
                         EpisodesLabel(episodes = data.episodes, modifier = modifier)
                         AddToDataBaseRow(
-                            modifier = modifier, data = data, viewModelProvider = viewModelProvider, isInDarkTheme = isInDarkTheme
+                            modifier = modifier,
+                            data = data,
+                            viewModelProvider = viewModelProvider,
+                            isInDarkTheme = isInDarkTheme,
+                            svgImageLoader = svgImageLoader
                         )
                     }
 
@@ -459,13 +462,12 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 private fun AddToDataBaseRow(
     modifier: Modifier,
     data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData,
-    viewModelProvider: ViewModelProvider, isInDarkTheme: Boolean
+    viewModelProvider: ViewModelProvider, isInDarkTheme: Boolean,
+    svgImageLoader: ImageLoader
 ) {
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     var isExpanded by remember { mutableStateOf(false) }
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
+
     val threeDots = if (isInDarkTheme) {
         R.drawable.three_dots_white
     } else {
@@ -901,7 +903,7 @@ private fun AddToDataBaseRow(
                 else -> {
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model =threeDots, imageLoader = svgImageLoader
+                            model = threeDots, imageLoader = svgImageLoader
                         ),
                         contentDescription = null,
                         modifier = modifier

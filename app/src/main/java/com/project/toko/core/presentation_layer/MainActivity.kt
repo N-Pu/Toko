@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import coil.decode.SvgDecoder
 import com.project.toko.core.dao.MainDb
 import com.project.toko.core.di.Application
 import com.project.toko.core.repository.MalApiService
@@ -56,6 +58,9 @@ class MainActivity : ComponentActivity() {
                 context = context
             )
         val viewModelProvider = ViewModelProvider(this, myViewModelFactory)
+        val svgImageLoader = ImageLoader.Builder(this).components {
+            add(SvgDecoder.Factory())
+        }.build()
 
         setContent {
             navController = rememberNavController()
@@ -76,7 +81,8 @@ class MainActivity : ComponentActivity() {
                             darkTheme.isDarkThemeActive.value = !darkTheme.isDarkThemeActive.value
                             darkTheme.saveData(darkTheme.isDarkThemeActive.value)
                         },
-                        isInDarkTheme = darkTheme.isDarkThemeActive.value
+                        isInDarkTheme = darkTheme.isDarkThemeActive.value,
+                        svgImageLoader = svgImageLoader
                     )
                 }
             }

@@ -29,7 +29,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.FabPosition
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
@@ -39,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -69,7 +70,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
 import com.project.toko.core.dao.MainDb
@@ -97,11 +97,9 @@ fun AppActivator(
     componentActivity: ComponentActivity,
     mainDb: MainDb,
     onThemeChange:  () -> Unit,
-    isInDarkTheme: Boolean
+    isInDarkTheme: Boolean,
+    svgImageLoader: ImageLoader
 ) {
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
 
     val currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedId
     val characterDetailScreenId = viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
@@ -138,8 +136,8 @@ fun AppActivator(
 //        }
 //    }
 
-
-    ModalNavigationDrawer(
+val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    ModalNavigationDrawer(drawerState = drawerState,
         drawerContent = {
             ShowDrawerContent(
                 modifier = modifier,
@@ -148,13 +146,12 @@ fun AppActivator(
                 componentActivity = componentActivity,
                 mainDb = mainDb,
                 onThemeChange = onThemeChange,
-                darkTheme = isInDarkTheme
+                darkTheme = isInDarkTheme,
+                svgImageLoader = svgImageLoader
             )
         }
     ) {
-
         Scaffold(bottomBar = {
-
             BottomNavigationBar(
                 navController = navController,
                 currentDetailScreenId = currentDetailScreenId,
@@ -165,16 +162,16 @@ fun AppActivator(
                 lastSelectedScreen = lastSelectedScreen,
                 imageLoader = svgImageLoader
             )
-
         },
-            floatingActionButtonPosition = FabPosition.Center,
             content = { padding ->
                 padding.calculateTopPadding()
                 SetupNavGraph(
                     navController = navController,
                     viewModelProvider = viewModelProvider,
                     modifier = modifier,
-                    isInDarkTheme = isInDarkTheme
+                    isInDarkTheme = isInDarkTheme,
+                    drawerState = drawerState,
+                    svgImageLoader = svgImageLoader
                 )
             }
         )
@@ -476,16 +473,15 @@ private fun ShowDrawerContent(
     componentActivity: ComponentActivity,
     mainDb: MainDb,
     onThemeChange: () -> Unit,
-    darkTheme: Boolean
+    darkTheme: Boolean,
+    svgImageLoader: ImageLoader
 ) {
     val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
     var isHelpFAQOpen by remember { mutableStateOf(false) }
     var isLegalOpen by remember { mutableStateOf(false) }
     val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
+
 //    val saveDarkMode = SaveDarkMode(LocalContext.current)
 //    val currentTheme = saveDarkMode.loadData()
     val customModifier =
@@ -982,7 +978,8 @@ private fun ShowDrawerContent(
                 contentDescription = null,
                 modifier = modifier
                     .size(50.dp)
-                    .padding(bottom = 10.dp, end = 5.dp).clickable {
+                    .padding(bottom = 10.dp, end = 5.dp)
+                    .clickable {
                         onThemeChange()
                     }
             )

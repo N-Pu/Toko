@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -32,7 +33,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,7 +44,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.theme.DarkSearchBarColor
@@ -61,18 +60,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     navController: NavHostController, viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme: Boolean
+    modifier: Modifier, isInDarkTheme: Boolean, drawerState: DrawerState, svgImageLoader: ImageLoader
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
     val isTabMenuOpen = remember { mutableStateOf(true) }
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
-
     val switchIndicator = viewModel.switchIndicator
 //    val isInDarkMode = SaveDarkMode(LocalContext.current).isDarkThemeActive
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = modifier
@@ -91,11 +87,19 @@ fun MainScreen(
         ) {
             // Logotype on the top left
             Row(
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.Bottom
             ) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.inversePrimary,
+                    modifier = modifier
+                        .size(30.dp)
+                        .clickable { scope.launch { drawerState.open() } }
+                )
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),
-                    contentDescription = "None",
+                    contentDescription = null,
                     modifier = modifier
                         .height(50.dp)
                         .width(70.dp),
@@ -111,8 +115,7 @@ fun MainScreen(
                     .background(
                         if (isInDarkTheme) DarkSearchBarColor else SearchBarColor
 
-                    )
-                ,
+                    ),
                 verticalAlignment = Alignment.Bottom
             ) {
 
@@ -195,7 +198,8 @@ fun MainScreen(
                 modifier = modifier,
                 isTabMenuOpen = isTabMenuOpen,
                 switch = switchIndicator,
-                isInDarkTheme = isInDarkTheme
+                isInDarkTheme = isInDarkTheme,
+                svgImageLoader = svgImageLoader
             )
         } else {
             LoadingAnimation()

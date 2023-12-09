@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
-import coil.decode.SvgDecoder
 import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
@@ -46,7 +45,7 @@ fun DisplayPersonFullScreen(
     mal_id: Int,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme: Boolean
+    modifier: Modifier, isInDarkTheme: Boolean, svgImageLoader : ImageLoader
 ) {
     val personViewModel = viewModelProvider[PersonByIdViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
@@ -72,9 +71,7 @@ fun DisplayPersonFullScreen(
     val personPicturesState by
     personViewModel.picturesList.collectAsStateWithLifecycle()
     val painter = rememberAsyncImagePainter(model = personFullState?.images?.jpg?.image_url)
-    val svgImageLoader = ImageLoader.Builder(LocalContext.current).components {
-        add(SvgDecoder.Factory())
-    }.build()
+
     val isDialogShown = remember { mutableStateOf(false) }
     if (isSearching.not() && personFullState != null) {
 
