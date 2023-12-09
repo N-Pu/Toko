@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
-import coil.decode.SvgDecoder
 import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel

@@ -36,7 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.share.shareLink

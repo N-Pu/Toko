@@ -21,7 +21,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
 import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation

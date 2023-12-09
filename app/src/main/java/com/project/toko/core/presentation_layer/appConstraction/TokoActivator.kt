@@ -70,7 +70,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
 import com.project.toko.R
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
 import com.project.toko.core.dao.MainDb
