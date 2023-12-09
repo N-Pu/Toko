@@ -89,7 +89,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     e.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -104,7 +104,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     "${animeItem.animeName} is in ${animeItem.category} category!",
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         } catch (e: Exception) {
@@ -112,7 +112,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     e.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -157,7 +157,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     e.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -181,7 +181,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     "${characterItem.name} was removed to database!",
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         } catch (e: Exception) {
@@ -189,7 +189,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     e.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -208,7 +208,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     "${characterItem.name} was added to database!",
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         } catch (e: Exception) {
@@ -216,7 +216,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     e.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -236,7 +236,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     "${personItem.name} was removed from database!",
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         } catch (e: Exception) {
@@ -244,7 +244,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     e.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -263,7 +263,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     "${personItem.name} was added from database!",
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         } catch (e: Exception) {
@@ -271,7 +271,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     e.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -287,7 +287,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     "${favoriteItem.animeName} was removed from FAVORITE category!",
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         } catch (e: Exception) {
@@ -295,7 +295,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     e.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -309,7 +309,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     "${favoriteItem.animeName} is in Favorite category!",
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         } catch (e: Exception) {
@@ -317,7 +317,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
                 Toast.makeText(
                     context,
                     e.message,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
             }
         }
@@ -343,6 +343,4 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
             type = type ?: ""
         )
     }
-
-
 }

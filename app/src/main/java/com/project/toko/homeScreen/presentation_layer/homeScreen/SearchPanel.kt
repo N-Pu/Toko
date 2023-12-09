@@ -59,13 +59,17 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
-    navController: NavHostController, viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme: Boolean, drawerState: DrawerState, svgImageLoader: ImageLoader
+    navController: NavHostController,
+    viewModelProvider: ViewModelProvider,
+    modifier: Modifier,
+    isInDarkTheme: Boolean,
+    drawerState: DrawerState,
+    svgImageLoader: ImageLoader
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
-    val isTabMenuOpen = remember { mutableStateOf(true) }
+    val isTabMenuOpen = viewModel.isTabMenuOpen
     val switchIndicator = viewModel.switchIndicator
 //    val isInDarkMode = SaveDarkMode(LocalContext.current).isDarkThemeActive
     val scope = rememberCoroutineScope()
@@ -114,7 +118,6 @@ fun MainScreen(
                     .clip(RoundedCornerShape(20.dp))
                     .background(
                         if (isInDarkTheme) DarkSearchBarColor else SearchBarColor
-
                     ),
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -189,7 +192,7 @@ fun MainScreen(
             }
         }
 
-        TabSelectionMenu(viewModel, modifier, isTabMenuOpen)
+        TabSelectionMenu(viewModel, modifier, isTabMenuOpen, switchIndicator)
 
         if (isSearching.not()) {
             GridAdder(
@@ -214,7 +217,8 @@ fun MainScreen(
 private fun TabSelectionMenu(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    isTabMenuOpen: MutableState<Boolean>
+    isTabMenuOpen: MutableState<Boolean>,
+    switchIndicator: MutableState<Boolean>
 ) {
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -313,23 +317,23 @@ private fun TabSelectionMenu(
                     content = {
                         when (tabItems[index]) {
                             tabItems[0] -> {
-                                ShowTypes(viewModel, modifier)
+                                ShowTypes(viewModel, modifier,switchIndicator)
                             }
 
                             tabItems[1] -> {
-                                ShowGenres(viewModel, modifier)
+                                ShowGenres(viewModel, modifier,switchIndicator)
                             }
 
                             tabItems[2] -> {
-                                ShowRating(viewModel, modifier)
+                                ShowRating(viewModel, modifier,switchIndicator)
                             }
 
                             tabItems[3] -> {
-                                ScoreBar(viewModel, modifier)
+                                ScoreBar(viewModel, modifier,switchIndicator)
                             }
 
                             tabItems[4] -> {
-                                ShowOrderBy(viewModel, modifier)
+                                ShowOrderBy(viewModel, modifier,switchIndicator)
                             }
                         }
                     }
@@ -344,7 +348,8 @@ private fun TabSelectionMenu(
 @Composable
 private fun ScoreBar(
     viewModel: HomeScreenViewModel,
-    modifier: Modifier
+    modifier: Modifier,
+    switchIndicator: MutableState<Boolean>
 ) {
     val selectedNumber = viewModel.scoreState
     val items = listOf("—", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
@@ -403,6 +408,7 @@ private fun ScoreBar(
             delay(1000L)
             viewModel.pre_min_score.value = Score(minMaxScore.minScore)
             viewModel.pre_max_score.value = Score(minMaxScore.maxScore)
+            switchIndicator.value = true
             viewModel.addAllParams()
         }
     }
@@ -413,8 +419,8 @@ private fun ScoreBar(
 @Composable
 private fun ShowGenres(
     viewModel: HomeScreenViewModel,
-    modifier: Modifier
-) {
+    modifier: Modifier,
+    switchIndicator: MutableState<Boolean>) {
     val selectedGenre by viewModel.selectedGenre.collectAsStateWithLifecycle()
     Box(
         modifier = modifier
@@ -433,6 +439,9 @@ private fun ShowGenres(
                         }
                         viewModel.viewModelScope.launch(Dispatchers.IO) {
                             viewModel.tappingOnGenre(genreForUI.id)
+                        }
+                        viewModel.viewModelScope.launch(Dispatchers.IO) {
+                            switchIndicator.value = true
                         }
                         viewModel.viewModelScope.launch(Dispatchers.IO) {
                             viewModel.addAllParams()
@@ -483,7 +492,7 @@ private fun ButtonCreator(
 }
 
 @Composable
-private fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier) {
+private fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier, switchIndicator: MutableState<Boolean>)  {
     val ratingList by viewModel.ratingList.collectAsStateWithLifecycle()
     val selectedRating by viewModel.selectedRating.collectAsStateWithLifecycle()
     Row(
@@ -496,6 +505,7 @@ private fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier) {
                 onClick = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.setSelectedRating(rating)
+                        switchIndicator.value = true
                         viewModel.addAllParams()
                     }
                 },
@@ -513,7 +523,7 @@ private fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier) {
+private fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier, switchIndicator: MutableState<Boolean>) {
     val typeList by viewModel.typeList.collectAsStateWithLifecycle()
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
 
@@ -524,6 +534,7 @@ private fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier) {
                 onClick = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.setSelectedType(type)
+                        switchIndicator.value = true
                         viewModel.addAllParams()
                     }
                 },
@@ -541,7 +552,7 @@ private fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ShowOrderBy(viewModel: HomeScreenViewModel, modifier: Modifier) {
+private fun ShowOrderBy(viewModel: HomeScreenViewModel, modifier: Modifier, switchIndicator: MutableState<Boolean>) {
     val orderByList by viewModel.orderByList.collectAsStateWithLifecycle()
     val selectedOrderBy by viewModel.selectedOrderBy.collectAsStateWithLifecycle()
 
@@ -553,6 +564,7 @@ private fun ShowOrderBy(viewModel: HomeScreenViewModel, modifier: Modifier) {
                 onClick = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.setSelectedOrderBy(orderBy)
+                        switchIndicator.value = true
                         viewModel.addAllParams()
                     }
                 },
