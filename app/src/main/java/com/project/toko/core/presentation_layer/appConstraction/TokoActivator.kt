@@ -137,6 +137,7 @@ fun AppActivator(
 //    }
 
 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
     ModalNavigationDrawer(drawerState = drawerState,
         drawerContent = {
             ShowDrawerContent(

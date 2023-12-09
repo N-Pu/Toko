@@ -7,19 +7,24 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.toko.core.dao.MainDb
 import com.project.toko.core.di.Application
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.core.presentation_layer.appConstraction.AppActivator
-import com.project.toko.core.presentation_layer.theme.TokoTheme
+import com.project.toko.core.presentation_layer.theme.SplashTheme
+import com.project.toko.core.presentation_layer.theme.Theme
 import com.project.toko.core.settings.SaveDarkMode
 import com.project.toko.core.viewModel.viewModelFactory.MyViewModelFactory
+import com.project.toko.splashScreen.AnimatedSplashScreen
 import javax.inject.Inject
 
 
@@ -63,30 +68,54 @@ class MainActivity : ComponentActivity() {
         }.build()
 
         setContent {
+            val systemUiController = rememberSystemUiController()
+            val splashShown = remember { mutableStateOf(false) }
             navController = rememberNavController()
-
-            TokoTheme(darkTheme.isDarkThemeActive.value) {
-
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = modifier.fillMaxSize(),
+            if (!splashShown.value) {
+                SplashTheme(
+                    darkTheme = darkTheme.isDarkThemeActive.value,
+                    systemUiController = systemUiController
                 ) {
-                    AppActivator(
-                        navController = navController,
-                        viewModelProvider = viewModelProvider,
-                        modifier = modifier,
-                        componentActivity = this,
-                        mainDb = databaseComponent.provideDao(),
-                        onThemeChange = {
-                            darkTheme.isDarkThemeActive.value = !darkTheme.isDarkThemeActive.value
-                            darkTheme.saveData(darkTheme.isDarkThemeActive.value)
-                        },
-                        isInDarkTheme = darkTheme.isDarkThemeActive.value,
-                        svgImageLoader = svgImageLoader
-                    )
+                    AnimatedSplashScreen(navController, svgImageLoader) {
+                        splashShown.value = true
+                    }
+                }
+            } else {
+                Theme(
+                    darkTheme = darkTheme.isDarkThemeActive.value,
+                    systemUiController = systemUiController
+                ) {
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = modifier.fillMaxSize(),
+                    ) {
+
+                        AppActivator(
+                            navController = navController,
+                            viewModelProvider = viewModelProvider,
+                            modifier = modifier,
+                            componentActivity = this,
+                            mainDb = databaseComponent.provideDao(),
+                            onThemeChange = {
+                                darkTheme.isDarkThemeActive.value =
+                                    !darkTheme.isDarkThemeActive.value
+                                darkTheme.saveData(darkTheme.isDarkThemeActive.value)
+                            },
+                            isInDarkTheme = darkTheme.isDarkThemeActive.value,
+                            svgImageLoader = svgImageLoader
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+//SetupNavGraph(
+//navController = navController,
+//viewModelProvider = viewModelProvider,
+//modifier = modifier,
+//isInDarkTheme = darkTheme.isDarkThemeActive.value,
+//drawerState = drawerState,
+//svgImageLoader = svgImageLoader
+//)

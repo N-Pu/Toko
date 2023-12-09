@@ -4,6 +4,8 @@ import com.project.toko.R
 
 
 sealed class Screen(val route: String, val iconId: Int?, val contentDescription: String) {
+
+//    object Splash : Screen("splash_screen", null, "Splash Screen")
     object Home : Screen("home_screen", R.drawable.home, "Search Anime")
     object Detail : Screen("detail_screen/{id}", R.drawable.detail, "Details on Anime")
     object Favorites : Screen("favorites_screen", R.drawable.bookmarkempty, "Favorite anime")
