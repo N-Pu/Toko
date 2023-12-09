@@ -173,6 +173,9 @@ class HomeScreenViewModel @Inject constructor(
 
     private val _switchIndicator = mutableStateOf(false)
     val switchIndicator = _switchIndicator
+
+    private val _isTabMenuOpen = mutableStateOf(false)
+    val isTabMenuOpen = _isTabMenuOpen
     fun onSearchTextChange(text: String) {
         try {
             viewModelScope.launch(Dispatchers.IO) {
