@@ -126,26 +126,6 @@ fun SetupNavGraph(
                 svgImageLoader = svgImageLoader
             )
         }
-//        composable(
-//            route = Screen.ProducerDetail.route,
-//            arguments = listOf(navArgument("id") {
-//                type = NavType.IntType
-//            }
-////                , navArgument("studio_name") {
-////                type = NavType.StringType
-////
-////                }
-//            )
-//        ) { backStackEntry ->
-//            val id = backStackEntry.arguments!!.getInt("id")
-////            val studio_name = backStackEntry.arguments!!.getString("studio_name")!!
-//            ShowScreen(
-//                id = id, viewModelProvider = viewModelProvider,
-//
-////                studio_name = studio_name,
-//                modifier = modifier
-//            )
-//        }
 
     }
 }

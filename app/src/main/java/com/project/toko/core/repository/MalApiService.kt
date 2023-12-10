@@ -13,7 +13,6 @@ import com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel
 import com.project.toko.detailScreen.model.staffModel.StaffModel
 import com.project.toko.personDetailedScreen.model.personFullModel.PersonFullModel
 import com.project.toko.personDetailedScreen.model.personPictures.PersonPicturesModel
-import com.project.toko.producerDetailedScreen.model.producerModel.ProducerFullModel
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import retrofit2.Response
@@ -119,28 +118,4 @@ interface MalApiService {
         }
         throw Exception("Failed to get response after $retryCount retries")
     }
-
-
-    @GET("${BASE_URL}v4/producers/{id}/full")
-    suspend fun getProducerFullFromId(@Path("id") id: Int): Response<ProducerFullModel> {
-        var retryCount = 0
-        while (retryCount < 3) { // повторяем запрос не более 3 раз
-            try {
-                return getProducerFullFromId(id)
-            } catch (e: Exception) {
-                // обрабатываем ошибки
-                when (e) {
-                    is SocketTimeoutException, is HttpException -> {
-                        retryCount++
-                        Log.e("MalApiService", "Error occurred: ${e.message}")
-                        delay(1000) // задержка на 1 секунд перед повторным запросом
-                    }
-
-                    else -> throw e // выбрасываем ошибку, которую не умеем обрабатывать
-                }
-            }
-        }
-        throw Exception("Failed to get response after $retryCount retries")
-    }
-
 }

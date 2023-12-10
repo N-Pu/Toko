@@ -53,6 +53,7 @@ import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
 import com.project.toko.homeScreen.model.linkChangerModel.Score
 import com.project.toko.homeScreen.model.linkChangerModel.getMinMaxScore
 import com.project.toko.homeScreen.model.tabRow.TabItem
+import com.project.toko.homeScreen.model.tabRow.returnListOfTabItems
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -226,13 +227,7 @@ private fun TabSelectionMenu(
         mutableStateOf(IntSize.Zero)
     }
 
-    val tabItems = listOf(
-        TabItem("Type"),
-        TabItem("Genres"),
-        TabItem("Rating"),
-        TabItem("Score"),
-        TabItem("Order By")
-    )
+    val tabItems = returnListOfTabItems()
     val pagerState = rememberPagerState { tabItems.size }
 
     LaunchedEffect(selectedTabIndex) {

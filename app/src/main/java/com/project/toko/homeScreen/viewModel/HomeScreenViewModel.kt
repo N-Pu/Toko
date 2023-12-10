@@ -128,8 +128,23 @@ class HomeScreenViewModel @Inject constructor(
     private val _scoreState = mutableIntStateOf(0)
     val scoreState = _scoreState
 
-    private val _safeForWork = mutableStateOf(false)
-    var safeForWork = _safeForWork
+    private val _isNSFWActive = mutableStateOf(false)
+    val isNSFWActive = _isNSFWActive
+
+    fun saveNSFWData(isActive: Boolean) {
+        val sharedPreferences = context.getSharedPreferences("NSFW Mode", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("NSFW_MODE", isActive)
+        editor.apply()
+        _isNSFWActive.value = isActive
+
+//        Toast.makeText(context, "Data Saved", Toast.LENGTH_SHORT).show()
+    }
+
+    fun loadNSFWData() {
+        val sharedPreferences = context.getSharedPreferences("NSFW Mode", Context.MODE_PRIVATE)
+        _isNSFWActive.value = sharedPreferences.getBoolean("NSFW_MODE", false)
+    }
 
     private val _typeList =
         MutableStateFlow(getTypes())
@@ -215,7 +230,7 @@ class HomeScreenViewModel @Inject constructor(
 
             val response = malApiRepository.getAnimeSearchByName(
                 eTag = query + currentPage.value,
-                sfw = safeForWork.value,
+                sfw = _isNSFWActive.value,
                 query = currentQuery,
                 page = currentPage.value,
                 genres = currentGenres,
@@ -356,7 +371,7 @@ class HomeScreenViewModel @Inject constructor(
                 val response =
                     malApiRepository.getAnimeSearchByName(
                         eTag = query + currentPage.value,
-                        sfw = safeForWork.value,
+                        sfw = _isNSFWActive.value,
                         query = currentQuery,
                         page = nextPage,
                         genres = makeArrayToLinkWithCommas(arrayOfGenres.value),
