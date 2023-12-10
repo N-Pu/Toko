@@ -24,6 +24,7 @@ import com.project.toko.core.presentation_layer.theme.SplashTheme
 import com.project.toko.core.presentation_layer.theme.Theme
 import com.project.toko.core.settings.SaveDarkMode
 import com.project.toko.core.viewModel.viewModelFactory.MyViewModelFactory
+import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.splashScreen.AnimatedSplashScreen
 import javax.inject.Inject
 
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
         val svgImageLoader = ImageLoader.Builder(this).components {
             add(SvgDecoder.Factory())
         }.build()
-
+        viewModelProvider[HomeScreenViewModel::class.java].loadNSFWData()
         setContent {
             val systemUiController = rememberSystemUiController()
             val splashShown = remember { mutableStateOf(false) }
@@ -110,12 +111,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-//SetupNavGraph(
-//navController = navController,
-//viewModelProvider = viewModelProvider,
-//modifier = modifier,
-//isInDarkTheme = darkTheme.isDarkThemeActive.value,
-//drawerState = drawerState,
-//svgImageLoader = svgImageLoader
-//)

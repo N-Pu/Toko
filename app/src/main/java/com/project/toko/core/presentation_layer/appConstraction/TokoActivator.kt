@@ -79,7 +79,6 @@ import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
-import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -96,7 +95,7 @@ fun AppActivator(
     modifier: Modifier,
     componentActivity: ComponentActivity,
     mainDb: MainDb,
-    onThemeChange:  () -> Unit,
+    onThemeChange: () -> Unit,
     isInDarkTheme: Boolean,
     svgImageLoader: ImageLoader
 ) {
@@ -104,7 +103,6 @@ fun AppActivator(
     val currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedId
     val characterDetailScreenId = viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
     val personDetailScreenId = viewModelProvider[PersonByIdViewModel::class.java].loadedId
-    val producerDetailScreenId = viewModelProvider[ProducerFullViewModel::class.java].loadedId
     var lastSelectedScreen by rememberSaveable { mutableStateOf<String?>(null) }
 
     navController.addOnDestinationChangedListener { _, destination, arguments ->
@@ -136,7 +134,7 @@ fun AppActivator(
 //        }
 //    }
 
-val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     ModalNavigationDrawer(drawerState = drawerState,
         drawerContent = {
@@ -158,7 +156,6 @@ val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 currentDetailScreenId = currentDetailScreenId,
                 characterDetailScreenId = characterDetailScreenId,
                 personDetailScreenId = personDetailScreenId,
-                producerDetailScreenId = producerDetailScreenId,
                 modifier = modifier,
                 lastSelectedScreen = lastSelectedScreen,
                 imageLoader = svgImageLoader
@@ -185,7 +182,6 @@ private fun BottomNavigationBar(
     navController: NavController,
     currentDetailScreenId: MutableState<Int>,
     modifier: Modifier,
-    producerDetailScreenId: MutableState<Int>,
     characterDetailScreenId: MutableState<Int>,
     personDetailScreenId: MutableState<Int>,
     lastSelectedScreen: String?,
@@ -321,18 +317,6 @@ private fun BottomNavigationBar(
                                 Log.d(
                                     "last stack membor",
                                     "detail_on_staff/${personDetailScreenId.value}"
-                                )
-                            }
-
-                            Screen.ProducerDetail.route -> {
-                                navController.navigate("detail_on_producer/${producerDetailScreenId.value}/full") {
-                                    navController.graph.startDestinationRoute?.let { _ ->
-                                        launchSingleTop = true
-                                    }
-                                }
-                                Log.d(
-                                    "last stack membor",
-                                    "detail_on_producer/${producerDetailScreenId.value}/full"
                                 )
                             }
 
@@ -601,8 +585,9 @@ private fun ShowDrawerContent(
                 onClick = {
                 },
                 badge = {
-                    Switch(checked = homeScreenViewModel.safeForWork.value, onCheckedChange = {
-                        homeScreenViewModel.safeForWork.value = it
+                    Switch(checked = homeScreenViewModel.isNSFWActive.value, onCheckedChange = {
+                        homeScreenViewModel.saveNSFWData(it)
+                        homeScreenViewModel.isNSFWActive.value = it
                     }, colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
                         checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
@@ -611,7 +596,7 @@ private fun ShowDrawerContent(
                         uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
                         uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
                     ),
-                        thumbContent = if (homeScreenViewModel.safeForWork.value) {
+                        thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
                             {
                                 Icon(
                                     imageVector = Icons.Filled.Check,

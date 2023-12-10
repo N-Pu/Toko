@@ -11,7 +11,6 @@ import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
-import com.project.toko.producerDetailedScreen.viewModel.ProducerFullViewModel
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
@@ -41,10 +40,6 @@ class MyViewModelFactory @Inject constructor(
             ) as T
 
             modelClass.isAssignableFrom(RandomAnimeViewModel::class.java) -> RandomAnimeViewModel(
-                malApiRepository
-            ) as T
-
-            modelClass.isAssignableFrom(ProducerFullViewModel::class.java) -> ProducerFullViewModel(
                 malApiRepository
             ) as T
 
