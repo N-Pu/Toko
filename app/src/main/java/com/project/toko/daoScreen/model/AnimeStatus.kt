@@ -1,10 +1,10 @@
 package com.project.toko.daoScreen.model
-enum class AnimeListType(
+enum class AnimeStatus(
     val route: String,
 ) {
     WATCHING("Watching"),
     PLANNED("Planned"),
-    COMPLETED("Watched"),
+    COMPLETED("Completed"),
     DROPPED("Dropped"),
     FAVORITE("Favorite"),
     PERSON("Person"),

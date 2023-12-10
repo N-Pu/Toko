@@ -86,7 +86,7 @@ import com.project.toko.core.presentation_layer.theme.lightFavoriteTopBarColors
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
-import com.project.toko.daoScreen.model.AnimeListType
+import com.project.toko.daoScreen.model.AnimeStatus
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.personDetailedScreen.dao.PersonItem
 import kotlinx.coroutines.Dispatchers
@@ -102,13 +102,15 @@ import me.saket.swipe.SwipeableActionsBox
 fun DaoScreen(
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme: Boolean, drawerState: DrawerState, svgImageLoader : ImageLoader
+    modifier: Modifier,
+    isInDarkTheme: Boolean,
+    drawerState: DrawerState,
+    svgImageLoader: ImageLoader
 ) {
 
 
-
-    var selectedListType by rememberSaveable { mutableStateOf(AnimeListType.WATCHING) }
-    val arrayOfEntries = AnimeListType.values()
+    var selectedListType by rememberSaveable { mutableStateOf(AnimeStatus.WATCHING) }
+    val arrayOfEntries = AnimeStatus.values()
     val viewModel = viewModelProvider[DaoViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val rightSortingMenu = remember { mutableStateOf(false) }
@@ -152,7 +154,7 @@ fun DaoScreen(
                     tint = MaterialTheme.colorScheme.inversePrimary,
                     modifier = modifier
                         .size(30.dp)
-                        .clickable { scope.launch{ drawerState.open() } }
+                        .clickable { scope.launch { drawerState.open() } }
                 )
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),
@@ -216,7 +218,7 @@ fun DaoScreen(
             }
         }
 
-        if ((selectedListType != AnimeListType.CHARACTER) and (selectedListType != AnimeListType.PERSON)) {
+        if ((selectedListType != AnimeStatus.CHARACTER) and (selectedListType != AnimeStatus.PERSON)) {
             TwoSortingButtons(
                 modifier = modifier,
                 svgImageLoader = svgImageLoader,
@@ -242,11 +244,11 @@ fun DaoScreen(
                 .background(MaterialTheme.colorScheme.primary)
         ) {
             when (selectedListType) {
-                AnimeListType.WATCHING -> DataAnimeList(
+                AnimeStatus.WATCHING -> DataAnimeList(
                     navController = navController,
                     daoViewModel = viewModel,
                     modifier = modifier,
-                    category = AnimeListType.WATCHING.route,
+                    category = AnimeStatus.WATCHING.route,
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
                     isSortedByUsers = isSortedByUsers,
@@ -255,11 +257,11 @@ fun DaoScreen(
                     type = selectedType
                 )
 
-                AnimeListType.PLANNED -> DataAnimeList(
+                AnimeStatus.PLANNED -> DataAnimeList(
                     navController = navController,
                     daoViewModel = viewModel,
                     modifier = modifier,
-                    category = AnimeListType.PLANNED.route,
+                    category = AnimeStatus.PLANNED.route,
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
                     isSortedByUsers = isSortedByUsers,
@@ -268,11 +270,11 @@ fun DaoScreen(
                     type = selectedType
                 )
 
-                AnimeListType.COMPLETED -> DataAnimeList(
+                AnimeStatus.COMPLETED -> DataAnimeList(
                     navController = navController,
                     daoViewModel = viewModel,
                     modifier = modifier,
-                    category = AnimeListType.COMPLETED.route,
+                    category = AnimeStatus.COMPLETED.route,
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
                     isSortedByUsers = isSortedByUsers,
@@ -281,11 +283,11 @@ fun DaoScreen(
                     type = selectedType
                 )
 
-                AnimeListType.DROPPED -> DataAnimeList(
+                AnimeStatus.DROPPED -> DataAnimeList(
                     navController = navController,
                     daoViewModel = viewModel,
                     modifier = modifier,
-                    category = AnimeListType.DROPPED.route,
+                    category = AnimeStatus.DROPPED.route,
                     isSortedAlphabetically = isSortedAlphabetically,
                     isSortedByScore = isSortedByScore,
                     isSortedByUsers = isSortedByUsers,
@@ -294,7 +296,7 @@ fun DaoScreen(
                     type = selectedType
                 )
 
-                AnimeListType.FAVORITE -> FavoriteList(
+                AnimeStatus.FAVORITE -> FavoriteList(
                     navController = navController,
                     daoViewModel = viewModel,
                     modifier = modifier,
@@ -306,13 +308,13 @@ fun DaoScreen(
                     type = selectedType
                 )
 
-                AnimeListType.PERSON -> ShowPerson(
+                AnimeStatus.PERSON -> ShowPerson(
                     navController = navController,
                     viewModelProvider = viewModelProvider,
                     modifier = modifier
                 )
 
-                AnimeListType.CHARACTER -> ShowCharacter(
+                AnimeStatus.CHARACTER -> ShowCharacter(
                     navController = navController,
                     modifier = modifier,
                     daoViewModel = viewModel,
@@ -324,8 +326,8 @@ fun DaoScreen(
 
 @Composable
 private fun FavoriteAnimeListButton(
-    listType: AnimeListType,
-    selectedListType: AnimeListType,
+    listType: AnimeStatus,
+    selectedListType: AnimeStatus,
     onClick: () -> Unit,
     modifier: Modifier,
     colorIndex: Int,
@@ -397,7 +399,7 @@ private fun DataAnimeList(
 
     var selectedAnime by daoViewModel.lastSwipedAnime
     var isDialogOpen by remember { mutableStateOf(false) }
-    var listOfCategory = AnimeListType.values().dropLast(2)
+    var listOfCategory = AnimeStatus.values().dropLast(2)
 
     LaunchedEffect(key1 = category) {
         val trimmedList = listOfCategory
@@ -493,7 +495,7 @@ private fun DataAnimeList(
                                         .clickable {
                                             daoViewModel.viewModelScope.launch {
                                                 isDialogOpen = false
-                                                if (category == AnimeListType.FAVORITE) {
+                                                if (category == AnimeStatus.FAVORITE) {
                                                     daoViewModel.addToFavorite(
                                                         FavoriteItem(
                                                             id = selectedAnime.id,
@@ -581,7 +583,7 @@ private fun FavoriteList(
         .collectAsStateWithLifecycle(initialValue = emptyList())
 
     var isDialogOpen by remember { mutableStateOf(false) }
-    val listOfCategory = AnimeListType.values().dropLast(2).filter { it.route != "Favorite" }
+    val listOfCategory = AnimeStatus.values().dropLast(2).filter { it.route != "Favorite" }
 
     Column(
         modifier = modifier

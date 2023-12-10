@@ -41,7 +41,7 @@ import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetai
 import com.project.toko.core.presentation_layer.theme.DialogColor
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
-import com.project.toko.daoScreen.model.AnimeListType
+import com.project.toko.daoScreen.model.AnimeStatus
 import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -131,7 +131,7 @@ fun ShowRandomAnime(
                                                     scored_by = formatScoredBy(
                                                         data?.scored_by ?: 0.0f
                                                     ),
-                                                    category = AnimeListType.PLANNED.route,
+                                                    category = AnimeStatus.PLANNED.route,
                                                     status = data?.status ?: "",
                                                     rating = data?.rating ?: "",
                                                     secondName = data?.title_japanese ?: "",

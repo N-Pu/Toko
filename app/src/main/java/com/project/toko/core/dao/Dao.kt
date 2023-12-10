@@ -41,6 +41,7 @@ interface Dao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addToFavorite(favoriteItem: FavoriteItem)
+
     @Query("DELETE FROM animeItems WHERE id = :id")
     suspend fun removeFromDataBase(id: Int)
 
@@ -71,8 +72,6 @@ interface Dao {
         isAiredFrom: Boolean,
         type: String
     ): Flow<List<FavoriteItem>>
-
-
 
 
     @Query("SELECT EXISTS(SELECT 1 FROM animeItems WHERE id = :id AND category = :categoryId LIMIT 1)")
@@ -112,6 +111,19 @@ interface Dao {
 
     @Query("SELECT * FROM animeItems ORDER BY createdAt DESC LIMIT 10")
     fun getLastTenAddedAnime(): Flow<List<AnimeItem>>
+
+
+    @Query("DELETE FROM animeItems WHERE category = :category")
+    suspend fun deleteAnimeByCategory(category: String)
+
+    @Query("DELETE FROM characterItem")
+    suspend fun deleteAllCharacters()
+
+    @Query("DELETE FROM personItem")
+    suspend fun deleteAllPeople()
+
+    @Query("DELETE FROM favoriteItems")
+    suspend fun deleteAllFavorite()
 
 
 }

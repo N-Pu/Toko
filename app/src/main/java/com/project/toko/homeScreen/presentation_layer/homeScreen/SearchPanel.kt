@@ -52,7 +52,6 @@ import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.core.presentation_layer.theme.iconColorInSearchPanel
 import com.project.toko.homeScreen.model.linkChangerModel.Score
 import com.project.toko.homeScreen.model.linkChangerModel.getMinMaxScore
-import com.project.toko.homeScreen.model.tabRow.TabItem
 import com.project.toko.homeScreen.model.tabRow.returnListOfTabItems
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

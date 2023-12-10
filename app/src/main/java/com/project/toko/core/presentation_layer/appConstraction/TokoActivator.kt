@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -76,6 +77,8 @@ import com.project.toko.core.dao.MainDb
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
+import com.project.toko.daoScreen.daoViewModel.DaoViewModel
+import com.project.toko.daoScreen.model.AnimeStatus
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
@@ -462,8 +465,10 @@ private fun ShowDrawerContent(
     svgImageLoader: ImageLoader
 ) {
     val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
+    val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     var isHelpFAQOpen by remember { mutableStateOf(false) }
     var isLegalOpen by remember { mutableStateOf(false) }
+    var isDeleteDaoOpen by remember { mutableStateOf(false) }
     val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -917,6 +922,52 @@ private fun ShowDrawerContent(
                 )
                 Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
             }
+
+            NavigationDrawerItem(
+                modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = Color.Transparent,
+                    unselectedContainerColor = Color.Transparent
+                ),
+                label = {
+                    Text(
+                        text = "Data",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        modifier = modifier.padding(start = 20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontFamily = evolventaBoldFamily
+                    )
+                },
+                selected = false,
+                onClick = {
+                    isDeleteDaoOpen = !isDeleteDaoOpen
+                },
+                badge = {
+                    if (isDeleteDaoOpen) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.arrowdown, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+                        )
+                    } else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.arrowright, imageLoader = imageLoader
+                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+                        )
+                    }
+                },
+            )
+            Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+            if (isDeleteDaoOpen) {
+                AnimeListTypesToDelete(daoViewModel = daoViewModel, modifier = modifier)
+            }
+
+
+
             NavigationDrawerItem(
                 colors = NavigationDrawerItemDefaults.colors(
                     selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
@@ -1178,5 +1229,190 @@ private suspend fun copyFile(source: File, destination: File) {
         destChannel.close()
 
         continuation.resume(Unit)
+    }
+}
+
+
+@Composable
+fun AnimeListTypesToDelete(
+    daoViewModel: DaoViewModel,
+    modifier: Modifier
+) {
+    val animeListTypes = AnimeStatus.values()
+    val isDeleteDataOpen = remember { mutableStateOf(false) }
+    val currentSelectedAnimeListType = daoViewModel.currentSelectedAnimeListType
+    val customModifier =
+        modifier
+            .fillMaxWidth(0.8f)
+            .height(70.dp)
+            .clip(CardDefaults.shape)
+            .background(MaterialTheme.colorScheme.onPrimaryContainer)
+
+
+    animeListTypes.forEach { type ->
+        NavigationDrawerItem(
+            colors = NavigationDrawerItemDefaults.colors(
+                selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+                unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+            ),
+            label = {
+                Text(
+                    text = "Delete " + type.route,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 22.sp,
+                    modifier = Modifier.padding(start = 20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = evolventaBoldFamily
+                )
+            },
+            selected = false,
+            onClick = {
+                currentSelectedAnimeListType.value = type.route
+                isDeleteDataOpen.value = true
+            },
+            badge = {
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = "Delete ${type.route}",
+                    modifier = Modifier.size(30.dp),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+        )
+        Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+
+
+        if (isDeleteDataOpen.value) {
+            DeleteDialog(
+                modifier,
+                customModifier,
+                isDeleteDataOpen,
+                currentSelectedAnimeListType.value,
+                deleteProcess = {
+                    when (currentSelectedAnimeListType.value) {
+                        AnimeStatus.FAVORITE.route -> {
+                            daoViewModel.viewModelScope.launch {
+                                daoViewModel.deleteAllFavorite()
+                            }
+                        }
+
+                        AnimeStatus.PERSON.route -> {
+                            daoViewModel.viewModelScope.launch {
+                                daoViewModel.deleteAllPeople()
+                            }
+                        }
+
+                        AnimeStatus.CHARACTER.route -> {
+                            daoViewModel.viewModelScope.launch {
+                                daoViewModel.deleteAllCharacters()
+                            }
+                        }
+
+                        else -> {
+                            daoViewModel.viewModelScope.launch {
+                                daoViewModel.deleteAnimeByCategory(currentSelectedAnimeListType.value)
+                            }
+                        }
+                    }
+
+                })
+        }
+    }
+
+
+//    if (isExportDataPopUpDialogOpen.value) {
+//        DeleteDialog(modifier, customModifier, isExportDataPopUpDialogOpen, animeListTypes)
+//    }
+}
+
+@Composable
+fun DeleteDialog(
+    modifier: Modifier,
+    customModifier: Modifier,
+    isExportDataPopUpDialogOpen: MutableState<Boolean>,
+    animeListType: String,
+    deleteProcess: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = {
+            isExportDataPopUpDialogOpen.value = false
+        }, properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+        )
+    ) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.4f), contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = modifier.fillMaxSize(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceAround,
+                    modifier = modifier.fillMaxSize()
+                ) {
+                    Row(
+                        modifier = modifier
+                            .fillMaxHeight(0.4f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Delete $animeListType data?",
+                            fontSize = 25.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = evolventaBoldFamily
+                        )
+                    }
+                    Row(
+                        modifier = customModifier.clickable {
+                            deleteProcess()
+                            isExportDataPopUpDialogOpen.value = false
+                        },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Yes",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White,
+                            fontFamily = evolventaBoldFamily
+                        )
+                    }
+                    Spacer(modifier = modifier.height(10.dp))
+                    Row(
+                        modifier = modifier
+                            .fillMaxWidth(0.8f)
+                            .height(70.dp)
+                            .clip(CardDefaults.shape)
+                            .border(
+                                4.dp,
+                                MaterialTheme.colorScheme.onPrimaryContainer,
+                                CardDefaults.shape
+                            )
+                            .clickable {
+                                isExportDataPopUpDialogOpen.value = false
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "No",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontFamily = evolventaBoldFamily
+                        )
+                    }
+                    Spacer(modifier = modifier.height(20.dp))
+                }
+            }
+        }
     }
 }

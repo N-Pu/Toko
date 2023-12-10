@@ -42,7 +42,7 @@ import com.project.toko.core.share.shareLink
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
-import com.project.toko.daoScreen.model.AnimeListType
+import com.project.toko.daoScreen.model.AnimeStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -83,7 +83,7 @@ fun AddToFavorites(
                             score = formatScore(detailScreenState?.score),
                             scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
                             animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
-                            category = AnimeListType.FAVORITE.route,
+                            category = AnimeStatus.FAVORITE.route,
                             status = detailScreenState?.status ?: "",
                             rating = detailScreenState?.rating ?: "",
                             secondName = detailScreenState?.title_japanese ?: "",
@@ -99,7 +99,7 @@ fun AddToFavorites(
                             score = formatScore(detailScreenState?.score),
                             scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
                             animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
-                            category = AnimeListType.FAVORITE.route,
+                            category = AnimeStatus.FAVORITE.route,
                             status = detailScreenState?.status ?: "",
                             rating = detailScreenState?.rating ?: "",
                             secondName = detailScreenState?.title_japanese ?: "",
@@ -128,7 +128,7 @@ fun AddToFavorites(
             detailScreenViewModel.viewModelScope.launch {
                 if (daoViewModel.containsItemIdInCategory(
                         detailScreenState?.mal_id ?: 0,
-                        AnimeListType.PLANNED.route
+                        AnimeStatus.PLANNED.route
                     ).first()
                 ) {
                     daoViewModel.removeFromDataBase(
@@ -138,7 +138,7 @@ fun AddToFavorites(
                             score = formatScore(detailScreenState?.score),
                             scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
                             animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
-                            category = AnimeListType.PLANNED.route,
+                            category = AnimeStatus.PLANNED.route,
                             status = detailScreenState?.status ?: "",
                             rating = detailScreenState?.rating ?: "",
                             secondName = detailScreenState?.title_japanese ?: "",
@@ -154,7 +154,7 @@ fun AddToFavorites(
                             score = formatScore(detailScreenState?.score),
                             scored_by = formatScoredBy(detailScreenState?.scored_by ?: 0.0f),
                             animeImage = detailScreenState?.images?.jpg?.large_image_url ?: "",
-                            category = AnimeListType.PLANNED.route,
+                            category = AnimeStatus.PLANNED.route,
                             status = detailScreenState?.status ?: "",
                             rating = detailScreenState?.rating ?: "",
                             secondName = detailScreenState?.title_japanese ?: "",
@@ -174,7 +174,7 @@ fun AddToFavorites(
                 contentDescription = null,
                 colorFilter = if (daoViewModel.containsItemIdInCategory(
                         id = detailScreenState?.mal_id ?: 0,
-                        AnimeListType.PLANNED.route
+                        AnimeStatus.PLANNED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) ColorFilter.tint(
                     Color(
@@ -232,7 +232,7 @@ fun AddToFavorites(
                         colorFilter =
                         if (daoViewModel.containsItemIdInCategory(
                                 id = detailScreenState?.mal_id ?: 0,
-                                AnimeListType.COMPLETED.route
+                                AnimeStatus.COMPLETED.route
                             ).collectAsStateWithLifecycle(initialValue = false).value
                         ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
                             MaterialTheme.colorScheme.error
@@ -249,7 +249,7 @@ fun AddToFavorites(
                             text = "Completed",
                             color = if (daoViewModel.containsItemIdInCategory(
                                     id = detailScreenState?.mal_id ?: 0,
-                                    AnimeListType.COMPLETED.route
+                                    AnimeStatus.COMPLETED.route
 
                                 ).collectAsStateWithLifecycle(initialValue = false).value
                             ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
@@ -263,7 +263,7 @@ fun AddToFavorites(
 
                         if (daoViewModel.containsItemIdInCategory(
                                 detailScreenState?.mal_id ?: 0,
-                                AnimeListType.COMPLETED.route
+                                AnimeStatus.COMPLETED.route
                             ).first()
                         ) {
                             daoViewModel.removeFromDataBase(
@@ -276,7 +276,7 @@ fun AddToFavorites(
                                     ),
                                     animeImage = detailScreenState?.images?.jpg?.large_image_url
                                         ?: "",
-                                    category = AnimeListType.COMPLETED.route,
+                                    category = AnimeStatus.COMPLETED.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
                                     secondName = detailScreenState?.title_japanese ?: "",
@@ -295,7 +295,7 @@ fun AddToFavorites(
                                     ),
                                     animeImage = detailScreenState?.images?.jpg?.large_image_url
                                         ?: "",
-                                    category = AnimeListType.COMPLETED.route,
+                                    category = AnimeStatus.COMPLETED.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
                                     secondName = detailScreenState?.title_japanese ?: "",
@@ -316,7 +316,7 @@ fun AddToFavorites(
                         colorFilter =
                         if (daoViewModel.containsItemIdInCategory(
                                 id = detailScreenState?.mal_id ?: 0,
-                                AnimeListType.DROPPED.route
+                                AnimeStatus.DROPPED.route
                             ).collectAsStateWithLifecycle(initialValue = false).value
                         ) ColorFilter.tint(Color.Red) else ColorFilter.tint(MaterialTheme.colorScheme.error)
 
@@ -331,7 +331,7 @@ fun AddToFavorites(
                         Text(
                             text = "Dropped", color = if (daoViewModel.containsItemIdInCategory(
                                     id = detailScreenState?.mal_id ?: 0,
-                                    AnimeListType.DROPPED.route
+                                    AnimeStatus.DROPPED.route
 
                                 ).collectAsStateWithLifecycle(initialValue = false).value
                             ) Color.Red else MaterialTheme.colorScheme.error,
@@ -346,7 +346,7 @@ fun AddToFavorites(
 
                         if (daoViewModel.containsItemIdInCategory(
                                 detailScreenState?.mal_id ?: 0,
-                                AnimeListType.DROPPED.route
+                                AnimeStatus.DROPPED.route
                             ).first()
                         ) {
                             daoViewModel.removeFromDataBase(
@@ -359,7 +359,7 @@ fun AddToFavorites(
                                     ),
                                     animeImage = detailScreenState?.images?.jpg?.large_image_url
                                         ?: "",
-                                    category = AnimeListType.DROPPED.route,
+                                    category = AnimeStatus.DROPPED.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
                                     secondName = detailScreenState?.title_japanese ?: "",
@@ -379,7 +379,7 @@ fun AddToFavorites(
                                     ),
                                     animeImage = detailScreenState?.images?.jpg?.large_image_url
                                         ?: "",
-                                    category = AnimeListType.DROPPED.route,
+                                    category = AnimeStatus.DROPPED.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
                                     secondName = detailScreenState?.title_japanese ?: "",
@@ -400,7 +400,7 @@ fun AddToFavorites(
                         colorFilter =
                         if (daoViewModel.containsItemIdInCategory(
                                 id = detailScreenState?.mal_id ?: 0,
-                                AnimeListType.WATCHING.route
+                                AnimeStatus.WATCHING.route
                             ).collectAsStateWithLifecycle(initialValue = false).value
                         ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
                             MaterialTheme.colorScheme.error
@@ -419,7 +419,7 @@ fun AddToFavorites(
 
                             color = if (daoViewModel.containsItemIdInCategory(
                                     id = detailScreenState?.mal_id ?: 0,
-                                    AnimeListType.WATCHING.route
+                                    AnimeStatus.WATCHING.route
 
                                 ).collectAsStateWithLifecycle(initialValue = false).value
                             ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
@@ -434,7 +434,7 @@ fun AddToFavorites(
                     detailScreenViewModel.viewModelScope.launch {
                         if (daoViewModel.containsItemIdInCategory(
                                 detailScreenState?.mal_id ?: 0,
-                                AnimeListType.WATCHING.route
+                                AnimeStatus.WATCHING.route
                             ).first()
                         ) {
                             daoViewModel.removeFromDataBase(
@@ -447,7 +447,7 @@ fun AddToFavorites(
                                     ),
                                     animeImage = detailScreenState?.images?.jpg?.large_image_url
                                         ?: "",
-                                    category = AnimeListType.WATCHING.route,
+                                    category = AnimeStatus.WATCHING.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
                                     secondName = detailScreenState?.title_japanese ?: "",
@@ -466,7 +466,7 @@ fun AddToFavorites(
                                     ),
                                     animeImage = detailScreenState?.images?.jpg?.large_image_url
                                         ?: "",
-                                    category = AnimeListType.WATCHING.route,
+                                    category = AnimeStatus.WATCHING.route,
                                     status = detailScreenState?.status ?: "",
                                     rating = detailScreenState?.rating ?: "",
                                     secondName = detailScreenState?.title_japanese ?: "",
