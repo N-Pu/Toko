@@ -96,7 +96,6 @@ class MainActivity : ComponentActivity() {
                             viewModelProvider = viewModelProvider,
                             modifier = modifier,
                             componentActivity = this,
-                            mainDb = databaseComponent.provideDao(),
                             onThemeChange = {
                                 darkTheme.isDarkThemeActive.value =
                                     !darkTheme.isDarkThemeActive.value
