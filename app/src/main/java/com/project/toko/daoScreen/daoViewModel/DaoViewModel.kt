@@ -1,13 +1,14 @@
 package com.project.toko.daoScreen.daoViewModel
 
 import android.content.Context
+import android.os.Environment
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.characterDetailedScreen.dao.CharacterItem
-import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.core.dao.MainDb
+import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.personDetailedScreen.dao.PersonItem
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
+
 
 class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val context: Context) :
     ViewModel() {
@@ -450,4 +459,59 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
             }
         }
     }
+
+
+
+    fun exportDB(DATABASE_NAME: String, packageName: String) {
+        val data = Environment.getDataDirectory()
+        val currentDBPath = "/data/$packageName/databases/$DATABASE_NAME"
+
+        val sd = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val backupRootPath = File(sd, "Toko_Saved_Data")
+
+        if (!backupRootPath.exists()) {
+            backupRootPath.mkdirs()
+        }
+
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
+        val dateFolderName = dateFormat.format(Date())
+        val backupFolderPath = File(backupRootPath, dateFolderName)
+
+        if (!backupFolderPath.exists()) {
+            backupFolderPath.mkdirs()
+        }
+
+        val dbFiles = listOf(currentDBPath, "$currentDBPath-shm", "$currentDBPath-wal")
+        val backupFileNames = listOf("Main.db", "Main.db-shm", "Main.db-wal")
+
+        try {
+            for ((index, dbFile) in dbFiles.withIndex()) {
+                val currentDB = File(data, dbFile)
+                val backupDB = File(backupFolderPath, backupFileNames[index])
+
+                if (currentDB.exists()) {
+                    val source = FileInputStream(currentDB).channel
+                    val destination = FileOutputStream(backupDB).channel
+                    destination.transferFrom(source, 0, source.size())
+                    source.close()
+                    destination.close()
+                }
+            }
+            Toast.makeText(
+                context,
+                "Data was saved at $backupFolderPath!",
+                Toast.LENGTH_LONG
+            ).show()
+
+        } catch (e: IOException) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
 }

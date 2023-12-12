@@ -1,9 +1,7 @@
 package com.project.toko.core.presentation_layer.appConstraction
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -73,7 +71,6 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
-import com.project.toko.core.dao.MainDb
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
@@ -82,14 +79,7 @@ import com.project.toko.daoScreen.model.AnimeStatus
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
-
 
 @Composable
 fun AppActivator(
@@ -97,7 +87,6 @@ fun AppActivator(
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
     componentActivity: ComponentActivity,
-    mainDb: MainDb,
     onThemeChange: () -> Unit,
     isInDarkTheme: Boolean,
     svgImageLoader: ImageLoader
@@ -107,37 +96,26 @@ fun AppActivator(
     val characterDetailScreenId = viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
     val personDetailScreenId = viewModelProvider[PersonByIdViewModel::class.java].loadedId
     var lastSelectedScreen by rememberSaveable { mutableStateOf<String?>(null) }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    navController.addOnDestinationChangedListener { _, destination, arguments ->
-        if (destination.route == Screen.Detail.route) {
-            currentDetailScreenId.intValue = arguments?.getInt("id") ?: 0
-        }
-        when (destination.route) {
-            Screen.Home.route,
-            Screen.RandomAnimeOrManga.route,
-            Screen.Favorites.route -> {
+    LaunchedEffect(lastSelectedScreen) {
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+            if (destination.route == Screen.Detail.route) {
+                currentDetailScreenId.intValue = arguments?.getInt("id") ?: 0
             }
+            when (destination.route) {
+                Screen.Home.route,
+                Screen.RandomAnimeOrManga.route,
+                Screen.Favorites.route -> {
+                }
 
-            else -> {
-                lastSelectedScreen = destination.route
+                else -> {
+                    lastSelectedScreen = destination.route
+                }
             }
         }
     }
 
-
-//    navController.addOnDestinationChangedListener { _, destination, arguments ->
-//        when (destination.route) {
-//            Screen.Detail.route -> {
-//                currentDetailScreenId.intValue = arguments?.getInt("id") ?: 0
-//            }
-//            Screen.Home.route, Screen.RandomAnimeOrManga.route, Screen.Favorites.route -> {}
-//            else -> {
-//                lastSelectedScreen = destination.route
-//            }
-//        }
-//    }
-
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     ModalNavigationDrawer(drawerState = drawerState,
         drawerContent = {
@@ -146,7 +124,6 @@ fun AppActivator(
                 imageLoader = svgImageLoader,
                 viewModelProvider = viewModelProvider,
                 componentActivity = componentActivity,
-                mainDb = mainDb,
                 onThemeChange = onThemeChange,
                 darkTheme = isInDarkTheme,
                 svgImageLoader = svgImageLoader
@@ -213,12 +190,6 @@ private fun BottomNavigationBar(
             }
         }
     }
-//    val detailScreenButtonIsSelected = when (currentRoute) {
-//        Screen.Home.route -> false
-//        Screen.Favorites.route -> false
-//        Screen.RandomAnimeOrManga.route -> false
-//        else -> true
-//    }
 
     Row(
         modifier
@@ -459,7 +430,6 @@ private fun ShowDrawerContent(
     imageLoader: ImageLoader,
     viewModelProvider: ViewModelProvider,
     componentActivity: ComponentActivity,
-    mainDb: MainDb,
     onThemeChange: () -> Unit,
     darkTheme: Boolean,
     svgImageLoader: ImageLoader
@@ -472,85 +442,15 @@ private fun ShowDrawerContent(
     val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-//    val saveDarkMode = SaveDarkMode(LocalContext.current)
-//    val currentTheme = saveDarkMode.loadData()
     val customModifier =
         modifier
             .fillMaxWidth(0.8f)
             .height(70.dp)
             .clip(CardDefaults.shape)
             .background(MaterialTheme.colorScheme.onPrimaryContainer)
-//            .clickable {
-//                try {
-//                    val saveDb = homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-//                        // Получение пути к базе данных
-//                        val dbFile = context.getDatabasePath("Main.db")
-//                        // Копирование базы данных
-//                        val destinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-//                        val destinationFile = File(destinationDir, "Main.db")
-//                        dbFile.copyTo(destinationFile, overwrite = destinationFile.delete())
-//
-//                        // Повторное открытие базы данных после копирования
-//                        mainDb.openHelper.writableDatabase
-//                    }
-//                        homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-//                        // Ожидание завершения сохранения базы данных
-//                        saveDb.join()
-//
-//                        // Отображение уведомления
-//                        Toast.makeText(context, "Database is saved!", Toast.LENGTH_SHORT).show()
-//                    }
-//                    // Успешно скопировано
-//                } catch (e: Exception) {
-//                    homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-//                        Toast
-//                            .makeText(
-//                                context,
-//                                e.message,
-//                                Toast.LENGTH_SHORT
-//                            )
-//                            .show()
-//                    }
-//                }
-//            }
-
             .clickable {
-                try {
-                    val saveDb = homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                        // Получение пути к базе данных
-                        val dbFile = context.getDatabasePath("Main.db")
-                        // Копирование базы данных
-                        val destinationDir =
-                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                        val destinationFile = File(destinationDir, "Main.db")
-
-                        copyFile(dbFile, destinationFile)
-
-                        // Повторное открытие базы данных после копирования
-                        mainDb.openHelper.writableDatabase
-                    }
-
-                    homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                        // Ожидание завершения сохранения базы данных
-                        saveDb.join()
-
-                        // Отображение уведомления
-                        Toast
-                            .makeText(context, "Database is saved!", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                    // Успешно скопировано
-                } catch (e: Exception) {
-                    homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                        Toast
-                            .makeText(context, e.message, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }
+                daoViewModel.exportDB("Main.db", "com.project.toko")
             }
-//            .clickable {
-//                onClickSaveData(context, homeScreenViewModel)
-//            }
 
 
     Column {
@@ -1057,7 +957,8 @@ private fun ShowDrawerContent(
                                 text = "Export Data?",
                                 fontSize = 35.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontFamily = evolventaBoldFamily
                             )
                         }
                         Row(
@@ -1069,7 +970,8 @@ private fun ShowDrawerContent(
                                 text = "Save Data",
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = Color.White
+                                color = Color.White,
+                                fontFamily = evolventaBoldFamily
                             )
                         }
                         Spacer(modifier = modifier.height(10.dp))
@@ -1084,7 +986,13 @@ private fun ShowDrawerContent(
                                     CardDefaults.shape
                                 )
                                 .clickable {
-
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Will be added in next update!",
+                                            Toast.LENGTH_LONG
+                                        )
+                                        .show()
                                 },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
@@ -1093,7 +1001,8 @@ private fun ShowDrawerContent(
                                 text = "Upload Data",
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontFamily = evolventaBoldFamily
                             )
                         }
                         Spacer(modifier = modifier.height(20.dp))
@@ -1151,87 +1060,6 @@ private fun onClickRequestPermission(
         }
     }
 }
-
-private fun onClickSaveData(context: Context, homeScreenViewModel: HomeScreenViewModel) {
-    try {
-        val dbFile = context.getDatabasePath("Main.db")
-        Log.e("dbFile", dbFile.absolutePath)
-        val destinationDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        Log.e("destinationDir", destinationDir.absolutePath)
-        val destinationFile = File(destinationDir, "Main.db")
-
-        // Проверяем, существует ли файл базы данных
-        if (dbFile.exists()) {
-            FileInputStream(dbFile).use { inputStream ->
-                FileOutputStream(destinationFile).use { outputStream ->
-                    val buffer = ByteArray(1024)
-                    var length: Int
-                    // Читаем данные из исходного файла и записываем их в файл назначения
-                    while (inputStream
-                            .read(buffer)
-                            .also { length = it } > 0
-                    ) {
-                        outputStream.write(buffer, 0, length)
-                    }
-                }
-            }
-
-            // Если файл успешно скопирован, отображаем уведомление
-            homeScreenViewModel.viewModelScope.launch {
-                Toast
-                    .makeText(context, "Data was saved successfully!", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        } else {
-            // Если файл базы данных не найден, отображаем сообщение об ошибке
-            homeScreenViewModel.viewModelScope.launch {
-                Toast
-                    .makeText(
-                        context,
-                        "File was not found!",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-            }
-        }
-    } catch (e: Exception) {
-        // Обработка ошибок при копировании файла
-        homeScreenViewModel.viewModelScope.launch {
-            Toast
-                .makeText(
-                    context,
-                    "Error when copied data: ${e.message}",
-                    Toast.LENGTH_SHORT
-                )
-                .show()
-        }
-    }
-}
-
-//private suspend fun copyFile(sourceFile: File, destFile: File) = withContext(Dispatchers.IO) {
-//    FileInputStream(sourceFile).channel.use { source ->
-//        FileOutputStream(destFile).channel.use { destination ->
-//            destination.transferFrom(source, 0, source.size())
-//        }
-//    }
-//}
-
-private suspend fun copyFile(source: File, destination: File) {
-
-    suspendCoroutine { continuation ->
-        val sourceChannel = FileInputStream(source).channel
-        val destChannel = FileOutputStream(destination).channel
-
-        destChannel.transferFrom(sourceChannel, 0, sourceChannel.size())
-
-        sourceChannel.close()
-        destChannel.close()
-
-        continuation.resume(Unit)
-    }
-}
-
 
 @Composable
 fun AnimeListTypesToDelete(
@@ -1318,12 +1146,8 @@ fun AnimeListTypesToDelete(
                 })
         }
     }
-
-
-//    if (isExportDataPopUpDialogOpen.value) {
-//        DeleteDialog(modifier, customModifier, isExportDataPopUpDialogOpen, animeListTypes)
-//    }
 }
+
 
 @Composable
 fun DeleteDialog(
