@@ -510,6 +510,8 @@ class HomeScreenViewModel @Inject constructor(
     fun showLastAdded(): Flow<List<AnimeItem>> {
         return dao.getDao().getLastTenAddedAnime()
     }
+
+
 }
 
 

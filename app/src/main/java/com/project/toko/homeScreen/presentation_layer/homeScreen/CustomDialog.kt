@@ -63,7 +63,7 @@ import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
-import com.project.toko.daoScreen.model.AnimeListType
+import com.project.toko.daoScreen.model.AnimeStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -494,7 +494,7 @@ private fun AddToDataBaseRow(
                 textAlign = TextAlign.Center,
                 color = if (daoViewModel.containsItemIdInCategory(
                         id = data.mal_id,
-                        AnimeListType.WATCHING.route
+                        AnimeStatus.WATCHING.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) Color.Yellow else MaterialTheme.colorScheme.primary,
             )
@@ -502,7 +502,7 @@ private fun AddToDataBaseRow(
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                 if (daoViewModel.containsItemIdInCategory(
                         data.mal_id,
-                        AnimeListType.WATCHING.route
+                        AnimeStatus.WATCHING.route
                     ).first()
                 ) {
                     daoViewModel.removeFromDataBase(
@@ -516,7 +516,7 @@ private fun AddToDataBaseRow(
                             data.rating ?: "N/A",
                             data.title_japanese,
                             airedFrom = data.aired.from,
-                            category = AnimeListType.WATCHING.route,
+                            category = AnimeStatus.WATCHING.route,
                             type = data.type
                         )
                     )
@@ -532,7 +532,7 @@ private fun AddToDataBaseRow(
                             data.rating ?: "N/A",
                             data.title_japanese,
                             airedFrom = data.aired.from,
-                            category = AnimeListType.WATCHING.route,
+                            category = AnimeStatus.WATCHING.route,
                             type = data.type
                         )
                     )
@@ -549,7 +549,7 @@ private fun AddToDataBaseRow(
                 colorFilter =
                 if (daoViewModel.containsItemIdInCategory(
                         id = data.mal_id,
-                        AnimeListType.WATCHING.route
+                        AnimeStatus.WATCHING.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) ColorFilter.tint(Color.Yellow) else ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
@@ -562,7 +562,7 @@ private fun AddToDataBaseRow(
                 textAlign = TextAlign.Center,
                 color = if (daoViewModel.containsItemIdInCategory(
                         id = data.mal_id,
-                        AnimeListType.COMPLETED.route
+                        AnimeStatus.COMPLETED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
             )
@@ -570,7 +570,7 @@ private fun AddToDataBaseRow(
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                 if (daoViewModel.containsItemIdInCategory(
                         data.mal_id,
-                        AnimeListType.COMPLETED.route
+                        AnimeStatus.COMPLETED.route
                     ).first()
                 ) {
                     daoViewModel.removeFromDataBase(
@@ -584,7 +584,7 @@ private fun AddToDataBaseRow(
                             data.rating ?: "N/A",
                             data.title_japanese,
                             airedFrom = data.aired.from,
-                            category = AnimeListType.COMPLETED.route,
+                            category = AnimeStatus.COMPLETED.route,
                             type = data.type
                         )
                     )
@@ -600,7 +600,7 @@ private fun AddToDataBaseRow(
                             data.rating ?: "N/A",
                             data.title_japanese,
                             airedFrom = data.aired.from,
-                            category = AnimeListType.COMPLETED.route,
+                            category = AnimeStatus.COMPLETED.route,
                             type = data.type
                         )
                     )
@@ -617,7 +617,7 @@ private fun AddToDataBaseRow(
                 colorFilter =
                 if (daoViewModel.containsItemIdInCategory(
                         id = data.mal_id,
-                        AnimeListType.COMPLETED.route
+                        AnimeStatus.COMPLETED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
                     MaterialTheme.colorScheme.primary
@@ -632,7 +632,7 @@ private fun AddToDataBaseRow(
                 textAlign = TextAlign.Center,
                 color = if (daoViewModel.containsItemIdInCategory(
                         id = data.mal_id,
-                        AnimeListType.DROPPED.route
+                        AnimeStatus.DROPPED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) Color.Red else MaterialTheme.colorScheme.primary,
             )
@@ -640,7 +640,7 @@ private fun AddToDataBaseRow(
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                 if (daoViewModel.containsItemIdInCategory(
                         data.mal_id,
-                        AnimeListType.DROPPED.route
+                        AnimeStatus.DROPPED.route
                     ).first()
                 ) {
                     daoViewModel.removeFromDataBase(
@@ -654,7 +654,7 @@ private fun AddToDataBaseRow(
                             data.rating ?: "N/A",
                             data.title_japanese,
                             airedFrom = data.aired.from,
-                            category = AnimeListType.DROPPED.route,
+                            category = AnimeStatus.DROPPED.route,
                             type = data.type
                         )
                     )
@@ -670,7 +670,7 @@ private fun AddToDataBaseRow(
                             data.rating ?: "N/A",
                             data.title_japanese,
                             airedFrom = data.aired.from,
-                            category = AnimeListType.DROPPED.route,
+                            category = AnimeStatus.DROPPED.route,
                             type = data.type
                         )
                     )
@@ -687,7 +687,7 @@ private fun AddToDataBaseRow(
                 colorFilter =
                 if (daoViewModel.containsItemIdInCategory(
                         id = data.mal_id,
-                        AnimeListType.DROPPED.route
+                        AnimeStatus.DROPPED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) ColorFilter.tint(Color.Red) else ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
@@ -710,7 +710,7 @@ private fun AddToDataBaseRow(
                         if (daoViewModel
                                 .containsItemIdInCategory(
                                     data.mal_id,
-                                    AnimeListType.PLANNED.route
+                                    AnimeStatus.PLANNED.route
                                 )
                                 .first()
                         ) {
@@ -727,7 +727,7 @@ private fun AddToDataBaseRow(
                                     data.rating ?: "N/A",
                                     data.title_japanese,
                                     airedFrom = data.aired.from,
-                                    category = AnimeListType.PLANNED.route,
+                                    category = AnimeStatus.PLANNED.route,
                                     type = data.type
                                 )
                             )
@@ -745,7 +745,7 @@ private fun AddToDataBaseRow(
                                     data.rating ?: "N/A",
                                     data.title_japanese,
                                     airedFrom = data.aired.from,
-                                    category = AnimeListType.PLANNED.route,
+                                    category = AnimeStatus.PLANNED.route,
                                     type = data.type
                                 )
                             )
@@ -761,7 +761,7 @@ private fun AddToDataBaseRow(
                 colorFilter =
                 if (daoViewModel.containsItemIdInCategory(
                         id = data.mal_id,
-                        AnimeListType.PLANNED.route
+                        AnimeStatus.PLANNED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) ColorFilter.tint(
                     Color(
@@ -799,7 +799,7 @@ private fun AddToDataBaseRow(
                                     data.rating ?: "N/A",
                                     data.title_japanese,
                                     airedFrom = data.aired.from,
-                                    category = AnimeListType.FAVORITE.route,
+                                    category = AnimeStatus.FAVORITE.route,
                                     type = data.type
                                 )
                             )
@@ -817,7 +817,7 @@ private fun AddToDataBaseRow(
                                     data.rating ?: "N/A",
                                     data.title_japanese,
                                     airedFrom = data.aired.from,
-                                    category = AnimeListType.FAVORITE.route,
+                                    category = AnimeStatus.FAVORITE.route,
                                     type = data.type
                                 )
                             )
@@ -848,7 +848,7 @@ private fun AddToDataBaseRow(
             when {
                 daoViewModel.containsItemIdInCategory(
                     id = data.mal_id,
-                    AnimeListType.WATCHING.route
+                    AnimeStatus.WATCHING.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
                         painter = rememberAsyncImagePainter(
@@ -866,7 +866,7 @@ private fun AddToDataBaseRow(
 
                 daoViewModel.containsItemIdInCategory(
                     id = data.mal_id,
-                    AnimeListType.COMPLETED.route
+                    AnimeStatus.COMPLETED.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
                         painter = rememberAsyncImagePainter(
@@ -884,7 +884,7 @@ private fun AddToDataBaseRow(
 
                 daoViewModel.containsItemIdInCategory(
                     id = data.mal_id,
-                    AnimeListType.DROPPED.route
+                    AnimeStatus.DROPPED.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
                         painter = rememberAsyncImagePainter(

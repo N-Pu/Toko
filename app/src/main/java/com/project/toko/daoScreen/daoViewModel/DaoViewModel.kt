@@ -49,35 +49,43 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
     val isMusicSelected = _isMusicSelected
 
 
-    private val _lastSwipedAnime = mutableStateOf(AnimeItem(
-        id = null,
-        animeName = "",
-        score = "",
-        scored_by = "",
-        animeImage = "",
-        status = "",
-        rating = "",
-        secondName = "",
-        airedFrom = "",
-        category = null,
-        type = "",
-        createdAt = 0
-    ))
+    private val _currentSelectedAnimeListType = mutableStateOf("")
+    val currentSelectedAnimeListType = _currentSelectedAnimeListType
+
+
+    private val _lastSwipedAnime = mutableStateOf(
+        AnimeItem(
+            id = null,
+            animeName = "",
+            score = "",
+            scored_by = "",
+            animeImage = "",
+            status = "",
+            rating = "",
+            secondName = "",
+            airedFrom = "",
+            category = null,
+            type = "",
+            createdAt = 0
+        )
+    )
     var lastSwipedAnime = _lastSwipedAnime
 
-    private val _lastSwipedInFavorite = mutableStateOf(FavoriteItem(
-        id = null,
-        animeName = "",
-        score = "",
-        scored_by = "",
-        animeImage = "",
-        status = "",
-        rating = "",
-        secondName = "",
-        airedFrom = "",
-        type = "",
-        createdAt = 0
-    ))
+    private val _lastSwipedInFavorite = mutableStateOf(
+        FavoriteItem(
+            id = null,
+            animeName = "",
+            score = "",
+            scored_by = "",
+            animeImage = "",
+            status = "",
+            rating = "",
+            secondName = "",
+            airedFrom = "",
+            type = "",
+            createdAt = 0
+        )
+    )
     var lastSwipedInFavorite = _lastSwipedInFavorite
     fun onSearchTextChange(text: String) {
         try {
@@ -278,7 +286,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
     }
 
 
-    suspend fun removeFromFavorite(favoriteItem: FavoriteItem){
+    suspend fun removeFromFavorite(favoriteItem: FavoriteItem) {
         try {
             viewModelScope.launch(Dispatchers.IO) {
                 mainDb.getDao().removeFromFavorite(favoriteItem.id!!)
@@ -300,6 +308,7 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
             }
         }
     }
+
     suspend fun addToFavorite(favoriteItem: FavoriteItem) {
         try {
             viewModelScope.launch(Dispatchers.IO) {
@@ -322,7 +331,8 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
             }
         }
     }
-    fun containsInFavorite(id: Int): Flow<Boolean>{
+
+    fun containsInFavorite(id: Int): Flow<Boolean> {
         return mainDb.getDao().containsInFavorite(id)
     }
 
@@ -342,5 +352,102 @@ class DaoViewModel @Inject constructor(private val mainDb: MainDb, private val c
             isAiredFrom = isAiredFrom,
             type = type ?: ""
         )
+    }
+
+
+    suspend fun deleteAnimeByCategory(category: String) {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                mainDb.getDao().deleteAnimeByCategory(category)
+            }
+            viewModelScope.launch{
+                Toast.makeText(
+                    context,
+                    "All anime were deleted from $category!",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+
+    suspend fun deleteAllCharacters() {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                mainDb.getDao().deleteAllCharacters()
+            }
+            viewModelScope.launch{
+                Toast.makeText(
+                    context,
+                    "All characters were deleted!",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+
+    suspend fun deleteAllPeople() {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                mainDb.getDao().deleteAllPeople()
+            }
+            viewModelScope.launch{
+                Toast.makeText(
+                    context,
+                    "All people were deleted!",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+
+    suspend fun deleteAllFavorite() {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                mainDb.getDao().deleteAllFavorite()
+
+            }
+            viewModelScope.launch{
+                Toast.makeText(
+                    context,
+                    "All anime were deleted from Favorite!",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    e.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 }
