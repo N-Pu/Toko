@@ -74,6 +74,7 @@ import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewM
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
+import com.project.toko.core.share.openSite
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.daoScreen.model.AnimeStatus
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
@@ -563,7 +564,7 @@ private fun ShowDrawerContent(
                     ),
                     label = {
                         Text(
-                            text = "Known bugs",
+                            text = "Future of the app",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
                             modifier = modifier.padding(start = 20.dp),
@@ -573,6 +574,7 @@ private fun ShowDrawerContent(
                     },
                     selected = false,
                     onClick = {
+                              context.openSite("https://sites.google.com/view/toko-your-own-anime-library/future?authuser=0")
                     },
                     badge = {
                         Image(
@@ -583,6 +585,7 @@ private fun ShowDrawerContent(
                         )
                     },
                 )
+
                 Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
                 NavigationDrawerItem(
                     colors = NavigationDrawerItemDefaults.colors(
@@ -591,7 +594,7 @@ private fun ShowDrawerContent(
                     ),
                     label = {
                         Text(
-                            text = "About the features of the app",
+                            text = "Bugs",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
                             modifier = modifier.padding(start = 20.dp),
@@ -601,90 +604,7 @@ private fun ShowDrawerContent(
                     },
                     selected = false,
                     onClick = {
-                    },
-                    badge = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    },
-                )
-                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
-                            text = "My list functional problems",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                    },
-                    badge = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    },
-                )
-                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
-                            text = "Database problems",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                    },
-                    badge = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    },
-                )
-                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
-                            text = "Technical problems",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
+                        context.openSite("https://sites.google.com/view/toko-your-own-anime-library/bugs?authuser=0")
                     },
                     badge = {
                         Image(
@@ -714,6 +634,7 @@ private fun ShowDrawerContent(
                 },
                 selected = false,
                 onClick = {
+                    context.openSite("https://discord.gg/arJvEJ6RJb")
                 },
                 badge = {
                     Image(
@@ -782,6 +703,7 @@ private fun ShowDrawerContent(
                     },
                     selected = false,
                     onClick = {
+                        context.openSite("https://sites.google.com/view/toko-your-own-anime-library/terms-of-use?authuser=0")
                     },
                     badge = {
                         Image(
@@ -810,6 +732,7 @@ private fun ShowDrawerContent(
                     },
                     selected = false,
                     onClick = {
+                        context.openSite("https://sites.google.com/view/toko-your-own-anime-library/resource?authuser=0")
                     },
                     badge = {
                         Image(

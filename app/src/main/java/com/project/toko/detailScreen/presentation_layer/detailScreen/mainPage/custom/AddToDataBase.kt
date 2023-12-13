@@ -66,11 +66,10 @@ fun AddToFavorites(
     }
     Row(
         modifier = modifier
-            .height(70.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        IconButton(onClick = {
+        IconButton(modifier = modifier.weight(1f),onClick = {
             detailScreenViewModel.viewModelScope.launch {
                 if (daoViewModel.containsInFavorite(
                         detailScreenState?.mal_id ?: 0
@@ -113,18 +112,23 @@ fun AddToFavorites(
         ) {
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = R.drawable.star, imageLoader = svgImageLoader
+                    model = if (daoViewModel.containsInFavorite(
+                            id = detailScreenState?.mal_id ?: 0
+                        ).collectAsStateWithLifecycle(initialValue = false).value
+                    ) R.drawable.favorite_touched else
+                        R.drawable.favorite_untouched
+                    , imageLoader = svgImageLoader
                 ),
                 contentDescription = null,
                 colorFilter = if (daoViewModel.containsInFavorite(
                         id = detailScreenState?.mal_id ?: 0
                     ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                ) null else ColorFilter.tint(
                     MaterialTheme.colorScheme.onError
                 )
             )
         }
-        IconButton(onClick = {
+        IconButton(modifier = modifier.weight(1f),onClick = {
             detailScreenViewModel.viewModelScope.launch {
                 if (daoViewModel.containsItemIdInCategory(
                         detailScreenState?.mal_id ?: 0,
@@ -187,7 +191,7 @@ fun AddToFavorites(
             )
         }
         if (detailScreenState?.url?.isNotEmpty() == true) {
-            IconButton(onClick = {
+            IconButton(modifier = modifier.weight(1f),onClick = {
             }) {
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -207,10 +211,7 @@ fun AddToFavorites(
                 }
 
             },
-            colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.secondary),
-            modifier = modifier
-                .height(50.dp)
-                .width(50.dp)
+            modifier = modifier.weight(1f)
         ) {
             Image(
                 painter = rememberAsyncImagePainter(

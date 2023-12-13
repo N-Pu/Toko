@@ -481,7 +481,7 @@ private fun AddToDataBaseRow(
         },
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
-            .height(100.dp)
+            .height(120.dp)
             .width(170.dp),
         offset = DpOffset((-40).dp, (-40).dp),
         properties = PopupProperties(clippingEnabled = true)
@@ -692,6 +692,78 @@ private fun AddToDataBaseRow(
                 ) ColorFilter.tint(Color.Red) else ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
         })
+        DropdownMenuItem(text = {
+            Text(
+                text = "Favorite",
+                fontWeight = FontWeight.Light,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                color = if (daoViewModel.containsInFavorite(
+                        id = data.mal_id
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) Color.Red else MaterialTheme.colorScheme.primary,
+            )
+        }, modifier = modifier.weight(1f), onClick = {
+            daoViewModel.viewModelScope.launch(Dispatchers.IO) {
+                if (daoViewModel.containsInFavorite(
+                        data.mal_id
+                    ).first()
+                ) {
+                    daoViewModel.removeFromFavorite(
+                        FavoriteItem(
+                            data.mal_id,
+                            data.title,
+                            data.score.toString(),
+                            data.scored_by.toInt().toString(),
+                            data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
+                            airedFrom = data.aired.from,
+                            category = AnimeStatus.DROPPED.route,
+                            type = data.type
+                        )
+                    )
+                } else {
+                    daoViewModel.addToFavorite(
+                        FavoriteItem(
+                            data.mal_id,
+                            data.title,
+                            data.score.toString(),
+                            data.scored_by.toInt().toString(),
+                            data.images.jpg.large_image_url,
+                            data.status,
+                            data.rating ?: "N/A",
+                            data.title_japanese,
+                            airedFrom = data.aired.from,
+                            category = AnimeStatus.DROPPED.route,
+                            type = data.type
+                        )
+                    )
+                }
+            }
+        }, colors = MenuDefaults.itemColors(
+            textColor = MaterialTheme.colorScheme.onPrimary,
+            trailingIconColor = MaterialTheme.colorScheme.onPrimary
+        ), trailingIcon = {
+            Image(
+                modifier = modifier.size(25.dp),
+                painter = rememberAsyncImagePainter(
+                    model = if (daoViewModel.containsInFavorite(
+                            id = data.mal_id
+                        ).collectAsStateWithLifecycle(initialValue = false).value
+                    ) R.drawable.favorite_touched else
+                        R.drawable.favorite_untouched, imageLoader = svgImageLoader
+                ),
+                contentDescription = null,
+                colorFilter = if (daoViewModel.containsInFavorite(
+                        id = data.mal_id
+                    ).collectAsStateWithLifecycle(initialValue = false).value
+                ) null else ColorFilter.tint(
+                    MaterialTheme.colorScheme.primary
+                )
+            )
+        })
 
     }
 
@@ -702,9 +774,28 @@ private fun AddToDataBaseRow(
             .height(40.dp), horizontalArrangement = Arrangement.SpaceAround
     ) {
 
-        Column(
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
             modifier = modifier
-                .weight(1f)
+                .weight(2.5f)
+                .fillMaxWidth().fillMaxHeight().padding(horizontal = 5.dp)
+                .clip(CardDefaults.shape)
+                .background(
+                    if (daoViewModel
+                            .containsItemIdInCategory(
+                                id = data.mal_id,
+                                AnimeStatus.PLANNED.route
+                            )
+                            .collectAsStateWithLifecycle(initialValue = false).value
+                    )
+                        Color(
+                            255,
+                            152,
+                            0,
+                            255
+                        )
+                    else MaterialTheme.colorScheme.onError
+                )
                 .clickable {
                     daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                         if (daoViewModel
@@ -751,94 +842,16 @@ private fun AddToDataBaseRow(
                             )
                         }
                     }
-                },
-            horizontalAlignment = Alignment.CenterHorizontally
+                }
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = R.drawable.bookmarkfilled, imageLoader = svgImageLoader
-                ), contentDescription = null, modifier = modifier.size(38.dp),
-                colorFilter =
-                if (daoViewModel.containsItemIdInCategory(
-                        id = data.mal_id,
-                        AnimeStatus.PLANNED.route
-                    ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(
-                    Color(
-                        255,
-                        152,
-                        0,
-                        255
-                    )
-                ) else ColorFilter.tint(MaterialTheme.colorScheme.onError)
 
+            Text(
+                text = "In the plans",
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 12.sp,
             )
         }
 
-        Column(
-            modifier = modifier
-                .weight(1f)
-                .clickable {
-                    daoViewModel.viewModelScope.launch(Dispatchers.IO) {
-                        if (daoViewModel
-                                .containsInFavorite(
-                                    data.mal_id
-                                )
-                                .first()
-                        ) {
-                            daoViewModel.removeFromFavorite(
-                                FavoriteItem(
-                                    data.mal_id,
-                                    data.title,
-                                    data.score.toString(),
-                                    data.scored_by
-                                        .toInt()
-                                        .toString(),
-                                    data.images.jpg.large_image_url,
-                                    data.status,
-                                    data.rating ?: "N/A",
-                                    data.title_japanese,
-                                    airedFrom = data.aired.from,
-                                    category = AnimeStatus.FAVORITE.route,
-                                    type = data.type
-                                )
-                            )
-                        } else {
-                            daoViewModel.addToFavorite(
-                                FavoriteItem(
-                                    data.mal_id,
-                                    data.title,
-                                    data.score.toString(),
-                                    data.scored_by
-                                        .toInt()
-                                        .toString(),
-                                    data.images.jpg.large_image_url,
-                                    data.status,
-                                    data.rating ?: "N/A",
-                                    data.title_japanese,
-                                    airedFrom = data.aired.from,
-                                    category = AnimeStatus.FAVORITE.route,
-                                    type = data.type
-                                )
-                            )
-                        }
-                    }
-                },
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = R.drawable.star, imageLoader = svgImageLoader
-                ), contentDescription = null, modifier = modifier.size(38.dp),
-                colorFilter =
-                if (daoViewModel.containsInFavorite(
-                        id = data.mal_id
-                    ).collectAsStateWithLifecycle(initialValue = false).value
-                ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
-                    MaterialTheme.colorScheme.onError
-                )
-            )
-        }
         Column(
             modifier = modifier
                 .weight(1f),

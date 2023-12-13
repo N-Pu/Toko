@@ -169,7 +169,7 @@ fun AddFavorites(
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = R.drawable.star, imageLoader = svgImageLoader
+                            model = R.drawable.favorite_touched, imageLoader = svgImageLoader
                         ),
                         contentDescription = null,
                         modifier = modifier
@@ -177,7 +177,7 @@ fun AddFavorites(
                             .clickable {
                                 isExpanded = true
                             },
-                        colorFilter = ColorFilter.tint(LightGreen)
+
                     )
 
                 }
@@ -551,13 +551,16 @@ fun AddFavorites(
             ), trailingIcon = {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = R.drawable.star, imageLoader = svgImageLoader
+                        model =   if (daoViewModel.containsInFavorite(
+                                id = mal_id
+                            ).collectAsStateWithLifecycle(initialValue = false).value
+                        ) R.drawable.favorite_touched else R.drawable.favorite_untouched, imageLoader = svgImageLoader
                     ), contentDescription = null, modifier = modifier.size(25.dp),
                     colorFilter =
                     if (daoViewModel.containsInFavorite(
                             id = mal_id
                         ).collectAsStateWithLifecycle(initialValue = false).value
-                    ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                    ) null else ColorFilter.tint(
                         MaterialTheme.colorScheme.error
                     )
                 )

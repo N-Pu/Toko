@@ -116,7 +116,8 @@ fun ShowNamesAndInteractionIcons(
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = R.drawable.star,
+                        model = if (isPersonInDao
+                        )R.drawable.favorite_touched else R.drawable.favorite_untouched,
                         imageLoader = imageLoader
                     ), contentDescription = null,
                     modifier = modifier
@@ -148,7 +149,7 @@ fun ShowNamesAndInteractionIcons(
                                 }
                             }
                         },
-                    colorFilter = if (isPersonInDao) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
+                    colorFilter = if (isPersonInDao) null else ColorFilter.tint(
                         MaterialTheme.colorScheme.onError
                     )
                 )
