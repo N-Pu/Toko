@@ -164,15 +164,16 @@ fun MainScreen(
                         Icon(Icons.Filled.Search, "Search Icon", tint = iconColorInSearchPanel)
                     },
                     suffix = {
+
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.switchinsearch,
+                                model =if (switchIndicator.value)  R.drawable.search_back else R.drawable.search_home,
                                 imageLoader = svgImageLoader
                             ),
                             contentDescription = null,
-                            colorFilter = if (switchIndicator.value) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else null,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
                             modifier = modifier
-                                .size(40.dp)
+                                .fillMaxHeight(0.55f)
                                 .clickable {
                                     switchIndicator.value = !switchIndicator.value
                                 }
