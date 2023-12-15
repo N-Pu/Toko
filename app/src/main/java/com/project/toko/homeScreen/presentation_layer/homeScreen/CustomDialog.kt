@@ -59,6 +59,7 @@ import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
+import com.project.toko.core.autoResizedText.AutoResizedText
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.daoScreen.dao.FavoriteItem
@@ -844,12 +845,13 @@ private fun AddToDataBaseRow(
                     }
                 }
         ) {
-
-            Text(
-                text = "In the plans",
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 12.sp,
-            )
+            AutoResizedText(    text = "In the plans",
+                color = MaterialTheme.colorScheme.primary)
+//            Text(
+//                text = "In the plans",
+//                color = MaterialTheme.colorScheme.primary,
+//                fontSize = 12.sp,
+//            )
         }
 
         Column(

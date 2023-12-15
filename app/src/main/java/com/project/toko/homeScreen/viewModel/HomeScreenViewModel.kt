@@ -110,20 +110,9 @@ class HomeScreenViewModel @Inject constructor(
     private val _min_score = MutableStateFlow<Score?>(null)
 
 
-//    fun setSelectedMinScore(score: Score) {
-//        pre_min_score.value = if (score == pre_min_score.value) null else score
-//    }
-
     private val _pre_max_score = MutableStateFlow<Score?>(null)
     val pre_max_score = _pre_max_score
     private val _max_score = MutableStateFlow<Score?>(null)
-
-//    fun setSelectedMaxScore(score: Score) {
-//        pre_max_score.value = if (score == pre_max_score.value) null else score
-//    }
-
-//    private val preSelectedMinMax = mutableStateOf(false)
-//    val selectedMinMax: MutableState<Boolean> = preSelectedMinMax
 
     private val _scoreState = mutableIntStateOf(0)
     val scoreState = _scoreState
@@ -137,8 +126,6 @@ class HomeScreenViewModel @Inject constructor(
         editor.putBoolean("NSFW_MODE", isActive)
         editor.apply()
         _isNSFWActive.value = isActive
-
-//        Toast.makeText(context, "Data Saved", Toast.LENGTH_SHORT).show()
     }
 
     fun loadNSFWData() {
