@@ -693,35 +693,6 @@ private fun ShowDrawerContent(
                     ),
                     label = {
                         Text(
-                            text = "Terms of use",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        context.openSite("https://sites.google.com/view/toko-your-own-anime-library/terms-of-use?authuser=0")
-                    },
-                    badge = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    },
-                )
-                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
                             text = "Resource",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 22.sp,
