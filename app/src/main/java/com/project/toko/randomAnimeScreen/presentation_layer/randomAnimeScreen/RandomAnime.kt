@@ -13,9 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -66,119 +68,113 @@ fun ShowRandomAnime(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        when (data) {
-            null -> {
-                BoxWithConstraints(modifier = Modifier
-                    .clip(CardDefaults.shape)
-                    .background(MaterialTheme.colorScheme.secondary)
-                    .combinedClickable(onDoubleClick = {
-                        randomViewModel.viewModelScope.launch(Dispatchers.IO) {
-                            if (isInternetAvailable(context)) {
-                                randomViewModel.onTapRandomAnime()
-                            }
-                        }
-                        randomViewModel.viewModelScope.launch {
-                            if (!isInternetAvailable(context)) {
-                                Toast
-                                    .makeText(
-                                        context,
-                                        "No internet connection!",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                    .show()
-                            }
-                        }
 
-                    }) {}
-                    .padding(20.dp, 20.dp, 20.dp, 20.dp)) {
-                    Text(
-                        text = "Tap 2 times",
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        fontFamily = evolventaBoldFamily
-                    )
-                }
-            }
+        if (data != null) {
+            AnimeCard(
+                data = data,
+                modifier = modifier
+                    .width(340.dp)
+                    .height(510.dp)
+                    .swipableCard(
+                        blockedDirections = listOf(Direction.Down),
+                        state = swipeState, onSwiped = { direction ->
 
-            else -> {
-                AnimeCard(
-                    data = data,
-                    modifier = modifier
-                        .width(340.dp)
-                        .height(510.dp)
-                        .swipableCard(
-                            blockedDirections = listOf(Direction.Down),
-                            state = swipeState, onSwiped = { direction ->
-
-                                when (direction) {
-                                    Direction.Left -> {
-                                        randomViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                            randomViewModel.onTapRandomAnime()
-                                            cardIsShown.value = false
-                                        }
-                                    }
-
-                                    Direction.Right -> {
-                                        randomViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                            daoViewModel.addToCategory(
-                                                animeItem = AnimeItem(
-                                                    id = data?.mal_id,
-                                                    animeName = data?.title ?: "N/A",
-                                                    animeImage = data?.images?.jpg?.large_image_url
-                                                        ?: "",
-                                                    score = formatScoredBy(data?.score ?: 0.0f),
-                                                    scored_by = formatScoredBy(
-                                                        data?.scored_by ?: 0.0f
-                                                    ),
-                                                    category = AnimeStatus.PLANNED.route,
-                                                    status = data?.status ?: "",
-                                                    rating = data?.rating ?: "",
-                                                    secondName = data?.title_japanese ?: "",
-                                                    airedFrom = data?.aired?.from ?: "N/A",
-                                                    type = data?.type ?: "N/A"
-                                                )
-                                            )
-                                        }
-                                        randomViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                            randomViewModel.onTapRandomAnime()
-                                            cardIsShown.value = false
-                                        }
-                                    }
-
-                                    Direction.Up -> {
-                                        navigateToDetailScreen(navController, data?.mal_id ?: 0)
-                                    }
-
-                                    else -> {}
-
-                                }
-                            },
-                            onSwipeCancel = {
-                                randomViewModel.viewModelScope.launch {
-                                    if (!isInternetAvailable(context)) {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                "No internet connection!",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
+                            when (direction) {
+                                Direction.Left -> {
+                                    randomViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                        randomViewModel.onTapRandomAnime()
+                                        cardIsShown.value = false
                                     }
                                 }
+
+                                Direction.Right -> {
+                                    randomViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                        daoViewModel.addToCategory(
+                                            animeItem = AnimeItem(
+                                                id = data?.mal_id,
+                                                animeName = data?.title ?: "N/A",
+                                                animeImage = data?.images?.jpg?.large_image_url
+                                                    ?: "",
+                                                score = formatScoredBy(data?.score ?: 0.0f),
+                                                scored_by = formatScoredBy(
+                                                    data?.scored_by ?: 0.0f
+                                                ),
+                                                category = AnimeStatus.PLANNED.route,
+                                                status = data?.status ?: "",
+                                                rating = data?.rating ?: "",
+                                                secondName = data?.title_japanese ?: "",
+                                                airedFrom = data?.aired?.from ?: "N/A",
+                                                type = data?.type ?: "N/A"
+                                            )
+                                        )
+                                    }
+                                    randomViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                        randomViewModel.onTapRandomAnime()
+                                        cardIsShown.value = false
+                                    }
+                                }
+
+                                Direction.Up -> {
+                                    navigateToDetailScreen(navController, data?.mal_id ?: 0)
+                                }
+
+                                else -> {}
+
                             }
-                        ),
-                    navController = navController,
-                    context = context
+                        },
+                        onSwipeCancel = {
+                            randomViewModel.viewModelScope.launch {
+                                if (!isInternetAvailable(context)) {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "No internet connection!",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
+                            }
+                        }
+                    ),
+                navController = navController,
+                context = context
+            )
+        } else {
+            Box(modifier = Modifier
+                .clip(CardDefaults.shape)
+                .background(MaterialTheme.colorScheme.secondary)
+                .combinedClickable(onDoubleClick = {
+                    randomViewModel.viewModelScope.launch(Dispatchers.IO) {
+                        if (isInternetAvailable(context)) {
+                            randomViewModel.onTapRandomAnime()
+                        }
+                    }
+                    randomViewModel.viewModelScope.launch {
+                        if (!isInternetAvailable(context)) {
+                            Toast
+                                .makeText(
+                                    context,
+                                    "No internet connection!",
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+                        }
+                    }
+
+                }) {}
+                .padding(20.dp, 20.dp, 20.dp, 20.dp)) {
+                Text(
+                    text = "Tap 2 times",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    fontFamily = evolventaBoldFamily
                 )
             }
         }
-
         LaunchedEffect(data?.mal_id) {
             swipeState.offset.animateTo(Offset(0.0f, 1000.0f))
-//            if (swipeState.offset.value != Offset(0.0f, 0.0f)) {
             swipeState.offset.animateTo(Offset(0.0f, 0.0f))
-//            }
         }
 
     }
@@ -206,7 +202,8 @@ private fun AnimeCard(
 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        modifier = modifier.shadow(20.dp),
+        modifier = modifier
+            .shadow(150.dp, shape = CardDefaults.shape, clip = true)
     ) {
         Column(
             verticalArrangement = Arrangement.Top,
@@ -271,14 +268,13 @@ private fun AnimeCard(
                 .size(300.dp, 420.dp)
                 .clip(CardDefaults.shape),
         ) {
-            BoxWithConstraints {
+            Box {
                 Image(
                     painter = painter,
                     contentDescription = "Anime ${data?.title}",
                     modifier = Modifier
                         .then(clickableModifier)
-                        .fillMaxHeight(1f)
-                        .fillMaxWidth(1f),
+                        .fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     alignment = Alignment.TopCenter
                 )
@@ -286,8 +282,7 @@ private fun AnimeCard(
 
                 Row(
                     modifier = Modifier
-                        .fillMaxHeight(1f)
-                        .fillMaxWidth(1f)
+                        .fillMaxSize()
                 ) {
                     Box(
                         modifier = Modifier
@@ -316,11 +311,11 @@ private fun AnimeCard(
                     Column(
                         modifier = Modifier
                             .wrapContentSize()
-                            .shadow(
-                                elevation = 80.dp,
-                                spotColor = Color(0f, 0f, 0f, 1f),
-                                ambientColor = Color(0f, 0f, 0f, 1f)
-                            )
+//                            .shadow(
+//                                elevation = 10.dp,
+//                                spotColor = Color(0f, 0f, 0f, 1f),
+//                                ambientColor = Color(0f, 0f, 0f, 1f)
+//                            )
                     ) {
 
 
@@ -404,8 +399,7 @@ private fun AnimeCard(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(1f)
+                .fillMaxSize()
         ) {
             if (data?.year != 0 && data?.season != null) {
 

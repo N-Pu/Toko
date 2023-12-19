@@ -81,7 +81,7 @@ fun MainScreen(
             .background(MaterialTheme.colorScheme.primary)
 
     ) {
-        Spacer(modifier = modifier.height(10.dp))
+        Spacer(modifier = modifier.fillMaxWidth().height(10.dp).background(MaterialTheme.colorScheme.error))
         Column(
             modifier = modifier
                 .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
