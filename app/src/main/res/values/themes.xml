@@ -2,9 +2,13 @@
 <resources>
 
     <style name="Theme.Toko.BarColors" parent="android:Theme.Material.NoActionBar">
-        <item name="android:navigationBarColor">@color/light_green</item>
-        <item name="android:windowBackground">@color/light_green</item>
-        <item name="android:statusBarColor">@color/light_green</item>
+        <!--        <item name="android:navigationBarColor">@color/light_green</item>-->
+        <!--        <item name="android:windowBackground">@color/light_green</item>-->
+        <!--        <item name="android:statusBarColor">@color/light_green</item>-->
+
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
 </resources>

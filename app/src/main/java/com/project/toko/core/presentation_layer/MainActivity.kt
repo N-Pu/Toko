@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -46,6 +47,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var darkTheme: SaveDarkMode
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         darkTheme = SaveDarkMode(this)
         darkTheme.loadData()
@@ -69,7 +71,7 @@ class MainActivity : ComponentActivity() {
         }.build()
         viewModelProvider[HomeScreenViewModel::class.java].loadNSFWData()
         setContent {
-            val systemUiController = rememberSystemUiController()
+            val systemUiController = rememberSystemUiController(window)
             val splashShown = remember { mutableStateOf(false) }
             navController = rememberNavController()
             if (!splashShown.value) {
@@ -88,9 +90,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     // A surface container using the 'background' color from the theme
                     Surface(
-                        modifier = modifier.fillMaxSize(),
+                        modifier = modifier
+                            .windowInsetsPadding(NavigationBarDefaults.windowInsets)
+                            .fillMaxSize(),
                     ) {
-
                         AppActivator(
                             navController = navController,
                             viewModelProvider = viewModelProvider,

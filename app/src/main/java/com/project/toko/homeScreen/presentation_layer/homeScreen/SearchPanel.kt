@@ -57,6 +57,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun MainScreen(
     navController: NavHostController,
@@ -71,14 +72,16 @@ fun MainScreen(
     val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
     val isTabMenuOpen = viewModel.isTabMenuOpen
     val switchIndicator = viewModel.switchIndicator
-//    val isInDarkMode = SaveDarkMode(LocalContext.current).isDarkThemeActive
     val scope = rememberCoroutineScope()
 
     Column(
         modifier = modifier
+//            .systemBarsPadding()
+//            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
             .background(MaterialTheme.colorScheme.primary)
 
     ) {
+        Spacer(modifier = modifier.height(10.dp))
         Column(
             modifier = modifier
                 .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
@@ -153,7 +156,7 @@ fun MainScreen(
 //                }
 
                 OutlinedTextField(
-                    placeholder = { Text(text = "Search...", color = Color.Gray) },
+                    placeholder = { Text(text = "Search...", color = iconColorInSearchPanel) },
                     value = searchText ?: "",
                     onValueChange = viewModel::onSearchTextChange,
                     modifier = modifier
@@ -167,7 +170,7 @@ fun MainScreen(
 
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model =if (switchIndicator.value)  R.drawable.search_back else R.drawable.search_home,
+                                model = if (switchIndicator.value) R.drawable.search_back else R.drawable.search_home,
                                 imageLoader = svgImageLoader
                             ),
                             contentDescription = null,
@@ -272,7 +275,6 @@ private fun TabSelectionMenu(
                     },
                     selectedContentColor = MaterialTheme.colorScheme.primary,
                     unselectedContentColor = MaterialTheme.colorScheme.primary,
-//                    modifier = modifier.background(MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
                         text = item.title,
@@ -286,7 +288,7 @@ private fun TabSelectionMenu(
             }
         }
     }
-
+    Spacer(modifier = modifier.height(5.dp))
     if (isTabMenuOpen.value) {
         Spacer(
             modifier = modifier
@@ -312,23 +314,23 @@ private fun TabSelectionMenu(
                     content = {
                         when (tabItems[index]) {
                             tabItems[0] -> {
-                                ShowTypes(viewModel, modifier,switchIndicator)
+                                ShowTypes(viewModel, modifier, switchIndicator)
                             }
 
                             tabItems[1] -> {
-                                ShowGenres(viewModel, modifier,switchIndicator)
+                                ShowGenres(viewModel, modifier, switchIndicator)
                             }
 
                             tabItems[2] -> {
-                                ShowRating(viewModel, modifier,switchIndicator)
+                                ShowRating(viewModel, modifier, switchIndicator)
                             }
 
                             tabItems[3] -> {
-                                ScoreBar(viewModel, modifier,switchIndicator)
+                                ScoreBar(viewModel, modifier, switchIndicator)
                             }
 
                             tabItems[4] -> {
-                                ShowOrderBy(viewModel, modifier,switchIndicator)
+                                ShowOrderBy(viewModel, modifier, switchIndicator)
                             }
                         }
                     }
@@ -415,7 +417,8 @@ private fun ScoreBar(
 private fun ShowGenres(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator: MutableState<Boolean>) {
+    switchIndicator: MutableState<Boolean>
+) {
     val selectedGenre by viewModel.selectedGenre.collectAsStateWithLifecycle()
     Box(
         modifier = modifier
@@ -487,7 +490,11 @@ private fun ButtonCreator(
 }
 
 @Composable
-private fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier, switchIndicator: MutableState<Boolean>)  {
+private fun ShowRating(
+    viewModel: HomeScreenViewModel,
+    modifier: Modifier,
+    switchIndicator: MutableState<Boolean>
+) {
     val ratingList by viewModel.ratingList.collectAsStateWithLifecycle()
     val selectedRating by viewModel.selectedRating.collectAsStateWithLifecycle()
     Row(
@@ -518,7 +525,11 @@ private fun ShowRating(viewModel: HomeScreenViewModel, modifier: Modifier, switc
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier, switchIndicator: MutableState<Boolean>) {
+private fun ShowTypes(
+    viewModel: HomeScreenViewModel,
+    modifier: Modifier,
+    switchIndicator: MutableState<Boolean>
+) {
     val typeList by viewModel.typeList.collectAsStateWithLifecycle()
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
 
@@ -547,7 +558,11 @@ private fun ShowTypes(viewModel: HomeScreenViewModel, modifier: Modifier, switch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ShowOrderBy(viewModel: HomeScreenViewModel, modifier: Modifier, switchIndicator: MutableState<Boolean>) {
+private fun ShowOrderBy(
+    viewModel: HomeScreenViewModel,
+    modifier: Modifier,
+    switchIndicator: MutableState<Boolean>
+) {
     val orderByList by viewModel.orderByList.collectAsStateWithLifecycle()
     val selectedOrderBy by viewModel.selectedOrderBy.collectAsStateWithLifecycle()
 

@@ -151,7 +151,7 @@ private fun BackArrow(modifier: Modifier, navController: NavController, isInDark
     val backArrowSecondColor =
         if (isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
-        Spacer(modifier = modifier.height(20.dp))
+        Spacer(modifier = modifier.height(40.dp))
         Box(
             modifier = modifier
                 .fillMaxWidth()

@@ -2,6 +2,7 @@ package com.project.toko.core.presentation_layer.theme
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -75,24 +76,47 @@ fun Theme(
 //    val systemUiController = rememberSystemUiController()
     if (darkTheme) {
 
-        systemUiController.setSystemBarsColor(
-            color = LightColorScheme.onPrimary,
-            darkIcons = false
-        )
+//        systemUiController.setSystemBarsColor(
+//            color = LightColorScheme.onPrimary,
+//            darkIcons = false
+//        )
         systemUiController.setNavigationBarColor(
             color = LightColorScheme.onPrimary,
+//            color = DarkColorScheme.onBackground,
+
             darkIcons = false
         )
 
-    } else {
-        systemUiController.setSystemBarsColor(
-            color = DarkColorScheme.onPrimary,
-            darkIcons = true
+        systemUiController.setStatusBarColor(
+            color = Color.Transparent,
+            darkIcons = false
         )
+//        systemUiController.setNavigationBarColor(
+//            color = Color.Transparent,
+//            darkIcons = false
+//        )
+    } else {
+//        systemUiController.setSystemBarsColor(
+//            color = DarkColorScheme.onPrimary,
+//            darkIcons = true
+//        )
         systemUiController.setNavigationBarColor(
             color = DarkColorScheme.onPrimary,
+//            color = LightColorScheme.onBackground,
             darkIcons = true
         )
+
+
+
+        systemUiController.setStatusBarColor(
+            color = Color.Transparent,
+            darkIcons = true
+        )
+//        systemUiController.setNavigationBarColor(
+//            color = Color.Transparent,
+//            darkIcons = true
+//        )
+
     }
 
     MaterialTheme(
