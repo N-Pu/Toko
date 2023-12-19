@@ -136,6 +136,7 @@ fun DaoScreen(
             .fillMaxWidth(1f)
             .background(MaterialTheme.colorScheme.primary)
     ) {
+        Spacer(modifier = modifier.height(10.dp))
         Column(
             modifier = modifier
                 .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))

@@ -17,6 +17,7 @@
         tools:ignore="ScopedStorage" />
 
     <application
+        android:windowSoftInputMode="adjustResize"
         android:requestLegacyExternalStorage="true"
         android:name=".core.di.Application"
         android:allowBackup="true"

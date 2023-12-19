@@ -12,6 +12,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -93,7 +94,11 @@ fun GridAdder(
         )
 
     val context = LocalContext.current
+    val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
+    val getTopUpcoming by viewModel.topUpcomingAnime.collectAsStateWithLifecycle()
+    val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
 
+    var log by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = Unit) {
         if (isInternetAvailable(context)) {
@@ -111,11 +116,7 @@ fun GridAdder(
         }
     }
 
-    val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
-    val getTopUpcoming by viewModel.topUpcomingAnime.collectAsStateWithLifecycle()
-    val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
 
-    var log by remember { mutableStateOf("") }
 
     if (switch.value) {
         LazyVerticalStaggeredGrid(
@@ -161,148 +162,149 @@ fun GridAdder(
 
     } else {
 
-        LazyColumn(
+        Column(
             modifier = modifier
+                .verticalScroll(rememberScrollState())
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.primary)
         ) {
             if (lastTenAnimeFromWatchingSection.value.isNotEmpty()) {
-                item {
-                    ShowSectionName(
-                        sectionName = "Now Watching ",
-                        modifier = modifier,
-                        isInDarkTheme = isInDarkTheme
-                    )
-                }
-                item {
-                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
-                        lastTenAnimeFromWatchingSection.value.forEach { data ->
-                            Spacer(modifier = modifier.width(20.dp))
-                            ShowSection(
-                                data = data, navController = navController,
-                                viewModelProvider = viewModelProvider,
-                                modifier = modifier,
-                                svgImageLoader = svgImageLoader
-                            )
-                        }
-                        Spacer(modifier = modifier.width(20.dp))
-                    }
 
+                ShowSectionName(
+                    sectionName = "Now Watching ",
+                    modifier = modifier,
+                    isInDarkTheme = isInDarkTheme
+                )
+
+
+                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+                    lastTenAnimeFromWatchingSection.value.forEach { data ->
+                        Spacer(modifier = modifier.width(20.dp))
+                        ShowSection(
+                            data = data, navController = navController,
+                            viewModelProvider = viewModelProvider,
+                            modifier = modifier,
+                            svgImageLoader = svgImageLoader
+                        )
+                    }
+                    Spacer(modifier = modifier.width(20.dp))
                 }
-                item {
-                    Spacer(modifier = modifier.height(20.dp))
-                }
+
+
+
+                Spacer(modifier = modifier.height(20.dp))
+
             }
             if (getTrendingAnime.data.isNotEmpty()) {
-                item {
-                    ShowSectionName(
-                        sectionName = "Trending",
-                        modifier = modifier,
-                        isInDarkTheme = isInDarkTheme
-                    )
-                }
-                item {
-                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
 
-                        getTrendingAnime.data.forEach { data ->
-                            Spacer(modifier = modifier.width(20.dp))
-                            ShowTopAnime(
-                                data = data, navController = navController,
-                                viewModelProvider = viewModelProvider,
-                                modifier = modifier,
-                                svgImageLoader = svgImageLoader
-                            )
-                        }
+                ShowSectionName(
+                    sectionName = "Trending",
+                    modifier = modifier,
+                    isInDarkTheme = isInDarkTheme
+                )
+
+
+                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+
+                    getTrendingAnime.data.forEach { data ->
                         Spacer(modifier = modifier.width(20.dp))
+                        ShowTopAnime(
+                            data = data, navController = navController,
+                            viewModelProvider = viewModelProvider,
+                            modifier = modifier,
+                            svgImageLoader = svgImageLoader
+                        )
                     }
+                    Spacer(modifier = modifier.width(20.dp))
+                }
 
-                }
-                item {
-                    Spacer(modifier = modifier.height(20.dp))
-                }
+
+
+                Spacer(modifier = modifier.height(20.dp))
+
             }
             if (getJustTenAddedAnime.value.isNotEmpty()) {
-                item {
-                    ShowSectionName(
-                        sectionName = "Just Added",
-                        modifier = modifier,
-                        isInDarkTheme = isInDarkTheme
-                    )
-                }
-                item {
-                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
 
-                        getJustTenAddedAnime.value.forEach { data ->
-                            Spacer(modifier = modifier.width(20.dp))
-                            ShowSection(
-                                data = data, navController = navController,
-                                viewModelProvider = viewModelProvider,
-                                modifier = modifier, svgImageLoader = svgImageLoader
-                            )
-                        }
+                ShowSectionName(
+                    sectionName = "Just Added",
+                    modifier = modifier,
+                    isInDarkTheme = isInDarkTheme
+                )
+
+
+                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+
+                    getJustTenAddedAnime.value.forEach { data ->
                         Spacer(modifier = modifier.width(20.dp))
+                        ShowSection(
+                            data = data, navController = navController,
+                            viewModelProvider = viewModelProvider,
+                            modifier = modifier, svgImageLoader = svgImageLoader
+                        )
                     }
+                    Spacer(modifier = modifier.width(20.dp))
+                }
 
-                }
-                item {
-                    Spacer(modifier = modifier.height(20.dp))
-                }
+
+
+                Spacer(modifier = modifier.height(20.dp))
+
             }
             if (getTopAiring.data.isNotEmpty()) {
-                item {
-                    ShowSectionName(
-                        sectionName = "Top Airing",
-                        modifier = modifier,
-                        isInDarkTheme = isInDarkTheme
-                    )
-                }
-                item {
-                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
 
-                        getTopAiring.data.forEach { data ->
-                            Spacer(modifier = modifier.width(20.dp))
-                            ShowTopAnime(
-                                data = data, navController = navController,
-                                viewModelProvider = viewModelProvider,
-                                modifier = modifier,
-                                svgImageLoader = svgImageLoader
-                            )
-                        }
+                ShowSectionName(
+                    sectionName = "Top Airing",
+                    modifier = modifier,
+                    isInDarkTheme = isInDarkTheme
+                )
+
+
+                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+
+                    getTopAiring.data.forEach { data ->
                         Spacer(modifier = modifier.width(20.dp))
+                        ShowTopAnime(
+                            data = data, navController = navController,
+                            viewModelProvider = viewModelProvider,
+                            modifier = modifier,
+                            svgImageLoader = svgImageLoader
+                        )
                     }
+                    Spacer(modifier = modifier.width(20.dp))
+                }
 
-                }
-                item {
-                    Spacer(modifier = modifier.height(20.dp))
-                }
+
+
+                Spacer(modifier = modifier.height(20.dp))
+
             }
             if (getTopUpcoming.data.isNotEmpty()) {
-                item {
-                    ShowSectionName(
-                        sectionName = "Top Upcoming",
-                        modifier = modifier,
-                        isInDarkTheme = isInDarkTheme
-                    )
-                }
-                item {
-                    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
 
-                        getTopUpcoming.data.forEach { data ->
-                            Spacer(modifier = modifier.width(20.dp))
-                            ShowTopAnime(
-                                data = data, navController = navController,
-                                viewModelProvider = viewModelProvider,
-                                modifier = modifier,
-                                svgImageLoader = svgImageLoader
-                            )
-                        }
+                ShowSectionName(
+                    sectionName = "Top Upcoming",
+                    modifier = modifier,
+                    isInDarkTheme = isInDarkTheme
+                )
+
+
+                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+
+                    getTopUpcoming.data.forEach { data ->
                         Spacer(modifier = modifier.width(20.dp))
+                        ShowTopAnime(
+                            data = data, navController = navController,
+                            viewModelProvider = viewModelProvider,
+                            modifier = modifier,
+                            svgImageLoader = svgImageLoader
+                        )
                     }
+                    Spacer(modifier = modifier.width(20.dp))
+                }
 
-                }
-                item {
-                    Spacer(modifier = modifier.height(20.dp))
-                }
+
+
+                Spacer(modifier = modifier.height(20.dp))
+
             }
         }
 

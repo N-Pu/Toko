@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -68,7 +69,6 @@ fun DisplayCharacterFromId(
 
     val isDialogShown = remember { mutableStateOf(false) }
     if (isSearching.not() && characterFullState != null) {
-
 
         Column(
             modifier = modifier.background(MaterialTheme.colorScheme.primary)
@@ -136,7 +136,7 @@ private fun BackArrow(modifier: Modifier, navController: NavController, isInDark
     val backArrowFirstColor = if (isInDarkTheme) DarkBackArrowCastColor else BackArrowCastColor
     val backArrowSecondColor =if (isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
-        Spacer(modifier = modifier.height(20.dp))
+        Spacer(modifier = modifier.height(40.dp))
         Box(
             modifier = modifier
                 .fillMaxWidth()
