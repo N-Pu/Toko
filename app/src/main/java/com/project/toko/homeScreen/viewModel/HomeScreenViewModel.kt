@@ -137,6 +137,7 @@ class HomeScreenViewModel @Inject constructor(
         MutableStateFlow(getTypes())
     val typeList =
         _typeList
+
     private val pre_selectedType =
         MutableStateFlow<Types?>(null)
     val selectedType: StateFlow<Types?> =

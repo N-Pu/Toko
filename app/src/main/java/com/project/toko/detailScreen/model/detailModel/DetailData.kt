@@ -1,6 +1,8 @@
 
 package com.project.toko.detailScreen.model.detailModel
+import androidx.compose.runtime.Immutable
 import com.google.gson.annotations.SerializedName
+@Immutable
 data class DetailData(
     @SerializedName("aired") val aired: Aired,
     @SerializedName("airing") val airing: Boolean,
