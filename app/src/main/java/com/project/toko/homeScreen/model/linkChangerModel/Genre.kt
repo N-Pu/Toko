@@ -9,7 +9,6 @@ data class Genre(
     val name: String,
     val id: Int,
     val isSelected: MutableState<Boolean> = mutableStateOf(false)
-
 )
 
 fun getGenres(): List<Genre> {

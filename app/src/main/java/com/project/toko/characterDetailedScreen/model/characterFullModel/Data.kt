@@ -1,9 +1,10 @@
 
 package com.project.toko.characterDetailedScreen.model.characterFullModel
 
+import androidx.compose.runtime.Immutable
 import com.google.gson.annotations.SerializedName
 
-
+@Immutable
 data class Data(
     @SerializedName("about") val about: String,
     @SerializedName("anime") val anime: List<Anime>,

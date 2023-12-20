@@ -1,10 +1,13 @@
 package com.project.toko.core.presentation_layer.theme
 
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import okhttp3.internal.immutableListOf
 
+@Immutable
 sealed class ThemeColors(
     val background: Color,
     val text: Color,
@@ -104,7 +107,7 @@ private val favorite = Color(69, 167, 149)
 private val person = Color(46, 135, 118)
 private val character = Color(34, 124, 107, 255)
 
-val lightFavoriteTopBarColors = listOf(
+val lightFavoriteTopBarColors = immutableListOf(
     watching, planned, completed, dropped, favorite, person,
     character
 )
@@ -129,7 +132,7 @@ private val darkFavorite = Color(190, 80, 165, 255)
 private val darkPerson = Color(177, 71, 153, 255)
 private val darkCharacter = Color(150, 44, 126, 255)
 
-val darkFavoriteTopBarColors = listOf(
+val darkFavoriteTopBarColors = immutableListOf(
     darkWatching, darkPlanned, darkCompleted, darkDropped, darkFavorite, darkPerson,
     darkCharacter
 )

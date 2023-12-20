@@ -1,6 +1,8 @@
 package com.project.toko.personDetailedScreen.model.personFullModel
+import androidx.compose.runtime.Immutable
 import com.google.gson.annotations.SerializedName
 
+@Immutable
 data class Data(
     @SerializedName("about") val about: String,
     @SerializedName("alternate_names") val alternate_names: List<String>,

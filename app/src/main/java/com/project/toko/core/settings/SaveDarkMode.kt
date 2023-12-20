@@ -3,8 +3,9 @@ package com.project.toko.core.settings
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
+import javax.inject.Inject
 
-class SaveDarkMode(private val context: Context) {
+class SaveDarkMode @Inject constructor(private val context: Context) {
 
 
     private val _isDarkThemeActive = mutableStateOf(false)

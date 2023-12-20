@@ -1,6 +1,7 @@
 package com.project.toko.core.presentation_layer
 
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.Window
 import androidx.activity.ComponentActivity
@@ -48,6 +49,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // locked screen for the time being
+
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         darkTheme = SaveDarkMode(this)
         darkTheme.loadData()
