@@ -58,7 +58,7 @@ fun ShowWholeCast(
     navController: NavController,
     viewModel: DetailScreenViewModel,
     modifier: Modifier,
-    isInDarkTheme : Boolean
+    isInDarkTheme :() ->  Boolean
 ) {
 
     val castList by
@@ -285,9 +285,9 @@ private fun CurrentCast(
 }
 
 @Composable
-private fun BackArrow(modifier: Modifier, navController: NavController, detailScreenMalId: Int,  isInDarkTheme : Boolean) {
-    val backArrowFirstColor = if ( isInDarkTheme ) DarkBackArrowCastColor else BackArrowCastColor
-    val backArrowSecondColor =if ( isInDarkTheme ) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
+private fun BackArrow(modifier: Modifier, navController: NavController, detailScreenMalId: Int,  isInDarkTheme :() ->  Boolean) {
+    val backArrowFirstColor = if ( isInDarkTheme() ) DarkBackArrowCastColor else BackArrowCastColor
+    val backArrowSecondColor =if ( isInDarkTheme() ) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
         Spacer(modifier = modifier.height(40.dp))
         Box(

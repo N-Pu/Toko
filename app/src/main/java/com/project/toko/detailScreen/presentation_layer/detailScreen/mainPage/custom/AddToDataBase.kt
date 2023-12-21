@@ -51,7 +51,7 @@ import java.util.Locale
 
 @Composable
 fun AddToFavorites(
-    viewModelProvider: ViewModelProvider, modifier: Modifier, isDarkTheme: Boolean, svgImageLoader : ImageLoader
+    viewModelProvider: ViewModelProvider, modifier: Modifier, isDarkTheme: () -> Boolean, svgImageLoader : ImageLoader
 ) {
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
@@ -59,7 +59,7 @@ fun AddToFavorites(
     var isExpanded by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val threeDots = if (isDarkTheme) {
+    val threeDots = if (isDarkTheme()) {
         R.drawable.three_dots_white
     } else {
         R.drawable.three_dots_gray

@@ -45,7 +45,7 @@ fun DisplayPersonFullScreen(
     mal_id: Int,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme: Boolean, svgImageLoader : ImageLoader
+    modifier: Modifier, isInDarkTheme: () -> Boolean, svgImageLoader : ImageLoader
 ) {
     val personViewModel = viewModelProvider[PersonByIdViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
@@ -146,10 +146,10 @@ fun DisplayPersonFullScreen(
 }
 
 @Composable
-private fun BackArrow(modifier: Modifier, navController: NavController, isInDarkTheme: Boolean) {
-    val backArrowFirstColor = if (isInDarkTheme) DarkBackArrowCastColor else BackArrowCastColor
+private fun BackArrow(modifier: Modifier, navController: NavController, isInDarkTheme:() ->  Boolean) {
+    val backArrowFirstColor = if (isInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
     val backArrowSecondColor =
-        if (isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
+        if (isInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
         Spacer(modifier = modifier.height(40.dp))
         Box(

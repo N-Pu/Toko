@@ -50,7 +50,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // locked screen for the time being
+        requestedOrientation =
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // locked screen for the time being
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         darkTheme = SaveDarkMode(this)
@@ -108,7 +109,7 @@ class MainActivity : ComponentActivity() {
                                     !darkTheme.isDarkThemeActive.value
                                 darkTheme.saveData(darkTheme.isDarkThemeActive.value)
                             },
-                            isInDarkTheme = darkTheme.isDarkThemeActive.value,
+                            isInDarkTheme = { darkTheme.isDarkThemeActive.value },
                             svgImageLoader = svgImageLoader
                         )
                     }
