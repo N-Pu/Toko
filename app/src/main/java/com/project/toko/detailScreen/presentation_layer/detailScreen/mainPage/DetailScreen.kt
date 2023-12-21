@@ -56,7 +56,7 @@ fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
     navController: NavController,
     id: Int,
-    modifier: Modifier, isInDarkTheme : Boolean, svgImageLoader : ImageLoader
+    modifier: Modifier, isInDarkTheme: () -> Boolean, svgImageLoader: ImageLoader
 ) {
 
     val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
@@ -186,7 +186,12 @@ fun ActivateDetailScreen(
                 genres = detailData?.genres ?: listOf(),
                 modifier = modifier
             )
-            AddToFavorites(viewModelProvider, modifier, isInDarkTheme, svgImageLoader = svgImageLoader)
+            AddToFavorites(
+                viewModelProvider,
+                modifier,
+                isInDarkTheme,
+                svgImageLoader = svgImageLoader
+            )
             ExpandableText(text = detailData!!.synopsis, title = "Synopsis", modifier = modifier)
 //            FullScreenYoutubeActivity().YoutubePlayerSecond(
 //                detailData?.trailer?.youtube_id ?: "",
@@ -218,7 +223,13 @@ fun ActivateDetailScreen(
                 navController = navController,
                 viewModel = viewModel
             )
-            Recommendations(recommendationsData, navController, viewModelProvider, modifier, isInDarkTheme)
+            Recommendations(
+                recommendationsData,
+                navController,
+                viewModelProvider,
+                modifier,
+                isInDarkTheme
+            )
             Spacer(modifier = modifier.height(20.dp))
 
         }

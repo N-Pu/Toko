@@ -12,9 +12,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
@@ -74,9 +72,9 @@ fun GridAdder(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
-    isTabMenuOpen: MutableState<Boolean>,
-    switch: MutableState<Boolean>,
-    isInDarkTheme: Boolean,
+    isTabMenuOpen: () ->MutableState<Boolean>,
+    switch:() -> Boolean,
+    isInDarkTheme: () -> Boolean,
     svgImageLoader: ImageLoader
 ) {
 
@@ -118,15 +116,15 @@ fun GridAdder(
 
 
 
-    if (switch.value) {
+    if (switch()) {
         LazyVerticalStaggeredGrid(
             state = if (scrollGridState.firstVisibleItemIndex >= 4) {
                 log = scrollGridState.firstVisibleItemIndex.toString()
-                isTabMenuOpen.value = false
+                isTabMenuOpen().value = false
                 scrollGridState
             } else {
                 log = scrollGridState.firstVisibleItemIndex.toString()
-                isTabMenuOpen.value = true
+                isTabMenuOpen().value = true
                 scrollGridState
             },
             columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
@@ -753,11 +751,11 @@ private fun ShowSection(
 }
 
 @Composable
-private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkTheme: Boolean) {
+private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkTheme:() -> Boolean) {
     Box(
         modifier = modifier
             .fillMaxWidth(0.85f)
-            .background(if (isInDarkTheme) DarkSectionColor else SectionColor)
+            .background(if (isInDarkTheme()) DarkSectionColor else SectionColor)
             .padding(bottom = 5.dp)
     ) {
         Box(

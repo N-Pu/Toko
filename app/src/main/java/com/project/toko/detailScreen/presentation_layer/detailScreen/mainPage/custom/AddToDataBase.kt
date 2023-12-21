@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,7 +48,7 @@ import java.util.Locale
 
 @Composable
 fun AddToFavorites(
-    viewModelProvider: ViewModelProvider, modifier: Modifier, isDarkTheme: Boolean, svgImageLoader : ImageLoader
+    viewModelProvider: ViewModelProvider, modifier: Modifier, isDarkTheme: () -> Boolean, svgImageLoader : ImageLoader
 ) {
     val detailScreenViewModel = viewModelProvider[DetailScreenViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
@@ -59,7 +56,7 @@ fun AddToFavorites(
     var isExpanded by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val threeDots = if (isDarkTheme) {
+    val threeDots = if (isDarkTheme()) {
         R.drawable.three_dots_white
     } else {
         R.drawable.three_dots_gray

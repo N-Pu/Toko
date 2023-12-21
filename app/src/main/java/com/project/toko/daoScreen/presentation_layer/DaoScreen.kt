@@ -103,7 +103,7 @@ fun DaoScreen(
     navController: NavController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
-    isInDarkTheme: Boolean,
+    isInDarkTheme: () -> Boolean,
     drawerState: DrawerState,
     svgImageLoader: ImageLoader
 ) {
@@ -177,7 +177,7 @@ fun DaoScreen(
                     .wrapContentSize()
                     .padding(top = 10.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(if (isInDarkTheme) DarkSearchBarColor else SearchBarColor),
+                    .background(if (isInDarkTheme()) DarkSearchBarColor else SearchBarColor),
                 verticalAlignment = Alignment.Bottom
             ) {
                 OutlinedTextField(
@@ -228,19 +228,19 @@ fun DaoScreen(
             TwoSortingButtons(
                 modifier = modifier,
                 svgImageLoader = svgImageLoader,
-                rightSortingMenu = rightSortingMenu,
-                isSortedAlphabetically = isSortedAlphabetically,
-                isSortedByScore = isSortedByScore,
-                isSortedByUsers = isSortedByUsers,
-                isAiredFrom = isAiredFrom,
-                leftSortingMenu = leftSortingMenu,
-                isTvSelected = isTvSelected,
-                isMovieSelected = isMovieSelected,
-                isOvaSelected = isOvaSelected,
-                isSpecialSelected = isSpecialSelected,
-                isOnaSelected = isOnaSelected,
-                isMusicSelected = isMusicSelected,
-                selectedType = selectedType,
+                rightSortingMenu = { rightSortingMenu },
+                isSortedAlphabetically = { isSortedAlphabetically },
+                isSortedByScore = { isSortedByScore },
+                isSortedByUsers = { isSortedByUsers },
+                isAiredFrom = { isAiredFrom },
+                leftSortingMenu = { leftSortingMenu },
+                isTvSelected = { isTvSelected },
+                isMovieSelected = { isMovieSelected },
+                isOvaSelected = { isOvaSelected },
+                isSpecialSelected = { isSpecialSelected },
+                isOnaSelected = { isOnaSelected },
+                isMusicSelected = { isMusicSelected },
+                selectedType = { selectedType },
                 isInDarkTheme = isInDarkTheme
             )
         }
@@ -337,9 +337,9 @@ private fun FavoriteAnimeListButton(
     onClick: () -> Unit,
     modifier: Modifier,
     colorIndex: Int,
-    isInDarkTheme: Boolean
+    isInDarkTheme: () -> Boolean
 ) {
-    val colors = if (isInDarkTheme) darkFavoriteTopBarColors else lightFavoriteTopBarColors
+    val colors = if (isInDarkTheme()) darkFavoriteTopBarColors else lightFavoriteTopBarColors
     val customModifier = if (selectedListType == listType) modifier
         .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
         .clickable { onClick() }
@@ -1247,25 +1247,25 @@ private fun FavoriteScreenCardBox(
 private fun TwoSortingButtons(
     modifier: Modifier,
     svgImageLoader: ImageLoader,
-    leftSortingMenu: MutableState<Boolean>,
-    rightSortingMenu: MutableState<Boolean>,
-    isSortedAlphabetically: MutableState<Boolean>,
-    isSortedByScore: MutableState<Boolean>,
-    isSortedByUsers: MutableState<Boolean>,
-    isAiredFrom: MutableState<Boolean>,
-    isTvSelected: MutableState<Boolean>,
-    isMovieSelected: MutableState<Boolean>,
-    isOvaSelected: MutableState<Boolean>,
-    isSpecialSelected: MutableState<Boolean>,
-    isOnaSelected: MutableState<Boolean>,
-    isMusicSelected: MutableState<Boolean>,
-    selectedType: MutableState<String?>,
-    isInDarkTheme: Boolean
+    leftSortingMenu: () -> MutableState<Boolean>,
+    rightSortingMenu: () -> MutableState<Boolean>,
+    isSortedAlphabetically: () -> MutableState<Boolean>,
+    isSortedByScore: () -> MutableState<Boolean>,
+    isSortedByUsers: () -> MutableState<Boolean>,
+    isAiredFrom: () -> MutableState<Boolean>,
+    isTvSelected: () -> MutableState<Boolean>,
+    isMovieSelected: () -> MutableState<Boolean>,
+    isOvaSelected: () -> MutableState<Boolean>,
+    isSpecialSelected: () -> MutableState<Boolean>,
+    isOnaSelected: () -> MutableState<Boolean>,
+    isMusicSelected: () -> MutableState<Boolean>,
+    selectedType: () -> MutableState<String?>,
+    isInDarkTheme: () -> Boolean
 ) {
     val backArrowFirstColor =
-        if (isInDarkTheme) DarkBackArrowCastColor else BackArrowCastColor
+        if (isInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
     val backArrowSecondColor =
-        if (isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
+        if (isInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
 
     Row(
         modifier = modifier
@@ -1278,7 +1278,7 @@ private fun TwoSortingButtons(
 //                .fillMaxWidth()
                 .background(backArrowFirstColor)
         ) {
-            if (leftSortingMenu.value) {
+            if (leftSortingMenu().value) {
                 Text(
                     text = "All v",
                     fontWeight = FontWeight.ExtraBold,
@@ -1286,7 +1286,7 @@ private fun TwoSortingButtons(
                     modifier = modifier
                         .padding(start = 20.dp)
                         .clickable {
-                            leftSortingMenu.value = !leftSortingMenu.value
+                            leftSortingMenu().value = !leftSortingMenu().value
                         }, color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = evolventaBoldFamily
                 )
@@ -1298,7 +1298,7 @@ private fun TwoSortingButtons(
                     modifier = modifier
                         .padding(start = 20.dp)
                         .clickable {
-                            leftSortingMenu.value = !leftSortingMenu.value
+                            leftSortingMenu().value = !leftSortingMenu().value
                         }, color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = evolventaBoldFamily
                 )
@@ -1314,14 +1314,14 @@ private fun TwoSortingButtons(
         DropdownMenu(
             modifier = modifier
                 .background(MaterialTheme.colorScheme.error),
-            expanded = leftSortingMenu.value,
-            onDismissRequest = { leftSortingMenu.value = false }) {
+            expanded = leftSortingMenu().value,
+            onDismissRequest = { leftSortingMenu().value = false }) {
             DropdownMenuItem(
                 text = {
                     Text(text = "TV", fontSize = 22.sp, color = MaterialTheme.colorScheme.onPrimary)
                 },
                 trailingIcon = {
-                    if (isTvSelected.value) {
+                    if (isTvSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1342,18 +1342,18 @@ private fun TwoSortingButtons(
                     }
                 },
                 onClick = {
-                    isTvSelected.value = !isTvSelected.value
-                    if (isTvSelected.value) {
-                        selectedType.value = "TV"
+                    isTvSelected().value = !isTvSelected().value
+                    if (isTvSelected().value) {
+                        selectedType().value = "TV"
                     } else {
-                        selectedType.value = null
+                        selectedType().value = null
                     }
 
-                    isMovieSelected.value = false
-                    isOnaSelected.value = false
-                    isOvaSelected.value = false
-                    isSpecialSelected.value = false
-                    isMusicSelected.value = false
+                    isMovieSelected().value = false
+                    isOnaSelected().value = false
+                    isOvaSelected().value = false
+                    isSpecialSelected().value = false
+                    isMusicSelected().value = false
 
                 })
             DropdownMenuItem(
@@ -1366,7 +1366,7 @@ private fun TwoSortingButtons(
 
                 },
                 trailingIcon = {
-                    if (isOnaSelected.value) {
+                    if (isOnaSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1387,17 +1387,17 @@ private fun TwoSortingButtons(
                     }
                 },
                 onClick = {
-                    isOnaSelected.value = !isOnaSelected.value
-                    if (isOnaSelected.value) {
-                        selectedType.value = "ONA"
+                    isOnaSelected().value = !isOnaSelected().value
+                    if (isOnaSelected().value) {
+                        selectedType().value = "ONA"
                     } else {
-                        selectedType.value = null
+                        selectedType().value = null
                     }
-                    isMovieSelected.value = false
-                    isTvSelected.value = false
-                    isOvaSelected.value = false
-                    isSpecialSelected.value = false
-                    isMusicSelected.value = false
+                    isMovieSelected().value = false
+                    isTvSelected().value = false
+                    isOvaSelected().value = false
+                    isSpecialSelected().value = false
+                    isMusicSelected().value = false
                 })
             DropdownMenuItem(
                 text = {
@@ -1409,7 +1409,7 @@ private fun TwoSortingButtons(
 
                 },
                 trailingIcon = {
-                    if (isOvaSelected.value) {
+                    if (isOvaSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1430,18 +1430,18 @@ private fun TwoSortingButtons(
                     }
                 },
                 onClick = {
-                    isOvaSelected.value = !isOvaSelected.value
+                    isOvaSelected().value = !isOvaSelected().value
 
-                    if (isOvaSelected.value) {
-                        selectedType.value = "OVA"
+                    if (isOvaSelected().value) {
+                        selectedType().value = "OVA"
                     } else {
-                        selectedType.value = null
+                        selectedType().value = null
                     }
-                    isMovieSelected.value = false
-                    isTvSelected.value = false
-                    isOnaSelected.value = false
-                    isSpecialSelected.value = false
-                    isMusicSelected.value = false
+                    isMovieSelected().value = false
+                    isTvSelected().value = false
+                    isOnaSelected().value = false
+                    isSpecialSelected().value = false
+                    isMusicSelected().value = false
                 })
             DropdownMenuItem(
                 text = {
@@ -1453,7 +1453,7 @@ private fun TwoSortingButtons(
 
                 },
                 trailingIcon = {
-                    if (isMovieSelected.value) {
+                    if (isMovieSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1475,18 +1475,18 @@ private fun TwoSortingButtons(
                 },
                 onClick = {
 
-                    isMovieSelected.value = !isMovieSelected.value
+                    isMovieSelected().value = !isMovieSelected().value
 
-                    if (isMovieSelected.value) {
-                        selectedType.value = "Movie"
+                    if (isMovieSelected().value) {
+                        selectedType().value = "Movie"
                     } else {
-                        selectedType.value = null
+                        selectedType().value = null
                     }
-                    isOvaSelected.value = false
-                    isTvSelected.value = false
-                    isOnaSelected.value = false
-                    isSpecialSelected.value = false
-                    isMusicSelected.value = false
+                    isOvaSelected().value = false
+                    isTvSelected().value = false
+                    isOnaSelected().value = false
+                    isSpecialSelected().value = false
+                    isMusicSelected().value = false
                 })
             DropdownMenuItem(
                 text = {
@@ -1498,7 +1498,7 @@ private fun TwoSortingButtons(
 
                 },
                 trailingIcon = {
-                    if (isSpecialSelected.value) {
+                    if (isSpecialSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1520,18 +1520,18 @@ private fun TwoSortingButtons(
                 },
                 onClick = {
 
-                    isSpecialSelected.value = !isSpecialSelected.value
+                    isSpecialSelected().value = !isSpecialSelected().value
 
-                    if (isSpecialSelected.value) {
-                        selectedType.value = "Special"
+                    if (isSpecialSelected().value) {
+                        selectedType().value = "Special"
                     } else {
-                        selectedType.value = null
+                        selectedType().value = null
                     }
-                    isOvaSelected.value = false
-                    isMovieSelected.value = false
-                    isTvSelected.value = false
-                    isOnaSelected.value = false
-                    isMusicSelected.value = false
+                    isOvaSelected().value = false
+                    isMovieSelected().value = false
+                    isTvSelected().value = false
+                    isOnaSelected().value = false
+                    isMusicSelected().value = false
                 })
             DropdownMenuItem(
                 text = {
@@ -1543,7 +1543,7 @@ private fun TwoSortingButtons(
 
                 },
                 trailingIcon = {
-                    if (isMusicSelected.value) {
+                    if (isMusicSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1564,18 +1564,18 @@ private fun TwoSortingButtons(
                     }
                 },
                 onClick = {
-                    isMusicSelected.value = !isMusicSelected.value
+                    isMusicSelected().value = !isMusicSelected().value
 
-                    if (isMusicSelected.value) {
-                        selectedType.value = "Music"
+                    if (isMusicSelected().value) {
+                        selectedType().value = "Music"
                     } else {
-                        selectedType.value = null
+                        selectedType().value = null
                     }
-                    isOvaSelected.value = false
-                    isTvSelected.value = false
-                    isOnaSelected.value = false
-                    isMovieSelected.value = false
-                    isSpecialSelected.value = false
+                    isOvaSelected().value = false
+                    isTvSelected().value = false
+                    isOnaSelected().value = false
+                    isMovieSelected().value = false
+                    isSpecialSelected().value = false
                 })
 
         }
@@ -1591,13 +1591,13 @@ private fun TwoSortingButtons(
                 modifier = modifier
                     .size(22.dp)
                     .clickable {
-                        rightSortingMenu.value = true
+                        rightSortingMenu().value = true
                     }, colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
             )
 
             DropdownMenu(
-                expanded = rightSortingMenu.value,
-                onDismissRequest = { rightSortingMenu.value = false },
+                expanded = rightSortingMenu().value,
+                onDismissRequest = { rightSortingMenu().value = false },
                 modifier = modifier
                     .fillMaxWidth(0.58f)
                     .background(MaterialTheme.colorScheme.error)
@@ -1613,7 +1613,7 @@ private fun TwoSortingButtons(
 
                     },
                     trailingIcon = {
-                        if (isSortedAlphabetically.value) {
+                        if (isSortedAlphabetically().value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1634,10 +1634,10 @@ private fun TwoSortingButtons(
                         }
                     },
                     onClick = {
-                        isSortedByScore.value = false
-                        isSortedByUsers.value = false
-                        isAiredFrom.value = false
-                        isSortedAlphabetically.value = !isSortedAlphabetically.value
+                        isSortedByScore().value = false
+                        isSortedByUsers().value = false
+                        isAiredFrom().value = false
+                        isSortedAlphabetically().value = !isSortedAlphabetically().value
                     })
                 DropdownMenuItem(
                     text = {
@@ -1648,7 +1648,7 @@ private fun TwoSortingButtons(
                         )
                     },
                     trailingIcon = {
-                        if (isSortedByScore.value) {
+                        if (isSortedByScore().value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1669,10 +1669,10 @@ private fun TwoSortingButtons(
                         }
                     },
                     onClick = {
-                        isSortedByUsers.value = false
-                        isSortedAlphabetically.value = false
-                        isAiredFrom.value = false
-                        isSortedByScore.value = !isSortedByScore.value
+                        isSortedByUsers().value = false
+                        isSortedAlphabetically().value = false
+                        isAiredFrom().value = false
+                        isSortedByScore().value = !isSortedByScore().value
 
                     })
                 DropdownMenuItem(
@@ -1684,7 +1684,7 @@ private fun TwoSortingButtons(
                         )
                     },
                     trailingIcon = {
-                        if (isSortedByUsers.value) {
+                        if (isSortedByUsers().value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1705,10 +1705,10 @@ private fun TwoSortingButtons(
                         }
                     },
                     onClick = {
-                        isSortedAlphabetically.value = false
-                        isSortedByScore.value = false
-                        isAiredFrom.value = false
-                        isSortedByUsers.value = !isSortedByUsers.value
+                        isSortedAlphabetically().value = false
+                        isSortedByScore().value = false
+                        isAiredFrom().value = false
+                        isSortedByUsers().value = !isSortedByUsers().value
 
                     })
                 DropdownMenuItem(
@@ -1722,7 +1722,7 @@ private fun TwoSortingButtons(
 
                     },
                     trailingIcon = {
-                        if (isAiredFrom.value) {
+                        if (isAiredFrom().value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.filledcircle, imageLoader = svgImageLoader
@@ -1743,10 +1743,10 @@ private fun TwoSortingButtons(
                         }
                     },
                     onClick = {
-                        isSortedAlphabetically.value = false
-                        isSortedByScore.value = false
-                        isSortedByUsers.value = false
-                        isAiredFrom.value = !isAiredFrom.value
+                        isSortedAlphabetically().value = false
+                        isSortedByScore().value = false
+                        isSortedByUsers().value = false
+                        isAiredFrom().value = !isAiredFrom().value
                     })
             }
         }

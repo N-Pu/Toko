@@ -63,7 +63,7 @@ fun MainScreen(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
-    isInDarkTheme: Boolean,
+    isInDarkTheme:() -> Boolean,
     drawerState: DrawerState,
     svgImageLoader: ImageLoader
 ) {
@@ -120,7 +120,7 @@ fun MainScreen(
                     .padding(top = 10.dp)
                     .clip(RoundedCornerShape(20.dp))
                     .background(
-                        if (isInDarkTheme) DarkSearchBarColor else SearchBarColor
+                        if (isInDarkTheme()) DarkSearchBarColor else SearchBarColor
                     ),
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -196,15 +196,15 @@ fun MainScreen(
             }
         }
 
-        TabSelectionMenu(viewModel, modifier, isTabMenuOpen, switchIndicator)
+        TabSelectionMenu(viewModel, modifier, {isTabMenuOpen}, {switchIndicator})
 
         if (isSearching.not()) {
             GridAdder(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
                 modifier = modifier,
-                isTabMenuOpen = isTabMenuOpen,
-                switch = switchIndicator,
+                isTabMenuOpen = {isTabMenuOpen},
+                switch = {switchIndicator.value},
                 isInDarkTheme = isInDarkTheme,
                 svgImageLoader = svgImageLoader
             )
@@ -221,8 +221,8 @@ fun MainScreen(
 private fun TabSelectionMenu(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    isTabMenuOpen: MutableState<Boolean>,
-    switchIndicator: MutableState<Boolean>
+    isTabMenuOpen: () -> MutableState<Boolean>,
+    switchIndicator:() -> MutableState<Boolean>
 ) {
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -267,10 +267,10 @@ private fun TabSelectionMenu(
                     selected = index == selectedTabIndex,
                     onClick = {
                         if (selectedTabIndex == index) {
-                            isTabMenuOpen.value = !isTabMenuOpen.value
+                            isTabMenuOpen().value = !isTabMenuOpen().value
                         } else {
                             selectedTabIndex = index
-                            isTabMenuOpen.value = true
+                            isTabMenuOpen().value = true
                         }
                     },
                     selectedContentColor = MaterialTheme.colorScheme.primary,
@@ -289,7 +289,7 @@ private fun TabSelectionMenu(
         }
     }
     Spacer(modifier = modifier.height(5.dp))
-    if (isTabMenuOpen.value) {
+    if (isTabMenuOpen().value) {
         Spacer(
             modifier = modifier
                 .height(20.dp)
@@ -346,7 +346,7 @@ private fun TabSelectionMenu(
 private fun ScoreBar(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator: MutableState<Boolean>
+    switchIndicator: () ->MutableState<Boolean>
 ) {
     val selectedNumber = viewModel.scoreState
     val items = listOf("—", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
@@ -405,7 +405,7 @@ private fun ScoreBar(
             delay(1000L)
             viewModel.pre_min_score.value = Score(minMaxScore.minScore)
             viewModel.pre_max_score.value = Score(minMaxScore.maxScore)
-            switchIndicator.value = true
+            switchIndicator().value = true
             viewModel.addAllParams()
         }
     }
@@ -417,7 +417,7 @@ private fun ScoreBar(
 private fun ShowGenres(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator: MutableState<Boolean>
+    switchIndicator: () -> MutableState<Boolean>
 ) {
     val selectedGenre by viewModel.selectedGenre.collectAsStateWithLifecycle()
     Box(
@@ -430,7 +430,7 @@ private fun ShowGenres(
             selectedGenre.forEach { genreForUI ->
                 ButtonCreator(
                     text = genreForUI.name,
-                    isTouched = genreForUI.isSelected.value,
+                    isTouched = {genreForUI.isSelected.value},
                     onClick = {
                         viewModel.viewModelScope.launch(Dispatchers.IO) {
                             genreForUI.isSelected.value = !genreForUI.isSelected.value
@@ -439,7 +439,7 @@ private fun ShowGenres(
                             viewModel.tappingOnGenre(genreForUI.id)
                         }
                         viewModel.viewModelScope.launch(Dispatchers.IO) {
-                            switchIndicator.value = true
+                            switchIndicator().value = true
                         }
                         viewModel.viewModelScope.launch(Dispatchers.IO) {
                             viewModel.addAllParams()
@@ -462,14 +462,14 @@ private fun ShowGenres(
 private fun ButtonCreator(
     text: String,
     onClick: () -> Unit,
-    isTouched: Boolean,
+    isTouched:() -> Boolean,
     modifier: Modifier
 ) {
     Box(
         modifier = Modifier
             .clip(CircleShape)
             .background(
-                if (isTouched) {
+                if (isTouched()) {
                     MaterialTheme.colorScheme.onPrimaryContainer
                 } else {
                     MaterialTheme.colorScheme.primaryContainer
@@ -480,7 +480,7 @@ private fun ButtonCreator(
         content = {
             Text(
                 text = text,
-                color = if (isTouched) MaterialTheme.colorScheme.outlineVariant else MaterialTheme.colorScheme.onPrimary,
+                color = if (isTouched()) MaterialTheme.colorScheme.outlineVariant else MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
                 modifier = modifier.padding(8.dp),
                 fontSize = 18.sp
@@ -493,7 +493,7 @@ private fun ButtonCreator(
 private fun ShowRating(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator: MutableState<Boolean>
+    switchIndicator:() -> MutableState<Boolean>
 ) {
     val ratingList by viewModel.ratingList.collectAsStateWithLifecycle()
     val selectedRating by viewModel.selectedRating.collectAsStateWithLifecycle()
@@ -503,11 +503,11 @@ private fun ShowRating(
     ) {
         ratingList.forEach { rating ->
             ButtonCreator(
-                isTouched = rating == selectedRating,
+                isTouched = {rating == selectedRating},
                 onClick = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.setSelectedRating(rating)
-                        switchIndicator.value = true
+                        switchIndicator().value = true
                         viewModel.addAllParams()
                     }
                 },
@@ -528,7 +528,7 @@ private fun ShowRating(
 private fun ShowTypes(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator: MutableState<Boolean>
+    switchIndicator:() -> MutableState<Boolean>
 ) {
     val typeList by viewModel.typeList.collectAsStateWithLifecycle()
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
@@ -536,11 +536,11 @@ private fun ShowTypes(
     FlowRow(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
         typeList.forEach { type ->
             ButtonCreator(
-                isTouched = type == selectedType,
+                isTouched = {type == selectedType},
                 onClick = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.setSelectedType(type)
-                        switchIndicator.value = true
+                        switchIndicator().value = true
                         viewModel.addAllParams()
                     }
                 },
@@ -561,7 +561,7 @@ private fun ShowTypes(
 private fun ShowOrderBy(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator: MutableState<Boolean>
+    switchIndicator:() -> MutableState<Boolean>
 ) {
     val orderByList by viewModel.orderByList.collectAsStateWithLifecycle()
     val selectedOrderBy by viewModel.selectedOrderBy.collectAsStateWithLifecycle()
@@ -570,11 +570,11 @@ private fun ShowOrderBy(
     FlowRow(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
         orderByList.forEach { orderBy ->
             ButtonCreator(
-                isTouched = orderBy == selectedOrderBy,
+                isTouched = {orderBy == selectedOrderBy},
                 onClick = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.setSelectedOrderBy(orderBy)
-                        switchIndicator.value = true
+                        switchIndicator().value = true
                         viewModel.addAllParams()
                     }
                 },

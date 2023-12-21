@@ -76,7 +76,7 @@ fun CustomDialog(
     navController: NavController,
     modifier: Modifier,
     viewModelProvider: ViewModelProvider,
-    isInDarkTheme: Boolean,
+    isInDarkTheme: () -> Boolean,
     svgImageLoader: ImageLoader
 ) {
 
@@ -463,13 +463,13 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 private fun AddToDataBaseRow(
     modifier: Modifier,
     data: com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData,
-    viewModelProvider: ViewModelProvider, isInDarkTheme: Boolean,
+    viewModelProvider: ViewModelProvider, isInDarkTheme:() ->  Boolean,
     svgImageLoader: ImageLoader
 ) {
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     var isExpanded by remember { mutableStateOf(false) }
 
-    val threeDots = if (isInDarkTheme) {
+    val threeDots = if (isInDarkTheme()) {
         R.drawable.three_dots_white
     } else {
         R.drawable.three_dots_gray

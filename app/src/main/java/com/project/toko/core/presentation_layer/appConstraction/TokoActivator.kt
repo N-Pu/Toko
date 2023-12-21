@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -33,7 +32,6 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
@@ -91,22 +89,26 @@ fun AppActivator(
     modifier: Modifier,
     componentActivity: ComponentActivity,
     onThemeChange: () -> Unit,
-    isInDarkTheme: Boolean,
+    isInDarkTheme: ()-> Boolean,
     svgImageLoader: ImageLoader
 ) {
 
-    val currentDetailScreenId = viewModelProvider[DetailScreenViewModel::class.java].loadedId
-    val characterDetailScreenId = viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
-    val personDetailScreenId = viewModelProvider[PersonByIdViewModel::class.java].loadedId
+    var currentDetailScreenId by viewModelProvider[DetailScreenViewModel::class.java].loadedId
+    val characterDetailScreenId by viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
+    val personDetailScreenId by viewModelProvider[PersonByIdViewModel::class.java].loadedId
     var lastSelectedScreen by rememberSaveable { mutableStateOf<String?>(null) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     LaunchedEffect(lastSelectedScreen) {
         navController.addOnDestinationChangedListener { _, destination, arguments ->
-            if (destination.route == Screen.Detail.route) {
-                currentDetailScreenId.intValue = arguments?.getInt("id") ?: 0
-            }
+
             when (destination.route) {
+
+                Screen.Detail.route -> {
+                    currentDetailScreenId = arguments?.getInt("id") ?: 0
+                    lastSelectedScreen = destination.route
+                }
+
                 Screen.Home.route,
                 Screen.RandomAnimeOrManga.route,
                 Screen.Favorites.route -> {
@@ -136,9 +138,9 @@ fun AppActivator(
         Scaffold(bottomBar = {
             BottomNavigationBar(
                 navController = navController,
-                currentDetailScreenId = currentDetailScreenId,
-                characterDetailScreenId = characterDetailScreenId,
-                personDetailScreenId = personDetailScreenId,
+                currentDetailScreenId = { currentDetailScreenId },
+                characterDetailScreenId = { characterDetailScreenId },
+                personDetailScreenId = { personDetailScreenId },
                 modifier = modifier,
                 lastSelectedScreen = lastSelectedScreen,
                 imageLoader = svgImageLoader
@@ -163,10 +165,11 @@ fun AppActivator(
 @Composable
 private fun BottomNavigationBar(
     navController: NavController,
-    currentDetailScreenId: MutableState<Int>,
+    currentDetailScreenId: () -> Int,
+//    currentDetailScreenId: MutableState<Int>,
     modifier: Modifier,
-    characterDetailScreenId: MutableState<Int>,
-    personDetailScreenId: MutableState<Int>,
+    characterDetailScreenId: () -> Int,
+    personDetailScreenId: () -> Int,
     lastSelectedScreen: String?,
     imageLoader: ImageLoader
 
@@ -175,21 +178,13 @@ private fun BottomNavigationBar(
     val currentRoute = navBackStackEntry?.destination?.route
     var detailScreenButtonIsSelected = false
     LaunchedEffect(key1 = currentRoute) {
-        when (currentRoute) {
-            Screen.Home.route -> {
-                detailScreenButtonIsSelected = false
-            }
-
-            Screen.Favorites.route -> {
-                detailScreenButtonIsSelected = false
-            }
-
-            Screen.RandomAnimeOrManga.route -> {
-                detailScreenButtonIsSelected = false
+        detailScreenButtonIsSelected = when (currentRoute) {
+            Screen.Home.route, Screen.Favorites.route, Screen.RandomAnimeOrManga.route -> {
+                false
             }
 
             else -> {
-                detailScreenButtonIsSelected = true
+                true
             }
         }
     }
@@ -261,7 +256,7 @@ private fun BottomNavigationBar(
                     try {
                         when (lastSelectedScreen) {
                             Screen.Detail.route -> {
-                                navController.navigate("detail_screen/${currentDetailScreenId.value}") {
+                                navController.navigate("detail_screen/${currentDetailScreenId()}") {
                                     navController.graph.startDestinationRoute?.let { _ ->
                                         launchSingleTop = true
                                     }
@@ -269,31 +264,31 @@ private fun BottomNavigationBar(
 
                                 Log.d(
                                     "last stack membor",
-                                    "detail_screen/${currentDetailScreenId.value}"
+                                    "detail_screen/${currentDetailScreenId()}"
                                 )
                             }
 
                             Screen.CharacterDetail.route -> {
-                                navController.navigate("detail_on_character/${characterDetailScreenId.value}") {
+                                navController.navigate("detail_on_character/${characterDetailScreenId()}") {
                                     navController.graph.startDestinationRoute?.let { _ ->
                                         launchSingleTop = true
                                     }
                                 }
                                 Log.d(
                                     "last stack membor",
-                                    "detail_on_character/${characterDetailScreenId.value}"
+                                    "detail_on_character/${characterDetailScreenId()}"
                                 )
                             }
 
                             Screen.StaffDetail.route -> {
-                                navController.navigate("detail_on_staff/${personDetailScreenId.value}") {
+                                navController.navigate("detail_on_staff/${personDetailScreenId()}") {
                                     navController.graph.startDestinationRoute?.let { _ ->
                                         launchSingleTop = true
                                     }
                                 }
                                 Log.d(
                                     "last stack membor",
-                                    "detail_on_staff/${personDetailScreenId.value}"
+                                    "detail_on_staff/${personDetailScreenId()}"
                                 )
                             }
 
@@ -434,7 +429,7 @@ private fun ShowDrawerContent(
     viewModelProvider: ViewModelProvider,
     componentActivity: ComponentActivity,
     onThemeChange: () -> Unit,
-    darkTheme: Boolean,
+    darkTheme: () -> Boolean,
     svgImageLoader: ImageLoader
 ) {
     val homeScreenViewModel = viewModelProvider[HomeScreenViewModel::class.java]
@@ -576,7 +571,7 @@ private fun ShowDrawerContent(
                     },
                     selected = false,
                     onClick = {
-                              context.openSite("https://sites.google.com/view/toko-your-own-anime-library/future?authuser=0")
+                        context.openSite("https://sites.google.com/view/toko-your-own-anime-library/future?authuser=0")
                     },
                     badge = {
                         Image(
@@ -805,7 +800,7 @@ private fun ShowDrawerContent(
         ) {
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = if (darkTheme) R.drawable.sun else R.drawable.moon,
+                    model = if (darkTheme()) R.drawable.sun else R.drawable.moon,
                     imageLoader = svgImageLoader
                 ),
                 contentDescription = null,

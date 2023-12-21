@@ -27,7 +27,7 @@ fun SetupNavGraph(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
-    isInDarkTheme: Boolean,
+    isInDarkTheme: () -> Boolean,
     drawerState: DrawerState,
     svgImageLoader: ImageLoader
 ) {

@@ -53,7 +53,7 @@ import com.project.toko.detailScreen.model.staffModel.Person
 
 @Composable
 fun ShowWholeStaff(
-    navController: NavController, viewModel: DetailScreenViewModel, modifier: Modifier, isInDarkTheme: Boolean
+    navController: NavController, viewModel: DetailScreenViewModel, modifier: Modifier, isInDarkTheme:() ->  Boolean
 ) {
 
     val staffState by viewModel.staffList.collectAsStateWithLifecycle()
@@ -82,11 +82,11 @@ fun ShowWholeStaff(
 }
 
 @Composable
-private fun BackArrow(modifier: Modifier, navController: NavController, detailScreenMalId: Int,isInDarkTheme : Boolean) {
+private fun BackArrow(modifier: Modifier, navController: NavController, detailScreenMalId: Int,isInDarkTheme : () -> Boolean) {
     val backArrowFirstColor =
-        if (isInDarkTheme) DarkBackArrowCastColor else BackArrowCastColor
+        if (isInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
     val backArrowSecondColor =
-        if (isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
+        if (isInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
         Spacer(modifier = modifier.height(40.dp))
         Box(

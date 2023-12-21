@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,7 +39,7 @@ fun DisplayCharacterFromId(
     mal_id: Int,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme : Boolean, svgImageLoader : ImageLoader
+    modifier: Modifier, isInDarkTheme :() ->  Boolean, svgImageLoader : ImageLoader
 ) {
     val characterViewModel = viewModelProvider[CharacterFullByIdViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
@@ -132,9 +131,9 @@ fun DisplayCharacterFromId(
 
 
 @Composable
-private fun BackArrow(modifier: Modifier, navController: NavController, isInDarkTheme: Boolean) {
-    val backArrowFirstColor = if (isInDarkTheme) DarkBackArrowCastColor else BackArrowCastColor
-    val backArrowSecondColor =if (isInDarkTheme) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
+private fun BackArrow(modifier: Modifier, navController: NavController, isInDarkTheme:() ->  Boolean) {
+    val backArrowFirstColor = if (isInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
+    val backArrowSecondColor =if (isInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor
     Column {
         Spacer(modifier = modifier.height(40.dp))
         Box(
