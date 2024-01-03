@@ -30,7 +30,7 @@ import com.project.toko.characterDetailedScreen.dao.CharacterItem
 import com.project.toko.characterDetailedScreen.model.characterFullModel.Data
 import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewModel
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
-import com.project.toko.core.share.shareLink
+import com.project.toko.core.utils.share.shareLink
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import kotlinx.coroutines.launch
 

@@ -9,7 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.toko.core.connectionCheck.isInternetAvailable
+import com.project.toko.core.utils.connectionCheck.isInternetAvailable
 import com.project.toko.core.dao.MainDb
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.daoScreen.dao.AnimeItem
@@ -27,6 +27,7 @@ import com.project.toko.homeScreen.model.newAnimeSearchModel.Pagination
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -50,11 +51,12 @@ class HomeScreenViewModel @Inject constructor(
             )
         )
 
-    private val _isPerformingSearch = MutableStateFlow(false)
-    val isPerformingSearch = _isPerformingSearch.asStateFlow()
+
+    private val _isLoading = mutableStateOf(false)
+    var isLoading = _isLoading
 
     private val _currentPage = MutableStateFlow(1)
-    val currentPage = _currentPage.asStateFlow()
+    private val currentPage = _currentPage.asStateFlow()
 
     private val _isNextPageLoading = MutableStateFlow(false)
     val isNextPageLoading = _isNextPageLoading.asStateFlow()
@@ -207,7 +209,7 @@ class HomeScreenViewModel @Inject constructor(
             var currentQuery = query
             var currentGenres = _genres.value
             _currentPage.value = 1
-            _isPerformingSearch.value = true
+            _isLoading.value = true
 
             if (currentQuery == "") {
                 currentQuery = null
@@ -239,7 +241,7 @@ class HomeScreenViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e("HomeScreenViewModel", "Failed to perform search: ${e.message}")
         } finally {
-            _isPerformingSearch.value = false
+            _isLoading.value = false
         }
     }
 
@@ -253,7 +255,7 @@ class HomeScreenViewModel @Inject constructor(
     val topUpcomingAnime = _topUpcomingAnime.asStateFlow()
 
 
-    suspend fun getTopTrendingAnime(filter: String, limit: Int = 10) {
+    private suspend fun getTopTrendingAnime(filter: String, limit: Int = 10) {
         try {
             if (isInternetAvailable(context)) {
                 viewModelScope.launch(Dispatchers.IO) {
@@ -281,7 +283,7 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    suspend fun getTopAiring(filter: String, limit: Int = 10) {
+    private suspend fun getTopAiring(filter: String, limit: Int = 10) {
         try {
             if (isInternetAvailable(context)) {
                 viewModelScope.launch(Dispatchers.IO) {
@@ -309,7 +311,7 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    suspend fun getTopUpcoming(filter: String, limit: Int = 10) {
+    private suspend fun getTopUpcoming(filter: String, limit: Int = 10) {
         try {
             if (isInternetAvailable(context)) {
                 viewModelScope.launch(Dispatchers.IO) {
@@ -499,7 +501,25 @@ class HomeScreenViewModel @Inject constructor(
         return dao.getDao().getLastTenAddedAnime()
     }
 
-
+    suspend fun loadAllInfo(context: Context) {
+        viewModelScope.launch {
+            if (isInternetAvailable(context)) {
+                _isLoading.value = true
+                getTopTrendingAnime("bypopularity", 25)
+                delay(2000L)
+                getTopAiring("airing", 25)
+                delay(2000L)
+                getTopUpcoming("upcoming", 25)
+                _isLoading.value = false
+            } else {
+                Toast.makeText(
+                    context,
+                    "No internet connection!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 }
 
 

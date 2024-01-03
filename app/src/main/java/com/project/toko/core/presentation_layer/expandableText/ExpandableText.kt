@@ -43,7 +43,7 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
             Column(
                 modifier = modifier
                     .fillMaxWidth(1f)
-                    .padding(start = 20.dp, bottom = 25.dp, end = 20.dp),
+                    .padding(start = 20.dp, bottom = 25.dp, end = 20.dp, top = 20.dp),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Top
             ) {
@@ -54,7 +54,7 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontFamily = evolventaBoldFamily
                 )
-                Spacer(modifier = modifier.height(10.dp))
+                Spacer(modifier = modifier.height(20.dp))
                 Text(
                     text = text,
                     maxLines = maxLines,
@@ -73,7 +73,7 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
         Column(
             modifier = modifier
                 .fillMaxWidth(1f)
-                .padding(start = 20.dp, bottom = 0.dp, end = 20.dp),
+                .padding(start = 20.dp, bottom = 0.dp, end = 20.dp, top = 20.dp),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
@@ -84,8 +84,7 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
                 color = MaterialTheme.colorScheme.onPrimary,
                 fontFamily = evolventaBoldFamily
             )
-
-            Spacer(modifier = modifier.height(10.dp))
+            Spacer(modifier = modifier.height(20.dp))
             Text(
                 text = text,
                 maxLines = maxLines,
@@ -124,6 +123,7 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
                     modifier = modifier.clickable(onClick = toggleExpanded),
                     color = MaterialTheme.colorScheme.inversePrimary
                 )
+
                 if (expanded) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowUp,
@@ -145,6 +145,7 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
                     )
                 }
             }
+            Spacer(modifier = modifier.height(20.dp))
         }
     }
 }

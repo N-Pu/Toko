@@ -1,6 +1,5 @@
 package com.project.toko.homeScreen.presentation_layer.homeScreen
 
-import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import androidx.compose.animation.core.LinearEasing
@@ -13,18 +12,18 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,8 +52,8 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
-import com.project.toko.core.connectionCheck.isInternetAvailable
 import com.project.toko.core.presentation_layer.addToFavorite.AddFavorites
+import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.core.presentation_layer.theme.DarkSectionColor
 import com.project.toko.core.presentation_layer.theme.SectionColor
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
@@ -66,107 +65,95 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-
+@Stable
 @Composable
 fun GridAdder(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
-    isTabMenuOpen: () ->MutableState<Boolean>,
-    switch:() -> Boolean,
+    isTabMenuOpen: () -> MutableState<Boolean>,
+    switch: () -> Boolean,
     isInDarkTheme: () -> Boolean,
-    svgImageLoader: ImageLoader
+    svgImageLoader: ImageLoader,
+    gridState: LazyStaggeredGridState,
+    scrollState: ScrollState
 ) {
 
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val listData by viewModel.animeSearch.collectAsStateWithLifecycle()
-    val scrollGridState = rememberLazyStaggeredGridState()
     val isLoading by viewModel.isNextPageLoading.collectAsStateWithLifecycle()
-    val lastTenAnimeFromWatchingSection =
-        viewModel.showListOfWatching().collectAsStateWithLifecycle(
-            initialValue = emptyList()
-        )
-    val getJustTenAddedAnime =
-        viewModel.showLastAdded().collectAsStateWithLifecycle(
-            initialValue = emptyList()
-        )
+    val lastTenAnimeFromWatchingSection by
+    viewModel.showListOfWatching().collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
+    val getJustTenAddedAnime by
+    viewModel.showLastAdded().collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
 
-    val context = LocalContext.current
     val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
     val getTopUpcoming by viewModel.topUpcomingAnime.collectAsStateWithLifecycle()
     val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
 
     var log by remember { mutableStateOf("") }
 
-    LaunchedEffect(key1 = Unit) {
-        if (isInternetAvailable(context)) {
-            viewModel.getTopTrendingAnime("bypopularity", 25)
-            delay(2000L)
-            viewModel.getTopAiring("airing", 25)
-            delay(2000L)
-            viewModel.getTopUpcoming("upcoming", 25)
-        } else {
-            Toast.makeText(
-                context,
-                "No internet connection!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
-
-
     if (switch()) {
-        LazyVerticalStaggeredGrid(
-            state = if (scrollGridState.firstVisibleItemIndex >= 4) {
-                log = scrollGridState.firstVisibleItemIndex.toString()
-                isTabMenuOpen().value = false
-                scrollGridState
-            } else {
-                log = scrollGridState.firstVisibleItemIndex.toString()
-                isTabMenuOpen().value = true
-                scrollGridState
-            },
-            columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
-            modifier = modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primary)
-                .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow)),
-            horizontalArrangement = Arrangement.spacedBy(22.dp),
-            verticalItemSpacing = 20.dp,
-            contentPadding = PaddingValues(10.dp)
-        ) {
-            item {
-                Spacer(modifier = modifier.height(1.dp))
+        if (viewModel.isLoading.value.not()) {
+            LazyVerticalStaggeredGrid(
+                state = if (gridState.firstVisibleItemIndex >= 4) {
+                    log = gridState.firstVisibleItemIndex.toString()
+                    isTabMenuOpen().value = false
+                    gridState
+                } else {
+                    log = gridState.firstVisibleItemIndex.toString()
+                    isTabMenuOpen().value = true
+                    gridState
+                },
+                columns = StaggeredGridCells.Adaptive(minSize = 140.dp),
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary)
+                    .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow)),
+                horizontalArrangement = Arrangement.spacedBy(22.dp),
+                verticalItemSpacing = 20.dp,
+                contentPadding = PaddingValues(10.dp)
+            ) {
+                item {
+                    Spacer(modifier = modifier.height(1.dp))
 
-            }
-            item {
-                Spacer(modifier = modifier.height(20.dp))
-            }
-            itemsIndexed(listData.data) { index, data ->
-                AnimeCardBox(
-                    data = data,
-                    navController = navController,
-                    viewModelProvider = viewModelProvider,
-                    modifier = modifier
-                )
+                }
+                item {
+                    Spacer(modifier = modifier.height(20.dp))
+                }
 
-                // Загрузка следующей страницы при достижении конца списка и has_next_page = true
-                if (index == listData.data.lastIndex - 2 && isLoading.not() && listData.pagination.has_next_page) {
-                    viewModel.loadNextPage()
+                itemsIndexed(
+                    items = listData.data
+                ) { index, data ->
+                    AnimeCardBox(
+                        data = data,
+                        navController = navController,
+                        viewModelProvider = viewModelProvider,
+                        modifier = modifier
+                    )
+
+                    // Загрузка следующей страницы при достижении конца списка и has_next_page = true
+                    if (index == listData.data.lastIndex - 2 && isLoading.not() && listData.pagination.has_next_page) {
+                        viewModel.loadNextPage()
+                    }
                 }
             }
+        } else {
+            LoadingAnimation()
         }
-
     } else {
 
         Column(
             modifier = modifier
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.primary)
         ) {
-            if (lastTenAnimeFromWatchingSection.value.isNotEmpty()) {
+            if (lastTenAnimeFromWatchingSection.isNotEmpty()) {
 
                 ShowSectionName(
                     sectionName = "Now Watching ",
@@ -175,8 +162,12 @@ fun GridAdder(
                 )
 
 
-                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
-                    lastTenAnimeFromWatchingSection.value.forEach { data ->
+                Row(
+                    modifier = modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .horizontalScroll(rememberScrollState())
+                ) {
+                    lastTenAnimeFromWatchingSection.forEach { data ->
                         Spacer(modifier = modifier.width(20.dp))
                         ShowSection(
                             data = data, navController = navController,
@@ -193,7 +184,7 @@ fun GridAdder(
                 Spacer(modifier = modifier.height(20.dp))
 
             }
-            if (getTrendingAnime.data.isNotEmpty()) {
+            if (viewModel.isLoading.value.not()) {
 
                 ShowSectionName(
                     sectionName = "Trending",
@@ -202,7 +193,11 @@ fun GridAdder(
                 )
 
 
-                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+                Row(
+                    modifier = modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .horizontalScroll(rememberScrollState())
+                ) {
 
                     getTrendingAnime.data.forEach { data ->
                         Spacer(modifier = modifier.width(20.dp))
@@ -220,8 +215,23 @@ fun GridAdder(
 
                 Spacer(modifier = modifier.height(20.dp))
 
+            } else {
+                ShowSectionName(
+                    sectionName = "Trending",
+                    modifier = modifier,
+                    isInDarkTheme = isInDarkTheme
+                )
+                Row(
+                    modifier = modifier
+                        .height(300.dp)
+                        .background(MaterialTheme.colorScheme.primary),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    LoadingAnimation()
+                }
             }
-            if (getJustTenAddedAnime.value.isNotEmpty()) {
+            if (getJustTenAddedAnime.isNotEmpty()) {
 
                 ShowSectionName(
                     sectionName = "Just Added",
@@ -230,9 +240,13 @@ fun GridAdder(
                 )
 
 
-                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+                Row(
+                    modifier = modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .horizontalScroll(rememberScrollState())
+                ) {
 
-                    getJustTenAddedAnime.value.forEach { data ->
+                    getJustTenAddedAnime.forEach { data ->
                         Spacer(modifier = modifier.width(20.dp))
                         ShowSection(
                             data = data, navController = navController,
@@ -248,7 +262,7 @@ fun GridAdder(
                 Spacer(modifier = modifier.height(20.dp))
 
             }
-            if (getTopAiring.data.isNotEmpty()) {
+            if (viewModel.isLoading.value.not()){
 
                 ShowSectionName(
                     sectionName = "Top Airing",
@@ -257,7 +271,11 @@ fun GridAdder(
                 )
 
 
-                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+                Row(
+                    modifier = modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .horizontalScroll(rememberScrollState())
+                ) {
 
                     getTopAiring.data.forEach { data ->
                         Spacer(modifier = modifier.width(20.dp))
@@ -275,8 +293,24 @@ fun GridAdder(
 
                 Spacer(modifier = modifier.height(20.dp))
 
+            } else {
+                ShowSectionName(
+                    sectionName = "Top Airing",
+                    modifier = modifier,
+                    isInDarkTheme = isInDarkTheme
+                )
+                Row(
+                    modifier = modifier
+                        .height(300.dp)
+                        .background(MaterialTheme.colorScheme.primary),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    LoadingAnimation()
+                }
+
             }
-            if (getTopUpcoming.data.isNotEmpty()) {
+            if (viewModel.isLoading.value.not()) {
 
                 ShowSectionName(
                     sectionName = "Top Upcoming",
@@ -285,7 +319,11 @@ fun GridAdder(
                 )
 
 
-                Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+                Row(
+                    modifier = modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .horizontalScroll(rememberScrollState())
+                ) {
 
                     getTopUpcoming.data.forEach { data ->
                         Spacer(modifier = modifier.width(20.dp))
@@ -302,6 +340,22 @@ fun GridAdder(
 
 
                 Spacer(modifier = modifier.height(20.dp))
+
+            } else {
+                ShowSectionName(
+                    sectionName = "Top Upcoming",
+                    modifier = modifier,
+                    isInDarkTheme = isInDarkTheme
+                )
+                Row(
+                    modifier = modifier
+                        .height(300.dp)
+                        .background(MaterialTheme.colorScheme.primary),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    LoadingAnimation()
+                }
 
             }
         }
@@ -385,7 +439,7 @@ fun GridAdder(
     }
 }
 
-
+@Stable
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AnimeCardBox(
@@ -580,7 +634,7 @@ private fun formatScore(float: Float?): String {
     }
 }
 
-
+@Stable
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ShowSection(
@@ -750,8 +804,9 @@ private fun ShowSection(
 
 }
 
+@Stable
 @Composable
-private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkTheme:() -> Boolean) {
+private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkTheme: () -> Boolean) {
     Box(
         modifier = modifier
             .fillMaxWidth(0.85f)
@@ -775,7 +830,7 @@ private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkThe
     Spacer(modifier = modifier.height(20.dp))
 }
 
-
+@Stable
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ShowTopAnime(

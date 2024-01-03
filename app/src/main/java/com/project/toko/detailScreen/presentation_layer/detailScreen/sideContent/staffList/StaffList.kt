@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -64,8 +65,8 @@ private fun ListEditor(
 
     Row(
         modifier = modifier
-            .fillMaxWidth(1f)
-            .padding(start = 20.dp, bottom = 0.dp, end = 20.dp, top = 20.dp),
+            .fillMaxWidth()
+            .padding(bottom = 20.dp, end = 20.dp, start = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -90,7 +91,6 @@ private fun ListEditor(
     Row(
         modifier = Modifier
             .fillMaxHeight()
-            .height(180.dp)
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
@@ -128,8 +128,7 @@ private fun ListEditor(
                     .background(MaterialTheme.colorScheme.onSecondary)
                     .clickable {
                         navController.navigate(Screen.DetailOnWholeStaff.route)
-                    }
-                , contentAlignment = Alignment.Center
+                    }, contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.vector),

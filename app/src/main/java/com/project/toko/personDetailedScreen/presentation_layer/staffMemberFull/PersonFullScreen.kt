@@ -1,7 +1,6 @@
 package com.project.toko.personDetailedScreen.presentation_layer.staffMemberFull
 
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,46 +25,37 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
-import com.project.toko.core.connectionCheck.isInternetAvailable
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.project.toko.core.presentation_layer.animations.LoadingAnimation
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
 import com.project.toko.core.presentation_layer.expandableText.ExpandableText
+import com.project.toko.core.presentation_layer.pullToRefpresh.PullToRefreshLayout
 import com.project.toko.core.presentation_layer.theme.BackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.BackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun DisplayPersonFullScreen(
-    mal_id: Int,
+    id: Int,
     navController: NavController,
     viewModelProvider: ViewModelProvider,
-    modifier: Modifier, isInDarkTheme: () -> Boolean, svgImageLoader : ImageLoader
+    modifier: Modifier, isInDarkTheme: () -> Boolean, svgImageLoader: ImageLoader
 ) {
     val personViewModel = viewModelProvider[PersonByIdViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     val context = LocalContext.current
-    LaunchedEffect(mal_id) {
-        if (isInternetAvailable(context)) {
-            delay(300L)
-            personViewModel.getPersonFromId(mal_id)
-            delay(300L)
-            personViewModel.getPicturesFromId(mal_id)
-        } else {
-            Toast.makeText(
-                context,
-                "No internet connection!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+    LaunchedEffect(id) {
+        personViewModel.loadAllInfo(id, context)
     }
-
-    val isSearching by personViewModel.isSearching.collectAsStateWithLifecycle()
+    val swipeRefreshState =
+        rememberSwipeRefreshState(isRefreshing = personViewModel.isLoading.value)
     val personFullState by
     personViewModel.personFull.collectAsStateWithLifecycle()
     val personPicturesState by
@@ -73,80 +63,94 @@ fun DisplayPersonFullScreen(
     val painter = rememberAsyncImagePainter(model = personFullState?.images?.jpg?.image_url)
 
     val isDialogShown = remember { mutableStateOf(false) }
-    if (isSearching.not() && personFullState != null) {
-
-        Column(
-            modifier = modifier
-                .background(MaterialTheme.colorScheme.primary)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Row(
+    if (personViewModel.isLoading.value.not() && personFullState != null) {
+        PullToRefreshLayout(composable = {
+            Column(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-            ) {}
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-//                    .background(Color.Red)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .verticalScroll(rememberScrollState())
             ) {
-                ShowPersonPicture(
-                    painter = painter,
-                    modifier = modifier,
-                    isDialogShown = isDialogShown
-                )
-                ShowNamesAndInteractionIcons(
-                    data = personFullState!!,
-                    modifier = modifier,
-                    imageLoader = svgImageLoader,
-                    daoViewModel = daoViewModel,
-                    personViewModel = personViewModel
-                )
-                ShowCharacterPictureAlbum(
-                    isDialogShown = isDialogShown,
-                    picturesData = personPicturesState,
+                Row(
                     modifier = modifier
-                )
+                        .fillMaxWidth()
+                        .height(80.dp)
+                ) {}
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+//                    .background(Color.Red)
+                ) {
+                    ShowPersonPicture(
+                        painter = painter,
+                        modifier = modifier,
+                        isDialogShown = isDialogShown
+                    )
+                    ShowNamesAndInteractionIcons(
+                        data = personFullState!!,
+                        modifier = modifier,
+                        imageLoader = svgImageLoader,
+                        daoViewModel = daoViewModel,
+                        personViewModel = personViewModel
+                    )
+                    ShowCharacterPictureAlbum(
+                        isDialogShown = isDialogShown,
+                        picturesData = personPicturesState,
+                        modifier = modifier
+                    )
 
 
-            }
-            Row {
-                personFullState?.about?.let { about ->
-                    ExpandableText(text = about, title = "More Information", modifier = modifier)
+                }
+                Row {
+                    personFullState?.about?.let { about ->
+                        ExpandableText(
+                            text = about,
+                            title = "More Information",
+                            modifier = modifier
+                        )
+                    }
+                }
+
+                if (!personFullState?.voices.isNullOrEmpty()) {
+                    ShowAnimeRelated(
+                        modifier = modifier,
+                        voices = personFullState?.voices!!,
+                        navController = navController
+                    )
+
+                }
+
+                if (
+                    !personFullState?.anime.isNullOrEmpty()
+                ) {
+                    ShowStaffPosition(
+                        modifier = modifier,
+                        animes = personFullState!!.anime,
+                        navController = navController
+                    )
+
                 }
             }
-
-            if (!personFullState?.voices.isNullOrEmpty()) {
-                ShowAnimeRelated(
-                    modifier = modifier,
-                    voices = personFullState?.voices!!,
-                    navController = navController
-                )
-
+            BackArrow(
+                modifier,
+                navController, isInDarkTheme
+            )
+        }, onLoad = {
+            personViewModel.viewModelScope.launch {
+                personViewModel.loadAllInfo(id, context)
             }
+        }, swipeRefreshState = swipeRefreshState)
 
-            if (
-                !personFullState?.anime.isNullOrEmpty()
-            ) {
-                ShowStaffPosition(
-                    modifier = modifier,
-                    animes = personFullState!!.anime,
-                    navController = navController
-                )
-
-            }
-        }
-        BackArrow(
-            modifier,
-            navController, isInDarkTheme
-        )
 
     } else LoadingAnimation()
 }
 
 @Composable
-private fun BackArrow(modifier: Modifier, navController: NavController, isInDarkTheme:() ->  Boolean) {
+private fun BackArrow(
+    modifier: Modifier,
+    navController: NavController,
+    isInDarkTheme: () -> Boolean
+) {
     val backArrowFirstColor = if (isInDarkTheme()) DarkBackArrowCastColor else BackArrowCastColor
     val backArrowSecondColor =
         if (isInDarkTheme()) DarkBackArrowSecondCastColor else BackArrowSecondCastColor

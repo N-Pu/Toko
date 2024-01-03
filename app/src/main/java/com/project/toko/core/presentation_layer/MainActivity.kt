@@ -80,6 +80,8 @@ class MainActivity : ComponentActivity() {
             val splashShown = remember { mutableStateOf(false) }
             navController = rememberNavController()
             if (!splashShown.value) {
+
+                systemUiController.isNavigationBarVisible = false
                 SplashTheme(
                     darkTheme = darkTheme.isDarkThemeActive.value,
                     systemUiController = systemUiController
@@ -89,6 +91,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             } else {
+                systemUiController.isNavigationBarVisible = true
                 Theme(
                     darkTheme = darkTheme.isDarkThemeActive.value,
                     systemUiController = systemUiController

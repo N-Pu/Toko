@@ -1,6 +1,8 @@
 package com.project.toko.detailScreen.viewModel
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -8,12 +10,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.core.repository.MalApiService
+import com.project.toko.core.utils.connectionCheck.isInternetAvailable
 import com.project.toko.detailScreen.model.castModel.CastData
 import com.project.toko.detailScreen.model.detailModel.DetailData
 import com.project.toko.detailScreen.model.pictureModel.DetailPicturesData
 import com.project.toko.detailScreen.model.recommendationsModel.RecommendationsData
 import com.project.toko.detailScreen.model.staffModel.StaffData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,16 +35,19 @@ class DetailScreenViewModel @Inject constructor(
     private val _loadedId = mutableIntStateOf(0)
     val loadedId = _loadedId
 
-    private val _isSearching = MutableStateFlow(false)
-    val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
+//    private val _isSearching = MutableStateFlow(false)
+//    val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
 
     private val _scrollState: ScrollState by mutableStateOf(ScrollState(0))
     var scrollState = _scrollState
 
     private val _previousId = MutableStateFlow(0)
-    var previousId = _previousId
+    private var previousId = _previousId
 
-    suspend fun onTapAnime(id: Int) {
+    private val _isLoading = mutableStateOf(false)
+    var isLoading = _isLoading
+
+    private suspend fun onTapAnime(id: Int) {
 
         viewModelScope.launch(Dispatchers.IO) {
             // Сохраните предыдущее id
@@ -50,7 +57,8 @@ class DetailScreenViewModel @Inject constructor(
             }
 
             try {
-                _isSearching.value = true
+//                _isSearching.value = true
+//                _isLoading.value = true
                 val response = malApiService.getDetailsFromAnime(id)
                 if (response.isSuccessful) {
                     val data = response.body()?.data
@@ -63,9 +71,10 @@ class DetailScreenViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e("DetailScreenViewModel", e.message.toString())
-            } finally {
-                _isSearching.value = false
             }
+//            finally {
+//                _isLoading.value = false
+//            }
         }
     }
 
@@ -76,7 +85,7 @@ class DetailScreenViewModel @Inject constructor(
         MutableStateFlow<List<StaffData>>(emptyList())
     val staffList = _staffList.asStateFlow()
 
-    suspend fun addStaffFromId(id: Int) {
+    private suspend fun addStaffFromId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = malApiService.getStaffFromId(id)
@@ -100,7 +109,7 @@ class DetailScreenViewModel @Inject constructor(
         MutableStateFlow<List<CastData>>(emptyList())
     val castList = _castList.asStateFlow()
 
-    suspend fun addCastFromId(id: Int) {
+    private suspend fun addCastFromId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = malApiService.getCharactersFromId(id)
@@ -124,7 +133,7 @@ class DetailScreenViewModel @Inject constructor(
     private val _recommendationList = MutableStateFlow<List<RecommendationsData>>(emptyList())
     val recommendationList = _recommendationList.asStateFlow()
 
-    suspend fun addRecommendationsFromId(id: Int) {
+    private suspend fun addRecommendationsFromId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = malApiService.getRecommendationsFromAnime(id)
@@ -146,7 +155,7 @@ class DetailScreenViewModel @Inject constructor(
 
     private val _picturesData = MutableStateFlow<List<DetailPicturesData>>(emptyList())
     val picturesData = _picturesData.asStateFlow()
-    suspend fun showPictures(id: Int) {
+    private suspend fun showPictures(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = malApiService.getDetailScreenPictures(id)
@@ -167,4 +176,36 @@ class DetailScreenViewModel @Inject constructor(
     }
 
 
+    suspend fun loadAllInfo(id: Int, context: Context) {
+        viewModelScope.launch {
+
+
+            val prevId = previousId.value
+            if (id != prevId) {
+                scrollState.scrollTo(0)
+                previousId.value = id
+            }
+            if (isInternetAvailable(context)) {
+                _isLoading.value = true
+
+                onTapAnime(id)
+                delay(300)
+                addStaffFromId(id)
+                delay(300)
+                addCastFromId(id)
+                delay(1000L)
+                addRecommendationsFromId(id)
+                delay(1000L)
+                showPictures(id)
+
+                _isLoading.value = false
+            } else {
+                Toast.makeText(
+                    context,
+                    "No internet connection!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 }
