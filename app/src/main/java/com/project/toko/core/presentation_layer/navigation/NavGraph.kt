@@ -103,7 +103,7 @@ fun SetupNavGraph(
         ) { backStackEntry ->
             val id = backStackEntry.arguments!!.getInt("id")
             DisplayCharacterFromId(
-                mal_id = id,
+                id = id,
                 navController = navController,
                 viewModelProvider = viewModelProvider,
                 modifier = modifier,
@@ -118,7 +118,7 @@ fun SetupNavGraph(
         ) { backStackEntry ->
             val id = backStackEntry.arguments!!.getInt("id")
             DisplayPersonFullScreen(
-                mal_id = id,
+                id = id,
                 navController = navController,
                 viewModelProvider = viewModelProvider,
                 modifier = modifier,

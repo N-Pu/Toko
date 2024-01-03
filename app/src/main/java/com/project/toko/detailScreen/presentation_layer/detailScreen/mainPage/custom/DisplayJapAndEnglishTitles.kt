@@ -5,7 +5,6 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,15 +22,15 @@ fun DisplayJapAndEnglishTitles(detailData: DetailData?, modifier: Modifier) {
 
     Row(
         modifier = modifier
-            .fillMaxWidth(1f)
-            .height(20.dp)
+            .fillMaxWidth()
             .basicMarquee(
                 iterations = Int.MAX_VALUE,
                 delayMillis = 2000,
                 initialDelayMillis = 2000,
                 velocity = 50.dp
             )
-            .padding(start = 20.dp, end = 20.dp),
+            .padding(start = 20.dp, end = 20.dp)
+        ,
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top
     ) {
 
@@ -44,7 +43,7 @@ fun DisplayJapAndEnglishTitles(detailData: DetailData?, modifier: Modifier) {
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Text(
-                text = "/",
+                text = " / ",
                 minLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,

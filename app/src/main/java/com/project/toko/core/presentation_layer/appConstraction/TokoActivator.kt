@@ -45,11 +45,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -74,13 +72,14 @@ import com.project.toko.characterDetailedScreen.viewModel.CharacterFullByIdViewM
 import com.project.toko.core.presentation_layer.navigation.Screen
 import com.project.toko.core.presentation_layer.navigation.SetupNavGraph
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
-import com.project.toko.core.share.openSite
+import com.project.toko.core.utils.share.openSite
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.daoScreen.model.AnimeStatus
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun AppActivator(
@@ -89,16 +88,13 @@ fun AppActivator(
     modifier: Modifier,
     componentActivity: ComponentActivity,
     onThemeChange: () -> Unit,
-    isInDarkTheme: ()-> Boolean,
+    isInDarkTheme: () -> Boolean,
     svgImageLoader: ImageLoader
 ) {
 
     var currentDetailScreenId by viewModelProvider[DetailScreenViewModel::class.java].loadedId
-    val characterDetailScreenId by viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
-    val personDetailScreenId by viewModelProvider[PersonByIdViewModel::class.java].loadedId
-    var lastSelectedScreen by rememberSaveable { mutableStateOf<String?>(null) }
+    var lastSelectedScreen by remember { mutableStateOf<String?>(null) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
     LaunchedEffect(lastSelectedScreen) {
         navController.addOnDestinationChangedListener { _, destination, arguments ->
 
@@ -139,11 +135,10 @@ fun AppActivator(
             BottomNavigationBar(
                 navController = navController,
                 currentDetailScreenId = { currentDetailScreenId },
-                characterDetailScreenId = { characterDetailScreenId },
-                personDetailScreenId = { personDetailScreenId },
                 modifier = modifier,
                 lastSelectedScreen = lastSelectedScreen,
-                imageLoader = svgImageLoader
+                imageLoader = svgImageLoader,
+                viewModelProvider = viewModelProvider
             )
         },
             content = { padding ->
@@ -166,17 +161,18 @@ fun AppActivator(
 private fun BottomNavigationBar(
     navController: NavController,
     currentDetailScreenId: () -> Int,
-//    currentDetailScreenId: MutableState<Int>,
     modifier: Modifier,
-    characterDetailScreenId: () -> Int,
-    personDetailScreenId: () -> Int,
     lastSelectedScreen: String?,
-    imageLoader: ImageLoader
-
+    imageLoader: ImageLoader,
+    viewModelProvider: ViewModelProvider
 ) {
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     var detailScreenButtonIsSelected = false
+    val characterDetailScreenId by viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
+    val personDetailScreenId by viewModelProvider[PersonByIdViewModel::class.java].loadedId
+
     LaunchedEffect(key1 = currentRoute) {
         detailScreenButtonIsSelected = when (currentRoute) {
             Screen.Home.route, Screen.Favorites.route, Screen.RandomAnimeOrManga.route -> {
@@ -197,7 +193,7 @@ private fun BottomNavigationBar(
             )
             .height(50.dp)
             .background(MaterialTheme.colorScheme.onBackground)
-            .blur(200.dp),
+        ,
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -226,7 +222,6 @@ private fun BottomNavigationBar(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
-
             if (currentRoute != Screen.Home.route) {
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -234,8 +229,6 @@ private fun BottomNavigationBar(
                     ), contentDescription = null, modifier = modifier.size(35.dp),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surface)
                 )
-
-
             } else {
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -244,8 +237,6 @@ private fun BottomNavigationBar(
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surface)
 
                 )
-
-
             }
         }
         Column(
@@ -269,26 +260,26 @@ private fun BottomNavigationBar(
                             }
 
                             Screen.CharacterDetail.route -> {
-                                navController.navigate("detail_on_character/${characterDetailScreenId()}") {
+                                navController.navigate("detail_on_character/${characterDetailScreenId}") {
                                     navController.graph.startDestinationRoute?.let { _ ->
                                         launchSingleTop = true
                                     }
                                 }
                                 Log.d(
                                     "last stack membor",
-                                    "detail_on_character/${characterDetailScreenId()}"
+                                    "detail_on_character/${characterDetailScreenId}"
                                 )
                             }
 
                             Screen.StaffDetail.route -> {
-                                navController.navigate("detail_on_staff/${personDetailScreenId()}") {
+                                navController.navigate("detail_on_staff/${personDetailScreenId}") {
                                     navController.graph.startDestinationRoute?.let { _ ->
                                         launchSingleTop = true
                                     }
                                 }
                                 Log.d(
                                     "last stack membor",
-                                    "detail_on_staff/${personDetailScreenId()}"
+                                    "detail_on_staff/${personDetailScreenId}"
                                 )
                             }
 

@@ -13,11 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +34,7 @@ import com.alexstyl.swipeablecard.Direction
 import com.alexstyl.swipeablecard.ExperimentalSwipeableCardApi
 import com.alexstyl.swipeablecard.rememberSwipeableCardState
 import com.alexstyl.swipeablecard.swipableCard
-import com.project.toko.core.connectionCheck.isInternetAvailable
+import com.project.toko.core.utils.connectionCheck.isInternetAvailable
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
@@ -61,10 +59,12 @@ fun ShowRandomAnime(
     val cardIsShown = randomViewModel.cardIsShown
     val context = LocalContext.current
     val swipeState = rememberSwipeableCardState()
+
     Column(
         modifier
             .background(MaterialTheme.colorScheme.primary)
-            .fillMaxSize(),
+            .fillMaxSize()
+            ,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -78,7 +78,6 @@ fun ShowRandomAnime(
                     .swipableCard(
                         blockedDirections = listOf(Direction.Down),
                         state = swipeState, onSwiped = { direction ->
-
                             when (direction) {
                                 Direction.Left -> {
                                     randomViewModel.viewModelScope.launch(Dispatchers.IO) {
@@ -162,7 +161,7 @@ fun ShowRandomAnime(
                     }
 
                 }) {}
-                .padding(20.dp, 20.dp, 20.dp, 20.dp)) {
+                .padding(20.dp)) {
                 Text(
                     text = "Tap 2 times",
                     fontSize = 30.sp,
@@ -477,4 +476,5 @@ private fun formatScoredBy(float: Float): String {
         }
     }
 }
+
 

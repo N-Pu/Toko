@@ -1,13 +1,18 @@
 package com.project.toko.personDetailedScreen.viewModel
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.toko.personDetailedScreen.model.personFullModel.Data
 import com.project.toko.core.repository.MalApiService
+import com.project.toko.core.utils.connectionCheck.isInternetAvailable
 import com.project.toko.personDetailedScreen.model.personPictures.PersonPicturesData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -18,18 +23,15 @@ class PersonByIdViewModel @Inject constructor(malApiService: MalApiService) : Vi
     private val _personFull = MutableStateFlow<Data?>(null)
     private val personCache = mutableMapOf<Int, Data?>()
     val personFull = _personFull.asStateFlow()
-
-    private val _isSearching = MutableStateFlow(false)
-    val isSearching = _isSearching.asStateFlow()
-
-
+    private val _isLoading = mutableStateOf(false)
+    var isLoading = _isLoading
     private val _loadedId = mutableIntStateOf(0)
     val loadedId = _loadedId
 
-   suspend fun getPersonFromId(mal_id: Int) {
+  private suspend fun getPersonFromId(mal_id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _isSearching.value = true
+//                _isLoading.value = true
                 val response = animeRepository.getPersonFullFromId(mal_id)
                 if (response.isSuccessful) {
                     val data = response.body()?.data
@@ -39,9 +41,10 @@ class PersonByIdViewModel @Inject constructor(malApiService: MalApiService) : Vi
                 }
             } catch (e: Exception) {
                 Log.e("StaffFullByIdViewModel", e.message.toString())
-            } finally {
-                _isSearching.value = false
             }
+//            finally {
+//                _isLoading.value = false
+//            }
         }
     }
     //character album
@@ -53,7 +56,7 @@ class PersonByIdViewModel @Inject constructor(malApiService: MalApiService) : Vi
         )
     val picturesList = _picturesList.asStateFlow()
 
-    suspend fun getPicturesFromId(id: Int) {
+    private  suspend fun getPicturesFromId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = animeRepository.getPersonFullPictures(id)
@@ -64,6 +67,26 @@ class PersonByIdViewModel @Inject constructor(malApiService: MalApiService) : Vi
                 }
             } catch (e: Exception) {
                 Log.e("CharacterPicturesVM", e.message.toString())
+            }
+        }
+    }
+
+
+    suspend fun loadAllInfo(id: Int, context: Context) {
+        viewModelScope.launch {
+            if (isInternetAvailable(context)) {
+                _isLoading.value = true
+                delay(300L)
+                getPersonFromId(id)
+                delay(300L)
+                getPicturesFromId(id)
+                _isLoading.value = false
+            } else {
+                Toast.makeText(
+                    context,
+                    "No internet connection!",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

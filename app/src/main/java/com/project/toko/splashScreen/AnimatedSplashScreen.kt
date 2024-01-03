@@ -100,7 +100,13 @@ private fun Splash(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Row(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f).padding(end = 20.dp), horizontalArrangement = Arrangement.End) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.5f)
+                    .padding(end = 20.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = R.raw.paw, imageLoader = svgImageLoader

@@ -64,8 +64,8 @@ private fun ListEditor(
 
     Row(
         modifier = modifier
-            .fillMaxWidth(1f)
-            .padding(start = 20.dp, bottom = 0.dp, end = 20.dp, top = 20.dp),
+            .fillMaxWidth()
+            .padding(bottom = 20.dp, end = 20.dp, start = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -90,7 +90,6 @@ private fun ListEditor(
     Row(
         modifier = Modifier
             .fillMaxHeight()
-            .height(180.dp)
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
@@ -128,8 +127,7 @@ private fun ListEditor(
                     .background(MaterialTheme.colorScheme.onSecondary)
                     .clickable {
                         navController.navigate(Screen.DetailOnWholeStaff.route)
-                    }
-                , contentAlignment = Alignment.Center
+                    }, contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.vector),

@@ -35,7 +35,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import com.project.toko.daoScreen.dao.AnimeItem
-import com.project.toko.core.share.shareLink
+import com.project.toko.core.utils.share.shareLink
 import com.project.toko.daoScreen.dao.FavoriteItem
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel

@@ -48,111 +48,182 @@ fun ShowMoreInformation(
                 fontFamily = evolventaBoldFamily
             )
         }
-        Row(modifier = modifier.height(20.dp), horizontalArrangement = Arrangement.Start) {
+        Row(modifier = modifier.height(20.dp)) {
 
         }
-        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
             Text(
+                lineHeight = 22.sp,
                 text = "Aired: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Text(
+                lineHeight = 22.sp,
                 text = "from $airedFrom to $airedTo",
                 color = MaterialTheme.colorScheme.secondary
             )
         }
 
-        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
             val licensor = if (licensors?.isEmpty() == true)
                 "N/A"
             else licensors
             Text(
+                lineHeight = 22.sp,
                 text = "Licensors: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
-            Text(text = licensor.toString(), color = MaterialTheme.colorScheme.secondary)
+            Text(
+                lineHeight = 22.sp,
+                text = licensor.toString(),
+                color = MaterialTheme.colorScheme.secondary
+            )
 
         }
-        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
             val synonym = if (synonyms?.isEmpty() == true)
                 "N/A"
             else synonyms
             Text(
+                lineHeight = 22.sp,
                 text = "Synonyms: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
-            Text(text = synonym.toString(), color = MaterialTheme.colorScheme.secondary)
+            Text(
+                lineHeight = 22.sp,
+                text = synonym.toString(),
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
-        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
             val studio = if (studios?.isEmpty() == true)
                 "N/A"
             else studios
             Text(
+                lineHeight = 22.sp,
                 text = "Studios: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
-            Text(text = studio.toString(), color = MaterialTheme.colorScheme.secondary)
-        }
-        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
             Text(
+                lineHeight = 22.sp,
+                text = studio.toString(),
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                lineHeight = 22.sp,
                 text = "Source: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
-            Text(text = detailData?.source ?: "N/A", color = MaterialTheme.colorScheme.secondary)
+            Text(
+                lineHeight = 22.sp,
+                text = detailData?.source ?: "N/A",
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
-        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
             val demo = if (demographic?.isEmpty() == true)
                 "N/A"
             else demographic
             Text(
+                lineHeight = 22.sp,
                 text = "Demographic: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
-            Text(text = demo.toString(), color = MaterialTheme.colorScheme.secondary)
+            Text(
+                lineHeight = 22.sp,
+                text = demo.toString(),
+                color = MaterialTheme.colorScheme.secondary
+            )
 
         }
-        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
             Text(
+                lineHeight = 22.sp,
                 text = "Rating: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Text(
+                lineHeight = 22.sp,
                 text = detailData?.rating ?: "N/A",
                 minLines = 1,
                 color = MaterialTheme.colorScheme.secondary
             )
         }
-        Row {
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
             Text(
+                lineHeight = 22.sp,
                 text = "Broadcast: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Text(
+                lineHeight = 22.sp,
                 text = (detailData?.broadcast?.string ?: "N/A").toString(),
                 color = MaterialTheme.colorScheme.secondary
             )
         }
-        Row {
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
             val producer = if (demographic?.isEmpty() == true)
                 "N/A"
             else producers
             Text(
+                lineHeight = 22.sp,
                 text = "Producers: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
-            Text(text = producer.toString(), color = MaterialTheme.colorScheme.secondary)
+            Text(
+                lineHeight = 22.sp,
+                text = producer.toString(),
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
 
 
-        Row(modifier = modifier, horizontalArrangement = Arrangement.Start) {
+        Row(
+            modifier = modifier.padding(vertical = 3.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
             val title = if (titles?.isEmpty() == true) {
                 "N/A"
             } else titles
             Text(
+                lineHeight = 22.sp,
                 text = "Titles: ",
                 color = MaterialTheme.colorScheme.onPrimary
             )
-            Text(text = title.toString(), color = MaterialTheme.colorScheme.secondary)
+            Text(
+                lineHeight = 22.sp,
+                text = title.toString(),
+                color = MaterialTheme.colorScheme.secondary
+            )
 
         }
 

@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,30 +59,31 @@ fun DisplayCast(
         val numCharacterAndActors =
             min(12, castList.size) // Количество персонажей для вывода (не более 12)
 
+
         Row(
             modifier = modifier
                 .fillMaxWidth(1f)
-                .padding(start = 20.dp, bottom = 15.dp, end = 20.dp),
+                .padding(bottom = 20.dp, start =  20.dp, end =  20.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Column {
-                Text(
-                    text = "Cast", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontFamily = evolventaBoldFamily
-                )
-            }
-            Column {
-                Text(
-                    text = " $numCharacterAndActors>",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontFamily = evolventaBoldFamily
-                )
-            }
+
+            Text(
+                text = "Cast", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
+            )
+
+            Text(
+                text = " $numCharacterAndActors>",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
+            )
+
         }
+
         AddCast(
             castList = castWithJapVoiceActors,
             navController = navController,
@@ -89,9 +91,11 @@ fun DisplayCast(
             numCharacterAndActors = numCharacterAndActors,
             detailMalId = detailMalId
         )
+
     }
 }
 
+@Stable
 @Composable
 private fun AddCast(
     castList: List<CastData>,
@@ -185,7 +189,9 @@ private fun AddCast(
             // Пустая колонка для выравнивания
         }
     }
-
+    Row(
+        modifier = Modifier.height(20.dp)
+    ) {}
 }
 
 @Composable
@@ -227,13 +233,18 @@ private fun CurrentCast(
                         .height(107.dp)
                         .clip(RoundedCornerShape(3.dp))
                         .background(Color(102, 102, 102)),
-                    contentAlignment =  Alignment.Center
+                    contentAlignment = Alignment.Center
 
-                    ) {
+                ) {
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.personplaceholder, imageLoader = svgImageLoader
-                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp), colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+                        ),
+                        contentDescription = null,
+                        modifier = modifier
+                            .fillMaxSize(0.6f)
+                            .padding(bottom = 10.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                     )
                 }
             } else {
@@ -324,13 +335,18 @@ private fun CurrentCast(
                         .height(107.dp)
                         .clip(RoundedCornerShape(6.dp))
                         .background(Color(102, 102, 102)),
-                    contentAlignment =  Alignment.Center
+                    contentAlignment = Alignment.Center
 
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.personplaceholder, imageLoader = svgImageLoader
-                        ), contentDescription = null, modifier = modifier.fillMaxSize(0.6f).padding(bottom = 10.dp), colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+                        ),
+                        contentDescription = null,
+                        modifier = modifier
+                            .fillMaxSize(0.6f)
+                            .padding(bottom = 10.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                     )
                 }
             } else {

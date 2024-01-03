@@ -49,7 +49,7 @@ fun DisplayCustomGenreBoxes(genres: List<com.project.toko.detailScreen.model.det
             modifier = modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
-                .height(80.dp)
+                .height(75.dp)
                 .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.Center
         ) {

@@ -43,8 +43,10 @@ fun ShowRelation(relation: String, modifier: Modifier) {
     Row(
         modifier = modifier.padding(start = 20.dp, bottom = 5.dp, end = 20.dp)
     ) {
-        Text(fontWeight = FontWeight.Medium, text = "$relation: ",
-            color = MaterialTheme.colorScheme.onPrimary)
+        Text(
+            fontWeight = FontWeight.Medium, text = "$relation: ",
+            color = MaterialTheme.colorScheme.onPrimary
+        )
     }
 }
 
@@ -105,7 +107,7 @@ fun ExpandableRelated(
 
             Box(
                 modifier = modifier
-                    .padding(start = 20.dp, bottom = 5.dp)
+                    .padding(start = 20.dp, bottom = 20.dp, end = 20.dp)
                     .fillMaxWidth(),
                 contentAlignment = Alignment.CenterStart
             ) {
@@ -118,7 +120,7 @@ fun ExpandableRelated(
                     fontFamily = evolventaBoldFamily
                 )
             }
-
+//            Box(modifier = modifier.height(20.dp))
             if (relations.isNotEmpty()) {
                 // Apply animateContentSize to the content that should expand or collapse
                 Column(
@@ -137,7 +139,7 @@ fun ExpandableRelated(
                 Column(
                     modifier = modifier
                         .fillMaxWidth(1f)
-                        .padding(start = 20.dp, bottom = 25.dp, end = 20.dp)
+                        .padding(start = 20.dp, bottom = 20.dp, end = 20.dp)
                 ) {
                     Spacer(
                         modifier = modifier
@@ -174,5 +176,5 @@ fun ExpandableRelated(
             }
         }
     }
-    Spacer(modifier = modifier.height(20.dp))
+//    Spacer(modifier = modifier.height(20.dp))
 }

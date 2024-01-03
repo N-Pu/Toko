@@ -1,7 +1,6 @@
 package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,23 +20,25 @@ fun ShowBackground(detailData: DetailData?, modifier: Modifier) {
     if (detailData?.background?.isNotEmpty() == true) {
 
         Column(modifier = modifier.padding(start = 20.dp, end = 20.dp)) {
-            Row {
-                Text(
-                    text = "Background",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 22.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = evolventaBoldFamily
-                )
-            }
-            Spacer(modifier = Modifier.height(10.dp))
 
-            Row {
-                Text(text = detailData.background,
-                    color = MaterialTheme.colorScheme.onPrimary)
-            }
-            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "Background",
+                color = MaterialTheme.colorScheme.onPrimary,
+                lineHeight = 16.sp, fontSize = 22.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                fontFamily = evolventaBoldFamily
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+
+            Text(
+                text = detailData.background,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }

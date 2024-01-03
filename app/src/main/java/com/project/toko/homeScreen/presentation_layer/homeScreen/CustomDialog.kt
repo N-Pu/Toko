@@ -59,7 +59,7 @@ import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
-import com.project.toko.core.autoResizedText.AutoResizedText
+import com.project.toko.core.utils.autoResizedText.AutoResizedText
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.dao.AnimeItem
 import com.project.toko.daoScreen.dao.FavoriteItem

@@ -9,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerSnapDistance
@@ -33,6 +34,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,8 +46,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.project.toko.R
-import com.project.toko.core.presentation_layer.animations.LoadingAnimation
+import com.project.toko.core.presentation_layer.pullToRefpresh.PullToRefreshLayout
 import com.project.toko.core.presentation_layer.theme.DarkSearchBarColor
 import com.project.toko.core.presentation_layer.theme.SearchBarColor
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
@@ -57,73 +60,86 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
+@Stable
 @Composable
 fun MainScreen(
     navController: NavHostController,
     viewModelProvider: ViewModelProvider,
     modifier: Modifier,
-    isInDarkTheme:() -> Boolean,
+    isInDarkTheme: () -> Boolean,
     drawerState: DrawerState,
     svgImageLoader: ImageLoader
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
-    val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
+//    val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
     val isTabMenuOpen = viewModel.isTabMenuOpen
     val switchIndicator = viewModel.switchIndicator
     val scope = rememberCoroutineScope()
-
-    Column(
-        modifier = modifier
-//            .systemBarsPadding()
-//            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
-            .background(MaterialTheme.colorScheme.primary)
-
-    ) {
-        Spacer(modifier = modifier.fillMaxWidth().height(10.dp).background(MaterialTheme.colorScheme.error))
+    val gridState = rememberLazyStaggeredGridState()
+    val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = viewModel.isLoading.value)
+    LaunchedEffect(key1 = Unit) {
+        viewModel.loadAllInfo(context)
+    }
+//    if (viewModel.isLoading.value.not())
+    PullToRefreshLayout(composable = {
         Column(
             modifier = modifier
-                .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
-                .height(140.dp)
-                .shadow(20.dp)
-                .fillMaxWidth(1f)
-                .background(MaterialTheme.colorScheme.error)
-                .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 0.dp)
+//            .systemBarsPadding()
+//            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
+                .background(MaterialTheme.colorScheme.primary)
 
         ) {
-            // Logotype on the top left
-            Row(
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.inversePrimary,
-                    modifier = modifier
-                        .size(30.dp)
-                        .clickable { scope.launch { drawerState.open() } }
-                )
-                Image(
-                    painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),
-                    contentDescription = null,
-                    modifier = modifier
-                        .height(50.dp)
-                        .width(70.dp),
-                    alpha = 0.8f,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
-                )
-            }
-            Row(
+            Spacer(
                 modifier = modifier
-                    .wrapContentSize()
-                    .padding(top = 10.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(
-                        if (isInDarkTheme()) DarkSearchBarColor else SearchBarColor
-                    ),
-                verticalAlignment = Alignment.Bottom
+                    .fillMaxWidth()
+                    .height(10.dp)
+                    .background(MaterialTheme.colorScheme.error)
+            )
+            Column(
+                modifier = modifier
+                    .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
+                    .height(140.dp)
+                    .shadow(20.dp)
+                    .fillMaxWidth(1f)
+                    .background(MaterialTheme.colorScheme.error)
+                    .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 0.dp)
+
             ) {
+                // Logotype on the top left
+                Row(
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.inversePrimary,
+                        modifier = modifier
+                            .size(30.dp)
+                            .clickable { scope.launch { drawerState.open() } }
+                    )
+                    Image(
+                        painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),
+                        contentDescription = null,
+                        modifier = modifier
+                            .height(50.dp)
+                            .width(70.dp),
+                        alpha = 0.8f,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
+                    )
+                }
+                Row(
+                    modifier = modifier
+                        .wrapContentSize()
+                        .padding(top = 10.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(
+                            if (isInDarkTheme()) DarkSearchBarColor else SearchBarColor
+                        ),
+                    verticalAlignment = Alignment.Bottom
+                ) {
 
 //                DockedSearchBar(
 //                    placeholder = { Text(text = "Search...") },
@@ -155,64 +171,73 @@ fun MainScreen(
 //
 //                }
 
-                OutlinedTextField(
-                    placeholder = { Text(text = "Search...", color = iconColorInSearchPanel) },
-                    value = searchText ?: "",
-                    onValueChange = viewModel::onSearchTextChange,
-                    modifier = modifier
-                        .clip(RoundedCornerShape(30.dp))
-                        .height(50.dp)
-                        .fillMaxWidth(1f),
-                    prefix = {
-                        Icon(Icons.Filled.Search, "Search Icon", tint = iconColorInSearchPanel)
-                    },
-                    suffix = {
+                    OutlinedTextField(
+                        placeholder = { Text(text = "Search...", color = iconColorInSearchPanel) },
+                        value = searchText ?: "",
+                        onValueChange = viewModel::onSearchTextChange,
+                        modifier = modifier
+                            .clip(RoundedCornerShape(30.dp))
+                            .height(50.dp)
+                            .fillMaxWidth(1f),
+                        prefix = {
+                            Icon(Icons.Filled.Search, "Search Icon", tint = iconColorInSearchPanel)
+                        },
+                        suffix = {
 
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = if (switchIndicator.value) R.drawable.search_back else R.drawable.search_home,
-                                imageLoader = svgImageLoader
-                            ),
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                            modifier = modifier
-                                .fillMaxHeight(0.55f)
-                                .clickable {
-                                    switchIndicator.value = !switchIndicator.value
-                                }
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = if (switchIndicator.value) R.drawable.search_back else R.drawable.search_home,
+                                    imageLoader = svgImageLoader
+                                ),
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                                modifier = modifier
+                                    .fillMaxHeight(0.55f)
+                                    .clickable {
+                                        switchIndicator.value = !switchIndicator.value
+                                    }
+                            )
+                        },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            cursorColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = Color.Transparent
+
                         )
-                    },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        focusedPlaceholderColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        cursorColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedBorderColor = Color.Transparent
-
                     )
-                )
+                }
             }
-        }
 
-        TabSelectionMenu(viewModel, modifier, {isTabMenuOpen}, {switchIndicator})
+            TabSelectionMenu(viewModel, modifier, { isTabMenuOpen }, { switchIndicator })
 
-        if (isSearching.not()) {
             GridAdder(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
                 modifier = modifier,
-                isTabMenuOpen = {isTabMenuOpen},
-                switch = {switchIndicator.value},
+                isTabMenuOpen = { isTabMenuOpen },
+                switch = { switchIndicator.value },
                 isInDarkTheme = isInDarkTheme,
-                svgImageLoader = svgImageLoader
+                svgImageLoader = svgImageLoader,
+                gridState = gridState,
+                scrollState = scrollState
             )
-        } else {
-            LoadingAnimation()
-        }
 
-    }
+
+        }
+    }, onLoad = {
+        viewModel.viewModelScope.launch {
+            if (switchIndicator.value.not()) {
+                viewModel.loadAllInfo(context)
+            } else {
+                viewModel.addAllParams()
+            }
+        }
+    }, swipeRefreshState = swipeRefreshState)
+
 }
 
 
@@ -222,7 +247,7 @@ private fun TabSelectionMenu(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
     isTabMenuOpen: () -> MutableState<Boolean>,
-    switchIndicator:() -> MutableState<Boolean>
+    switchIndicator: () -> MutableState<Boolean>
 ) {
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -346,7 +371,7 @@ private fun TabSelectionMenu(
 private fun ScoreBar(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator: () ->MutableState<Boolean>
+    switchIndicator: () -> MutableState<Boolean>
 ) {
     val selectedNumber = viewModel.scoreState
     val items = listOf("—", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
@@ -430,7 +455,7 @@ private fun ShowGenres(
             selectedGenre.forEach { genreForUI ->
                 ButtonCreator(
                     text = genreForUI.name,
-                    isTouched = {genreForUI.isSelected.value},
+                    isTouched = { genreForUI.isSelected.value },
                     onClick = {
                         viewModel.viewModelScope.launch(Dispatchers.IO) {
                             genreForUI.isSelected.value = !genreForUI.isSelected.value
@@ -462,7 +487,7 @@ private fun ShowGenres(
 private fun ButtonCreator(
     text: String,
     onClick: () -> Unit,
-    isTouched:() -> Boolean,
+    isTouched: () -> Boolean,
     modifier: Modifier
 ) {
     Box(
@@ -493,7 +518,7 @@ private fun ButtonCreator(
 private fun ShowRating(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator:() -> MutableState<Boolean>
+    switchIndicator: () -> MutableState<Boolean>
 ) {
     val ratingList by viewModel.ratingList.collectAsStateWithLifecycle()
     val selectedRating by viewModel.selectedRating.collectAsStateWithLifecycle()
@@ -503,7 +528,7 @@ private fun ShowRating(
     ) {
         ratingList.forEach { rating ->
             ButtonCreator(
-                isTouched = {rating == selectedRating},
+                isTouched = { rating == selectedRating },
                 onClick = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.setSelectedRating(rating)
@@ -528,7 +553,7 @@ private fun ShowRating(
 private fun ShowTypes(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator:() -> MutableState<Boolean>
+    switchIndicator: () -> MutableState<Boolean>
 ) {
     val typeList by viewModel.typeList.collectAsStateWithLifecycle()
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
@@ -536,7 +561,7 @@ private fun ShowTypes(
     FlowRow(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
         typeList.forEach { type ->
             ButtonCreator(
-                isTouched = {type == selectedType},
+                isTouched = { type == selectedType },
                 onClick = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.setSelectedType(type)
@@ -561,7 +586,7 @@ private fun ShowTypes(
 private fun ShowOrderBy(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    switchIndicator:() -> MutableState<Boolean>
+    switchIndicator: () -> MutableState<Boolean>
 ) {
     val orderByList by viewModel.orderByList.collectAsStateWithLifecycle()
     val selectedOrderBy by viewModel.selectedOrderBy.collectAsStateWithLifecycle()
@@ -570,7 +595,7 @@ private fun ShowOrderBy(
     FlowRow(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
         orderByList.forEach { orderBy ->
             ButtonCreator(
-                isTouched = {orderBy == selectedOrderBy},
+                isTouched = { orderBy == selectedOrderBy },
                 onClick = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.setSelectedOrderBy(orderBy)

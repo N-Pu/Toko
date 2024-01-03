@@ -35,7 +35,7 @@ fun YearTypeEpisodesTimeStatusStudio(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
             modifier = modifier
-                .padding(start = 20.dp, top = 5.dp, bottom = 0.dp, end = 20.dp)
+                .padding(start = 20.dp, end = 20.dp)
                 .fillMaxWidth(1f)
         ) {
             val yearSeasonText = buildAnnotatedString {
@@ -43,25 +43,25 @@ fun YearTypeEpisodesTimeStatusStudio(
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                         append("${data.season} ${data.year}")
                     }
-                    append("|")
+                    append(" | ")
                 }
                 withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                     append(data?.type ?: "N/A")
                 }
                 withStyle(style = SpanStyle(color = Color.Gray.copy(0.5f))) {
-                    append("|")
+                    append(" | ")
                 }
                 if (data?.episodes != 0 && data?.duration != null) {
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                         append("${data.episodes} ep/${data.duration}")
                     }
-                    append("|")
+                    append(" | ")
                 }
                 withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                     append(data?.status ?: "N/A")
                 }
                 if (!isStudioEmpty) {
-                    append("|")
+                    append(" | ")
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                         append(data?.studios?.component1()?.name ?: "N/A")
                     }
@@ -72,7 +72,7 @@ fun YearTypeEpisodesTimeStatusStudio(
                 text = yearSeasonText,
                 fontWeight = FontWeight.Medium,
                 fontSize = 20.sp,
-                lineHeight = 20.sp,
+                lineHeight = 25.sp,
                 color = MaterialTheme.colorScheme.onPrimary.copy(0.5f),
                 textAlign = TextAlign.Center
             )
