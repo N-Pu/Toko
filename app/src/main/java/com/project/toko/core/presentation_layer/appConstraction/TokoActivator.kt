@@ -91,32 +91,7 @@ fun AppActivator(
     isInDarkTheme: () -> Boolean,
     svgImageLoader: ImageLoader
 ) {
-
-    var currentDetailScreenId by viewModelProvider[DetailScreenViewModel::class.java].loadedId
-    var lastSelectedScreen by remember { mutableStateOf<String?>(null) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    LaunchedEffect(lastSelectedScreen) {
-        navController.addOnDestinationChangedListener { _, destination, arguments ->
-
-            when (destination.route) {
-
-                Screen.Detail.route -> {
-                    currentDetailScreenId = arguments?.getInt("id") ?: 0
-                    lastSelectedScreen = destination.route
-                }
-
-                Screen.Home.route,
-                Screen.RandomAnimeOrManga.route,
-                Screen.Favorites.route -> {
-                }
-
-                else -> {
-                    lastSelectedScreen = destination.route
-                }
-            }
-        }
-    }
-
 
     ModalNavigationDrawer(drawerState = drawerState,
         drawerContent = {
@@ -134,9 +109,7 @@ fun AppActivator(
         Scaffold(bottomBar = {
             BottomNavigationBar(
                 navController = navController,
-                currentDetailScreenId = { currentDetailScreenId },
                 modifier = modifier,
-                lastSelectedScreen = lastSelectedScreen,
                 imageLoader = svgImageLoader,
                 viewModelProvider = viewModelProvider
             )
@@ -160,18 +133,37 @@ fun AppActivator(
 @Composable
 private fun BottomNavigationBar(
     navController: NavController,
-    currentDetailScreenId: () -> Int,
     modifier: Modifier,
-    lastSelectedScreen: String?,
     imageLoader: ImageLoader,
     viewModelProvider: ViewModelProvider
 ) {
-
+    var currentDetailScreenId by viewModelProvider[DetailScreenViewModel::class.java].loadedId
+    var lastSelectedScreen by remember { mutableStateOf<String?>(null) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    var detailScreenButtonIsSelected = false
+    var detailScreenButtonIsSelected by remember { mutableStateOf(false)}
     val characterDetailScreenId by viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
     val personDetailScreenId by viewModelProvider[PersonByIdViewModel::class.java].loadedId
+
+    LaunchedEffect(lastSelectedScreen) {
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+
+            when (destination.route) {
+
+                Screen.Detail.route -> {
+                    currentDetailScreenId = arguments?.getInt("id") ?: 0
+                    lastSelectedScreen = destination.route
+                }
+
+                Screen.Home.route, Screen.RandomAnimeOrManga.route, Screen.Favorites.route -> {
+                }
+
+                else -> {
+                    lastSelectedScreen = destination.route
+                }
+            }
+        }
+    }
 
     LaunchedEffect(key1 = currentRoute) {
         detailScreenButtonIsSelected = when (currentRoute) {
@@ -192,8 +184,7 @@ private fun BottomNavigationBar(
                 RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp)
             )
             .height(50.dp)
-            .background(MaterialTheme.colorScheme.onBackground)
-        ,
+            .background(MaterialTheme.colorScheme.onBackground),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -247,7 +238,7 @@ private fun BottomNavigationBar(
                     try {
                         when (lastSelectedScreen) {
                             Screen.Detail.route -> {
-                                navController.navigate("detail_screen/${currentDetailScreenId()}") {
+                                navController.navigate("detail_screen/${currentDetailScreenId}") {
                                     navController.graph.startDestinationRoute?.let { _ ->
                                         launchSingleTop = true
                                     }
@@ -255,7 +246,7 @@ private fun BottomNavigationBar(
 
                                 Log.d(
                                     "last stack membor",
-                                    "detail_screen/${currentDetailScreenId()}"
+                                    "detail_screen/${currentDetailScreenId}"
                                 )
                             }
 

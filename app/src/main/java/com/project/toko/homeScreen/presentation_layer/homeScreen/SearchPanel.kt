@@ -9,7 +9,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerSnapDistance
@@ -72,18 +71,21 @@ fun MainScreen(
 ) {
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
-//    val isSearching by viewModel.isPerformingSearch.collectAsStateWithLifecycle()
-    val isTabMenuOpen = viewModel.isTabMenuOpen
-    val switchIndicator = viewModel.switchIndicator
+    val switchIndicator = remember { viewModel.switchIndicator }
     val scope = rememberCoroutineScope()
-    val gridState = rememberLazyStaggeredGridState()
-    val scrollState = rememberScrollState()
     val context = LocalContext.current
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = viewModel.isLoading.value)
-    LaunchedEffect(key1 = Unit) {
-        viewModel.loadAllInfo(context)
+
+    LaunchedEffect(key1 = switchIndicator.value) {
+        this.launch(Dispatchers.IO) {
+            if (switchIndicator.value.not()) {
+                viewModel.loadAllInfo(context)
+            } else {
+                viewModel.addAllParams()
+            }
+        }
     }
-//    if (viewModel.isLoading.value.not())
+
     PullToRefreshLayout(composable = {
         Column(
             modifier = modifier
@@ -212,18 +214,15 @@ fun MainScreen(
                 }
             }
 
-            TabSelectionMenu(viewModel, modifier, { isTabMenuOpen }, { switchIndicator })
+            TabSelectionMenu(viewModel, modifier) { switchIndicator }
 
             GridAdder(
                 navController = navController,
                 viewModelProvider = viewModelProvider,
                 modifier = modifier,
-                isTabMenuOpen = { isTabMenuOpen },
                 switch = { switchIndicator.value },
                 isInDarkTheme = isInDarkTheme,
                 svgImageLoader = svgImageLoader,
-                gridState = gridState,
-                scrollState = scrollState
             )
 
 
@@ -246,10 +245,9 @@ fun MainScreen(
 private fun TabSelectionMenu(
     viewModel: HomeScreenViewModel,
     modifier: Modifier,
-    isTabMenuOpen: () -> MutableState<Boolean>,
     switchIndicator: () -> MutableState<Boolean>
 ) {
-
+    val isTabMenuOpen = remember { viewModel.isTabMenuOpen }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     var sizeOfCurrentComposable by remember {
         mutableStateOf(IntSize.Zero)
@@ -292,10 +290,10 @@ private fun TabSelectionMenu(
                     selected = index == selectedTabIndex,
                     onClick = {
                         if (selectedTabIndex == index) {
-                            isTabMenuOpen().value = !isTabMenuOpen().value
+                            isTabMenuOpen.value = !isTabMenuOpen.value
                         } else {
                             selectedTabIndex = index
-                            isTabMenuOpen().value = true
+                            isTabMenuOpen.value = true
                         }
                     },
                     selectedContentColor = MaterialTheme.colorScheme.primary,
@@ -314,7 +312,7 @@ private fun TabSelectionMenu(
         }
     }
     Spacer(modifier = modifier.height(5.dp))
-    if (isTabMenuOpen().value) {
+    if (isTabMenuOpen.value) {
         Spacer(
             modifier = modifier
                 .height(20.dp)
@@ -426,13 +424,11 @@ private fun ScoreBar(
     }
 
     LaunchedEffect(key1 = selectedNumber.intValue) {
-        if (selectedNumber.intValue != 0) {
-            delay(1000L)
-            viewModel.pre_min_score.value = Score(minMaxScore.minScore)
-            viewModel.pre_max_score.value = Score(minMaxScore.maxScore)
-            switchIndicator().value = true
-            viewModel.addAllParams()
-        }
+        delay(1000L)
+        viewModel.pre_min_score.value = Score(minMaxScore.minScore)
+        viewModel.pre_max_score.value = Score(minMaxScore.maxScore)
+        switchIndicator().value = true
+        viewModel.addAllParams()
     }
 
 }
