@@ -27,13 +27,13 @@ import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 @Composable
 fun ShowVoiceActors(modifier: Modifier, actors: List<Voice>, navController: NavController) {
 
-    Row(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
+    Row(modifier = modifier.padding(start = 20.dp)) {
         Text(text = "Voice Actors", fontSize = 24.sp,
             color = MaterialTheme.colorScheme.onPrimary,
             fontFamily = evolventaBoldFamily
         )
     }
-
+    Spacer(modifier = Modifier.height(20.dp).fillMaxWidth())
     Column(
         modifier = modifier
             .fillMaxWidth()

@@ -1,6 +1,8 @@
 package com.project.toko.core.di.module
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import com.project.toko.core.di.Application
 import com.project.toko.core.repository.MalApiService
 import dagger.Module
@@ -19,7 +21,14 @@ import javax.inject.Singleton
 @Module
 class MalApiModule @Inject constructor(private val application: Application) {
 
-
+    private fun hasNetwork(context: Context): Boolean? {
+        var isConnected: Boolean? = false // Initial Value
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
+        if (activeNetwork != null && activeNetwork.isConnected)
+            isConnected = true
+        return isConnected
+    }
     @Provides
     @Singleton
     fun provideContext(): Context {
@@ -38,23 +47,32 @@ class MalApiModule @Inject constructor(private val application: Application) {
         return Cache(cacheDirectory, 250L * 1024L * 1024L) // 250 MiB
     }
 
-    @Provides
-    @Singleton
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
-        return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-    }
+//    @Provides
+//    @Singleton
+//    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
+//        return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+//    }
 
     @Provides
     @Singleton
     fun provideHttpClient(
         cache: Cache,
-        httpLoggingInterceptor: HttpLoggingInterceptor
+//        httpLoggingInterceptor: HttpLoggingInterceptor,
+        context: Context
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .cache(cache)
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(httpLoggingInterceptor)
+//            .addInterceptor(httpLoggingInterceptor)
+            .addInterceptor { chain ->
+                var request = chain.request()
+                request = if (hasNetwork(context)!!)
+                    request.newBuilder().header("Cache-Control", "public, max-age=" + 5).build()
+                else
+                    request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()
+                chain.proceed(request)
+            }
             .build()
     }
 

@@ -13,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -49,7 +48,9 @@ import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.cu
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ShowMoreInformation
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ShowPictureAlbum
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.YearTypeEpisodesTimeStatusStudio
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -78,7 +79,9 @@ fun ActivateDetailScreen(
 
 
     LaunchedEffect(key1 = id) {
-        viewModel.loadAllInfo(id, context)
+        withContext(Dispatchers.IO){
+            viewModel.loadAllInfo(id, context)
+        }
     }
 
 
@@ -93,8 +96,10 @@ fun ActivateDetailScreen(
             model
         )
 
-    if (viewModel.isLoading.value.not()
-        && detailData != null
+    if (
+        viewModel.isLoading.value.not()
+        &&
+            detailData != null
     ) {
         PullToRefreshLayout(
             composable = {
@@ -229,7 +234,7 @@ fun ActivateDetailScreen(
             },
             onLoad = {
                 viewModel.viewModelScope.launch {
-                    viewModel.loadAllInfo(id, context)
+                    viewModel.refreshAndLoadAllInfo(id, context)
                 }
             },
             swipeRefreshState = swipeRefreshState

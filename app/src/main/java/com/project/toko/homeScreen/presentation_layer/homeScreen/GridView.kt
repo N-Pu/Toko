@@ -58,6 +58,7 @@ import com.project.toko.homeScreen.model.newAnimeSearchModel.NewAnimeSearchModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 @Stable
@@ -74,21 +75,12 @@ fun GridAdder(
 
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val newAnimeSearchModel by viewModel.animeSearch.collectAsStateWithLifecycle()
-    val lastTenAnimeFromWatchingSection by
-    viewModel.showListOfWatching().collectAsStateWithLifecycle(
-        initialValue = emptyList()
-    )
-    val getJustTenAddedAnime by
-    viewModel.showLastAdded().collectAsStateWithLifecycle(
-        initialValue = emptyList()
-    )
-
     val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
     val getTopUpcoming by viewModel.topUpcomingAnime.collectAsStateWithLifecycle()
     val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
 
     if (switch()) {
-        if (viewModel.isLoading.value.not()) {
+        if (viewModel.isLoadingSearch.value.not()) {
             SearchScreen(
                 viewModel, newAnimeSearchModel, navController, viewModelProvider, svgImageLoader
             )
@@ -96,19 +88,15 @@ fun GridAdder(
             LoadingAnimation()
         }
     } else {
-
         ShowMainScreen(
             viewModelProvider = viewModelProvider,
             isInDarkTheme = isInDarkTheme,
             navController = navController,
             svgImageLoader = svgImageLoader,
-            lastTenAnimeFromWatchingSection = lastTenAnimeFromWatchingSection,
-            getJustTenAddedAnime = getJustTenAddedAnime,
             getTopAiring = getTopAiring,
             getTopUpcoming = getTopUpcoming,
             getTrendingAnime = getTrendingAnime
         )
-
     }
 
 
@@ -202,7 +190,7 @@ fun SearchScreen(
     val columnState = rememberLazyListState()
 
     LaunchedEffect(key1 = !columnState.canScrollForward && newAnimeSearchModel.pagination.has_next_page) {
-        this.launch(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             additionalDataRequested = true
             delay(300) // Измените задержку по вашему усмотрению
             viewModel.loadNextPage()
@@ -247,14 +235,22 @@ fun ShowMainScreen(
     navController: NavController,
     viewModelProvider: ViewModelProvider,
     svgImageLoader: ImageLoader,
-    lastTenAnimeFromWatchingSection: List<AnimeItem>,
-    getJustTenAddedAnime: List<AnimeItem>,
     getTrendingAnime: NewAnimeSearchModel,
     getTopUpcoming: NewAnimeSearchModel,
     getTopAiring: NewAnimeSearchModel
 ) {
     val scroll = rememberScrollState()
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
+    val loadingSection by viewModel.loadingSection
+    val lastTenAnimeFromWatchingSection by
+    viewModel.showListOfWatching().collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
+    val getJustTenAddedAnime by
+    viewModel.showLastAdded().collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
+
     Column(
         modifier = modifier
             .verticalScroll(scroll)
@@ -292,7 +288,7 @@ fun ShowMainScreen(
             Spacer(modifier = modifier.height(20.dp))
 
         }
-        if (viewModel.isLoading.value.not()) {
+        if (loadingSection.not()) {
 
             ShowSectionName(
                 sectionName = "Trending",
@@ -318,9 +314,6 @@ fun ShowMainScreen(
                 }
                 Spacer(modifier = modifier.width(20.dp))
             }
-
-
-
             Spacer(modifier = modifier.height(20.dp))
 
         } else {
@@ -370,7 +363,7 @@ fun ShowMainScreen(
             Spacer(modifier = modifier.height(20.dp))
 
         }
-        if (viewModel.isLoading.value.not()) {
+        if (loadingSection.not()) {
 
             ShowSectionName(
                 sectionName = "Top Airing",
@@ -418,7 +411,7 @@ fun ShowMainScreen(
             }
 
         }
-        if (viewModel.isLoading.value.not()) {
+        if (loadingSection.not()) {
 
             ShowSectionName(
                 sectionName = "Top Upcoming",

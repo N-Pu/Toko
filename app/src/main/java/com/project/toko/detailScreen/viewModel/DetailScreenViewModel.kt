@@ -12,10 +12,13 @@ import androidx.lifecycle.viewModelScope
 import com.project.toko.core.repository.MalApiService
 import com.project.toko.core.utils.connectionCheck.isInternetAvailable
 import com.project.toko.detailScreen.model.castModel.CastData
+import com.project.toko.detailScreen.model.castModel.CastModel
 import com.project.toko.detailScreen.model.detailModel.DetailData
+import com.project.toko.detailScreen.model.detailModel.DetailScreenModel
 import com.project.toko.detailScreen.model.pictureModel.DetailPicturesData
 import com.project.toko.detailScreen.model.recommendationsModel.RecommendationsData
 import com.project.toko.detailScreen.model.staffModel.StaffData
+import com.project.toko.detailScreen.model.staffModel.StaffModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,9 +38,6 @@ class DetailScreenViewModel @Inject constructor(
     private val _loadedId = mutableIntStateOf(0)
     val loadedId = _loadedId
 
-//    private val _isSearching = MutableStateFlow(false)
-//    val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
-
     private val _scrollState: ScrollState by mutableStateOf(ScrollState(0))
     var scrollState = _scrollState
 
@@ -47,20 +47,27 @@ class DetailScreenViewModel @Inject constructor(
     private val _isLoading = mutableStateOf(false)
     var isLoading = _isLoading
 
+
+    private val cachedDetailScreenData: MutableMap<Int, DetailScreenModel> = mutableMapOf()
+
     private suspend fun onTapAnime(id: Int) {
 
         viewModelScope.launch(Dispatchers.IO) {
-            // Сохраните предыдущее id
-            val previousId = _loadedId.intValue
-            if (previousId != id) {
-                _previousId.value = previousId
-            }
 
             try {
-//                _isSearching.value = true
-//                _isLoading.value = true
+                // Сохраните предыдущее id
+                val previousId = _loadedId.intValue
+                if (previousId != id) {
+                    _previousId.value = previousId
+                }
+                if (cachedDetailScreenData.contains(id)) {
+                    _animeDetails.value = cachedDetailScreenData[id]!!.data
+                    return@launch
+                }
+
                 val response = malApiService.getDetailsFromAnime(id)
                 if (response.isSuccessful) {
+
                     val data = response.body()?.data
                     _loadedId.intValue = id
                     if (data != null) {
@@ -68,18 +75,17 @@ class DetailScreenViewModel @Inject constructor(
                             _animeDetails.value = data
                         }
                     }
+                    cachedDetailScreenData[id] = response.body()!!
                 }
             } catch (e: Exception) {
                 Log.e("DetailScreenViewModel", e.message.toString())
             }
-//            finally {
-//                _isLoading.value = false
-//            }
         }
     }
 
 
     //staff
+    private val cachedStaffData: MutableMap<Int, StaffModel> = mutableMapOf()
 
     private val _staffList =
         MutableStateFlow<List<StaffData>>(emptyList())
@@ -88,10 +94,18 @@ class DetailScreenViewModel @Inject constructor(
     private suspend fun addStaffFromId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+
+                if (cachedStaffData.contains(id)) {
+                    _staffList.value = cachedStaffData[id]!!.data
+                    return@launch
+                }
+
                 val response = malApiService.getStaffFromId(id)
                 if (response.isSuccessful) {
                     val staff = response.body()?.data ?: emptyList()
                     _staffList.value = staff
+
+                    cachedStaffData[id] = response.body()!!
                 }
             } catch (e: Exception) {
                 Log.e("Staff", e.message.toString())
@@ -105,6 +119,8 @@ class DetailScreenViewModel @Inject constructor(
 
 
     // cast
+    private val cachedCastData: MutableMap<Int, CastModel> = mutableMapOf()
+
     private val _castList =
         MutableStateFlow<List<CastData>>(emptyList())
     val castList = _castList.asStateFlow()
@@ -112,10 +128,17 @@ class DetailScreenViewModel @Inject constructor(
     private suspend fun addCastFromId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                if (cachedCastData.contains(id)) {
+                    _castList.value = cachedCastData[id]!!.data
+                    return@launch
+                }
+
                 val response = malApiService.getCharactersFromId(id)
                 if (response.isSuccessful) {
                     val characters = response.body()?.data ?: emptyList()
                     _castList.value = characters
+                    cachedCastData[id] = response.body()!!
+
                 } else if (response.code() == 404) {
                     // если получен ответ 404, присваиваем пустой список
                     _castList.value = emptyList()
@@ -130,16 +153,25 @@ class DetailScreenViewModel @Inject constructor(
 
 
     // recommendations
+    private val cachedRecommendationsData: MutableMap<Int, List<RecommendationsData>> =
+        mutableMapOf()
+
     private val _recommendationList = MutableStateFlow<List<RecommendationsData>>(emptyList())
     val recommendationList = _recommendationList.asStateFlow()
 
     private suspend fun addRecommendationsFromId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                if (cachedRecommendationsData.contains(id)) {
+                    _recommendationList.value = cachedRecommendationsData[id]!!
+                    return@launch
+                }
+
                 val response = malApiService.getRecommendationsFromAnime(id)
                 if (response.isSuccessful) {
                     val recommendationData = response.body()?.data ?: emptyList()
                     _recommendationList.value = recommendationData
+                    cachedRecommendationsData[id] = response.body()!!.data
                 } else if (response.code() == 404) {
                     // если получен ответ 404, присваиваем пустой список
                     _recommendationList.value = emptyList()
@@ -152,17 +184,22 @@ class DetailScreenViewModel @Inject constructor(
         }
     }
 
-
+    private val cachedPicturesData: MutableMap<Int, List<DetailPicturesData>> =
+        mutableMapOf()
     private val _picturesData = MutableStateFlow<List<DetailPicturesData>>(emptyList())
     val picturesData = _picturesData.asStateFlow()
     private suspend fun showPictures(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                if (cachedPicturesData.contains(id)) {
+                    _picturesData.value = cachedPicturesData[id]!!
+                    return@launch
+                }
                 val response = malApiService.getDetailScreenPictures(id)
                 if (response.isSuccessful) {
                     val pictures = response.body()?.data ?: emptyList()
-//                    DetailPicturesData(jpg = Jpg("","",""), webp = Webp("","",""))
                     _picturesData.value = pictures
+                    cachedPicturesData[id] = response.body()!!.data
                 } else if (response.code() == 404) {
                     // если получен ответ 404, присваиваем пустой список
                     _picturesData.value = emptyList()
@@ -186,6 +223,46 @@ class DetailScreenViewModel @Inject constructor(
                 previousId.value = id
             }
             if (isInternetAvailable(context)) {
+//                _isLoading.value = true
+
+                onTapAnime(id)
+                delay(300)
+                addStaffFromId(id)
+                delay(300)
+                addCastFromId(id)
+                delay(1000L)
+                addRecommendationsFromId(id)
+                delay(1000L)
+                showPictures(id)
+
+//                _isLoading.value = false
+            } else {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context, "No internet connection!", Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+
+    suspend fun refreshAndLoadAllInfo(id: Int, context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            //cleaning current cache
+            cachedDetailScreenData.remove(id)
+            cachedCastData.remove(id)
+            cachedStaffData.remove(id)
+            cachedRecommendationsData.remove(id)
+            cachedPicturesData.remove(id)
+
+            val prevId = previousId.value
+            if (id != prevId) {
+                scrollState.scrollTo(0)
+                previousId.value = id
+            }
+            if (isInternetAvailable(context)) {
                 _isLoading.value = true
 
                 onTapAnime(id)
@@ -200,11 +277,11 @@ class DetailScreenViewModel @Inject constructor(
 
                 _isLoading.value = false
             } else {
-                Toast.makeText(
-                    context,
-                    "No internet connection!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context, "No internet connection!", Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }

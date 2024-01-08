@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -51,8 +52,7 @@ fun ShowNamesAndInteractionIcons(
 
     Column(
         modifier = modifier
-            .fillMaxWidth(1f)
-            .fillMaxHeight()
+            .fillMaxSize()
 
     ) {
         Text(
@@ -76,7 +76,7 @@ fun ShowNamesAndInteractionIcons(
                 modifier = modifier.fillMaxWidth(),
                 minLines = 1,
                 fontWeight = FontWeight.ExtraBold,
-                lineHeight = 20.sp,
+                lineHeight = 24.sp,
                 color = MaterialTheme.colorScheme.onPrimary
             )
         }

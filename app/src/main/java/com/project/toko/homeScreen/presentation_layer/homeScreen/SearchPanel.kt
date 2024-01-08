@@ -58,6 +58,7 @@ import com.project.toko.homeScreen.model.tabRow.returnListOfTabItems
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Stable
 @Composable
@@ -74,12 +75,13 @@ fun MainScreen(
     val switchIndicator = remember { viewModel.switchIndicator }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = viewModel.isLoading.value)
+    val swipeRefreshState =
+        rememberSwipeRefreshState(isRefreshing = viewModel.isLoadingSearch.value)
 
     LaunchedEffect(key1 = switchIndicator.value) {
-        this.launch(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             if (switchIndicator.value.not()) {
-                viewModel.loadAllInfo(context)
+                viewModel.loadAllSections(context)
             } else {
                 viewModel.addAllParams()
             }
@@ -105,7 +107,7 @@ fun MainScreen(
                     .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
                     .height(140.dp)
                     .shadow(20.dp)
-                    .fillMaxWidth(1f)
+                    .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.error)
                     .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 0.dp)
 
@@ -179,8 +181,8 @@ fun MainScreen(
                         onValueChange = viewModel::onSearchTextChange,
                         modifier = modifier
                             .clip(RoundedCornerShape(30.dp))
-                            .height(50.dp)
-                            .fillMaxWidth(1f),
+                            .height(55.dp)
+                            .fillMaxWidth(),
                         prefix = {
                             Icon(Icons.Filled.Search, "Search Icon", tint = iconColorInSearchPanel)
                         },
@@ -202,13 +204,12 @@ fun MainScreen(
                         },
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                            focusedPlaceholderColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                            cursorColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            focusedTextColor = iconColorInSearchPanel,
+                            focusedPlaceholderColor = iconColorInSearchPanel,
+                            unfocusedPlaceholderColor = iconColorInSearchPanel,
+                            cursorColor = iconColorInSearchPanel,
                             unfocusedBorderColor = Color.Transparent,
                             focusedBorderColor = Color.Transparent
-
                         )
                     )
                 }
@@ -228,11 +229,11 @@ fun MainScreen(
 
         }
     }, onLoad = {
-        viewModel.viewModelScope.launch {
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
             if (switchIndicator.value.not()) {
-                viewModel.loadAllInfo(context)
+                viewModel.reloadAllSectionAndCache(context)
             } else {
-                viewModel.addAllParams()
+                viewModel.reloadAllParamsAndClearCache(searchText)
             }
         }
     }, swipeRefreshState = swipeRefreshState)
@@ -311,16 +312,9 @@ private fun TabSelectionMenu(
             }
         }
     }
-    Spacer(modifier = modifier.height(5.dp))
+    Spacer(modifier = modifier.height(20.dp))
     if (isTabMenuOpen.value) {
-        Spacer(
-            modifier = modifier
-                .height(20.dp)
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
-        )
         Box(modifier = modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow))) {
-
             HorizontalPager(
                 state = pagerState, modifier = modifier
                     .fillMaxWidth()
@@ -424,11 +418,13 @@ private fun ScoreBar(
     }
 
     LaunchedEffect(key1 = selectedNumber.intValue) {
-        delay(1000L)
-        viewModel.pre_min_score.value = Score(minMaxScore.minScore)
-        viewModel.pre_max_score.value = Score(minMaxScore.maxScore)
-        switchIndicator().value = true
-        viewModel.addAllParams()
+        withContext(Dispatchers.IO) {
+            delay(1000L)
+            viewModel.pre_min_score.value = Score(minMaxScore.minScore)
+            viewModel.pre_max_score.value = Score(minMaxScore.maxScore)
+            switchIndicator().value = true
+            viewModel.addAllParams()
+        }
     }
 
 }

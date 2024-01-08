@@ -31,7 +31,6 @@ class PersonByIdViewModel @Inject constructor(malApiService: MalApiService) : Vi
   private suspend fun getPersonFromId(mal_id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-//                _isLoading.value = true
                 val response = animeRepository.getPersonFullFromId(mal_id)
                 if (response.isSuccessful) {
                     val data = response.body()?.data
@@ -42,9 +41,6 @@ class PersonByIdViewModel @Inject constructor(malApiService: MalApiService) : Vi
             } catch (e: Exception) {
                 Log.e("StaffFullByIdViewModel", e.message.toString())
             }
-//            finally {
-//                _isLoading.value = false
-//            }
         }
     }
     //character album

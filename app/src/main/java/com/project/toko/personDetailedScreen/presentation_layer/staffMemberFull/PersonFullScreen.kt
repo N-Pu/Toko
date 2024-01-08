@@ -72,8 +72,7 @@ fun DisplayPersonFullScreen(
             ) {
                 Row(
                     modifier = modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
+                        .height(100.dp)
                 ) {}
                 Row(
                     modifier = modifier

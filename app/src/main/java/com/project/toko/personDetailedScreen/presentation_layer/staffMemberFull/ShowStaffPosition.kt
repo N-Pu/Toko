@@ -29,7 +29,7 @@ import com.project.toko.personDetailedScreen.model.personFullModel.Anime
 fun ShowStaffPosition(modifier: Modifier, animes: List<Anime>, navController: NavController) {
 
 
-    Row(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
+    Row(modifier = modifier.padding(start = 20.dp, top = 10.dp, bottom = 20.dp)) {
         Text(text = "Anime Staff Positions", fontSize = 24.sp,
             color = MaterialTheme.colorScheme.onPrimary,
             fontFamily = evolventaBoldFamily

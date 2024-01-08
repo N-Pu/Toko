@@ -553,7 +553,7 @@ private fun ShowDrawerContent(
                     },
                     selected = false,
                     onClick = {
-                        context.openSite("https://sites.google.com/view/toko-your-own-anime-library/future?authuser=0")
+                        context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/future?authuser=0")
                     },
                     badge = {
                         Image(
@@ -583,7 +583,7 @@ private fun ShowDrawerContent(
                     },
                     selected = false,
                     onClick = {
-                        context.openSite("https://sites.google.com/view/toko-your-own-anime-library/bugs?authuser=0")
+                        context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/bugs?authuser=0")
                     },
                     badge = {
                         Image(
@@ -682,7 +682,7 @@ private fun ShowDrawerContent(
                     },
                     selected = false,
                     onClick = {
-                        context.openSite("https://sites.google.com/view/toko-your-own-anime-library/resource?authuser=0")
+                        context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/resource?authuser=0")
                     },
                     badge = {
                         Image(

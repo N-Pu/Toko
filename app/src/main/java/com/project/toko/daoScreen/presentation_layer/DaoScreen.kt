@@ -199,7 +199,6 @@ fun DaoScreen(
                         cursorColor = iconColorInSearchPanel,
                         unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = Color.Transparent
-
                     )
                 )
             }

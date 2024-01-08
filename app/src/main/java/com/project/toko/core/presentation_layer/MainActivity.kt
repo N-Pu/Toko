@@ -79,18 +79,18 @@ class MainActivity : ComponentActivity() {
             val systemUiController = rememberSystemUiController(window)
             val splashShown = remember { mutableStateOf(false) }
             navController = rememberNavController()
-//            if (!splashShown.value) {
-//
-//                systemUiController.isNavigationBarVisible = false
-//                SplashTheme(
-//                    darkTheme = darkTheme.isDarkThemeActive.value,
-//                    systemUiController = systemUiController
-//                ) {
-//                    AnimatedSplashScreen(navController, svgImageLoader) {
-//                        splashShown.value = true
-//                    }
-//                }
-//            } else {
+            if (!splashShown.value) {
+
+                systemUiController.isNavigationBarVisible = false
+                SplashTheme(
+                    darkTheme = darkTheme.isDarkThemeActive.value,
+                    systemUiController = systemUiController
+                ) {
+                    AnimatedSplashScreen(navController, svgImageLoader) {
+                        splashShown.value = true
+                    }
+                }
+            } else {
                 systemUiController.isNavigationBarVisible = true
                 Theme(
                     darkTheme = darkTheme.isDarkThemeActive.value,
@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-//            }
+            }
         }
     }
 }
