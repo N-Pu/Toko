@@ -30,6 +30,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -41,25 +42,21 @@ class HomeScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val emptyItem = Items(0, 0, 0)
-    private val emptyNewAnimeSearchModel =
-        NewAnimeSearchModel(
-            data = ArrayList(),
-            pagination = Pagination(
-                false,
-                emptyItem,
-                0
-            )
+    private val emptyNewAnimeSearchModel = NewAnimeSearchModel(
+        data = ArrayList(), pagination = Pagination(
+            false, emptyItem, 0
         )
+    )
 
 
-    private val _isLoading = mutableStateOf(false)
-    var isLoading = _isLoading
+    private val _isLoadingSearch = mutableStateOf(false)
+    var isLoadingSearch = _isLoadingSearch
 
     private val _currentPage = MutableStateFlow(1)
     private val currentPage = _currentPage.asStateFlow()
 
     private val _isNextPageLoading = MutableStateFlow(false)
-    val isNextPageLoading = _isNextPageLoading.asStateFlow()
+//    val isNextPageLoading = _isNextPageLoading.asStateFlow()
 
     private val _searchText = MutableStateFlow<String?>(null)
     val searchText = _searchText.asStateFlow()
@@ -78,29 +75,22 @@ class HomeScreenViewModel @Inject constructor(
 
     private val arrayOfGenres = MutableStateFlow(arrayListOf<Int>())
 
-    private val preSelectedGenre =
-        MutableStateFlow(getGenres())
-    val selectedGenre =
-        preSelectedGenre
+    private val preSelectedGenre = MutableStateFlow(getGenres())
+    val selectedGenre = preSelectedGenre
 
 
     private var pre_genres = ""
 
     private val _genres = MutableStateFlow<String?>(null)
 
-    private val _ratingList =
-        MutableStateFlow(getRating())
-    val ratingList =
-        _ratingList
+    private val _ratingList = MutableStateFlow(getRating())
+    val ratingList = _ratingList
 
 
-    private val preSelectedRating =
-        MutableStateFlow<Rating?>(null)
-    val selectedRating =
-        preSelectedRating
+    private val preSelectedRating = MutableStateFlow<Rating?>(null)
+    val selectedRating = preSelectedRating
 
-    private val _selectedRating =
-        MutableStateFlow<Rating?>(null)
+    private val _selectedRating = MutableStateFlow<Rating?>(null)
 
     fun setSelectedRating(rating: Rating) {
         preSelectedRating.value = if (rating == preSelectedRating.value) null else rating
@@ -135,32 +125,22 @@ class HomeScreenViewModel @Inject constructor(
         _isNSFWActive.value = sharedPreferences.getBoolean("NSFW_MODE", false)
     }
 
-    private val _typeList =
-        MutableStateFlow(getTypes())
-    val typeList =
-        _typeList
+    private val _typeList = MutableStateFlow(getTypes())
+    val typeList = _typeList
 
-    private val pre_selectedType =
-        MutableStateFlow<Types?>(null)
-    val selectedType: StateFlow<Types?> =
-        pre_selectedType
-    private val _selectedType =
-        MutableStateFlow<Types?>(null)
+    private val pre_selectedType = MutableStateFlow<Types?>(null)
+    val selectedType: StateFlow<Types?> = pre_selectedType
+    private val _selectedType = MutableStateFlow<Types?>(null)
 
     fun setSelectedType(type: Types) {
         pre_selectedType.value = if (type == pre_selectedType.value) null else type
     }
 
-    private val _orderByList =
-        MutableStateFlow(getOrderBy())
-    val orderByList =
-        _orderByList
-    private val pre_selectedOrderBy =
-        MutableStateFlow<OrderBy?>(null)
-    val selectedOrderBy: StateFlow<OrderBy?> =
-        pre_selectedOrderBy
-    private val _selectedOrderBy =
-        MutableStateFlow<OrderBy?>(null)
+    private val _orderByList = MutableStateFlow(getOrderBy())
+    val orderByList = _orderByList
+    private val pre_selectedOrderBy = MutableStateFlow<OrderBy?>(null)
+    val selectedOrderBy: StateFlow<OrderBy?> = pre_selectedOrderBy
+    private val _selectedOrderBy = MutableStateFlow<OrderBy?>(null)
 
     fun setSelectedOrderBy(orderBy: OrderBy) {
         pre_selectedOrderBy.value = if (orderBy == pre_selectedOrderBy.value) null else orderBy
@@ -168,11 +148,9 @@ class HomeScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            searchDebouncer
-                .debounce(1000L)
-                .collectLatest { searchQuery ->
-                    performSearch(searchQuery)
-                }
+            searchDebouncer.debounce(1000L).collectLatest { searchQuery ->
+                performSearch(searchQuery)
+            }
         }
     }
 
@@ -191,26 +169,43 @@ class HomeScreenViewModel @Inject constructor(
         } catch (e: Exception) {
             viewModelScope.launch(Dispatchers.Main) {
                 Toast.makeText(
-                    context,
-                    e.message,
-                    Toast.LENGTH_SHORT
+                    context, e.message, Toast.LENGTH_SHORT
                 ).show()
             }
         }
     }
 
-    // note: if you hit "ok" button without tapping on genres - it will show you whole list of animes.
+
+    private val cachedSearch: MutableMap<String, NewAnimeSearchModel> = mutableMapOf()
+
+    private fun generateRequestKey(
+        query: String?,
+        genres: String?,
+        type: String?,
+        rating: String?,
+        orderBy: String?,
+        maxScore: String?,
+        minScore: String?
+    ): String {
+        // Customize this key generation based on your needs, concatenating the query parameters
+        return "${MalApiService.BASE_URL}v4/anime?" +
+                "q=${query ?: ""}&" +
+                "genres=${genres ?: ""}&" +
+                "type=${type ?: ""}&" +
+                "rating=${rating ?: ""}&" +
+                "orderBy=${orderBy ?: ""}&" +
+                "max_score=${maxScore ?: ""}&" +
+                "min_score=${minScore ?: ""}"
+    }
+
+
     private suspend fun performSearch(query: String?) {
-
         try {
-            // This "if" statement is temporary added because
-            // Jikan.Api isn't working properly with query that
-            // contains less then 3 letters.
-
+            // Existing code
             var currentQuery = query
             var currentGenres = _genres.value
             _currentPage.value = 1
-            _isLoading.value = true
+            _isLoadingSearch.value = true
 
             if (currentQuery == "") {
                 currentQuery = null
@@ -218,34 +213,50 @@ class HomeScreenViewModel @Inject constructor(
             if (currentGenres == "") {
                 currentGenres = null
             }
-
-            val response = malApiRepository.getAnimeSearchByName(
-                eTag = query + currentPage.value,
-                sfw = _isNSFWActive.value,
+            val requestKey = generateRequestKey(
                 query = currentQuery,
-                page = currentPage.value,
                 genres = currentGenres,
-                rating = _selectedRating.value?.ratingName,
                 type = _selectedType.value?.typeName,
+                rating = _selectedRating.value?.ratingName,
                 orderBy = _selectedOrderBy.value?.orderBy,
-                max_score = _max_score.value?.score,
-                min_score = _min_score.value?.score
+                maxScore = _max_score.value?.score,
+                minScore = _min_score.value?.score
+            )
 
-            ).body()
+            if (cachedSearch.containsKey(requestKey)) {
+                val cachedResponse = cachedSearch[requestKey]
+                // Use cached response if needed
+                _animeSearch.value = cachedResponse!!
+            } else {
+                val response = malApiRepository.getAnimeSearchByName(
+                    eTag = query + currentPage.value,
+                    sfw = _isNSFWActive.value,
+                    query = currentQuery,
+                    page = currentPage.value,
+                    genres = currentGenres,
+                    rating = _selectedRating.value?.ratingName,
+                    type = _selectedType.value?.typeName,
+                    orderBy = _selectedOrderBy.value?.orderBy,
+                    max_score = _max_score.value?.score,
+                    min_score = _min_score.value?.score
 
-            if (response != null) {
-                hasNextPage.value = response.pagination.has_next_page
-                _animeSearch.value = response
+                ).body()
+
+                if (response != null) {
+                    hasNextPage.value = response.pagination.has_next_page
+                    _animeSearch.value = response
+
+                    // Cache the response
+                    cachedSearch[requestKey] = response
+                }
             }
-
-
         } catch (e: Exception) {
             Log.e("HomeScreenViewModel", "Failed to perform search: ${e.message}")
         } finally {
-            _isLoading.value = false
+            _isLoadingSearch.value = false
         }
-
     }
+
 
     private val _topTrendingAnime = MutableStateFlow(emptyNewAnimeSearchModel)
     val topTrendingAnime = _topTrendingAnime.asStateFlow()
@@ -259,46 +270,46 @@ class HomeScreenViewModel @Inject constructor(
 
     private val cachedTopTrendingAnime: MutableMap<String, NewAnimeSearchModel> = mutableMapOf()
 
+    private val _loadingSection = mutableStateOf(false)
+    val loadingSection = _loadingSection
     private suspend fun getTopAnime(
-        filter: String,
-        limit: Int = 10,
-        data: MutableStateFlow<NewAnimeSearchModel>
+        filter: String, limit: Int = 10, data: MutableStateFlow<NewAnimeSearchModel>
     ) {
         try {
-            if (isInternetAvailable(context)) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    val cachedData = cachedTopTrendingAnime[filter]
-                    if (cachedData != null) {
-                        // Если данные уже есть в кэше, используем их
-                        data.value = cachedTopTrendingAnime[filter]!!
-                    } else {
-                        // Если данные отсутствуют в кэше, делаем запрос к API
-                        val response = malApiRepository.getTenTopAnime(filter, limit).body()
-                        val newData = response ?: emptyNewAnimeSearchModel
+//            if (isInternetAvailable(context)) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val cachedData = cachedTopTrendingAnime[filter]
+                if (cachedData != null) {
+                    // Если данные уже есть в кэше, используем их
+                    data.value = cachedTopTrendingAnime[filter]!!
+                } else {
+                    _loadingSection.value = true
+                    // Если данные отсутствуют в кэше, делаем запрос к API
+                    val response = malApiRepository.getTenTopAnime(filter, limit).body()
+                    val newData = response ?: emptyNewAnimeSearchModel
+                    _loadingSection.value = false
 
-                        // Сохраняем новые данные в кэше
-                        cachedTopTrendingAnime[filter] = newData
+                    // Сохраняем новые данные в кэше
+                    cachedTopTrendingAnime[filter] = newData
 
-                        data.value = newData
-                    }
-                }
-            } else {
-                // Если нет интернета, показываем сообщение
-                viewModelScope.launch(Dispatchers.Main) {
-                    Toast.makeText(
-                        context,
-                        "No internet connection!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    data.value = newData
                 }
             }
+//            } else {
+//                // Если нет интернета, показываем сообщение
+//                viewModelScope.launch(Dispatchers.Main) {
+//                    Toast.makeText(
+//                        context,
+//                        "No internet connection!",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//            }
         } catch (e: Exception) {
             // Если произошла ошибка, показываем сообщение
             viewModelScope.launch(Dispatchers.Main) {
                 Toast.makeText(
-                    context,
-                    e.message,
-                    Toast.LENGTH_SHORT
+                    context, e.message, Toast.LENGTH_SHORT
                 ).show()
             }
         }
@@ -306,18 +317,6 @@ class HomeScreenViewModel @Inject constructor(
 
 
     suspend fun loadNextPage() {
-
-
-//        val query = searchText.value
-//        var currentQuery = query
-//        if (currentQuery == "") {
-//            currentQuery = null
-//        }
-//        if (!hasNextPage.value) {
-//            return
-//        }
-//        val nextPage = currentPage.value + 1
-
 
         viewModelScope.launch(Dispatchers.IO) {
 
@@ -332,19 +331,18 @@ class HomeScreenViewModel @Inject constructor(
                 }
                 val nextPage = currentPage.value + 1
 
-                val response =
-                    malApiRepository.getAnimeSearchByName(
-                        eTag = query + currentPage.value,
-                        sfw = _isNSFWActive.value,
-                        query = currentQuery,
-                        page = nextPage,
-                        genres = makeArrayToLinkWithCommas(arrayOfGenres.value),
-                        rating = preSelectedRating.value?.ratingName,
-                        type = pre_selectedType.value?.typeName,
-                        orderBy = pre_selectedOrderBy.value?.orderBy,
-                        max_score = pre_max_score.value?.score,
-                        min_score = pre_min_score.value?.score
-                    ).body()
+                val response = malApiRepository.getAnimeSearchByName(
+                    eTag = query + currentPage.value,
+                    sfw = _isNSFWActive.value,
+                    query = currentQuery,
+                    page = nextPage,
+                    genres = makeArrayToLinkWithCommas(arrayOfGenres.value),
+                    rating = preSelectedRating.value?.ratingName,
+                    type = pre_selectedType.value?.typeName,
+                    orderBy = pre_selectedOrderBy.value?.orderBy,
+                    max_score = pre_max_score.value?.score,
+                    min_score = pre_min_score.value?.score
+                ).body()
 
                 if (response != null) {
                     hasNextPage.value = response.pagination.has_next_page
@@ -364,57 +362,6 @@ class HomeScreenViewModel @Inject constructor(
             }
         }
     }
-
-
-//    private val _isLoadingNextPage =  mutableStateOf(false)
-//    var isLoadingNextPage = _isLoadingNextPage
-//    fun loadNextPage(onComplete: () -> Unit) {
-//        if (_isLoadingNextPage.value || !hasNextPage.value) {
-//            onComplete()
-//            return
-//        }
-//
-//        val query = searchText.value
-//        var currentQuery = query
-//        if (currentQuery == "") {
-//            currentQuery = null
-//        }
-//        val nextPage = currentPage.value + 1
-//
-//        viewModelScope.launch(Dispatchers.IO) {
-//            try {
-//                val response = malApiRepository.getAnimeSearchByName(
-//                    eTag = query + currentPage.value,
-//                    sfw = _isNSFWActive.value,
-//                    query = currentQuery,
-//                    page = nextPage,
-//                    genres = makeArrayToLinkWithCommas(arrayOfGenres.value),
-//                    rating = preSelectedRating.value?.ratingName,
-//                    type = pre_selectedType.value?.typeName,
-//                    orderBy = pre_selectedOrderBy.value?.orderBy,
-//                    max_score = pre_max_score.value?.score,
-//                    min_score = pre_min_score.value?.score
-//                ).body()
-//
-//                if (response != null) {
-//                    hasNextPage.value = response.pagination.has_next_page
-//                }
-//
-//                response?.let { newAnimeSearchModel ->
-//                    _animeSearch.value =
-//                        _animeSearch.value.copy(data = _animeSearch.value.data + newAnimeSearchModel.data)
-//                    _currentPage.value = nextPage
-//                    _isNextPageLoading.value = newAnimeSearchModel.pagination.has_next_page
-//                }
-//
-//            } catch (e: Exception) {
-//                Log.e("HomeScreenViewModel", "Failed to load next page: ${e.message}")
-//            } finally {
-//                _isNextPageLoading.value = false
-//                onComplete() // Invoke the callback to reset the loading flag
-//            }
-//        }
-//    }
 
 
     fun tappingOnGenre(number: Int) {
@@ -468,14 +415,66 @@ class HomeScreenViewModel @Inject constructor(
         } catch (e: Exception) {
             viewModelScope.launch(Dispatchers.Main) {
                 Toast.makeText(
-                    context,
-                    e.message,
-                    Toast.LENGTH_SHORT
+                    context, e.message, Toast.LENGTH_SHORT
                 ).show()
             }
         }
     }
 
+
+    suspend fun reloadAllParamsAndClearCache(query: String?) {
+        var currentQuery = query
+        var currentGenres = _genres.value
+        _currentPage.value = 1
+        _isLoadingSearch.value = true
+
+        if (currentQuery == "") {
+            currentQuery = null
+        }
+        if (currentGenres == "") {
+            currentGenres = null
+        }
+
+        val requestKey = generateRequestKey(
+            query = currentQuery,
+            genres = currentGenres,
+            type = _selectedType.value?.typeName,
+            rating = _selectedRating.value?.ratingName,
+            orderBy = _selectedOrderBy.value?.orderBy,
+            maxScore = _max_score.value?.score,
+            minScore = _min_score.value?.score
+        )
+        cachedSearch.remove(requestKey)
+
+        try {
+            viewModelScope.async(Dispatchers.IO) {
+                pre_genres = makeArrayToLinkWithCommas(arrayOfGenres.value)
+                _genres.value = pre_genres
+            }.join()
+            viewModelScope.async(Dispatchers.IO) {
+                _selectedRating.value = preSelectedRating.value
+            }.join()
+            viewModelScope.async(Dispatchers.IO) {
+                _selectedType.value = pre_selectedType.value
+            }.join()
+            viewModelScope.async(Dispatchers.IO) {
+                _selectedOrderBy.value = pre_selectedOrderBy.value
+            }.join()
+            viewModelScope.async(Dispatchers.IO) {
+                _min_score.value = _pre_min_score.value
+                _max_score.value = _pre_max_score.value
+            }.join()
+            viewModelScope.async(Dispatchers.IO) {
+                performSearch(searchText.value)
+            }.join()
+        } catch (e: Exception) {
+            viewModelScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    context, e.message, Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     //------------------------------------------------------
     var isDialogShown by mutableStateOf(false)
@@ -495,9 +494,7 @@ class HomeScreenViewModel @Inject constructor(
         } catch (e: Exception) {
             viewModelScope.launch(Dispatchers.Main) {
                 Toast.makeText(
-                    context,
-                    e.message,
-                    Toast.LENGTH_SHORT
+                    context, e.message, Toast.LENGTH_SHORT
                 ).show()
             }
         }
@@ -512,9 +509,7 @@ class HomeScreenViewModel @Inject constructor(
         } catch (e: Exception) {
             viewModelScope.launch(Dispatchers.Main) {
                 Toast.makeText(
-                    context,
-                    e.message,
-                    Toast.LENGTH_SHORT
+                    context, e.message, Toast.LENGTH_SHORT
                 ).show()
             }
         }
@@ -528,22 +523,40 @@ class HomeScreenViewModel @Inject constructor(
         return dao.getDao().getLastTenAddedAnime()
     }
 
-    suspend fun loadAllInfo(context: Context) {
+    suspend fun loadAllSections(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isInternetAvailable(context)) {
-                _isLoading.value = true
                 getTopAnime("bypopularity", 25, _topTrendingAnime)
                 delay(500L)
                 getTopAnime("airing", 25, _topAiringAnime)
                 delay(500L)
                 getTopAnime("upcoming", 25, _topUpcomingAnime)
-                _isLoading.value = false
             } else {
-                Toast.makeText(
-                    context,
-                    "No internet connection!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context, "No internet connection!", Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+
+    suspend fun reloadAllSectionAndCache(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isInternetAvailable(context)) {
+                cachedTopTrendingAnime.clear()
+                getTopAnime("bypopularity", 25, _topTrendingAnime)
+                delay(500L)
+                getTopAnime("airing", 25, _topAiringAnime)
+                delay(500L)
+                getTopAnime("upcoming", 25, _topUpcomingAnime)
+            } else {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context, "No internet connection!", Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }

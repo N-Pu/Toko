@@ -145,7 +145,7 @@ fun ExpandableText(text: String?, title: String, modifier: Modifier) {
                     )
                 }
             }
-            Spacer(modifier = modifier.height(20.dp))
+            Spacer(modifier = modifier.height(15.dp))
         }
     }
 }

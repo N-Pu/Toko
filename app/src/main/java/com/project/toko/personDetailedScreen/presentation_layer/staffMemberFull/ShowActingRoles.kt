@@ -30,7 +30,7 @@ import com.project.toko.personDetailedScreen.model.personFullModel.Voice
 
 @Composable
 fun ShowAnimeRelated(modifier: Modifier, voices: List<Voice>, navController: NavController) {
-    Row(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
+    Row(modifier = modifier.padding(start = 20.dp, top = 10.dp, bottom = 20.dp)) {
         Text(text = "Voice Acting Roles", fontSize = 24.sp,
             color = MaterialTheme.colorScheme.onPrimary,
             fontFamily = evolventaBoldFamily

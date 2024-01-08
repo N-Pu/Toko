@@ -188,7 +188,7 @@ private fun AnimeCard(
     context: Context,
 ) {
 
-    val model = ImageRequest.Builder(context).data(data?.images?.jpg?.large_image_url)
+    val model = ImageRequest.Builder(context).data(data?.images?.jpg?.large_image_url) 
         .size(Size.ORIGINAL).crossfade(true).build()
     val painter = rememberAsyncImagePainter(model = model)
     val scoreRoundedCornerShape = remember { RoundedCornerShape(bottomEnd = 10.dp) }

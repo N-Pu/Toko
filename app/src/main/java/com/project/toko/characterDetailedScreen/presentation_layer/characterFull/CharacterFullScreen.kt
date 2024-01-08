@@ -66,7 +66,7 @@ fun DisplayCharacterFromId(
                         .background(MaterialTheme.colorScheme.primary)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Row(modifier = modifier.height(80.dp)) {}
+                    Row(modifier = modifier.height(100.dp)) {}
                     Row(
                         modifier = modifier
                             .height(250.dp)
