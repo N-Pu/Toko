@@ -15,7 +15,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,8 +27,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 import com.project.toko.personDetailedScreen.model.personFullModel.Voice
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun ShowAnimeRelated(modifier: Modifier, voices: List<Voice>, navController: NavController) {

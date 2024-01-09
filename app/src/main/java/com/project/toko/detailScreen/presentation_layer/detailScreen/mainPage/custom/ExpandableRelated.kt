@@ -29,14 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.model.detailModel.Entry
 import com.project.toko.detailScreen.model.detailModel.Relation
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
-import kotlinx.coroutines.launch
 
 @Composable
 fun ShowRelation(relation: String, modifier: Modifier) {
