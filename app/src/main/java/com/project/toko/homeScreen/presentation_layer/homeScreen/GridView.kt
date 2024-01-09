@@ -1,5 +1,6 @@
 package com.project.toko.homeScreen.presentation_layer.homeScreen
 
+import android.media.effect.Effect
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -10,6 +11,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,7 +20,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,8 +75,6 @@ fun GridAdder(
     isInDarkTheme: () -> Boolean,
     svgImageLoader: ImageLoader,
 ) {
-
-
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
     val newAnimeSearchModel by viewModel.animeSearch.collectAsStateWithLifecycle()
     val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
@@ -101,77 +103,29 @@ fun GridAdder(
 
 
     if (viewModel.isDialogShown) {
-
         val selectedAnime =
             newAnimeSearchModel.data.find { it.mal_id == viewModel.selectedAnimeId.value }
-
-        if (selectedAnime != null) {
-            CustomDialog(
-                data = selectedAnime,
-                navController = navController,
-                onDismiss = {
-                    viewModel.viewModelScope.launch(Dispatchers.IO) {
-                        viewModel.onDialogDismiss()
-                    }
-
-                },
-                modifier = modifier,
-                viewModelProvider = viewModelProvider,
-                isInDarkTheme = isInDarkTheme, svgImageLoader = svgImageLoader
-            )
-        }
-
         val selectedTrending =
             getTrendingAnime.data.find { it.mal_id == viewModel.selectedAnimeId.value }
-
-        if (selectedTrending != null) {
-            CustomDialog(
-                data = selectedTrending,
-                navController = navController,
-                onDismiss = {
-                    viewModel.viewModelScope.launch(Dispatchers.IO) {
-                        viewModel.onDialogDismiss()
-                    }
-
-                },
-                modifier = modifier,
-                viewModelProvider = viewModelProvider,
-                isInDarkTheme = isInDarkTheme, svgImageLoader = svgImageLoader
-            )
-        }
         val selectedAiring = getTopAiring.data.find { it.mal_id == viewModel.selectedAnimeId.value }
-
-        if (selectedAiring != null) {
-            CustomDialog(
-                data = selectedAiring,
-                navController = navController,
-                onDismiss = {
-                    viewModel.viewModelScope.launch(Dispatchers.IO) {
-                        viewModel.onDialogDismiss()
-                    }
-
-                },
-                modifier = modifier,
-                viewModelProvider = viewModelProvider,
-                isInDarkTheme = isInDarkTheme, svgImageLoader = svgImageLoader
-            )
-        }
         val selectedUpcoming =
             getTopUpcoming.data.find { it.mal_id == viewModel.selectedAnimeId.value }
 
-        if (selectedUpcoming != null) {
+        val selectedData = selectedAnime ?: selectedTrending ?: selectedAiring ?: selectedUpcoming
+
+        selectedData?.let { data ->
             CustomDialog(
-                data = selectedUpcoming,
+                data = data,
                 navController = navController,
                 onDismiss = {
                     viewModel.viewModelScope.launch(Dispatchers.IO) {
                         viewModel.onDialogDismiss()
                     }
-
                 },
                 modifier = modifier,
                 viewModelProvider = viewModelProvider,
-                isInDarkTheme = isInDarkTheme, svgImageLoader = svgImageLoader
+                isInDarkTheme = isInDarkTheme,
+                svgImageLoader = svgImageLoader
             )
         }
     }
@@ -239,9 +193,12 @@ fun ShowMainScreen(
     getTopUpcoming: NewAnimeSearchModel,
     getTopAiring: NewAnimeSearchModel
 ) {
+
     val scroll = rememberScrollState()
     val viewModel = viewModelProvider[HomeScreenViewModel::class.java]
-    val loadingSection by viewModel.loadingSection
+    val loadingSectionTopAiring by viewModel.loadingSectionTopAiring
+    val loadingSectionTopUpcoming by viewModel.loadingSectionTopUpcoming
+    val loadingSectionTopTrending by viewModel.loadingSectionTopTrending
     val lastTenAnimeFromWatchingSection by
     viewModel.showListOfWatching().collectAsStateWithLifecycle(
         initialValue = emptyList()
@@ -264,14 +221,11 @@ fun ShowMainScreen(
                 modifier = modifier,
                 isInDarkTheme = isInDarkTheme
             )
-
-
-            Row(
+            LazyRow(
                 modifier = modifier
                     .background(MaterialTheme.colorScheme.primary)
-                    .horizontalScroll(rememberScrollState())
             ) {
-                lastTenAnimeFromWatchingSection.forEach { data ->
+                items(lastTenAnimeFromWatchingSection) { data ->
                     Spacer(modifier = modifier.width(20.dp))
                     ShowSection(
                         data = data, navController = navController,
@@ -280,15 +234,14 @@ fun ShowMainScreen(
                         svgImageLoader = svgImageLoader
                     )
                 }
-                Spacer(modifier = modifier.width(20.dp))
+                item {
+                    Spacer(modifier = modifier.width(20.dp))
+                }
             }
-
-
-
             Spacer(modifier = modifier.height(20.dp))
 
         }
-        if (loadingSection.not()) {
+        if (loadingSectionTopTrending.not()) {
 
             ShowSectionName(
                 sectionName = "Trending",
@@ -297,13 +250,11 @@ fun ShowMainScreen(
             )
 
 
-            Row(
+            LazyRow(
                 modifier = modifier
                     .background(MaterialTheme.colorScheme.primary)
-                    .horizontalScroll(rememberScrollState())
             ) {
-
-                getTrendingAnime.data.forEach { data ->
+                items(getTrendingAnime.data) { data ->
                     Spacer(modifier = modifier.width(20.dp))
                     ShowTopAnime(
                         data = data, navController = navController,
@@ -312,7 +263,9 @@ fun ShowMainScreen(
                         svgImageLoader = svgImageLoader
                     )
                 }
-                Spacer(modifier = modifier.width(20.dp))
+                item {
+                    Spacer(modifier = modifier.width(20.dp))
+                }
             }
             Spacer(modifier = modifier.height(20.dp))
 
@@ -341,29 +294,27 @@ fun ShowMainScreen(
             )
 
 
-            Row(
+            LazyRow(
                 modifier = modifier
                     .background(MaterialTheme.colorScheme.primary)
-                    .horizontalScroll(rememberScrollState())
             ) {
-
-                getJustTenAddedAnime.forEach { data ->
+                items(getJustTenAddedAnime) { data ->
                     Spacer(modifier = modifier.width(20.dp))
                     ShowSection(
                         data = data, navController = navController,
                         viewModelProvider = viewModelProvider,
-                        modifier = modifier, svgImageLoader = svgImageLoader
+                        modifier = modifier,
+                        svgImageLoader = svgImageLoader
                     )
                 }
-                Spacer(modifier = modifier.width(20.dp))
+                item {
+                    Spacer(modifier = modifier.width(20.dp))
+                }
             }
-
-
-
             Spacer(modifier = modifier.height(20.dp))
 
         }
-        if (loadingSection.not()) {
+        if (loadingSectionTopAiring.not()) {
 
             ShowSectionName(
                 sectionName = "Top Airing",
@@ -372,13 +323,11 @@ fun ShowMainScreen(
             )
 
 
-            Row(
+            LazyRow(
                 modifier = modifier
                     .background(MaterialTheme.colorScheme.primary)
-                    .horizontalScroll(rememberScrollState())
             ) {
-
-                getTopAiring.data.forEach { data ->
+                items(getTopAiring.data) { data ->
                     Spacer(modifier = modifier.width(20.dp))
                     ShowTopAnime(
                         data = data, navController = navController,
@@ -387,7 +336,10 @@ fun ShowMainScreen(
                         svgImageLoader = svgImageLoader
                     )
                 }
-                Spacer(modifier = modifier.width(20.dp))
+                item {
+                    Spacer(modifier = modifier.width(20.dp))
+                }
+
             }
 
 
@@ -411,7 +363,7 @@ fun ShowMainScreen(
             }
 
         }
-        if (loadingSection.not()) {
+        if (loadingSectionTopUpcoming.not()) {
 
             ShowSectionName(
                 sectionName = "Top Upcoming",
@@ -420,13 +372,11 @@ fun ShowMainScreen(
             )
 
 
-            Row(
+            LazyRow(
                 modifier = modifier
                     .background(MaterialTheme.colorScheme.primary)
-                    .horizontalScroll(rememberScrollState())
             ) {
-
-                getTopUpcoming.data.forEach { data ->
+                items(getTopUpcoming.data) { data ->
                     Spacer(modifier = modifier.width(20.dp))
                     ShowTopAnime(
                         data = data, navController = navController,
@@ -435,7 +385,9 @@ fun ShowMainScreen(
                         svgImageLoader = svgImageLoader
                     )
                 }
-                Spacer(modifier = modifier.width(20.dp))
+                item {
+                    Spacer(modifier = modifier.width(20.dp))
+                }
             }
 
 
@@ -508,11 +460,13 @@ private fun AnimeCardBox(
                 }
 
             }) {
-                homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                    navigateToDetailScreen(
-                        navController, data.mal_id
-                    )
-                }
+                navigateToDetailScreen {
+                        navController.navigate(route = "detail_screen/${data.mal_id}")
+                        {
+                            launchSingleTop = true
+                        }
+                    }
+
             },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onTertiaryContainer),
         shape = RectangleShape,
@@ -720,11 +674,14 @@ private fun ShowSection(
                 }
 
             }) {
-                homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                    navigateToDetailScreen(
-                        navController, data.id ?: 0
-                    )
-                }
+                    navigateToDetailScreen {
+                        navController.navigate(route = "detail_screen/${data.id}")
+                        {
+                            launchSingleTop = true
+                        }
+                    }
+
+
             },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RectangleShape,
@@ -917,10 +874,11 @@ private fun ShowTopAnime(
                 }
 
             }) {
-                homeScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                    navigateToDetailScreen(
-                        navController, data.mal_id ?: 0
-                    )
+                navigateToDetailScreen {
+                    navController.navigate(route = "detail_screen/${data.mal_id}")
+                    {
+                        launchSingleTop = true
+                    }
                 }
             },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),

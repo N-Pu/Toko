@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -1099,7 +1100,12 @@ private fun DisplayDialogPicture(
             .fillMaxSize()
             .clip(CardDefaults.shape)
             .clickable {
-                navigateToDetailScreen(navController, mal_id)
+                navigateToDetailScreen {
+                    navController.navigate(route = "detail_screen/${mal_id}")
+                    {
+                        launchSingleTop = true
+                    }
+                }
             },
         alignment = Alignment.Center,
     )

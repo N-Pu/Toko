@@ -3,6 +3,7 @@ package com.project.toko.homeScreen.viewModel
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -270,10 +271,19 @@ class HomeScreenViewModel @Inject constructor(
 
     private val cachedTopTrendingAnime: MutableMap<String, NewAnimeSearchModel> = mutableMapOf()
 
-    private val _loadingSection = mutableStateOf(false)
-    val loadingSection = _loadingSection
+    private val _loadingSectionTopAiring = mutableStateOf(false)
+    val loadingSectionTopAiring = _loadingSectionTopAiring
+
+    private val _loadingSectionTopUpcoming = mutableStateOf(false)
+    val loadingSectionTopUpcoming = _loadingSectionTopUpcoming
+
+    private val _loadingSectionTopTrending = mutableStateOf(false)
+    val loadingSectionTopTrending = _loadingSectionTopTrending
     private suspend fun getTopAnime(
-        filter: String, limit: Int = 10, data: MutableStateFlow<NewAnimeSearchModel>
+        filter: String,
+        limit: Int = 10,
+        data: MutableStateFlow<NewAnimeSearchModel>,
+        loadingCurrentSection: MutableState<Boolean>
     ) {
         try {
 //            if (isInternetAvailable(context)) {
@@ -283,11 +293,11 @@ class HomeScreenViewModel @Inject constructor(
                     // Если данные уже есть в кэше, используем их
                     data.value = cachedTopTrendingAnime[filter]!!
                 } else {
-                    _loadingSection.value = true
+                    loadingCurrentSection.value = true
                     // Если данные отсутствуют в кэше, делаем запрос к API
                     val response = malApiRepository.getTenTopAnime(filter, limit).body()
                     val newData = response ?: emptyNewAnimeSearchModel
-                    _loadingSection.value = false
+                    loadingCurrentSection.value = false
 
                     // Сохраняем новые данные в кэше
                     cachedTopTrendingAnime[filter] = newData
@@ -526,11 +536,11 @@ class HomeScreenViewModel @Inject constructor(
     suspend fun loadAllSections(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isInternetAvailable(context)) {
-                getTopAnime("bypopularity", 25, _topTrendingAnime)
+                getTopAnime("bypopularity", 25, _topTrendingAnime, loadingSectionTopTrending)
                 delay(500L)
-                getTopAnime("airing", 25, _topAiringAnime)
+                getTopAnime("airing", 25, _topAiringAnime, loadingSectionTopAiring)
                 delay(500L)
-                getTopAnime("upcoming", 25, _topUpcomingAnime)
+                getTopAnime("upcoming", 25, _topUpcomingAnime, loadingSectionTopUpcoming)
             } else {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
@@ -546,11 +556,11 @@ class HomeScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (isInternetAvailable(context)) {
                 cachedTopTrendingAnime.clear()
-                getTopAnime("bypopularity", 25, _topTrendingAnime)
+                getTopAnime("bypopularity", 25, _topTrendingAnime, loadingSectionTopTrending)
                 delay(500L)
-                getTopAnime("airing", 25, _topAiringAnime)
+                getTopAnime("airing", 25, _topAiringAnime, loadingSectionTopAiring)
                 delay(500L)
-                getTopAnime("upcoming", 25, _topUpcomingAnime)
+                getTopAnime("upcoming", 25, _topUpcomingAnime, loadingSectionTopUpcoming)
             } else {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(

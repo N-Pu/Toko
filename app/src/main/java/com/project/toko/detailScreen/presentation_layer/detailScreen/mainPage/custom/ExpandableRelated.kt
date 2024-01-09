@@ -54,7 +54,7 @@ fun ShowRelation(relation: String, modifier: Modifier) {
 fun CurrentRelation(
     modifier: Modifier,
     entry: Entry,
-    viewModel: DetailScreenViewModel,
+//    viewModel: DetailScreenViewModel,
     navController: NavController,
 ) {
 
@@ -66,9 +66,14 @@ fun CurrentRelation(
                 color = MaterialTheme.colorScheme.secondary,
                 text = entry.name + " (" + entry.type + ")",
                 modifier = modifier.clickable {
-                    viewModel.viewModelScope.launch {
-                        navigateToDetailScreen(navController, entry.mal_id)
-                    }
+//                    viewModel.viewModelScope.launch {
+                        navigateToDetailScreen {
+                            navController.navigate(route = "detail_screen/${entry.mal_id}")
+                            {
+                                launchSingleTop = true
+                            }
+                        }
+//                    }
                 })
         }
     } else {
@@ -129,7 +134,9 @@ fun ExpandableRelated(
                     relations.take(itemsToShow).forEach { related ->
                         ShowRelation(relation = related.relation, modifier = modifier)
                         related.entry.forEach { currentEntry ->
-                            CurrentRelation(modifier, currentEntry, viewModel, navController)
+                            CurrentRelation(modifier, currentEntry,
+//                                viewModel,
+                                navController)
                         }
                     }
                 }
