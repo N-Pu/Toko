@@ -32,7 +32,9 @@ import com.project.toko.core.presentation_layer.theme.DarkBackArrowCastColor
 import com.project.toko.core.presentation_layer.theme.DarkBackArrowSecondCastColor
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.daoScreen.daoViewModel.DaoViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @Composable
@@ -46,7 +48,9 @@ fun DisplayCharacterFromId(
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     val context = LocalContext.current
     LaunchedEffect(id) {
-        characterViewModel.loadAllInfo(id, context)
+        withContext(Dispatchers.IO) {
+            characterViewModel.loadAllInfo(id, context)
+        }
     }
     val swipeRefreshState =
         rememberSwipeRefreshState(isRefreshing = characterViewModel.isLoading.value)

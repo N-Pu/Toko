@@ -959,10 +959,14 @@ private fun DataScreenCardBox(
 
 
 
-
     Column(modifier = modifier.clickable {
         animeItem.id?.let {
-            navigateToDetailScreen(navController, it)
+            navigateToDetailScreen {
+                navController.navigate(route = "detail_screen/${it}")
+                {
+                    launchSingleTop = true
+                }
+            }
         }
     }, verticalArrangement = Arrangement.SpaceBetween) {
         Row {
@@ -1107,7 +1111,12 @@ private fun FavoriteScreenCardBox(
 
     Column(modifier = modifier.clickable {
         favoriteItem.id?.let {
-            navigateToDetailScreen(navController, it)
+            navigateToDetailScreen {
+                navController.navigate(route = "detail_screen/${it}")
+                {
+                    launchSingleTop = true
+                }
+            }
         }
     }, verticalArrangement = Arrangement.SpaceBetween) {
         Row {

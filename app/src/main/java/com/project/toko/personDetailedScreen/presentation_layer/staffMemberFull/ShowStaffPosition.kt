@@ -30,7 +30,8 @@ fun ShowStaffPosition(modifier: Modifier, animes: List<Anime>, navController: Na
 
 
     Row(modifier = modifier.padding(start = 20.dp, top = 10.dp, bottom = 20.dp)) {
-        Text(text = "Anime Staff Positions", fontSize = 24.sp,
+        Text(
+            text = "Anime Staff Positions", fontSize = 24.sp,
             color = MaterialTheme.colorScheme.onPrimary,
             fontFamily = evolventaBoldFamily
         )
@@ -45,22 +46,26 @@ fun ShowStaffPosition(modifier: Modifier, animes: List<Anime>, navController: Na
             Row(modifier = modifier
                 .clip(CardDefaults.shape)
                 .clickable {
-                    navigateToDetailScreen(navController, animes[i].anime.mal_id)
-                }) {
+                    navigateToDetailScreen {
+                        navController.navigate(route = "detail_screen/${animes[i].anime.mal_id}")
+                        {
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            ) {
                 Column(
                     modifier = modifier
                         .height(140.dp)
                         .fillMaxWidth(0.28f)
-                        .clip(CardDefaults.shape)
-                    ,
+                        .clip(CardDefaults.shape),
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(model = animes[i].anime.images.jpg.large_image_url),
                         contentDescription = animes[i].anime.title,
                         contentScale = ContentScale.Crop,
                         modifier = modifier
-                            .fillMaxSize()
-                        ,
+                            .fillMaxSize(),
                         alignment = Alignment.Center
                     )
                 }
@@ -70,9 +75,11 @@ fun ShowStaffPosition(modifier: Modifier, animes: List<Anime>, navController: Na
                         .padding(top = 0.dp, start = 10.dp)
 
                 ) {
-                    Text(text = animes[i].position,
+                    Text(
+                        text = animes[i].position,
                         fontFamily = evolventaBoldFamily, fontSize = 18.sp, minLines = 1,
-                        color = MaterialTheme.colorScheme.onPrimary)
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
 //                    Text(text = animes[i].position)
                 }
             }

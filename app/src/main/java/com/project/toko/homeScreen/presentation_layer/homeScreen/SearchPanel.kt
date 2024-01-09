@@ -82,9 +82,9 @@ fun MainScreen(
         withContext(Dispatchers.IO) {
             if (switchIndicator.value.not()) {
                 viewModel.loadAllSections(context)
-            } else {
-                viewModel.addAllParams()
+                return@withContext
             }
+            viewModel.addAllParams()
         }
     }
 
@@ -122,7 +122,7 @@ fun MainScreen(
                         tint = MaterialTheme.colorScheme.inversePrimary,
                         modifier = modifier
                             .size(30.dp)
-                            .clickable { scope.launch { drawerState.open() } }
+                            .clickable { scope.launch(Dispatchers.IO) { drawerState.open() } }
                     )
                     Image(
                         painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),
@@ -232,9 +232,10 @@ fun MainScreen(
         viewModel.viewModelScope.launch(Dispatchers.IO) {
             if (switchIndicator.value.not()) {
                 viewModel.reloadAllSectionAndCache(context)
-            } else {
-                viewModel.reloadAllParamsAndClearCache(searchText)
+                return@launch
             }
+            viewModel.reloadAllParamsAndClearCache(searchText)
+
         }
     }, swipeRefreshState = swipeRefreshState)
 
@@ -429,6 +430,7 @@ private fun ScoreBar(
 
 }
 
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ShowGenres(
@@ -437,6 +439,8 @@ private fun ShowGenres(
     switchIndicator: () -> MutableState<Boolean>
 ) {
     val selectedGenre by viewModel.selectedGenre.collectAsStateWithLifecycle()
+    val coroutineScope = rememberCoroutineScope()
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -449,20 +453,14 @@ private fun ShowGenres(
                     text = genreForUI.name,
                     isTouched = { genreForUI.isSelected.value },
                     onClick = {
-                        viewModel.viewModelScope.launch(Dispatchers.IO) {
+                        coroutineScope.launch(Dispatchers.IO) {
                             genreForUI.isSelected.value = !genreForUI.isSelected.value
-                        }
-                        viewModel.viewModelScope.launch(Dispatchers.IO) {
                             viewModel.tappingOnGenre(genreForUI.id)
-                        }
-                        viewModel.viewModelScope.launch(Dispatchers.IO) {
                             switchIndicator().value = true
-                        }
-                        viewModel.viewModelScope.launch(Dispatchers.IO) {
                             viewModel.addAllParams()
                         }
                     },
-                    modifier = modifier
+                    modifier = modifier,
                 )
                 Spacer(
                     modifier = modifier

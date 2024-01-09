@@ -126,9 +126,12 @@ fun SingleRecommendationCard(
             .clip(RoundedCornerShape(16.dp))
             .clickable {
                 detailScreenViewModel.viewModelScope.launch(Dispatchers.Main) {
-                    navigateToDetailScreen(
-                        navController, recommendationsData.entry.mal_id
-                    )
+                    navigateToDetailScreen {
+                        navController.navigate(route = "detail_screen/${recommendationsData.entry.mal_id}")
+                        {
+                            launchSingleTop = true
+                        }
+                    }
                 }
             },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onTertiaryContainer),

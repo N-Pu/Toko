@@ -30,7 +30,9 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.project.toko.R
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AnimatedSplashScreen(
@@ -54,14 +56,16 @@ fun AnimatedSplashScreen(
         animationSpec = tween(durationMillis = 1000), label = ""
     )
     LaunchedEffect(key1 = true) {
-        startAnimation = true
-        delay(2000)
-        firstPawStartAnimation = true
-        delay(1000)
-        secondPawStartAnimation = true
-        delay(1000)
-        splashShow()
-        navController.popBackStack()
+        withContext(Dispatchers.IO) {
+            startAnimation = true
+            delay(2000)
+            firstPawStartAnimation = true
+            delay(1000)
+            secondPawStartAnimation = true
+            delay(1000)
+            splashShow()
+            navController.popBackStack()
+        }
     }
     Splash(alphaAnim.value, svgImageLoader, firstPawAnim.value, secondPawAnim.value)
 }

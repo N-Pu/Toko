@@ -29,14 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.model.detailModel.Entry
 import com.project.toko.detailScreen.model.detailModel.Relation
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
-import kotlinx.coroutines.launch
 
 @Composable
 fun ShowRelation(relation: String, modifier: Modifier) {
@@ -54,7 +52,7 @@ fun ShowRelation(relation: String, modifier: Modifier) {
 fun CurrentRelation(
     modifier: Modifier,
     entry: Entry,
-    viewModel: DetailScreenViewModel,
+//    viewModel: DetailScreenViewModel,
     navController: NavController,
 ) {
 
@@ -66,9 +64,14 @@ fun CurrentRelation(
                 color = MaterialTheme.colorScheme.secondary,
                 text = entry.name + " (" + entry.type + ")",
                 modifier = modifier.clickable {
-                    viewModel.viewModelScope.launch {
-                        navigateToDetailScreen(navController, entry.mal_id)
-                    }
+//                    viewModel.viewModelScope.launch {
+                        navigateToDetailScreen {
+                            navController.navigate(route = "detail_screen/${entry.mal_id}")
+                            {
+                                launchSingleTop = true
+                            }
+                        }
+//                    }
                 })
         }
     } else {
@@ -129,7 +132,9 @@ fun ExpandableRelated(
                     relations.take(itemsToShow).forEach { related ->
                         ShowRelation(relation = related.relation, modifier = modifier)
                         related.entry.forEach { currentEntry ->
-                            CurrentRelation(modifier, currentEntry, viewModel, navController)
+                            CurrentRelation(modifier, currentEntry,
+//                                viewModel,
+                                navController)
                         }
                     }
                 }

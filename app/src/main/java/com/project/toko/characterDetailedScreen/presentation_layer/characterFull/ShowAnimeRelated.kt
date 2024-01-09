@@ -29,7 +29,8 @@ import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetai
 fun ShowAnimeRelated(modifier: Modifier, animes: List<Anime>, navController: NavController) {
 
     Row(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
-        Text(text = "Animeography", fontSize = 24.sp,
+        Text(
+            text = "Animeography", fontSize = 24.sp,
             color = MaterialTheme.colorScheme.onPrimary,
             fontFamily = evolventaBoldFamily
         )
@@ -45,7 +46,12 @@ fun ShowAnimeRelated(modifier: Modifier, animes: List<Anime>, navController: Nav
 
                 .clip(CardDefaults.shape)
                 .clickable {
-                    navigateToDetailScreen(navController, animes[i].anime.mal_id)
+                    navigateToDetailScreen {
+                        navController.navigate(route = "detail_screen/${animes[i].anime.mal_id}")
+                        {
+                            launchSingleTop = true
+                        }
+                    }
                 }) {
                 Column(
                     modifier = modifier
@@ -68,11 +74,15 @@ fun ShowAnimeRelated(modifier: Modifier, animes: List<Anime>, navController: Nav
                         .padding(top = 0.dp, start = 10.dp)
 
                 ) {
-                    Text(text = animes[i].anime.title, fontSize = 18.sp,
+                    Text(
+                        text = animes[i].anime.title, fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = evolventaBoldFamily)
-                    Text(text = animes[i].role,
-                        color = MaterialTheme.colorScheme.onPrimary)
+                        fontFamily = evolventaBoldFamily
+                    )
+                    Text(
+                        text = animes[i].role,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))

@@ -1099,7 +1099,12 @@ private fun DisplayDialogPicture(
             .fillMaxSize()
             .clip(CardDefaults.shape)
             .clickable {
-                navigateToDetailScreen(navController, mal_id)
+                navigateToDetailScreen {
+                    navController.navigate(route = "detail_screen/${mal_id}")
+                    {
+                        launchSingleTop = true
+                    }
+                }
             },
         alignment = Alignment.Center,
     )

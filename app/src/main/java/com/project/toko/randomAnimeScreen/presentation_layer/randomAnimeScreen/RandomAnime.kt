@@ -45,6 +45,7 @@ import com.project.toko.daoScreen.model.AnimeStatus
 import com.project.toko.homeScreen.model.newAnimeSearchModel.AnimeSearchData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 
@@ -63,8 +64,7 @@ fun ShowRandomAnime(
     Column(
         modifier
             .background(MaterialTheme.colorScheme.primary)
-            .fillMaxSize()
-            ,
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -114,7 +114,13 @@ fun ShowRandomAnime(
                                 }
 
                                 Direction.Up -> {
-                                    navigateToDetailScreen(navController, data?.mal_id ?: 0)
+                                    navigateToDetailScreen {
+                                        navController.navigate(route = "detail_screen/${data?.mal_id ?: 0}")
+                                        {
+                                            launchSingleTop = true
+                                        }
+                                    }
+
                                 }
 
                                 else -> {}
@@ -172,8 +178,10 @@ fun ShowRandomAnime(
             }
         }
         LaunchedEffect(data?.mal_id) {
-            swipeState.offset.animateTo(Offset(0.0f, 1000.0f))
-            swipeState.offset.animateTo(Offset(0.0f, 0.0f))
+            withContext(Dispatchers.IO) {
+                swipeState.offset.snapTo(Offset(0.0f, 1000.0f))
+                swipeState.offset.animateTo(Offset(0.0f, 0.0f))
+            }
         }
 
     }
@@ -188,13 +196,18 @@ private fun AnimeCard(
     context: Context,
 ) {
 
-    val model = ImageRequest.Builder(context).data(data?.images?.jpg?.large_image_url) 
+    val model = ImageRequest.Builder(context).data(data?.images?.jpg?.large_image_url)
         .size(Size.ORIGINAL).crossfade(true).build()
     val painter = rememberAsyncImagePainter(model = model)
     val scoreRoundedCornerShape = remember { RoundedCornerShape(bottomEnd = 10.dp) }
     val clickableModifier = Modifier.clickable {
         if (data != null) {
-            navigateToDetailScreen(navController, data.mal_id)
+            navigateToDetailScreen {
+                navController.navigate(route = "detail_screen/${data.mal_id}")
+                {
+                    launchSingleTop = true
+                }
+            }
         }
     }
 

@@ -67,7 +67,6 @@ class DetailScreenViewModel @Inject constructor(
 
                 val response = malApiService.getDetailsFromAnime(id)
                 if (response.isSuccessful) {
-
                     val data = response.body()?.data
                     _loadedId.intValue = id
                     if (data != null) {
@@ -214,22 +213,30 @@ class DetailScreenViewModel @Inject constructor(
 
 
     suspend fun loadAllInfo(id: Int, context: Context) {
-        viewModelScope.launch {
-
-
+        viewModelScope.launch(Dispatchers.IO) {
             val prevId = previousId.value
             if (id != prevId) {
                 scrollState.scrollTo(0)
                 previousId.value = id
             }
-            if (isInternetAvailable(context)) {
-//                _isLoading.value = true
 
+            if (cachedDetailScreenData.contains(id)){
+                _picturesData.value = cachedPicturesData[id]!!
+                _animeDetails.value = cachedDetailScreenData[id]!!.data
+                _staffList.value = cachedStaffData[id]!!.data
+                _castList.value = cachedCastData[id]!!.data
+                _recommendationList.value = cachedRecommendationsData[id]!!
+                return@launch
+            }
+            if (isInternetAvailable(context)) {
+                _isLoading.value = true
                 onTapAnime(id)
                 delay(300)
                 addStaffFromId(id)
                 delay(300)
                 addCastFromId(id)
+                _isLoading.value = false
+
                 delay(1000L)
                 addRecommendationsFromId(id)
                 delay(1000L)
