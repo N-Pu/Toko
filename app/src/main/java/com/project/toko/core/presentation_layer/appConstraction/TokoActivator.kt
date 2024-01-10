@@ -80,7 +80,6 @@ import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun AppActivator(
     navController: NavHostController,
