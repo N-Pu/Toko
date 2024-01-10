@@ -27,9 +27,5 @@ val Typography = Typography(
 )
 
 val evolventaBoldFamily = FontFamily (
-//    Font(R.font.evolventa_bold, FontWeight.ExtraLight),
-//    Font(R.font.evolventa_bold, FontWeight.Normal),
-//    Font(R.font.evolventa_bold, FontWeight.Normal, FontStyle.Italic),
-//    Font(R.font.evolventa_bold, FontWeight.Medium),
     Font(R.font.evolventa_bold, FontWeight.W900)
 )
