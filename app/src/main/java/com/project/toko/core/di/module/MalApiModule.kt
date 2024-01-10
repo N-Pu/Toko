@@ -1,8 +1,6 @@
 package com.project.toko.core.di.module
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import com.project.toko.core.di.Application
 import com.project.toko.core.repository.MalApiService
 import dagger.Module
