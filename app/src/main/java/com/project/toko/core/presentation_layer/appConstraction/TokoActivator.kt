@@ -469,10 +469,12 @@ private fun ShowDrawerContent(
                 onClick = {
                 },
                 badge = {
-                    Switch(checked = homeScreenViewModel.isNSFWActive.value, onCheckedChange = {
+                    Switch(checked = homeScreenViewModel.isNSFWActive.value,
+                        onCheckedChange = {
                         homeScreenViewModel.saveNSFWData(it)
                         homeScreenViewModel.isNSFWActive.value = it
-                    }, colors = SwitchDefaults.colors(
+                    },
+                        colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
                         checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
                         checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,

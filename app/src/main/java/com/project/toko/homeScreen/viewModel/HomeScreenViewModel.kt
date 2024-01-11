@@ -231,7 +231,7 @@ class HomeScreenViewModel @Inject constructor(
             } else {
                 val response = malApiRepository.getAnimeSearchByName(
                     eTag = query + currentPage.value,
-                    sfw = _isNSFWActive.value,
+                    sfw = !_isNSFWActive.value,
                     query = currentQuery,
                     page = currentPage.value,
                     genres = currentGenres,
@@ -343,7 +343,7 @@ class HomeScreenViewModel @Inject constructor(
 
                 val response = malApiRepository.getAnimeSearchByName(
                     eTag = query + currentPage.value,
-                    sfw = _isNSFWActive.value,
+                    sfw = !_isNSFWActive.value,
                     query = currentQuery,
                     page = nextPage,
                     genres = makeArrayToLinkWithCommas(arrayOfGenres.value),

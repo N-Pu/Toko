@@ -26,7 +26,7 @@ android {
         minSdk 24
         targetSdk 34
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -191,21 +191,21 @@ dependencies {
 
 }
 
-subprojects {
-    tasks.withType(KotlinCompile).configureEach {
-        kotlinOptions {
-            if (project.findProperty("AnimeApp.enableComposeCompilerReports") == "true") {
-                freeCompilerArgs += [
-                        "-P",
-                        "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
-                                project.buildDir.absolutePath + "/compose_metrics"
-                ]
-                freeCompilerArgs += [
-                        "-P",
-                        "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
-                                project.buildDir.absolutePath + "/compose_metrics"
-                ]
-            }
-        }
-    }
-}
+//subprojects {
+//    tasks.withType(KotlinCompile).configureEach {
+//        kotlinOptions {
+//            if (project.findProperty("AnimeApp.enableComposeCompilerReports") == "true") {
+//                freeCompilerArgs += [
+//                        "-P",
+//                        "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+//                                project.buildDir.absolutePath + "/compose_metrics"
+//                ]
+//                freeCompilerArgs += [
+//                        "-P",
+//                        "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+//                                project.buildDir.absolutePath + "/compose_metrics"
+//                ]
+//            }
+//        }
+//    }
+//}
