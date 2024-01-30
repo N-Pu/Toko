@@ -1,5 +1,6 @@
 package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import com.project.toko.detailScreen.model.detailModel.DetailData
 @Composable
 fun DisplayJapAndEnglishTitles(detailData: DetailData?, modifier: Modifier) {
 
+    Log.d("https::// title jap and english ", (detailData?.title_english + " / " + detailData?.title_japanese).length.toString())
     Row(
         modifier = modifier
             .fillMaxWidth()

@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class DetailScreenViewModel @Inject constructor(
     private val malApiService: MalApiService
@@ -220,14 +221,16 @@ class DetailScreenViewModel @Inject constructor(
                 previousId.value = id
             }
 
-            if (cachedDetailScreenData.contains(id)){
-                _picturesData.value = cachedPicturesData[id]!!
-                _animeDetails.value = cachedDetailScreenData[id]!!.data
-                _staffList.value = cachedStaffData[id]!!.data
-                _castList.value = cachedCastData[id]!!.data
-                _recommendationList.value = cachedRecommendationsData[id]!!
+            if (cachedDetailScreenData.contains(id)) {
+                _picturesData.value = cachedPicturesData[id] ?: emptyList()
+                _animeDetails.value = cachedDetailScreenData[id]?.data
+                _staffList.value = cachedStaffData[id]?.data ?: emptyList()
+                _castList.value = cachedCastData[id]?.data ?: emptyList()
+                _recommendationList.value = cachedRecommendationsData[id] ?: emptyList()
                 return@launch
             }
+
+
             if (isInternetAvailable(context)) {
                 _isLoading.value = true
                 onTapAnime(id)
