@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,7 +58,7 @@ fun ShowRandomAnime(
     val randomViewModel = viewModelProvider[RandomAnimeViewModel::class.java]
     val daoViewModel = viewModelProvider[DaoViewModel::class.java]
     val data by randomViewModel.animeDetails.collectAsStateWithLifecycle()
-    val cardIsShown = randomViewModel.cardIsShown
+    var cardIsShown by randomViewModel.cardIsShown
     val context = LocalContext.current
     val swipeState = rememberSwipeableCardState()
 
@@ -82,10 +83,9 @@ fun ShowRandomAnime(
                                 Direction.Left -> {
                                     randomViewModel.viewModelScope.launch(Dispatchers.IO) {
                                         randomViewModel.onTapRandomAnime()
-                                        cardIsShown.value = false
+                                        cardIsShown = false
                                     }
                                 }
-
                                 Direction.Right -> {
                                     randomViewModel.viewModelScope.launch(Dispatchers.IO) {
                                         daoViewModel.addToCategory(
@@ -109,10 +109,9 @@ fun ShowRandomAnime(
                                     }
                                     randomViewModel.viewModelScope.launch(Dispatchers.IO) {
                                         randomViewModel.onTapRandomAnime()
-                                        cardIsShown.value = false
+                                        cardIsShown = false
                                     }
                                 }
-
                                 Direction.Up -> {
                                     navigateToDetailScreen {
                                         navController.navigate(route = "detail_screen/${data?.mal_id ?: 0}")
@@ -122,9 +121,7 @@ fun ShowRandomAnime(
                                     }
 
                                 }
-
                                 else -> {}
-
                             }
                         },
                         onSwipeCancel = {
@@ -198,6 +195,7 @@ private fun AnimeCard(
 
     val model = ImageRequest.Builder(context).data(data?.images?.jpg?.large_image_url)
         .size(Size.ORIGINAL).crossfade(true).build()
+    val isStudioEmpty = data?.studios.isNullOrEmpty()
     val painter = rememberAsyncImagePainter(model = model)
     val scoreRoundedCornerShape = remember { RoundedCornerShape(bottomEnd = 10.dp) }
     val clickableModifier = Modifier.clickable {
@@ -211,12 +209,13 @@ private fun AnimeCard(
         }
     }
 
-
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         modifier = modifier
             .shadow(150.dp, shape = CardDefaults.shape, clip = true)
     ) {
+
+
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -405,7 +404,7 @@ private fun AnimeCard(
 
             }
         }
-        val isStudioEmpty = data?.studios.isNullOrEmpty()
+
 
         Row(
             horizontalArrangement = Arrangement.Center,
@@ -434,6 +433,7 @@ private fun AnimeCard(
                 )
             }
         }
+
 
     }
 }

@@ -1,5 +1,6 @@
 package com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
  fun DisplayTitle(title: String, modifier: Modifier) {
+    Log.d("https::// title NUM", title.length.toString())
     Row(
         modifier = modifier
             .fillMaxWidth(1f),

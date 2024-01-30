@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +49,7 @@ import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.cu
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ShowMoreInformation
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.ShowPictureAlbum
 import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.YearTypeEpisodesTimeStatusStudio
+import com.project.toko.detailScreen.presentation_layer.detailScreen.mainPage.custom.youtubePlayer.YoutubePlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,7 +61,9 @@ fun ActivateDetailScreen(
     viewModelProvider: ViewModelProvider,
     navController: NavController,
     id: Int,
-    modifier: Modifier, isInDarkTheme: () -> Boolean, svgImageLoader: ImageLoader
+    modifier: Modifier,
+    isInDarkTheme: () -> Boolean,
+    svgImageLoader: ImageLoader
 ) {
 
     val viewModel = viewModelProvider[DetailScreenViewModel::class.java]
@@ -98,8 +102,8 @@ fun ActivateDetailScreen(
 
     if (
         viewModel.isLoading.value.not()
-        &&
-            detailData != null
+//        &&
+//            detailData != null
     ) {
         PullToRefreshLayout(
             composable = {
@@ -187,10 +191,12 @@ fun ActivateDetailScreen(
                         svgImageLoader = svgImageLoader
                     )
                     ExpandableText(
-                        text = detailData!!.synopsis,
+                        text = detailData?.synopsis,
                         title = "Synopsis",
                         modifier = modifier
                     )
+
+
 //            FullScreenYoutubeActivity().YoutubePlayerSecond(
 //                detailData?.trailer?.youtube_id ?: "",
 //                LocalLifecycleOwner.current,
@@ -218,8 +224,7 @@ fun ActivateDetailScreen(
                     ExpandableRelated(
                         relations = detailData?.relations,
                         modifier = modifier,
-                        navController = navController,
-                        viewModel = viewModel
+                        navController = navController
                     )
                     Recommendations(
                         recommendationsData,
@@ -229,7 +234,6 @@ fun ActivateDetailScreen(
                         isInDarkTheme
                     )
                     Spacer(modifier = modifier.height(20.dp))
-
                 }
             },
             onLoad = {

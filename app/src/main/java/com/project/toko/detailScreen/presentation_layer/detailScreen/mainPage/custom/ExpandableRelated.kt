@@ -33,11 +33,10 @@ import androidx.navigation.NavController
 import com.project.toko.core.presentation_layer.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.model.detailModel.Entry
 import com.project.toko.detailScreen.model.detailModel.Relation
-import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.presentation_layer.homeScreen.navigateToDetailScreen
 
 @Composable
-fun ShowRelation(relation: String, modifier: Modifier) {
+private fun ShowRelation(relation: String, modifier: Modifier) {
     Row(
         modifier = modifier.padding(start = 20.dp, bottom = 5.dp, end = 20.dp)
     ) {
@@ -49,10 +48,9 @@ fun ShowRelation(relation: String, modifier: Modifier) {
 }
 
 @Composable
-fun CurrentRelation(
+private fun CurrentRelation(
     modifier: Modifier,
     entry: Entry,
-//    viewModel: DetailScreenViewModel,
     navController: NavController,
 ) {
 
@@ -64,14 +62,12 @@ fun CurrentRelation(
                 color = MaterialTheme.colorScheme.secondary,
                 text = entry.name + " (" + entry.type + ")",
                 modifier = modifier.clickable {
-//                    viewModel.viewModelScope.launch {
-                        navigateToDetailScreen {
-                            navController.navigate(route = "detail_screen/${entry.mal_id}")
-                            {
-                                launchSingleTop = true
-                            }
+                    navigateToDetailScreen {
+                        navController.navigate(route = "detail_screen/${entry.mal_id}")
+                        {
+                            launchSingleTop = true
                         }
-//                    }
+                    }
                 })
         }
     } else {
@@ -92,7 +88,6 @@ fun ExpandableRelated(
     relations: List<Relation>?,
     modifier: Modifier,
     navController: NavController,
-    viewModel: DetailScreenViewModel
 ) {
     val maxItemsToShow = 2
     var itemsToShow by remember { mutableIntStateOf(maxItemsToShow) }
@@ -110,7 +105,7 @@ fun ExpandableRelated(
 
             Box(
                 modifier = modifier
-                    .padding(start = 20.dp, bottom = 20.dp, end = 20.dp)
+                    .padding(start = 20.dp, end = 20.dp)
                     .fillMaxWidth(),
                 contentAlignment = Alignment.CenterStart
             ) {
@@ -123,7 +118,6 @@ fun ExpandableRelated(
                     fontFamily = evolventaBoldFamily
                 )
             }
-//            Box(modifier = modifier.height(20.dp))
             if (relations.isNotEmpty()) {
                 // Apply animateContentSize to the content that should expand or collapse
                 Column(
@@ -132,9 +126,10 @@ fun ExpandableRelated(
                     relations.take(itemsToShow).forEach { related ->
                         ShowRelation(relation = related.relation, modifier = modifier)
                         related.entry.forEach { currentEntry ->
-                            CurrentRelation(modifier, currentEntry,
-//                                viewModel,
-                                navController)
+                            CurrentRelation(
+                                modifier, currentEntry,
+                                navController
+                            )
                         }
                     }
                 }
@@ -181,5 +176,5 @@ fun ExpandableRelated(
             }
         }
     }
-//    Spacer(modifier = modifier.height(20.dp))
+    Spacer(modifier = modifier.height(20.dp))
 }
