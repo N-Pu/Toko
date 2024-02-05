@@ -49,7 +49,7 @@ This exciting function presents you with a wide selection of titles, increasing 
 * <a href="https://kotlinlang.org/docs/coroutines-overview.html">Dagger 2</a> dependency injection
 
 ### Download
-<img src="https://github.com/N-Pu/Toko/assets/40484678/07016d08-3658-4254-9b43-a498e2674056"
+<a href = "https://play.google.com/store/apps/details?id=com.project.toko"><img src="https://github.com/N-Pu/Toko/assets/40484678/07016d08-3658-4254-9b43-a498e2674056"
 width="200" hspace="10" vspace="10">
 
 ## Contributing
