@@ -1,3 +1,6 @@
+![привью](https://github.com/N-Pu/Toko/assets/40484678/4360d0d7-a3db-484a-93a6-6c8219acc3a5)
+
+
 # Toko - Android App
 
 <img src="https://github.com/N-Pu/Toko/assets/40484678/116cb830-9d75-4f53-a440-fd2cdcaa372c" align="left"
@@ -33,14 +36,6 @@ This exciting function presents you with a wide selection of titles, increasing 
 - Regular updates: The Toko app is actively maintained and regularly updated, ensuring you get the latest features, bug fixes, and improvements to enhance your anime-watching experience.
 - More to be added.
 
-## Screenshots
-
-<img src="https://github.com/N-Pu/Toko/assets/40484678/d13a8c1a-5a15-433e-8be5-d8c6dbafdae4" align="left"
-width="200" hspace="10" vspace="10">
-<img src="https://github.com/N-Pu/Toko/assets/40484678/ee11e5cd-a3ac-4ab2-8e32-126abd10d7f4" align="center"
-width="200" hspace="10" vspace="10">
-<img src="https://github.com/N-Pu/Toko/assets/40484678/6b4f8162-1b21-4705-bbbc-fdb1d85bde50" align="center"
-width="200" hspace="10" vspace="10">
 
 ### Libraries and Dependencies
 * <a href="https://square.github.io/retrofit/">Retrofit 2</a> for network requests
@@ -53,15 +48,13 @@ width="200" hspace="10" vspace="10">
 * <a href="https://kotlinlang.org/docs/coroutines-overview.html">Coroutines</a>
 * <a href="https://kotlinlang.org/docs/coroutines-overview.html">Dagger 2</a> dependency injection
 
-## Generating signed APK
-From Android Studio:
-1. ***Build*** menu
-2. ***Generate Signed APK...***
-3. Fill in the keystore information *(you only need to do this once manually and then let Android Studio remember it)*
-
+### Download
+<img src="https://github.com/N-Pu/Toko/assets/40484678/07016d08-3658-4254-9b43-a498e2674056"
+width="200" hspace="10" vspace="10">
 
 ## Contributing
 
 Toko app is a free and open source project. Any contributions are welcome. Here are a few ways you can help:
  * [Report bugs and make suggestions.](https://github.com/N-Pu/Toko/issues)
+ * [Discord.](https://discord.gg/SnP36EadtZ)
 
