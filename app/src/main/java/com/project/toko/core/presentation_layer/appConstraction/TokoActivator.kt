@@ -78,6 +78,7 @@ import com.project.toko.daoScreen.model.AnimeStatus
 import com.project.toko.detailScreen.viewModel.DetailScreenViewModel
 import com.project.toko.homeScreen.viewModel.HomeScreenViewModel
 import com.project.toko.personDetailedScreen.viewModel.PersonByIdViewModel
+import com.project.toko.randomAnimeScreen.viewModel.RandomAnimeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -140,9 +141,11 @@ private fun BottomNavigationBar(
     var lastSelectedScreen by remember { mutableStateOf<String?>(null) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    var detailScreenButtonIsSelected by remember { mutableStateOf(false)}
+    var detailScreenButtonIsSelected by remember { mutableStateOf(false) }
     val characterDetailScreenId by viewModelProvider[CharacterFullByIdViewModel::class.java].loadedId
     val personDetailScreenId by viewModelProvider[PersonByIdViewModel::class.java].loadedId
+
+
 
     LaunchedEffect(lastSelectedScreen) {
         navController.addOnDestinationChangedListener { _, destination, arguments ->
@@ -419,6 +422,7 @@ private fun ShowDrawerContent(
     var isLegalOpen by remember { mutableStateOf(false) }
     var isDeleteDaoOpen by remember { mutableStateOf(false) }
     val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
+    val randomScreenViewModel = viewModelProvider[RandomAnimeViewModel::class.java]
     val context = LocalContext.current
 
     val customModifier =
@@ -471,17 +475,18 @@ private fun ShowDrawerContent(
                 badge = {
                     Switch(checked = homeScreenViewModel.isNSFWActive.value,
                         onCheckedChange = {
-                        homeScreenViewModel.saveNSFWData(it)
-                        homeScreenViewModel.isNSFWActive.value = it
-                    },
+                            homeScreenViewModel.saveNSFWData(it)
+                            homeScreenViewModel.isNSFWActive.value = it
+                            randomScreenViewModel.isNSFWActive.value = it
+                        },
                         colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                        checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                        checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                        uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                        uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                    ),
+                            checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                            checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                            checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                            uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+                        ),
                         thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
                             {
                                 Icon(

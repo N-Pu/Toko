@@ -281,9 +281,10 @@ class HomeScreenViewModel @Inject constructor(
     val loadingSectionTopTrending = _loadingSectionTopTrending
     private suspend fun getTopAnime(
         filter: String,
-        limit: Int = 10,
+        limit: Int,
         data: MutableStateFlow<NewAnimeSearchModel>,
-        loadingCurrentSection: MutableState<Boolean>
+        loadingCurrentSection: MutableState<Boolean>,
+        sfw: Boolean
     ) {
         try {
 //            if (isInternetAvailable(context)) {
@@ -295,7 +296,7 @@ class HomeScreenViewModel @Inject constructor(
                 } else {
                     loadingCurrentSection.value = true
                     // Если данные отсутствуют в кэше, делаем запрос к API
-                    val response = malApiRepository.getTenTopAnime(filter, limit).body()
+                    val response = malApiRepository.getTenTopAnime(filter, limit, sfw).body()
                     val newData = response ?: emptyNewAnimeSearchModel
                     loadingCurrentSection.value = false
 
@@ -536,11 +537,29 @@ class HomeScreenViewModel @Inject constructor(
     suspend fun loadAllSections(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isInternetAvailable(context)) {
-                getTopAnime("bypopularity", 25, _topTrendingAnime, loadingSectionTopTrending)
+                getTopAnime(
+                    "bypopularity",
+                    25,
+                    _topTrendingAnime,
+                    loadingSectionTopTrending,
+                    !_isNSFWActive.value
+                )
                 delay(500L)
-                getTopAnime("airing", 25, _topAiringAnime, loadingSectionTopAiring)
+                getTopAnime(
+                    "airing",
+                    25,
+                    _topAiringAnime,
+                    loadingSectionTopAiring,
+                    !_isNSFWActive.value
+                )
                 delay(500L)
-                getTopAnime("upcoming", 25, _topUpcomingAnime, loadingSectionTopUpcoming)
+                getTopAnime(
+                    "upcoming",
+                    25,
+                    _topUpcomingAnime,
+                    loadingSectionTopUpcoming,
+                    !_isNSFWActive.value
+                )
             } else {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
@@ -556,11 +575,29 @@ class HomeScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (isInternetAvailable(context)) {
                 cachedTopTrendingAnime.clear()
-                getTopAnime("bypopularity", 25, _topTrendingAnime, loadingSectionTopTrending)
+                getTopAnime(
+                    "bypopularity",
+                    25,
+                    _topTrendingAnime,
+                    loadingSectionTopTrending,
+                    !_isNSFWActive.value
+                )
                 delay(500L)
-                getTopAnime("airing", 25, _topAiringAnime, loadingSectionTopAiring)
+                getTopAnime(
+                    "airing",
+                    25,
+                    _topAiringAnime,
+                    loadingSectionTopAiring,
+                    !_isNSFWActive.value
+                )
                 delay(500L)
-                getTopAnime("upcoming", 25, _topUpcomingAnime, loadingSectionTopUpcoming)
+                getTopAnime(
+                    "upcoming",
+                    25,
+                    _topUpcomingAnime,
+                    loadingSectionTopUpcoming,
+                    !_isNSFWActive.value
+                )
             } else {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
