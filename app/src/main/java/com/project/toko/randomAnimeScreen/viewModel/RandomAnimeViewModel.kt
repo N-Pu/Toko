@@ -22,12 +22,14 @@ class RandomAnimeViewModel @Inject constructor(private val malApiService: MalApi
     private val _cardIsShown = mutableStateOf(false)
     val cardIsShown = _cardIsShown
 
+    private val _isNSFWActive = mutableStateOf(false)
+    val isNSFWActive = _isNSFWActive
     suspend fun onTapRandomAnime() {
         if (isSearching) return
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 isSearching = true
-                val response = malApiService.getRandomAnime()
+                val response = malApiService.getRandomAnime(!isNSFWActive.value)
                 if (response.isSuccessful) {
                     val data = response.body()?.data
                     if (data != null) {
