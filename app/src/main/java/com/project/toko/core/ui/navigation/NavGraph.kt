@@ -60,7 +60,8 @@ private fun NavGraphBuilder.homeSubGraph(
             type = NavType.IntType
         })) { backStackEntry ->
             val id = backStackEntry.arguments!!.getInt("id")
-            ActivateDetailScreen(onNavigateToDetailOnWholeCast = { id ->
+            ActivateDetailScreen(onNavigateToDetailOnWholeCast = {
+//                id ->
                 navController.navigate("detail_on_whole_cast_home/$id")
             },
                 onNavigateToDetailOnCharacter = { characterId ->
@@ -177,7 +178,8 @@ private fun NavGraphBuilder.daoSubGraph(
             type = NavType.IntType
         })) { backStackEntry ->
             val id = backStackEntry.arguments!!.getInt("id")
-            ActivateDetailScreen(onNavigateToDetailOnWholeCast = { id ->
+            ActivateDetailScreen(onNavigateToDetailOnWholeCast = {
+//                id ->
                 navController.navigate("detail_on_whole_cast_dao/$id")
             },
                 onNavigateToDetailOnCharacter = { characterId ->
@@ -288,7 +290,8 @@ fun NavGraphBuilder.randomSubGraph(
             type = NavType.IntType
         })) { backStackEntry ->
             val id = backStackEntry.arguments!!.getInt("id")
-            ActivateDetailScreen(onNavigateToDetailOnWholeCast = { id ->
+            ActivateDetailScreen(onNavigateToDetailOnWholeCast = {
+//                id ->
                 navController.navigate("detail_on_whole_cast_random/$id")
             },
                 onNavigateToDetailOnCharacter = { characterId ->

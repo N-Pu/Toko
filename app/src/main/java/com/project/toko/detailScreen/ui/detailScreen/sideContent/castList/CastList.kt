@@ -52,10 +52,9 @@ import java.lang.Integer.min
 fun DisplayCast(
     castList: List<CastData>,
     onNavigateToDetailOnStaff: (Int) -> Unit,
-    onNavigateToWholeOnCast: (Int) -> Unit,
+    onNavigateToWholeOnCast: () -> Unit,
     onNavigateToDetailOnCharacter: (Int) -> Unit,
     modifier: Modifier,
-    detailMalId: Int
 ) {
 
     if (castList.isNotEmpty()) {
@@ -95,7 +94,6 @@ fun DisplayCast(
             onNavigateToDetailOnWholeCast = onNavigateToWholeOnCast,
             modifier = modifier,
             numCharacterAndActors = numCharacterAndActors,
-            detailMalId = detailMalId
         )
 
     }
@@ -107,10 +105,9 @@ private fun AddCast(
     castList: List<CastData>,
     onNavigateToDetailOnStaff: (Int) -> Unit,
     onNavigateToDetailOnCharacter: (Int) -> Unit,
-    onNavigateToDetailOnWholeCast: (Int) -> Unit,
+    onNavigateToDetailOnWholeCast: () -> Unit,
     modifier: Modifier,
     numCharacterAndActors: Int,
-    detailMalId: Int
 ) {
     val numCards = (numCharacterAndActors + 2) / 3 // Определение количества карточек
     Row(
@@ -168,7 +165,7 @@ private fun AddCast(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.onSecondary)
                     .clickable {
-                        onNavigateToDetailOnWholeCast(detailMalId)
+                        onNavigateToDetailOnWholeCast()
                     }, contentAlignment = Alignment.Center
             ) {
                 Image(

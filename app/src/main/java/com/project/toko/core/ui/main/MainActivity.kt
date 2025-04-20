@@ -114,11 +114,10 @@ class MainActivity : AppCompatActivity() {
         bottomNav = findViewById(R.id.bottom_nav)
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // locked screen for the time being
-        bottomNav.labelVisibilityMode =
-            BottomNavigationView.LABEL_VISIBILITY_UNLABELED
+        bottomNav.labelVisibilityMode = BottomNavigationView.LABEL_VISIBILITY_UNLABELED
 
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
 
         navController.addOnDestinationChangedListener { controller, destination, _ ->
@@ -141,7 +140,12 @@ class MainActivity : AppCompatActivity() {
             Log.d("NavDebug", "Previous entry: ${previous?.destination?.label}")
 
             when (destination.id) {
-                R.id.detailScreenFragment, R.id.singleCharacterFragment, R.id.singleStaffFragment -> hideBottomNav()
+                R.id.detailScreenFragment,
+                R.id.singleCharacterFragment,
+                R.id.singleStaffFragment,
+                R.id.wholeCast,
+                R.id.wholeStaff -> hideBottomNav()
+
                 else -> showBottomNav()
             }
         }
@@ -163,22 +167,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideBottomNav() {
         bottomNav.clearAnimation()
-        bottomNav.animate()
-            .translationY(bottomNav.height.toFloat())
-            .alpha(0f)
-            .setDuration(300)
-            .withEndAction { bottomNav.visibility = View.GONE }
-            .start()
+        bottomNav.animate().translationY(bottomNav.height.toFloat()).alpha(0f).setDuration(300)
+            .withEndAction { bottomNav.visibility = View.GONE }.start()
     }
 
     private fun showBottomNav() {
         bottomNav.visibility = View.VISIBLE
         bottomNav.clearAnimation()
-        bottomNav.animate()
-            .translationY(0f)
-            .alpha(1f)
-            .setDuration(300)
-            .start()
+        bottomNav.animate().translationY(0f).alpha(1f).setDuration(300).start()
     }
 
 }

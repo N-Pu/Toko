@@ -60,7 +60,7 @@ fun ActivateDetailScreen(
     onNavigateToDetailOnStaff: (Int) -> Unit,
     onNavigateToWholeOnStaff: () -> Unit,
     onNavigateToDetailScreen: (Int) -> Unit,
-    onNavigateToDetailOnWholeCast: (Int) -> Unit,
+    onNavigateToDetailOnWholeCast: () -> Unit,
     id: Int,
     modifier: Modifier = Modifier,
     isInDarkTheme: () -> Boolean,
@@ -221,7 +221,7 @@ fun ActivateDetailScreen(
                         onNavigateToDetailOnStaff = onNavigateToDetailOnStaff,
                         onNavigateToWholeOnCast = onNavigateToDetailOnWholeCast,
                         modifier = modifier,
-                        detailMalId = viewModel.loadedId.intValue
+//                        detailMalId = viewModel.loadedId.intValue
                     )
                     DisplayStaff(
                         staffList = staffData,

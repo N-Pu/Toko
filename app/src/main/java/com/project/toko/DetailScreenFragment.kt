@@ -126,7 +126,13 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
                             R.id.action_detailScreenFragment_to_singleStaffFragment,
                             bundleOf("single_staff_id" to staffId),
                         )},
-                        onNavigateToWholeOnStaff = {},
+                        onNavigateToWholeOnStaff = {
+                            navController.navigate(
+                                R.id.action_detailScreenFragment_to_wholeStaff,
+                                bundleOf("detail_screen_id" to animeId),
+                                navOptions
+                            )
+                        },
                         onNavigateToDetailScreen = { detailScreenId ->
                             navController.navigate(
                                 R.id.action_detailScreenFragment_self,
@@ -134,7 +140,13 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
                                 navOptions
                             )
                         },
-                        onNavigateToDetailOnWholeCast = {},
+                        onNavigateToDetailOnWholeCast = {
+                            navController.navigate(
+                                R.id.action_detailScreenFragment_to_wholeCast,
+                                bundleOf("detail_screen_id" to animeId),
+                                navOptions
+                            )
+                        },
                         id = animeId,
                         modifier = Modifier,
                         isInDarkTheme = { isDark },
@@ -161,7 +173,7 @@ private fun DetailScreen(
     onNavigateToDetailOnStaff: (Int) -> Unit,
     onNavigateToWholeOnStaff: () -> Unit,
     onNavigateToDetailScreen: (Int) -> Unit,
-    onNavigateToDetailOnWholeCast: (Int) -> Unit,
+    onNavigateToDetailOnWholeCast: () -> Unit,
     id: Int,
     modifier: Modifier = Modifier,
     isInDarkTheme: () -> Boolean,
@@ -322,7 +334,7 @@ private fun DetailScreen(
                         onNavigateToDetailOnStaff = onNavigateToDetailOnStaff,
                         onNavigateToWholeOnCast = onNavigateToDetailOnWholeCast,
                         modifier = modifier,
-                        detailMalId = viewModel.loadedId.intValue
+//                        detailMalId = viewModel.loadedId.intValue
                     )
                     DisplayStaff(
                         staffList = staffData,

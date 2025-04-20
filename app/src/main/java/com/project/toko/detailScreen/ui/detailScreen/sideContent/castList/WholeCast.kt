@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,7 +64,7 @@ fun ShowWholeCast(
 
     val castList by
     viewModel.castList.collectAsStateWithLifecycle()
-    val castWithJapVoiceActors = hasJapVoiceActor(castList)
+    val castWithJapVoiceActors = remember { hasJapVoiceActor(castList) }
 
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -86,7 +87,7 @@ fun ShowWholeCast(
 
 @Composable
 private fun AddCast(
-    castList: com.project.toko.detailScreen.data.model.castModel.CastData,
+    castList: CastData,
     onNavigateToDetailOnCharacter: (Int) -> Unit, onNavigateToDetailOnStaff: (Int) -> Unit,
     modifier: Modifier,
 ) {
@@ -340,7 +341,7 @@ private fun BackArrow(
 private fun hasJapVoiceActor(castList: List<com.project.toko.detailScreen.data.model.castModel.CastData>): List<com.project.toko.detailScreen.data.model.castModel.CastData> {
     return castList.map { data ->
         val japOrFirstVoiceActor = getJapOrFirstVoiceActor(data)
-        com.project.toko.detailScreen.data.model.castModel.CastData(
+       CastData(
             data.character, data.role, listOf(japOrFirstVoiceActor)
         )
     }
