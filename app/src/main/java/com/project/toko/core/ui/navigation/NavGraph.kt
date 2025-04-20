@@ -277,9 +277,10 @@ fun NavGraphBuilder.randomSubGraph(
         composable(route = LeafScreen.RandomAnimeOrManga.route) {
             ShowRandomAnime(
                 onNavigateToDetailScreen = { detailScreenId ->
-                    navController.navigate("detail_screen_random/$detailScreenId") {
-                        launchSingleTop = true
-                    }
+                    navController.navigate("detail_screen_random/$detailScreenId")
+//                    {
+//                        launchSingleTop = true
+//                    }
                 },
             )
         }
@@ -297,9 +298,10 @@ fun NavGraphBuilder.randomSubGraph(
                 }, onNavigateToWholeOnStaff = {
                     navController.navigate("detail_on_whole_staff_random")
                 }, onNavigateToDetailScreen = { detailScreenId ->
-                    navController.navigate("detail_screen_random/$detailScreenId") {
-                        launchSingleTop = true
-                    }
+                    navController.navigate("detail_screen_random/$detailScreenId")
+//                    {
+//                        launchSingleTop = true
+//                    }
                 },
                 id = id,
                 isInDarkTheme = isInDarkTheme,
@@ -343,9 +345,10 @@ fun NavGraphBuilder.randomSubGraph(
                     navController.navigate("detail_on_staff_random/$staffId")
                 },
                 onNavigateToDetailScreen = { detailScreenId ->
-                    navController.navigate("detail_screen_random/$detailScreenId") {
-                        launchSingleTop = true
-                    }
+                    navController.navigate("detail_screen_random/$detailScreenId")
+//                    {
+//                        launchSingleTop = true
+//                    }
                 },
                 onNavigateBack = {
                     navController.navigateUp()
@@ -366,9 +369,10 @@ fun NavGraphBuilder.randomSubGraph(
                 onNavigateToDetailOnCharacter = { characterId ->
                     navController.navigate("detail_on_character_random/$characterId")
                 }, onNavigateToDetailScreen = { detailScreenId ->
-                    navController.navigate("detail_screen_random/$detailScreenId") {
-                        launchSingleTop = true
-                    }
+                    navController.navigate("detail_screen_random/$detailScreenId")
+//                    {
+//                        launchSingleTop = true
+//                    }
                 },
                 onNavigateBack = { navController.navigateUp() },
                 isInDarkTheme = isInDarkTheme,

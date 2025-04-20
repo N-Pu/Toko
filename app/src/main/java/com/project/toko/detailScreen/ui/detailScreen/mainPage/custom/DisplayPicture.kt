@@ -12,12 +12,10 @@ import coil.compose.AsyncImagePainter
     painter: AsyncImagePainter,
     modifier: Modifier,
 ) {
-    Box {
         Image(
             painter = painter,
             contentDescription = "Big anime picture",
             contentScale = ContentScale.FillWidth,
             modifier = modifier,
         )
-    }
 }

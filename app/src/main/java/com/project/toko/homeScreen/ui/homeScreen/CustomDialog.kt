@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,7 +83,7 @@ fun CustomDialog(
     val localDensity = LocalConfiguration.current
     val isSynopsisEmpty = data.synopsis.isNullOrEmpty()
     val isGenresEmpty = data.genres.isEmpty()
-    val weight = localDensity.screenWidthDp.dp - 50.dp
+    val weight = remember { localDensity.screenWidthDp.dp - 50.dp }
 //    var genreHeight by remember {
 //        mutableStateOf(0.dp)
 //    }
@@ -90,9 +91,10 @@ fun CustomDialog(
 //        mutableStateOf(0.dp)
 //    }
 
-    var currentHeight = 550.dp
 
-    val height = {
+    val height = remember {
+        var currentHeight = 550.dp
+
 //        var currentHeight = localDensity.screenHeightDp.dp - 150.dp
         if (isSynopsisEmpty) {
 //            currentHeight -= synopsisHeight.value
@@ -116,7 +118,7 @@ fun CustomDialog(
         Box(
             modifier = modifier
                 .width(weight)
-                .height(height())
+                .height(height)
         ) {
             Card(
                 modifier = modifier,
@@ -161,7 +163,10 @@ fun CustomDialog(
                         verticalArrangement = Arrangement.Center
                     ) {
                         DisplayDialogPicture(
-                            painter, data.id, onNavigateToDetailScreen = onNavigateToDetailScreen, modifier = modifier
+                            painter,
+                            data.id,
+                            onNavigateToDetailScreen = onNavigateToDetailScreen,
+                            modifier = modifier
                         )
                     }
                     Column(
@@ -372,7 +377,8 @@ private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
 @Composable
 private fun YearTypeStudio(
-    data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData?, modifier: Modifier
+    data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData?,
+    modifier: Modifier
 ) {
     val isStudioEmpty = data?.studios.isNullOrEmpty()
     Column(
@@ -1009,7 +1015,8 @@ private fun ColoredBox(
 
 @Composable
 private fun DisplayCustomGenres(
-    genres: List<com.project.toko.homeScreen.data.model.newAnimeSearchModel.Genre>, modifier: Modifier
+    genres: List<com.project.toko.homeScreen.data.model.newAnimeSearchModel.Genre>,
+    modifier: Modifier
 ) {
     Row(
         modifier = modifier

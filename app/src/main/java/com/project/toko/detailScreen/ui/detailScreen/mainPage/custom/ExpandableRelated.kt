@@ -48,7 +48,7 @@ private fun ShowRelation(relation: String, modifier: Modifier) {
 @Composable
 private fun CurrentRelation(
     modifier: Modifier,
-    entry: com.project.toko.detailScreen.data.model.detailModel.Entry,
+    entry: Entry,
     onNavigateToDetailScreen: (Int) -> Unit,
 ) {
 
@@ -78,7 +78,7 @@ private fun CurrentRelation(
 
 @Composable
 fun ExpandableRelated(
-    relations: List<com.project.toko.detailScreen.data.model.detailModel.Relation>?,
+    relations: List<Relation>?,
     modifier: Modifier,
     onNavigateToDetailScreen: (Int) -> Unit
 ) {

@@ -1,7 +1,6 @@
 package com.project.toko.detailScreen.ui.detailScreen.mainPage.custom
 
 import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -17,7 +16,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.project.toko.detailScreen.data.model.detailModel.DetailData
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DisplayJapAndEnglishTitles(detailData: com.project.toko.detailScreen.data.model.detailModel.DetailData?, modifier: Modifier) {
 
@@ -27,7 +25,7 @@ fun DisplayJapAndEnglishTitles(detailData: com.project.toko.detailScreen.data.mo
             .fillMaxWidth()
             .basicMarquee(
                 iterations = Int.MAX_VALUE,
-                delayMillis = 2000,
+//                delayMillis = 2000,
                 initialDelayMillis = 2000,
                 velocity = 50.dp
             )

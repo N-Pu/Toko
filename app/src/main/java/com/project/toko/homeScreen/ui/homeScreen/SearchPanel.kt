@@ -117,7 +117,9 @@ fun MainScreen(
                         tint = MaterialTheme.colorScheme.inversePrimary,
                         modifier = modifier
                             .size(30.dp)
-                            .clickable { scope.launch(Dispatchers.IO) { drawerState.open() } }
+                            .clickable { scope.launch(Dispatchers.IO) {
+                                drawerState.open()
+                            } }
                     )
                     Image(
                         painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),

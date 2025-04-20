@@ -33,26 +33,21 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.core.ui.theme.DarkSectionColor
 import com.project.toko.core.ui.theme.SectionColor
 import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.detailScreen.data.model.recommendationsModel.RecommendationsData
-import com.project.toko.detailScreen.ui.viewModel.DetailScreenViewModel
-import kotlinx.coroutines.launch
 
 @Composable
-fun Recommendations(
-    recommendationsDataList: List<com.project.toko.detailScreen.data.model.recommendationsModel.RecommendationsData>,
+fun AnimeAlike(
+    recommendationsDataList: List<RecommendationsData>,
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier,
     isInDarkTheme: () -> Boolean
 ) {
     if (recommendationsDataList.isNotEmpty()) {
-        val detailScreenViewModel: DetailScreenViewModel = hiltViewModel()
         Column(
             modifier = modifier
                 .fillMaxWidth(), horizontalAlignment = Alignment.Start,
@@ -93,7 +88,6 @@ fun Recommendations(
                     SingleRecommendationCard(
                         modifier = modifier,
                         onNavigateToDetailScreen = onNavigateToDetailScreen,
-                        detailScreenViewModel = detailScreenViewModel,
                         recommendationsData = recommendationsData,
                         painter = painter
                     )
@@ -111,8 +105,7 @@ fun Recommendations(
 fun SingleRecommendationCard(
     modifier: Modifier,
     onNavigateToDetailScreen: (Int) -> Unit,
-    detailScreenViewModel: DetailScreenViewModel,
-    recommendationsData: com.project.toko.detailScreen.data.model.recommendationsModel.RecommendationsData,
+    recommendationsData: RecommendationsData,
     painter: AsyncImagePainter,
 
     ) {
@@ -122,9 +115,7 @@ fun SingleRecommendationCard(
             .shadow(20.dp)
             .clip(RoundedCornerShape(16.dp))
             .clickable {
-                detailScreenViewModel.viewModelScope.launch {
-                    onNavigateToDetailScreen(recommendationsData.entry.id)
-                }
+                onNavigateToDetailScreen(recommendationsData.entry.id)
             },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onTertiaryContainer),
         shape = RectangleShape,

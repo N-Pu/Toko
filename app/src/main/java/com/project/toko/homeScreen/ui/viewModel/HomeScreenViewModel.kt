@@ -70,7 +70,8 @@ class HomeScreenViewModel @Inject constructor(
 
     private val arrayOfGenres = MutableStateFlow(arrayListOf<Int>())
 
-    private val preSelectedGenre = MutableStateFlow(com.project.toko.homeScreen.data.model.linkChangerModel.getGenres())
+    private val preSelectedGenre =
+        MutableStateFlow(com.project.toko.homeScreen.data.model.linkChangerModel.getGenres())
     val selectedGenre = preSelectedGenre
 
 
@@ -78,28 +79,35 @@ class HomeScreenViewModel @Inject constructor(
 
     private val _genres = MutableStateFlow<String?>(null)
 
-    private val _ratingList = MutableStateFlow(com.project.toko.homeScreen.data.model.linkChangerModel.getRating())
+    private val _ratingList =
+        MutableStateFlow(com.project.toko.homeScreen.data.model.linkChangerModel.getRating())
     val ratingList = _ratingList
 
 
-    private val preSelectedRating = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Rating?>(null)
+    private val preSelectedRating =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Rating?>(null)
     val selectedRating = preSelectedRating
 
-    private val _selectedRating = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Rating?>(null)
+    private val _selectedRating =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Rating?>(null)
 
     fun setSelectedRating(rating: com.project.toko.homeScreen.data.model.linkChangerModel.Rating) {
         preSelectedRating.value = if (rating == preSelectedRating.value) null else rating
     }
 
 
-    private val _pre_min_score = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Score?>(null)
+    private val _pre_min_score =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Score?>(null)
     val pre_min_score = _pre_min_score
-    private val _min_score = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Score?>(null)
+    private val _min_score =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Score?>(null)
 
 
-    private val _pre_max_score = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Score?>(null)
+    private val _pre_max_score =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Score?>(null)
     val pre_max_score = _pre_max_score
-    private val _max_score = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Score?>(null)
+    private val _max_score =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Score?>(null)
 
     private val _scoreState = mutableIntStateOf(0)
     val scoreState = _scoreState
@@ -120,22 +128,30 @@ class HomeScreenViewModel @Inject constructor(
         _isNSFWActive.value = sharedPreferences.getBoolean("NSFW_MODE", false)
     }
 
-    private val _typeList = MutableStateFlow(com.project.toko.homeScreen.data.model.linkChangerModel.getTypes())
+    private val _typeList =
+        MutableStateFlow(com.project.toko.homeScreen.data.model.linkChangerModel.getTypes())
     val typeList = _typeList
 
-    private val pre_selectedType = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Types?>(null)
-    val selectedType: StateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Types?> = pre_selectedType
-    private val _selectedType = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Types?>(null)
+    private val pre_selectedType =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Types?>(null)
+    val selectedType: StateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Types?> =
+        pre_selectedType
+    private val _selectedType =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.Types?>(null)
 
     fun setSelectedType(type: com.project.toko.homeScreen.data.model.linkChangerModel.Types) {
         pre_selectedType.value = if (type == pre_selectedType.value) null else type
     }
 
-    private val _orderByList = MutableStateFlow(com.project.toko.homeScreen.data.model.linkChangerModel.getOrderBy())
+    private val _orderByList =
+        MutableStateFlow(com.project.toko.homeScreen.data.model.linkChangerModel.getOrderBy())
     val orderByList = _orderByList
-    private val pre_selectedOrderBy = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.OrderBy?>(null)
-    val selectedOrderBy: StateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.OrderBy?> = pre_selectedOrderBy
-    private val _selectedOrderBy = MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.OrderBy?>(null)
+    private val pre_selectedOrderBy =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.OrderBy?>(null)
+    val selectedOrderBy: StateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.OrderBy?> =
+        pre_selectedOrderBy
+    private val _selectedOrderBy =
+        MutableStateFlow<com.project.toko.homeScreen.data.model.linkChangerModel.OrderBy?>(null)
 
     fun setSelectedOrderBy(orderBy: com.project.toko.homeScreen.data.model.linkChangerModel.OrderBy) {
         pre_selectedOrderBy.value = if (orderBy == pre_selectedOrderBy.value) null else orderBy
@@ -171,7 +187,8 @@ class HomeScreenViewModel @Inject constructor(
     }
 
 
-    private val cachedSearch: MutableMap<String, com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel> = mutableMapOf()
+    private val cachedSearch: MutableMap<String, com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel> =
+        mutableMapOf()
 
     private fun generateRequestKey(
         query: String?,
@@ -263,7 +280,8 @@ class HomeScreenViewModel @Inject constructor(
     val topUpcomingAnime = _topUpcomingAnime.asStateFlow()
 
 
-    private val cachedTopTrendingAnime: MutableMap<String, com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel> = mutableMapOf()
+    private val cachedTopTrendingAnime: MutableMap<String, com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel> =
+        mutableMapOf()
 
     private val _loadingSectionTopAiring = mutableStateOf(false)
     val loadingSectionTopAiring = _loadingSectionTopAiring
@@ -506,18 +524,14 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun onDialogDismiss() {
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
-                _selectedAnimeId.value = null
-                isDialogShown = false
-            }
-        } catch (e: Exception) {
-            viewModelScope.launch(Dispatchers.Main) {
-                Toast.makeText(
-                    context, e.message, Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
+//        try {
+            _selectedAnimeId.value = null
+            isDialogShown = false
+//        } catch (e: Exception) {
+//            Toast.makeText(
+//                context, e.message, Toast.LENGTH_SHORT
+//            ).show()
+//        }
     }
 
     fun showListOfWatching(): Flow<List<AnimeItem>> {

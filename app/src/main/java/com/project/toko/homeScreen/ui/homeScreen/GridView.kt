@@ -1,5 +1,6 @@
 package com.project.toko.homeScreen.ui.homeScreen
 
+import android.content.Intent
 import com.project.toko.homeScreen.ui.viewModel.HomeScreenViewModel
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -33,12 +34,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -52,6 +55,7 @@ import com.project.toko.core.ui.theme.SectionColor
 import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.ui.theme.scoreBoardColor
 import com.project.toko.daoScreen.data.dao.AnimeItem
+import com.project.toko.detailScreen.ui.detailScreen.mainPage.custom.youtubePlayer.DetailScreenActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -68,6 +72,7 @@ fun GridAdder(
     svgImageLoader: ImageLoader,
 ) {
     val viewModel: HomeScreenViewModel = hiltViewModel()
+//    val customDialogViewModel: CustomDialogViewModel = hiltViewModel()
 
     val newAnimeSearchModel by viewModel.animeSearch.collectAsStateWithLifecycle()
     val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
@@ -106,13 +111,13 @@ fun GridAdder(
         val selectedData = selectedAnime ?: selectedTrending ?: selectedAiring ?: selectedUpcoming
 
         selectedData?.let { data ->
+
+
             CustomDialog(
                 data = data,
                 onNavigateToDetailScreen = onNavigateToDetailScreen,
                 onDismiss = {
-                    viewModel.viewModelScope.launch(Dispatchers.IO) {
-                        viewModel.onDialogDismiss()
-                    }
+                    viewModel.onDialogDismiss()
                 },
                 modifier = modifier,
                 isInDarkTheme = isInDarkTheme,
@@ -623,7 +628,7 @@ private fun ShowSection(
             ), repeatMode = RepeatMode.Reverse
         ), label = ""
     )
-
+    val context = LocalContext.current
     Card(
         modifier = modifier
             .height(300.dp)
@@ -645,7 +650,14 @@ private fun ShowSection(
                     isCardClicked = false
                 }
 
-            }) { data.id?.let { onNavigateToDetailScreen(it) } },
+            }) {
+                data.id?.let {
+                    val intent = Intent(context, DetailScreenActivity::class.java)
+                    intent.putExtra("id", it)
+                    context.startActivity(intent)
+//                onNavigateToDetailScreen(it)
+                }
+            },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RectangleShape,
     ) {

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/vector"
+        android:title="" />
+
+    <item
+        android:id="@+id/savedAnimeFragment"
+        android:icon="@drawable/favorite_untouched"
+        android:title=""
+        />
+
+    <item
+        android:id="@+id/randomAnimeFragment"
+        android:icon="@drawable/export"
+        android:title="" />
+</menu>

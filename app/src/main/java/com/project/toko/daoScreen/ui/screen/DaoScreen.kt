@@ -156,7 +156,9 @@ fun DaoScreen(
                     tint = MaterialTheme.colorScheme.inversePrimary,
                     modifier = modifier
                         .size(30.dp)
-                        .clickable { scope.launch { drawerState.open() } }
+                        .clickable { scope.launch {
+                            drawerState.open()
+                        } }
                 )
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),

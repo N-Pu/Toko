@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
@@ -16,25 +16,30 @@
         tools:ignore="ScopedStorage" />
 
     <application
-        android:name = ".core.domain.di.Application"
-        android:versionCode="14"
-        android:versionName="1.13"
-        android:windowSoftInputMode="adjustResize"
-        android:requestLegacyExternalStorage="true"
+        android:name=".core.domain.di.Application"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_toko"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_toko_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Toko.BarColors"
+        android:versionCode="14"
+        android:versionName="1.13"
+        android:windowSoftInputMode="adjustResize"
         tools:targetApi="tiramisu">
         <activity
+            android:name=".detailScreen.ui.detailScreen.mainPage.custom.youtubePlayer.DetailScreenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat"
+            />
+        <activity
+            android:theme="@style/Theme.AppCompat"
             android:name=".core.ui.main.MainActivity"
-            android:exported="true"
-            >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,9 +50,6 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <!--        <activity android:name=".detailScreen.presentation_layer.detailScreen.mainPage.custom.youtubePlayer.FullScreenYoutubeActivity">-->
-
-        <!--        </activity>-->
     </application>
 
 </manifest>

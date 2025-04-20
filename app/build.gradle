@@ -18,7 +18,7 @@ android {
         }
     }
     namespace 'com.project.toko'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.project.toko"
@@ -74,6 +74,8 @@ dependencies {
     implementation libs.androidx.ui.graphics
     implementation libs.androidx.constraintlayout
     implementation libs.androidx.appcompat
+    implementation libs.material
+    implementation libs.androidx.activity
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
@@ -132,4 +134,16 @@ dependencies {
 
     //swiping in dao screen
     implementation libs.swipe
+
+
+
+    // Основная библиотека навигации
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.8.9")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.8.9")
+
+    implementation ("androidx.fragment:fragment-ktx:1.8.6") // <<< это важно!
+
+
+    implementation ("androidx.hilt:hilt-navigation-fragment:1.2.0")
+
 }
