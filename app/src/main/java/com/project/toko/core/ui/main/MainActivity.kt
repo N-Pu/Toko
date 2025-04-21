@@ -27,71 +27,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-//@AndroidEntryPoint
-//class MainActivity : AppCompatActivity() {
-//
-//
-////    lateinit var navController: NavHostController
-//
-//    @Inject
-//    lateinit var svgImageLoader: ImageLoader
-//
-//    private lateinit var darkTheme: SaveDarkMode
-//
-//    private lateinit var navController: NavController
-//    private lateinit var bottomNav: BottomNavigationView
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        supportActionBar?.hide()
-//        setContentView(R.layout.activity_main) // <<< ЭТО ОБЯЗАТЕЛЬНО
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
-//
-//        requestedOrientation =
-//            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // locked screen for the time being
-//
-//        darkTheme = SaveDarkMode(this)
-//        darkTheme.loadData()
-//
-//        // Инициализация navHostFragment
-//        val navHostFragment = supportFragmentManager
-//            .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
-//        if (navHostFragment != null) {
-//            navController = navHostFragment.navController
-//        }
-//        bottomNav = findViewById(R.id.bottom_nav)
-//        bottomNav.setupWithNavController(navController)
-//        navController.addOnDestinationChangedListener { _, destination, _ ->
-//            when (destination.id) {
-//                R.id.savedAnimeFragment -> hideBottomNav()
-//                else -> showBottomNav()
-//            }
-//        }
-//
-//    }
-//    fun hideBottomNav() {
-//        bottomNav.animate()
-//            .translationY(bottomNav.height.toFloat())
-//            .alpha(0f)
-//            .setDuration(1000)
-//            .withEndAction {
-//                bottomNav.visibility = View.GONE
-//            }
-//            .start()
-//    }
-//
-//    fun showBottomNav() {
-//        bottomNav.visibility = View.VISIBLE
-//        bottomNav.animate()
-//            .translationY(0f)
-//            .alpha(1f)
-//            .setDuration(1000)
-//            .start()
-//    }
-//
-//}
-//
-
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -108,53 +43,57 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        if (savedInstanceState == null) {
 //        window.decorView.systemUiVisibility =
 //            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
 //                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        bottomNav = findViewById(R.id.bottom_nav)
-        requestedOrientation =
-            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // locked screen for the time being
-        bottomNav.labelVisibilityMode = BottomNavigationView.LABEL_VISIBILITY_UNLABELED
+            bottomNav = findViewById(R.id.bottom_nav)
+//        requestedOrientation =
+//            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // locked screen for the time being
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+            bottomNav.labelVisibilityMode = BottomNavigationView.LABEL_VISIBILITY_UNLABELED
 
-        navController.addOnDestinationChangedListener { controller, destination, _ ->
+            val navHostFragment =
+                supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+            val navController = navHostFragment.navController
 
-            Log.d("NavDebug", "Current destination: ${destination.label}")
+            navController.addOnDestinationChangedListener { controller, destination, _ ->
 
-            val childFragmentManager = navHostFragment.childFragmentManager
-            val count = childFragmentManager.backStackEntryCount
-            Log.d("NavDebug", "Back stack entry count: $count")
+                Log.d("NavDebug", "Current destination: ${destination.label}")
 
-            for (i in 0 until count) {
-                val entry = childFragmentManager.getBackStackEntryAt(i)
-                Log.d("NavDebug", "[$i]: ${entry.name}")
+                val childFragmentManager = navHostFragment.childFragmentManager
+                val count = childFragmentManager.backStackEntryCount
+                Log.d("NavDebug", "Back stack entry count: $count")
+
+                for (i in 0 until count) {
+                    val entry = childFragmentManager.getBackStackEntryAt(i)
+                    Log.d("NavDebug", "[$i]: ${entry.name}")
+                }
+                val current = controller.currentBackStackEntry
+                val previous = controller.previousBackStackEntry
+
+                Log.d("NavDebug", "Current destination: ${destination.label}")
+                Log.d("NavDebug", "Current entry: ${current?.destination?.label}")
+                Log.d("NavDebug", "Previous entry: ${previous?.destination?.label}")
+
+                when (destination.id) {
+                    R.id.detailScreenFragment,
+                    R.id.singleCharacterFragment,
+                    R.id.singleStaffFragment,
+                    R.id.wholeCast,
+                    R.id.wholeStaff -> hideBottomNav()
+
+                    else -> showBottomNav()
+                }
             }
-            val current = controller.currentBackStackEntry
-            val previous = controller.previousBackStackEntry
-
-            Log.d("NavDebug", "Current destination: ${destination.label}")
-            Log.d("NavDebug", "Current entry: ${current?.destination?.label}")
-            Log.d("NavDebug", "Previous entry: ${previous?.destination?.label}")
-
-            when (destination.id) {
-                R.id.detailScreenFragment,
-                R.id.singleCharacterFragment,
-                R.id.singleStaffFragment,
-                R.id.wholeCast,
-                R.id.wholeStaff -> hideBottomNav()
-
-                else -> showBottomNav()
+            // Подписка на drawer state
+            lifecycleScope.launch {
+                drawerViewModel.isDrawerOpen.collect { isOpen ->
+                    if (isOpen) hideBottomNav() else showBottomNav()
+                }
             }
-        }
-        // Подписка на drawer state
-        lifecycleScope.launch {
-            drawerViewModel.isDrawerOpen.collect { isOpen ->
-                if (isOpen) hideBottomNav() else showBottomNav()
-            }
-        }
 
 
 //    lifecycleScope.launch {
@@ -162,7 +101,8 @@ class MainActivity : AppCompatActivity() {
 //            if (isVisible) showBottomNav() else hideBottomNav()
 //        }
 //    }
-        bottomNav.setupWithNavController(navController)
+            bottomNav.setupWithNavController(navController)
+        }
     }
 
     private fun hideBottomNav() {

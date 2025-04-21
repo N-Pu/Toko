@@ -113,8 +113,9 @@ class DetailScreenActivity : AppCompatActivity() {
 
         youTubePlayerView.initialize(object : AbstractYouTubePlayerListener() {
             override fun onReady(youTubePlayer: YouTubePlayer) {
+                Log.d("NNNNNN", "27OZc-ku6is")
                 this@DetailScreenActivity.youTubePlayer = youTubePlayer
-                youTubePlayer.loadVideo("WGn9yvsMPqw", 0f)
+                youTubePlayer.loadVideo("27OZc-ku6is", 0f)
 
                 val enterFullscreenButton = findViewById<Button>(R.id.enter_fullscreen_button)
                 enterFullscreenButton.setOnClickListener {

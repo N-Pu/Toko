@@ -1,11 +1,9 @@
 package com.project.toko
 
+import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.activity.compose.BackHandler
+import android.widget.FrameLayout
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -24,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -36,7 +33,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -44,6 +40,10 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.project.toko.core.data.settings.SaveDarkModeManager
 import com.project.toko.core.ui.animations.LoadingAnimation
 import com.project.toko.core.ui.expandableText.ExpandableText
@@ -77,6 +77,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
 class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
     @Inject
@@ -93,20 +94,31 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
         NavOptions.Builder().setEnterAnim(R.anim.slide_in_right).setExitAnim(R.anim.slide_out_left)
             .setPopEnterAnim(R.anim.slide_in_left).setPopExitAnim(R.anim.slide_out_right).build()
 
+    private lateinit var fullScreenContainer: FrameLayout
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View = ComposeView(requireContext()).apply {
-        setContent {
+    private lateinit var youTubePlayerView: YouTubePlayerView
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            youTubePlayerView?.matchParent()
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            youTubePlayerView?.wrapContent()
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        fullScreenContainer = view.findViewById(R.id.full_screen_view_container)
+
+        val composeView = view.findViewById<ComposeView>(R.id.compose_view)
+        composeView.setContent {
             val isDark = darkThemeManager.isDarkThemeActive.value
 
-            Theme(
-                darkTheme = isDark, systemUiController = rememberSystemUiController()
-            ) {
+            Theme(darkTheme = isDark, systemUiController = rememberSystemUiController()) {
+                val navController = remember { findNavController() }
 
-                val navController = remember {
-                    findNavController()
-                }
                 DetailScreen(
                     onNavigateToDetailOnCharacter = { characterId ->
                         navController.navigate(
@@ -144,20 +156,89 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
                     id = animeId,
                     modifier = Modifier,
                     isInDarkTheme = { isDark },
-                    svgImageLoader = svgImageLoader
+                    svgImageLoader = svgImageLoader,
+                    onEnterFullScreen = { fullscreenView ->
+                        fullScreenContainer.visibility = View.VISIBLE
+                        fullScreenContainer.addView(fullscreenView)
+                    },
+                    onExitFullScreen = {
+                        fullScreenContainer.removeAllViews()
+                        fullScreenContainer.visibility = View.GONE
+
+                    },
+                    onYouTubePlayerView = { view ->
+                        youTubePlayerView = view
+                    }
                 )
             }
-//                BackHandler {
-//                    Log.d("BackHandler", "popping from detail")
-//                    navController
-//                        .popBackStack()
-//                }
-
-
         }
     }
 
 
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//        fullScreenContainer = view.findViewById(R.id.full_screen_view_container)
+//
+//        val composeView = view.findViewById<ComposeView>(R.id.compose_view)
+//        composeView.setContent {
+//            val isDark = darkThemeManager.isDarkThemeActive.value
+//
+//            Theme(darkTheme = isDark, systemUiController = rememberSystemUiController()) {
+//                val navController = remember { findNavController() }
+//
+//                DetailScreen(
+//                    onNavigateToDetailOnCharacter = { characterId ->
+//                        navController.navigate(
+//                            R.id.action_detailScreenFragment_to_singleCharacterFragment,
+//                            bundleOf("single_character_id" to characterId),
+//                        )
+//                    },
+//                    onNavigateToDetailOnStaff = { staffId ->
+//                        navController.navigate(
+//                            R.id.action_detailScreenFragment_to_singleStaffFragment,
+//                            bundleOf("single_staff_id" to staffId),
+//                        )
+//                    },
+//                    onNavigateToWholeOnStaff = {
+//                        navController.navigate(
+//                            R.id.action_detailScreenFragment_to_wholeStaff,
+//                            bundleOf("detail_screen_id" to animeId),
+//                            navOptions
+//                        )
+//                    },
+//                    onNavigateToDetailScreen = { detailScreenId ->
+//                        navController.navigate(
+//                            R.id.action_detailScreenFragment_self,
+//                            bundleOf("detail_screen_id" to detailScreenId),
+//                            navOptions
+//                        )
+//                    },
+//                    onNavigateToDetailOnWholeCast = {
+//                        navController.navigate(
+//                            R.id.action_detailScreenFragment_to_wholeCast,
+//                            bundleOf("detail_screen_id" to animeId),
+//                            navOptions
+//                        )
+//                    },
+//                    id = animeId,
+//                    modifier = Modifier,
+//                    isInDarkTheme = { isDark },
+//                    svgImageLoader = svgImageLoader,
+//                    onEnterFullScreen = { fullscreenView ->
+//                        fullScreenContainer.visibility = View.VISIBLE
+//                        fullScreenContainer.addView(fullscreenView)
+//                    },
+//                    onExitFullScreen = {
+//                        fullScreenContainer.removeAllViews()
+//                        fullScreenContainer.visibility = View.GONE
+//
+//                    },
+//                    onYouTubePlayerView = { youTubePlayerView }
+//                )
+//            }
+//        }
+//    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -171,7 +252,10 @@ private fun DetailScreen(
     id: Int,
     modifier: Modifier = Modifier,
     isInDarkTheme: () -> Boolean,
-    svgImageLoader: ImageLoader
+    svgImageLoader: ImageLoader,
+    onExitFullScreen: () -> Unit,
+    onEnterFullScreen: (View) -> Unit,
+    onYouTubePlayerView: (YouTubePlayerView) -> Unit
 ) {
 
     val viewModel: DetailScreenViewModel = hiltViewModel()
@@ -297,7 +381,12 @@ private fun DetailScreen(
 //            )
 
                 detailData?.trailer?.youtube_id?.let {
-                    YoutubePlayer(youtubeVideoId = it)
+                    YoutubePlayer(
+                        youtubeVideoId = it,
+                        onExitFullScreen = onExitFullScreen,
+                        onEnterFullScreen = onEnterFullScreen,
+                        onYouTubePlayerView = onYouTubePlayerView
+                    )
                 }
 
                 ShowMoreInformation(modifier = modifier, detailData = detailData)

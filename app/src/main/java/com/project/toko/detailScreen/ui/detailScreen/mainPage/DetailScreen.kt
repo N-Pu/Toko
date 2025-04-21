@@ -210,7 +210,7 @@ fun ActivateDetailScreen(
 //            )
 
                     detailData?.trailer?.youtube_id?.let {
-                        YoutubePlayer(youtubeVideoId = it)
+//                        YoutubePlayer(youtubeVideoId = it)
                     }
 
                     ShowMoreInformation(modifier = modifier, detailData = detailData)
