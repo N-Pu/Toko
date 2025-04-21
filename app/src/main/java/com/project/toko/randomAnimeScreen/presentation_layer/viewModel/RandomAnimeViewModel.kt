@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,9 +26,13 @@ class RandomAnimeViewModel @Inject constructor(private val malApiService: MalApi
 
     private val _isNSFWActive = mutableStateOf(false)
     val isNSFWActive = _isNSFWActive
-    suspend fun onTapRandomAnime() {
-        if (isSearching) return
-        viewModelScope.launch(Dispatchers.IO) {
+//    init {
+//        viewModelScope.launch {
+//            onTapRandomAnime()
+//        }
+//    }
+    suspend fun onTapRandomAnime() = withContext(Dispatchers.IO) {
+        if (isSearching) return@withContext
             try {
                 isSearching = true
                 val response = malApiService.getRandomAnime(!isNSFWActive.value)
@@ -42,6 +47,5 @@ class RandomAnimeViewModel @Inject constructor(private val malApiService: MalApi
             } finally {
                 isSearching = false
             }
-        }
     }
 }

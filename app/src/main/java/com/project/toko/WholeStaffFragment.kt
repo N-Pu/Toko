@@ -31,33 +31,32 @@ class WholeStaffFragment : Fragment(R.layout.fragment_whole_staff) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val isDark = darkThemeManager.isDarkThemeActive.value
+    ): View = ComposeView(requireContext()).apply {
+        setContent {
+            val isDark = darkThemeManager.isDarkThemeActive.value
 
-                Theme(
-                    darkTheme = isDark,
-                    systemUiController = rememberSystemUiController()
-                ) {
-                    val navController = remember {
-                        findNavController()
-                    }
-                    val viewModel: DetailScreenViewModel = hiltViewModel()
-                    ShowWholeStaff(
-                        onNavigateToDetailOnStaff = { staffId ->
-                            navController.navigate(
-                                R.id.action_wholeStaff_to_singleStaffFragment,
-                                bundleOf("single_staff_id" to staffId)
-                            )
-                        },
-                        onNavigateBack = { navController.navigateUp() },
-                        viewModel = viewModel,
-                        modifier = Modifier,
-                        isInDarkTheme = { isDark }
-                    )
+            Theme(
+                darkTheme = isDark,
+                systemUiController = rememberSystemUiController()
+            ) {
+                val navController = remember {
+                    findNavController()
                 }
+                val viewModel: DetailScreenViewModel = hiltViewModel()
+                ShowWholeStaff(
+                    onNavigateToDetailOnStaff = { staffId ->
+                        navController.navigate(
+                            R.id.action_wholeStaff_to_singleStaffFragment,
+                            bundleOf("single_staff_id" to staffId)
+                        )
+                    },
+                    onNavigateBack = { navController.navigateUp() },
+                    viewModel = viewModel,
+                    modifier = Modifier,
+                    isInDarkTheme = { isDark }
+                )
             }
         }
     }
+
 }

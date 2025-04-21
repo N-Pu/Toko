@@ -89,70 +89,64 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
         requireArguments().getInt("detail_screen_id")
     }
 
-    private val navOptions = NavOptions.Builder()
-        .setEnterAnim(R.anim.slide_in_right)
-        .setExitAnim(R.anim.slide_out_left)
-        .setPopEnterAnim(R.anim.slide_in_left)
-        .setPopExitAnim(R.anim.slide_out_right)
-        .build()
+    private val navOptions =
+        NavOptions.Builder().setEnterAnim(R.anim.slide_in_right).setExitAnim(R.anim.slide_out_left)
+            .setPopEnterAnim(R.anim.slide_in_left).setPopExitAnim(R.anim.slide_out_right).build()
 
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val isDark = darkThemeManager.isDarkThemeActive.value
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View = ComposeView(requireContext()).apply {
+        setContent {
+            val isDark = darkThemeManager.isDarkThemeActive.value
 
-                Theme(
-                    darkTheme = isDark,
-                    systemUiController = rememberSystemUiController()
-                ) {
+            Theme(
+                darkTheme = isDark, systemUiController = rememberSystemUiController()
+            ) {
 
-                    val navController = remember {
-                        findNavController()
-                    }
-                    DetailScreen(
-                        onNavigateToDetailOnCharacter = { characterId ->
-                            navController.navigate(
-                                R.id.action_detailScreenFragment_to_singleCharacterFragment,
-                                bundleOf("single_character_id" to characterId),
-                            )
-                        },
-                        onNavigateToDetailOnStaff = {   staffId ->
-                            navController.navigate(
+                val navController = remember {
+                    findNavController()
+                }
+                DetailScreen(
+                    onNavigateToDetailOnCharacter = { characterId ->
+                        navController.navigate(
+                            R.id.action_detailScreenFragment_to_singleCharacterFragment,
+                            bundleOf("single_character_id" to characterId),
+                        )
+                    },
+                    onNavigateToDetailOnStaff = { staffId ->
+                        navController.navigate(
                             R.id.action_detailScreenFragment_to_singleStaffFragment,
                             bundleOf("single_staff_id" to staffId),
-                        )},
-                        onNavigateToWholeOnStaff = {
-                            navController.navigate(
-                                R.id.action_detailScreenFragment_to_wholeStaff,
-                                bundleOf("detail_screen_id" to animeId),
-                                navOptions
-                            )
-                        },
-                        onNavigateToDetailScreen = { detailScreenId ->
-                            navController.navigate(
-                                R.id.action_detailScreenFragment_self,
-                                bundleOf("detail_screen_id" to detailScreenId),
-                                navOptions
-                            )
-                        },
-                        onNavigateToDetailOnWholeCast = {
-                            navController.navigate(
-                                R.id.action_detailScreenFragment_to_wholeCast,
-                                bundleOf("detail_screen_id" to animeId),
-                                navOptions
-                            )
-                        },
-                        id = animeId,
-                        modifier = Modifier,
-                        isInDarkTheme = { isDark },
-                        svgImageLoader = svgImageLoader
-                    )
-                }
+                        )
+                    },
+                    onNavigateToWholeOnStaff = {
+                        navController.navigate(
+                            R.id.action_detailScreenFragment_to_wholeStaff,
+                            bundleOf("detail_screen_id" to animeId),
+                            navOptions
+                        )
+                    },
+                    onNavigateToDetailScreen = { detailScreenId ->
+                        navController.navigate(
+                            R.id.action_detailScreenFragment_self,
+                            bundleOf("detail_screen_id" to detailScreenId),
+                            navOptions
+                        )
+                    },
+                    onNavigateToDetailOnWholeCast = {
+                        navController.navigate(
+                            R.id.action_detailScreenFragment_to_wholeCast,
+                            bundleOf("detail_screen_id" to animeId),
+                            navOptions
+                        )
+                    },
+                    id = animeId,
+                    modifier = Modifier,
+                    isInDarkTheme = { isDark },
+                    svgImageLoader = svgImageLoader
+                )
+            }
 //                BackHandler {
 //                    Log.d("BackHandler", "popping from detail")
 //                    navController
@@ -160,9 +154,9 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
 //                }
 
 
-            }
         }
     }
+
 
 }
 
@@ -182,13 +176,12 @@ private fun DetailScreen(
 
     val viewModel: DetailScreenViewModel = hiltViewModel()
 
-    val detailData by
-    viewModel.animeDetails.collectAsStateWithLifecycle()
+    val detailData by viewModel.animeDetails.collectAsStateWithLifecycle()
 
     val castData by viewModel.castList.collectAsStateWithLifecycle()
     val staffData by viewModel.staffList.collectAsStateWithLifecycle()
     val recommendationsData by viewModel.recommendationList.collectAsStateWithLifecycle()
-    val scrollState = viewModel.scrollState
+    val scrollState = remember { viewModel.scrollState }
     val picturesData by viewModel.picturesData.collectAsStateWithLifecycle()
     val isAlbumDialogShown = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -202,112 +195,93 @@ private fun DetailScreen(
         }
     }
 
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current).data(detailData?.images?.jpg?.large_image_url)
+            .size(Size.ORIGINAL).crossfade(true).build()
+    )
 
-    val model = ImageRequest.Builder(LocalContext.current)
-        .data(detailData?.images?.jpg?.large_image_url)
-        .size(Size.ORIGINAL)
-        .crossfade(true)
-        .build()
-
-    val painter =
-        rememberAsyncImagePainter(
-            model
-        )
-
-    if (
-        viewModel.isLoading.value.not()
+    if (viewModel.isLoading.value.not()
 //        &&
 //            detailData != null
     ) {
-        PullToRefreshLayout(
-            composable = {
-                Column(
+        PullToRefreshLayout(composable = {
+            Column(
+                modifier = modifier
+                    .verticalScroll(scrollState)
+                    .background(MaterialTheme.colorScheme.errorContainer),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                DisplayPicture(
+                    painter = painter,
                     modifier = modifier
-                        .verticalScroll(scrollState)
-                        .background(MaterialTheme.colorScheme.errorContainer),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
+                        .fillMaxSize()
+                        .combinedClickable(onClick = {}, onLongClick = {
+                            isAlbumDialogShown.value = true
+                        })
+                )
+
+                ShowPictureAlbum(
+                    isDialogShown = isAlbumDialogShown,
+                    picturesData = picturesData,
+                    modifier = modifier
+                )
+
+                DisplayTitle(title = detailData?.title ?: "No title name", modifier)
+                Spacer(modifier = modifier.height(20.dp))
+                DisplayJapAndEnglishTitles(detailData = detailData, modifier = modifier)
+                Spacer(modifier = modifier.height(20.dp))
+                YearTypeEpisodesTimeStatusStudio(data = detailData, modifier = modifier)
+
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    DisplayPicture(
-                        painter = painter,
-                        modifier = modifier
-                            .fillMaxSize()
-                            .combinedClickable(onClick = {}, onLongClick = {
-                                isAlbumDialogShown.value = true
-                            })
-                    )
-
-                    ShowPictureAlbum(
-                        isDialogShown = isAlbumDialogShown,
-                        picturesData = picturesData,
-                        modifier = modifier
-                    )
-
-                    DisplayTitle(title = detailData?.title ?: "No title name", modifier)
-                    Spacer(modifier = modifier.height(20.dp))
-                    DisplayJapAndEnglishTitles(detailData = detailData, modifier = modifier)
-                    Spacer(modifier = modifier.height(20.dp))
-                    YearTypeEpisodesTimeStatusStudio(data = detailData, modifier = modifier)
-
-                    Row(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .height(150.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = modifier.size(150.dp)
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = modifier.size(150.dp)
-                        ) {
 
-                            ScoreLabel(modifier = modifier)
-                            ScoreNumber(modifier = modifier, score = detailData?.score ?: 0.0f)
-                            ScoreByNumber(
-                                scoreBy = detailData?.scored_by ?: 0.0f,
-                                modifier = modifier
-                            )
+                        ScoreLabel(modifier = modifier)
+                        ScoreNumber(modifier = modifier, score = detailData?.score ?: 0.0f)
+                        ScoreByNumber(
+                            scoreBy = detailData?.scored_by ?: 0.0f, modifier = modifier
+                        )
 
-                        }
-                        Column(
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = modifier.size(height = 150.dp, width = 150.dp)
-                        ) {
-
-                            RankedLine(
-                                rank = detailData?.rank ?: 0,
-                                modifier = modifier
-                            )
-                            PopularityLine(
-                                popularity = detailData?.popularity ?: 0,
-                                modifier = modifier
-                            )
-                            MembersLine(
-                                members = detailData?.members ?: 0,
-                                modifier = modifier
-                            )
-
-                            FavoritesLine(
-                                favorites = detailData?.favorites ?: 0,
-                                modifier = modifier
-                            )
-                        }
                     }
-                    DisplayCustomGenreBoxes(
-                        genres = detailData?.genres ?: listOf(),
-                        modifier = modifier
-                    )
-                    AddToFavorites(
-                        modifier,
-                        isInDarkTheme,
-                        svgImageLoader = svgImageLoader
-                    )
-                    ExpandableText(
-                        text = detailData?.synopsis,
-                        title = "Synopsis",
-                        modifier = modifier
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = modifier.size(height = 150.dp, width = 150.dp)
+                    ) {
+
+                        RankedLine(
+                            rank = detailData?.rank ?: 0, modifier = modifier
+                        )
+                        PopularityLine(
+                            popularity = detailData?.popularity ?: 0, modifier = modifier
+                        )
+                        MembersLine(
+                            members = detailData?.members ?: 0, modifier = modifier
+                        )
+
+                        FavoritesLine(
+                            favorites = detailData?.favorites ?: 0, modifier = modifier
+                        )
+                    }
+                }
+                DisplayCustomGenreBoxes(
+                    genres = detailData?.genres ?: listOf(), modifier = modifier
+                )
+                AddToFavorites(
+                    modifier, isInDarkTheme, svgImageLoader = svgImageLoader
+                )
+                ExpandableText(
+                    text = detailData?.synopsis, title = "Synopsis", modifier = modifier
+                )
 
 
 //            FullScreenYoutubeActivity().YoutubePlayerSecond(
@@ -322,47 +296,45 @@ private fun DetailScreen(
 //                modifier
 //            )
 
-                    detailData?.trailer?.youtube_id?.let {
-                        YoutubePlayer(youtubeVideoId = it)
-                    }
+                detailData?.trailer?.youtube_id?.let {
+                    YoutubePlayer(youtubeVideoId = it)
+                }
 
-                    ShowMoreInformation(modifier = modifier, detailData = detailData)
-                    ShowBackground(detailData = detailData, modifier = modifier)
-                    DisplayCast(
-                        castList = castData,
-                        onNavigateToDetailOnCharacter = onNavigateToDetailOnCharacter,
-                        onNavigateToDetailOnStaff = onNavigateToDetailOnStaff,
-                        onNavigateToWholeOnCast = onNavigateToDetailOnWholeCast,
-                        modifier = modifier,
+                ShowMoreInformation(modifier = modifier, detailData = detailData)
+                ShowBackground(detailData = detailData, modifier = modifier)
+                DisplayCast(
+                    castList = castData,
+                    onNavigateToDetailOnCharacter = onNavigateToDetailOnCharacter,
+                    onNavigateToDetailOnStaff = onNavigateToDetailOnStaff,
+                    onNavigateToWholeOnCast = onNavigateToDetailOnWholeCast,
+                    modifier = modifier,
 //                        detailMalId = viewModel.loadedId.intValue
-                    )
-                    DisplayStaff(
-                        staffList = staffData,
-                        onNavigateToDetailOnStaff = onNavigateToDetailOnStaff,
-                        onNavigateToWholeOnStaff = onNavigateToWholeOnStaff,
-                        modifier = modifier
-                    )
+                )
+                DisplayStaff(
+                    staffList = staffData,
+                    onNavigateToDetailOnStaff = onNavigateToDetailOnStaff,
+                    onNavigateToWholeOnStaff = onNavigateToWholeOnStaff,
+                    modifier = modifier
+                )
 //            ShowStudios(detailData, navController)
-                    ExpandableRelated(
-                        relations = detailData?.relations,
-                        modifier = modifier,
-                        onNavigateToDetailScreen = onNavigateToDetailScreen
-                    )
-                    AnimeAlike(
-                        recommendationsData,
-                        onNavigateToDetailScreen = onNavigateToDetailScreen,
-                        modifier,
-                        isInDarkTheme
-                    )
-                    Spacer(modifier = modifier.height(20.dp))
-                }
-            },
-            onLoad = {
-                viewModel.viewModelScope.launch {
-                    viewModel.refreshAndLoadAllInfo(id, context)
-                }
-            },
-            swipeRefreshState = swipeRefreshState
+                ExpandableRelated(
+                    relations = detailData?.relations,
+                    modifier = modifier,
+                    onNavigateToDetailScreen = onNavigateToDetailScreen
+                )
+                AnimeAlike(
+                    recommendationsData,
+                    onNavigateToDetailScreen = onNavigateToDetailScreen,
+                    modifier,
+                    isInDarkTheme
+                )
+                Spacer(modifier = modifier.height(20.dp))
+            }
+        }, onLoad = {
+            viewModel.viewModelScope.launch {
+                viewModel.refreshAndLoadAllInfo(id, context)
+            }
+        }, swipeRefreshState = swipeRefreshState
         )
 
     } else {

@@ -56,7 +56,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@Stable
 @Composable
 fun MainScreen(
     onNavigateToDetailScreen: (Int) -> Unit,
@@ -225,7 +224,7 @@ fun MainScreen(
 
         }
     }, onLoad = {
-        viewModel.viewModelScope.launch(Dispatchers.IO) {
+        viewModel.viewModelScope.launch {
             if (switchIndicator.value.not()) {
                 viewModel.reloadAllSectionAndCache(context)
                 return@launch
@@ -238,7 +237,7 @@ fun MainScreen(
 }
 
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TabSelectionMenu(
     viewModel: HomeScreenViewModel,

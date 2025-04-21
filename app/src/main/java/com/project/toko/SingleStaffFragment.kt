@@ -33,36 +33,35 @@ class SingleStaffFragment : Fragment(R.layout.fragment_single_staff) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val isDark = darkThemeManager.isDarkThemeActive.value
-                Theme(
-                    darkTheme = isDark,
-                    systemUiController = rememberSystemUiController()
-                ) {
-                    val navController = remember { findNavController() }
-                    DisplayPersonFullScreen(
-                        id = staffId,
-                        onNavigateToDetailScreen = { detailId ->
-                            navController.navigate(
-                                R.id.action_singleStaffFragment_to_detailScreenFragment,
-                                bundleOf("detail_screen_id" to detailId)
-                            )
-                        },
-                        onNavigateToDetailOnCharacter = { characterId ->
-                            navController.navigate(
-                                R.id.action_singleStaffFragment_to_singleCharacterFragment,
-                                bundleOf("single_character_id" to characterId)
-                            )
-                        },
-                        onNavigateBack = { navController.navigateUp() },
-                        modifier = Modifier,
-                        isInDarkTheme = { isDark },
-                        svgImageLoader = svgImageLoader
-                    )
-                }
+    ): View = ComposeView(requireContext()).apply {
+        setContent {
+            val isDark = darkThemeManager.isDarkThemeActive.value
+            Theme(
+                darkTheme = isDark,
+                systemUiController = rememberSystemUiController()
+            ) {
+                val navController = remember { findNavController() }
+                DisplayPersonFullScreen(
+                    id = staffId,
+                    onNavigateToDetailScreen = { detailId ->
+                        navController.navigate(
+                            R.id.action_singleStaffFragment_to_detailScreenFragment,
+                            bundleOf("detail_screen_id" to detailId)
+                        )
+                    },
+                    onNavigateToDetailOnCharacter = { characterId ->
+                        navController.navigate(
+                            R.id.action_singleStaffFragment_to_singleCharacterFragment,
+                            bundleOf("single_character_id" to characterId)
+                        )
+                    },
+                    onNavigateBack = { navController.navigateUp() },
+                    modifier = Modifier,
+                    isInDarkTheme = { isDark },
+                    svgImageLoader = svgImageLoader
+                )
             }
         }
     }
+
 }

@@ -33,40 +33,39 @@ class WholeCastFragment : Fragment(R.layout.fragment_whole_cast) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val isDark = darkThemeManager.isDarkThemeActive.value
+    ): View = ComposeView(requireContext()).apply {
+        setContent {
+            val isDark = darkThemeManager.isDarkThemeActive.value
 
-                Theme(
-                    darkTheme = isDark,
-                    systemUiController = rememberSystemUiController()
-                ) {
-                    val navController = remember {
-                        findNavController()
-                    }
-                    val viewModel: DetailScreenViewModel = hiltViewModel()
-                    ShowWholeCast(
-                        onNavigateToDetailOnCharacter = { characterId ->
-
-                            navController.navigate(
-                                R.id.action_wholeCast_to_singleCharacterFragment,
-                                bundleOf("single_character_id" to characterId)
-                            )
-                        },
-                        onNavigateToDetailOnStaff = { staffId ->
-                            navController.navigate(
-                                R.id.action_wholeCast_to_singleStaffFragment,
-                                bundleOf("single_staff_id" to staffId)
-                            )
-                        },
-                        onNavigateBack = { navController.navigateUp() },
-                        viewModel = viewModel,
-                        modifier = Modifier,
-                        isInDarkTheme = { isDark }
-                    )
+            Theme(
+                darkTheme = isDark,
+                systemUiController = rememberSystemUiController()
+            ) {
+                val navController = remember {
+                    findNavController()
                 }
+                val viewModel: DetailScreenViewModel = hiltViewModel()
+                ShowWholeCast(
+                    onNavigateToDetailOnCharacter = { characterId ->
+
+                        navController.navigate(
+                            R.id.action_wholeCast_to_singleCharacterFragment,
+                            bundleOf("single_character_id" to characterId)
+                        )
+                    },
+                    onNavigateToDetailOnStaff = { staffId ->
+                        navController.navigate(
+                            R.id.action_wholeCast_to_singleStaffFragment,
+                            bundleOf("single_staff_id" to staffId)
+                        )
+                    },
+                    onNavigateBack = { navController.navigateUp() },
+                    viewModel = viewModel,
+                    modifier = Modifier,
+                    isInDarkTheme = { isDark }
+                )
             }
         }
     }
+
 }

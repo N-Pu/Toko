@@ -42,60 +42,59 @@ class SavedAnimeFragment
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-                val isDark = darkThemeManager.isDarkThemeActive.value
+    ): View = ComposeView(requireContext()).apply {
+        setContent {
+            val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+            val isDark = darkThemeManager.isDarkThemeActive.value
 
-                // Следим за drawerState и обновляем ViewModel
-                LaunchedEffect(drawerState.isOpen) {
-                    drawerViewModel.setDrawerState(drawerState.isOpen)
-                }
+            // Следим за drawerState и обновляем ViewModel
+            LaunchedEffect(drawerState.isOpen) {
+                drawerViewModel.setDrawerState(drawerState.isOpen)
+            }
 
-                Theme(
-                    darkTheme = isDark,
-                    systemUiController = rememberSystemUiController()
-                ) {
-                    ModalNavigationDrawer(drawerState = drawerState,
-                        drawerContent = {
-                            ShowDrawerContent(
-                                imageLoader = svgImageLoader,
+            Theme(
+                darkTheme = isDark,
+                systemUiController = rememberSystemUiController()
+            ) {
+                ModalNavigationDrawer(drawerState = drawerState,
+                    drawerContent = {
+                        ShowDrawerContent(
+                            imageLoader = svgImageLoader,
 //                                componentActivity = componentActivity,
-                                onThemeChange = {
-                                    darkThemeManager.toggleTheme()
-                                },
-                                darkTheme = { isDark },
-                                svgImageLoader = svgImageLoader
-                            )
-                        }
-                    ) {
-                        val navController = remember { findNavController() }
-
-                        DaoScreen(
-                            onNavigateToDetailOnCharacter = { characterId ->
-                                navController.navigate(
-                                    R.id.action_savedAnimeFragment_to_singleCharacterFragment,
-                                    bundleOf("single_character_id" to characterId),
-                                )
-                            }, onNavigateToDetailOnStaff = { staffId ->
-                                navController.navigate(
-                                    R.id.action_savedAnimeFragment_to_singleStaffFragment,
-                                    bundleOf("single_staff_id" to staffId)
-                                )
-                            }, onNavigateToDetailScreen = { detailScreenId ->
-                                navController.navigate(
-                                    R.id.action_savedAnimeFragment_to_detailScreenFragment,
-                                    bundleOf("detail_screen_id" to detailScreenId),
-                                )
+                            onThemeChange = {
+                                darkThemeManager.toggleTheme()
                             },
-                            isInDarkTheme = { isDark },
-                            drawerState = drawerState,
+                            darkTheme = { isDark },
                             svgImageLoader = svgImageLoader
                         )
                     }
+                ) {
+                    val navController = remember { findNavController() }
+
+                    DaoScreen(
+                        onNavigateToDetailOnCharacter = { characterId ->
+                            navController.navigate(
+                                R.id.action_savedAnimeFragment_to_singleCharacterFragment,
+                                bundleOf("single_character_id" to characterId),
+                            )
+                        }, onNavigateToDetailOnStaff = { staffId ->
+                            navController.navigate(
+                                R.id.action_savedAnimeFragment_to_singleStaffFragment,
+                                bundleOf("single_staff_id" to staffId)
+                            )
+                        }, onNavigateToDetailScreen = { detailScreenId ->
+                            navController.navigate(
+                                R.id.action_savedAnimeFragment_to_detailScreenFragment,
+                                bundleOf("detail_screen_id" to detailScreenId),
+                            )
+                        },
+                        isInDarkTheme = { isDark },
+                        drawerState = drawerState,
+                        svgImageLoader = svgImageLoader
+                    )
                 }
             }
         }
     }
+
 }

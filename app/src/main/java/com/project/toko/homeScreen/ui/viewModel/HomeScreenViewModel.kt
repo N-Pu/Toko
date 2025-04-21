@@ -19,6 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -160,7 +161,7 @@ class HomeScreenViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             searchDebouncer.debounce(1000L).collectLatest { searchQuery ->
-                performSearch(searchQuery)
+                safeLaunch {  performSearch(searchQuery) }
             }
         }
     }
@@ -171,17 +172,17 @@ class HomeScreenViewModel @Inject constructor(
     private val _isTabMenuOpen = mutableStateOf(false)
     val isTabMenuOpen = _isTabMenuOpen
     fun onSearchTextChange(text: String) {
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
                 _searchText.value = text
                 searchDebouncer.emit(text)
                 _switchIndicator.value = true
-            }
-        } catch (e: Exception) {
-            viewModelScope.launch(Dispatchers.Main) {
-                Toast.makeText(
-                    context, e.message, Toast.LENGTH_SHORT
-                ).show()
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context, e.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
@@ -297,26 +298,24 @@ class HomeScreenViewModel @Inject constructor(
         data: MutableStateFlow<com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel>,
         loadingCurrentSection: MutableState<Boolean>,
         sfw: Boolean
-    ) {
+    ) = withContext(Dispatchers.IO) {
         try {
 //            if (isInternetAvailable(context)) {
-            viewModelScope.launch(Dispatchers.IO) {
-                val cachedData = cachedTopTrendingAnime[filter]
-                if (cachedData != null) {
-                    // Если данные уже есть в кэше, используем их
-                    data.value = cachedTopTrendingAnime[filter]!!
-                } else {
-                    loadingCurrentSection.value = true
-                    // Если данные отсутствуют в кэше, делаем запрос к API
-                    val response = malApiRepository.getTenTopAnime(filter, limit, sfw).body()
-                    val newData = response ?: emptyNewAnimeSearchModel
-                    loadingCurrentSection.value = false
+            val cachedData = cachedTopTrendingAnime[filter]
+            if (cachedData != null) {
+                // Если данные уже есть в кэше, используем их
+                data.value = cachedTopTrendingAnime[filter]!!
+            } else {
+                loadingCurrentSection.value = true
+                // Если данные отсутствуют в кэше, делаем запрос к API
+                val response = malApiRepository.getTenTopAnime(filter, limit, sfw).body()
+                val newData = response ?: emptyNewAnimeSearchModel
+                loadingCurrentSection.value = false
 
-                    // Сохраняем новые данные в кэше
-                    cachedTopTrendingAnime[filter] = newData
+                // Сохраняем новые данные в кэше
+                cachedTopTrendingAnime[filter] = newData
 
-                    data.value = newData
-                }
+                data.value = newData
             }
 //            } else {
 //                // Если нет интернета, показываем сообщение
@@ -330,7 +329,7 @@ class HomeScreenViewModel @Inject constructor(
 //            }
         } catch (e: Exception) {
             // Если произошла ошибка, показываем сообщение
-            viewModelScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 Toast.makeText(
                     context, e.message, Toast.LENGTH_SHORT
                 ).show()
@@ -339,50 +338,48 @@ class HomeScreenViewModel @Inject constructor(
     }
 
 
-    suspend fun loadNextPage() {
+    suspend fun loadNextPage() = withContext(Dispatchers.IO) {
 
-        viewModelScope.launch(Dispatchers.IO) {
 
-            try {
-                val query = searchText.value
-                var currentQuery = query
-                if (currentQuery == "") {
-                    currentQuery = null
-                }
-                if (!hasNextPage.value) {
-                    return@launch
-                }
-                val nextPage = currentPage.value + 1
-
-                val response = malApiRepository.getAnimeSearchByName(
-                    eTag = query + currentPage.value,
-                    sfw = !_isNSFWActive.value,
-                    query = currentQuery,
-                    page = nextPage,
-                    genres = makeArrayToLinkWithCommas(arrayOfGenres.value),
-                    rating = preSelectedRating.value?.ratingName,
-                    type = pre_selectedType.value?.typeName,
-                    orderBy = pre_selectedOrderBy.value?.orderBy,
-                    max_score = pre_max_score.value?.score,
-                    min_score = pre_min_score.value?.score
-                ).body()
-
-                if (response != null) {
-                    hasNextPage.value = response.pagination.has_next_page
-                }
-
-                response?.let { newAnimeSearchModel ->
-                    _animeSearch.value =
-                        _animeSearch.value.copy(data = _animeSearch.value.data + newAnimeSearchModel.data)
-                    _currentPage.value = nextPage
-                    _isNextPageLoading.value = newAnimeSearchModel.pagination.has_next_page
-                }
-
-            } catch (e: Exception) {
-                Log.e("HomeScreenViewModel", "Failed to load next page: ${e.message}")
-            } finally {
-                _isNextPageLoading.value = false
+        try {
+            val query = searchText.value
+            var currentQuery = query
+            if (currentQuery == "") {
+                currentQuery = null
             }
+            if (!hasNextPage.value) {
+                return@withContext
+            }
+            val nextPage = currentPage.value + 1
+
+            val response = malApiRepository.getAnimeSearchByName(
+                eTag = query + currentPage.value,
+                sfw = !_isNSFWActive.value,
+                query = currentQuery,
+                page = nextPage,
+                genres = makeArrayToLinkWithCommas(arrayOfGenres.value),
+                rating = preSelectedRating.value?.ratingName,
+                type = pre_selectedType.value?.typeName,
+                orderBy = pre_selectedOrderBy.value?.orderBy,
+                max_score = pre_max_score.value?.score,
+                min_score = pre_min_score.value?.score
+            ).body()
+
+            if (response != null) {
+                hasNextPage.value = response.pagination.has_next_page
+            }
+
+            response?.let { newAnimeSearchModel ->
+                _animeSearch.value =
+                    _animeSearch.value.copy(data = _animeSearch.value.data + newAnimeSearchModel.data)
+                _currentPage.value = nextPage
+                _isNextPageLoading.value = newAnimeSearchModel.pagination.has_next_page
+            }
+
+        } catch (e: Exception) {
+            Log.e("HomeScreenViewModel", "Failed to load next page: ${e.message}")
+        } finally {
+            _isNextPageLoading.value = false
         }
     }
 
@@ -413,50 +410,91 @@ class HomeScreenViewModel @Inject constructor(
     }
 
 
-    suspend fun addAllParams() {
-        try {
-            viewModelScope.async(Dispatchers.IO) {
-                pre_genres = makeArrayToLinkWithCommas(arrayOfGenres.value)
-                _genres.value = pre_genres
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
-                _selectedRating.value = preSelectedRating.value
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
-                _selectedType.value = pre_selectedType.value
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
-                _selectedOrderBy.value = pre_selectedOrderBy.value
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
-                _min_score.value = _pre_min_score.value
-                _max_score.value = _pre_max_score.value
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
+
+suspend fun addAllParams() {
+    try {
+        withContext(Dispatchers.IO) {
+            _genres.value = makeArrayToLinkWithCommas(arrayOfGenres.value)
+            _selectedRating.value = preSelectedRating.value
+            _selectedType.value = pre_selectedType.value
+            _selectedOrderBy.value = pre_selectedOrderBy.value
+            _min_score.value = _pre_min_score.value
+            _max_score.value = _pre_max_score.value
+
+            safeLaunch {
                 performSearch(searchText.value)
-            }.join()
-        } catch (e: Exception) {
-            viewModelScope.launch(Dispatchers.Main) {
-                Toast.makeText(
-                    context, e.message, Toast.LENGTH_SHORT
-                ).show()
             }
         }
+    } catch (e: Exception) {
+        withContext(Dispatchers.Main) {
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
+}
+
+
+
+//    suspend fun reloadAllParamsAndClearCache(query: String?) {
+//        var currentQuery = query
+//        var currentGenres = _genres.value
+//        _currentPage.value = 1
+//        _isLoadingSearch.value = true
+//
+//        if (currentQuery == "") {
+//            currentQuery = null
+//        }
+//        if (currentGenres == "") {
+//            currentGenres = null
+//        }
+//
+//        val requestKey = generateRequestKey(
+//            query = currentQuery,
+//            genres = currentGenres,
+//            type = _selectedType.value?.typeName,
+//            rating = _selectedRating.value?.ratingName,
+//            orderBy = _selectedOrderBy.value?.orderBy,
+//            maxScore = _max_score.value?.score,
+//            minScore = _min_score.value?.score
+//        )
+//        cachedSearch.remove(requestKey)
+//
+//        try {
+//            viewModelScope.async(Dispatchers.IO) {
+//                pre_genres = makeArrayToLinkWithCommas(arrayOfGenres.value)
+//                _genres.value = pre_genres
+//            }.join()
+//            viewModelScope.async(Dispatchers.IO) {
+//                _selectedRating.value = preSelectedRating.value
+//            }.join()
+//            viewModelScope.async(Dispatchers.IO) {
+//                _selectedType.value = pre_selectedType.value
+//            }.join()
+//            viewModelScope.async(Dispatchers.IO) {
+//                _selectedOrderBy.value = pre_selectedOrderBy.value
+//            }.join()
+//            viewModelScope.async(Dispatchers.IO) {
+//                _min_score.value = _pre_min_score.value
+//                _max_score.value = _pre_max_score.value
+//            }.join()
+//            viewModelScope.async(Dispatchers.IO) {
+//                performSearch(searchText.value)
+//            }.join()
+//        } catch (e: Exception) {
+//            viewModelScope.launch(Dispatchers.Main) {
+//                Toast.makeText(
+//                    context, e.message, Toast.LENGTH_SHORT
+//                ).show()
+//            }
+//        }
+//    }
 
 
     suspend fun reloadAllParamsAndClearCache(query: String?) {
-        var currentQuery = query
-        var currentGenres = _genres.value
+        val currentQuery = query?.takeIf { it.isNotBlank() }
+        val currentGenres = _genres.value.takeIf { it?.isNotBlank() == true }
+
         _currentPage.value = 1
         _isLoadingSearch.value = true
-
-        if (currentQuery == "") {
-            currentQuery = null
-        }
-        if (currentGenres == "") {
-            currentGenres = null
-        }
 
         val requestKey = generateRequestKey(
             query = currentQuery,
@@ -470,34 +508,24 @@ class HomeScreenViewModel @Inject constructor(
         cachedSearch.remove(requestKey)
 
         try {
-            viewModelScope.async(Dispatchers.IO) {
-                pre_genres = makeArrayToLinkWithCommas(arrayOfGenres.value)
-                _genres.value = pre_genres
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
+                _genres.value = makeArrayToLinkWithCommas(arrayOfGenres.value)
                 _selectedRating.value = preSelectedRating.value
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
                 _selectedType.value = pre_selectedType.value
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
                 _selectedOrderBy.value = pre_selectedOrderBy.value
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
                 _min_score.value = _pre_min_score.value
                 _max_score.value = _pre_max_score.value
-            }.join()
-            viewModelScope.async(Dispatchers.IO) {
                 performSearch(searchText.value)
-            }.join()
-        } catch (e: Exception) {
-            viewModelScope.launch(Dispatchers.Main) {
-                Toast.makeText(
-                    context, e.message, Toast.LENGTH_SHORT
-                ).show()
             }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, e.message ?: "Unknown error", Toast.LENGTH_SHORT).show()
+            }
+        } finally {
+            _isLoadingSearch.value = false
         }
     }
+
 
     //------------------------------------------------------
     var isDialogShown by mutableStateOf(false)
@@ -525,8 +553,8 @@ class HomeScreenViewModel @Inject constructor(
 
     fun onDialogDismiss() {
 //        try {
-            _selectedAnimeId.value = null
-            isDialogShown = false
+        _selectedAnimeId.value = null
+        isDialogShown = false
 //        } catch (e: Exception) {
 //            Toast.makeText(
 //                context, e.message, Toast.LENGTH_SHORT
@@ -542,79 +570,90 @@ class HomeScreenViewModel @Inject constructor(
         return dao.getDao().getLastTenAddedAnime()
     }
 
-    suspend fun loadAllSections(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (isInternetAvailable(context)) {
-                getTopAnime(
-                    "bypopularity",
-                    25,
-                    _topTrendingAnime,
-                    loadingSectionTopTrending,
-                    !_isNSFWActive.value
-                )
-                delay(500L)
-                getTopAnime(
-                    "airing",
-                    25,
-                    _topAiringAnime,
-                    loadingSectionTopAiring,
-                    !_isNSFWActive.value
-                )
-                delay(500L)
-                getTopAnime(
-                    "upcoming",
-                    25,
-                    _topUpcomingAnime,
-                    loadingSectionTopUpcoming,
-                    !_isNSFWActive.value
-                )
-            } else {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        context, "No internet connection!", Toast.LENGTH_SHORT
-                    ).show()
-                }
+    suspend fun loadAllSections(context: Context) = withContext(Dispatchers.IO) {
+        if (isInternetAvailable(context)) {
+            getTopAnime(
+                "bypopularity",
+                25,
+                _topTrendingAnime,
+                loadingSectionTopTrending,
+                !_isNSFWActive.value
+            )
+            delay(500L)
+            getTopAnime(
+                "airing",
+                25,
+                _topAiringAnime,
+                loadingSectionTopAiring,
+                !_isNSFWActive.value
+            )
+            delay(500L)
+            getTopAnime(
+                "upcoming",
+                25,
+                _topUpcomingAnime,
+                loadingSectionTopUpcoming,
+                !_isNSFWActive.value
+            )
+        } else {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context, "No internet connection!", Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
 
-    suspend fun reloadAllSectionAndCache(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (isInternetAvailable(context)) {
-                cachedTopTrendingAnime.clear()
-                getTopAnime(
-                    "bypopularity",
-                    25,
-                    _topTrendingAnime,
-                    loadingSectionTopTrending,
-                    !_isNSFWActive.value
-                )
-                delay(500L)
-                getTopAnime(
-                    "airing",
-                    25,
-                    _topAiringAnime,
-                    loadingSectionTopAiring,
-                    !_isNSFWActive.value
-                )
-                delay(500L)
-                getTopAnime(
-                    "upcoming",
-                    25,
-                    _topUpcomingAnime,
-                    loadingSectionTopUpcoming,
-                    !_isNSFWActive.value
-                )
-            } else {
+    suspend fun reloadAllSectionAndCache(context: Context) = withContext(Dispatchers.IO) {
+        if (isInternetAvailable(context)) {
+            cachedTopTrendingAnime.clear()
+            getTopAnime(
+                "bypopularity",
+                25,
+                _topTrendingAnime,
+                loadingSectionTopTrending,
+                !_isNSFWActive.value
+            )
+            delay(500L)
+            getTopAnime(
+                "airing",
+                25,
+                _topAiringAnime,
+                loadingSectionTopAiring,
+                !_isNSFWActive.value
+            )
+            delay(500L)
+            getTopAnime(
+                "upcoming",
+                25,
+                _topUpcomingAnime,
+                loadingSectionTopUpcoming,
+                !_isNSFWActive.value
+            )
+        } else {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context, "No internet connection!", Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+    }
+
+
+    private fun safeLaunch(action: suspend () -> Unit) {
+        viewModelScope.launch {
+            try {
+                action()
+            } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        context, "No internet connection!", Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, e.localizedMessage ?: "Error", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
+
 }
 
 

@@ -56,13 +56,13 @@ import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.ui.theme.scoreBoardColor
 import com.project.toko.daoScreen.data.dao.AnimeItem
 import com.project.toko.detailScreen.ui.detailScreen.mainPage.custom.youtubePlayer.DetailScreenActivity
+import com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-@Stable
 @Composable
 fun GridAdder(
     onNavigateToDetailScreen: (Int) -> Unit,
@@ -127,11 +127,33 @@ fun GridAdder(
     }
 }
 
+@Composable
+fun <T> AnimeHorizontalSection(
+    items: List<T>,
+    modifier: Modifier = Modifier,
+    isInDarkTheme: () -> Boolean,
+    sectionTitle: String,
+    itemContent: @Composable (T) -> Unit
+) {
+    if (items.isNotEmpty()) {
+        ShowSectionName(sectionTitle, modifier, isInDarkTheme)
+        LazyRow(modifier = modifier.background(MaterialTheme.colorScheme.primary)) {
+            items(items) { item ->
+                Spacer(modifier = Modifier.width(20.dp))
+                itemContent(item)
+            }
+            item { Spacer(modifier = Modifier.width(20.dp)) }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+    }
+}
+
+
 @Stable
 @Composable
 fun SearchScreen(
     viewModel: HomeScreenViewModel,
-    newAnimeSearchModel: com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel,
+    newAnimeSearchModel: NewAnimeSearchModel,
     onNavigateToDetailScreen: (Int) -> Unit,
     svgImageLoader: ImageLoader
 ) {
@@ -175,31 +197,23 @@ fun SearchScreen(
 
 }
 
-
 @Composable
 fun ShowMainScreen(
     modifier: Modifier = Modifier,
     isInDarkTheme: () -> Boolean,
     onNavigateToDetailScreen: (Int) -> Unit,
     svgImageLoader: ImageLoader,
-    getTrendingAnime: com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel,
-    getTopUpcoming: com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel,
-    getTopAiring: com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel
+    getTrendingAnime: NewAnimeSearchModel,
+    getTopUpcoming: NewAnimeSearchModel,
+    getTopAiring: NewAnimeSearchModel
 ) {
-
     val scroll = rememberScrollState()
     val viewModel: HomeScreenViewModel = hiltViewModel()
-    val loadingSectionTopAiring by viewModel.loadingSectionTopAiring
-    val loadingSectionTopUpcoming by viewModel.loadingSectionTopUpcoming
-    val loadingSectionTopTrending by viewModel.loadingSectionTopTrending
-    val lastTenAnimeFromWatchingSection by
-    viewModel.showListOfWatching().collectAsStateWithLifecycle(
-        initialValue = emptyList()
-    )
-    val getJustTenAddedAnime by
-    viewModel.showLastAdded().collectAsStateWithLifecycle(
-        initialValue = emptyList()
-    )
+    val loadingSectionTopAiring by remember { viewModel.loadingSectionTopAiring }
+    val loadingSectionTopUpcoming by remember { viewModel.loadingSectionTopUpcoming }
+    val loadingSectionTopTrending by remember { viewModel.loadingSectionTopTrending }
+    val lastTenAnimeFromWatchingSection by viewModel.showListOfWatching().collectAsStateWithLifecycle(initialValue = emptyList())
+    val getJustTenAddedAnime by viewModel.showLastAdded().collectAsStateWithLifecycle(initialValue = emptyList())
 
     Column(
         modifier = modifier
@@ -207,200 +221,313 @@ fun ShowMainScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.primary)
     ) {
-        if (lastTenAnimeFromWatchingSection.isNotEmpty()) {
-
-            ShowSectionName(
-                sectionName = "Now Watching ",
-                modifier = modifier,
-                isInDarkTheme = isInDarkTheme
-            )
-            LazyRow(
-                modifier = modifier
-                    .background(MaterialTheme.colorScheme.primary)
-            ) {
-                items(lastTenAnimeFromWatchingSection) { data ->
-                    Spacer(modifier = modifier.width(20.dp))
-                    ShowSection(
-                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-                        modifier = modifier,
-                        svgImageLoader = svgImageLoader
-                    )
-                }
-                item {
-                    Spacer(modifier = modifier.width(20.dp))
-                }
-            }
-            Spacer(modifier = modifier.height(20.dp))
-
+        AnimeHorizontalSection(
+            items = lastTenAnimeFromWatchingSection,
+            modifier = modifier,
+            isInDarkTheme = isInDarkTheme,
+            sectionTitle = "Now Watching"
+        ) { data ->
+            ShowSection(data, onNavigateToDetailScreen, modifier, svgImageLoader)
         }
-        if (loadingSectionTopTrending.not()) {
 
-            ShowSectionName(
-                sectionName = "Trending",
+        if (!loadingSectionTopTrending && !getTrendingAnime.data.isNullOrEmpty()) {
+            AnimeHorizontalSection(
+                items = getTrendingAnime.data,
                 modifier = modifier,
-                isInDarkTheme = isInDarkTheme
-            )
-
-
-            LazyRow(
-                modifier = modifier
-                    .background(MaterialTheme.colorScheme.primary)
-            ) {
-                items(getTrendingAnime.data) { data ->
-                    Spacer(modifier = modifier.width(20.dp))
-                    ShowTopAnime(
-                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-                        modifier = modifier,
-                        svgImageLoader = svgImageLoader
-                    )
-                }
-                item {
-                    Spacer(modifier = modifier.width(20.dp))
-                }
+                isInDarkTheme = isInDarkTheme,
+                sectionTitle = "Trending"
+            ) { data ->
+                ShowTopAnime(data, onNavigateToDetailScreen, modifier, svgImageLoader)
             }
-            Spacer(modifier = modifier.height(20.dp))
-
         } else {
-            ShowSectionName(
-                sectionName = "Trending",
-                modifier = modifier,
-                isInDarkTheme = isInDarkTheme
-            )
-            Row(
-                modifier = modifier
-                    .height(300.dp)
-                    .background(MaterialTheme.colorScheme.primary),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                LoadingAnimation()
-            }
+            LoadingSection("Trending", modifier, isInDarkTheme)
         }
-        if (getJustTenAddedAnime.isNotEmpty()) {
 
-            ShowSectionName(
-                sectionName = "Just Added",
-                modifier = modifier,
-                isInDarkTheme = isInDarkTheme
-            )
-
-
-            LazyRow(
-                modifier = modifier
-                    .background(MaterialTheme.colorScheme.primary)
-            ) {
-                items(getJustTenAddedAnime) { data ->
-                    Spacer(modifier = modifier.width(20.dp))
-                    ShowSection(
-                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-                        modifier = modifier,
-                        svgImageLoader = svgImageLoader
-                    )
-                }
-                item {
-                    Spacer(modifier = modifier.width(20.dp))
-                }
-            }
-            Spacer(modifier = modifier.height(20.dp))
-
+        AnimeHorizontalSection(
+            items = getJustTenAddedAnime,
+            modifier = modifier,
+            isInDarkTheme = isInDarkTheme,
+            sectionTitle = "Just Added"
+        ) { data ->
+            ShowSection(data, onNavigateToDetailScreen, modifier, svgImageLoader)
         }
-        if (loadingSectionTopAiring.not()) {
 
-            ShowSectionName(
-                sectionName = "Top Airing",
+        if (!loadingSectionTopAiring && !getTopAiring.data.isNullOrEmpty()) {
+            AnimeHorizontalSection(
+                items = getTopAiring.data,
                 modifier = modifier,
-                isInDarkTheme = isInDarkTheme
-            )
-
-
-            LazyRow(
-                modifier = modifier
-                    .background(MaterialTheme.colorScheme.primary)
-            ) {
-                items(getTopAiring.data) { data ->
-                    Spacer(modifier = modifier.width(20.dp))
-                    ShowTopAnime(
-                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-                        modifier = modifier,
-                        svgImageLoader = svgImageLoader
-                    )
-                }
-                item {
-                    Spacer(modifier = modifier.width(20.dp))
-                }
-
+                isInDarkTheme = isInDarkTheme,
+                sectionTitle = "Top Airing"
+            ) { data ->
+                ShowTopAnime(data, onNavigateToDetailScreen, modifier, svgImageLoader)
             }
-
-
-
-            Spacer(modifier = modifier.height(20.dp))
-
         } else {
-            ShowSectionName(
-                sectionName = "Top Airing",
-                modifier = modifier,
-                isInDarkTheme = isInDarkTheme
-            )
-            Row(
-                modifier = modifier
-                    .height(300.dp)
-                    .background(MaterialTheme.colorScheme.primary),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                LoadingAnimation()
-            }
-
+            LoadingSection("Top Airing", modifier, isInDarkTheme)
         }
-        if (loadingSectionTopUpcoming.not()) {
 
-            ShowSectionName(
-                sectionName = "Top Upcoming",
+        if (!loadingSectionTopUpcoming && !getTopUpcoming.data.isNullOrEmpty()) {
+            AnimeHorizontalSection(
+                items = getTopUpcoming.data,
                 modifier = modifier,
-                isInDarkTheme = isInDarkTheme
-            )
-
-
-            LazyRow(
-                modifier = modifier
-                    .background(MaterialTheme.colorScheme.primary)
-            ) {
-                items(getTopUpcoming.data) { data ->
-                    Spacer(modifier = modifier.width(20.dp))
-                    ShowTopAnime(
-                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-                        modifier = modifier,
-                        svgImageLoader = svgImageLoader
-                    )
-                }
-                item {
-                    Spacer(modifier = modifier.width(20.dp))
-                }
+                isInDarkTheme = isInDarkTheme,
+                sectionTitle = "Top Upcoming"
+            ) { data ->
+                ShowTopAnime(data, onNavigateToDetailScreen, modifier, svgImageLoader)
             }
-
-
-
-            Spacer(modifier = modifier.height(20.dp))
-
         } else {
-            ShowSectionName(
-                sectionName = "Top Upcoming",
-                modifier = modifier,
-                isInDarkTheme = isInDarkTheme
-            )
-            Row(
-                modifier = modifier
-                    .height(300.dp)
-                    .background(MaterialTheme.colorScheme.primary),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                LoadingAnimation()
-            }
-
+            LoadingSection("Top Upcoming", modifier, isInDarkTheme)
         }
     }
 }
+@Composable
+fun LoadingSection(
+    title: String,
+    modifier: Modifier,
+    isInDarkTheme: () -> Boolean
+) {
+    ShowSectionName(
+        sectionName = title,
+        modifier = modifier,
+        isInDarkTheme = isInDarkTheme
+    )
+    Row(
+        modifier = modifier
+            .height(300.dp)
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primary),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        LoadingAnimation()
+    }
+}
+
+
+//@Composable
+//fun ShowMainScreen(
+//    modifier: Modifier = Modifier,
+//    isInDarkTheme: () -> Boolean,
+//    onNavigateToDetailScreen: (Int) -> Unit,
+//    svgImageLoader: ImageLoader,
+//    getTrendingAnime: NewAnimeSearchModel,
+//    getTopUpcoming: NewAnimeSearchModel,
+//    getTopAiring: NewAnimeSearchModel
+//) {
+//
+//    val scroll = rememberScrollState()
+//    val viewModel: HomeScreenViewModel = hiltViewModel()
+//    val loadingSectionTopAiring by remember { viewModel.loadingSectionTopAiring }
+//    val loadingSectionTopUpcoming by remember { viewModel.loadingSectionTopUpcoming }
+//    val loadingSectionTopTrending by remember { viewModel.loadingSectionTopTrending }
+//    val lastTenAnimeFromWatchingSection by
+//    viewModel.showListOfWatching().collectAsStateWithLifecycle(
+//        initialValue = emptyList()
+//    )
+//    val getJustTenAddedAnime by
+//    viewModel.showLastAdded().collectAsStateWithLifecycle(
+//        initialValue = emptyList()
+//    )
+//
+//    Column(
+//        modifier = modifier
+//            .verticalScroll(scroll)
+//            .fillMaxSize()
+//            .background(MaterialTheme.colorScheme.primary)
+//    ) {
+//        if (lastTenAnimeFromWatchingSection.isNotEmpty()) {
+//
+//            ShowSectionName(
+//                sectionName = "Now Watching ",
+//                modifier = modifier,
+//                isInDarkTheme = isInDarkTheme
+//            )
+//            LazyRow(
+//                modifier = modifier
+//                    .background(MaterialTheme.colorScheme.primary)
+//            ) {
+//                items(lastTenAnimeFromWatchingSection) { data ->
+//                    Spacer(modifier = modifier.width(20.dp))
+//                    ShowSection(
+//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
+//                        modifier = modifier,
+//                        svgImageLoader = svgImageLoader
+//                    )
+//                }
+//                item {
+//                    Spacer(modifier = modifier.width(20.dp))
+//                }
+//            }
+//            Spacer(modifier = modifier.height(20.dp))
+//
+//        }
+//        if (loadingSectionTopTrending.not() && !getTrendingAnime.data.isNullOrEmpty()) {
+//
+//            ShowSectionName(
+//                sectionName = "Trending",
+//                modifier = modifier,
+//                isInDarkTheme = isInDarkTheme
+//            )
+//
+//
+//            LazyRow(
+//                modifier = modifier
+//                    .background(MaterialTheme.colorScheme.primary)
+//            ) {
+//                items(getTrendingAnime.data) { data ->
+//                    Spacer(modifier = modifier.width(20.dp))
+//                    ShowTopAnime(
+//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
+//                        modifier = modifier,
+//                        svgImageLoader = svgImageLoader
+//                    )
+//                }
+//                item {
+//                    Spacer(modifier = modifier.width(20.dp))
+//                }
+//            }
+//            Spacer(modifier = modifier.height(20.dp))
+//
+//        } else {
+//            ShowSectionName(
+//                sectionName = "Trending",
+//                modifier = modifier,
+//                isInDarkTheme = isInDarkTheme
+//            )
+//            Row(
+//                modifier = modifier
+//                    .height(300.dp)
+//                    .background(MaterialTheme.colorScheme.primary),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//                LoadingAnimation()
+//            }
+//        }
+//        if (getJustTenAddedAnime.isNotEmpty()) {
+//
+//            ShowSectionName(
+//                sectionName = "Just Added",
+//                modifier = modifier,
+//                isInDarkTheme = isInDarkTheme
+//            )
+//
+//
+//            LazyRow(
+//                modifier = modifier
+//                    .background(MaterialTheme.colorScheme.primary)
+//            ) {
+//                items(getJustTenAddedAnime) { data ->
+//                    Spacer(modifier = modifier.width(20.dp))
+//                    ShowSection(
+//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
+//                        modifier = modifier,
+//                        svgImageLoader = svgImageLoader
+//                    )
+//                }
+//                item {
+//                    Spacer(modifier = modifier.width(20.dp))
+//                }
+//            }
+//            Spacer(modifier = modifier.height(20.dp))
+//
+//        }
+//        if (loadingSectionTopAiring.not() && !getTrendingAnime.data.isNullOrEmpty()) {
+//
+//            ShowSectionName(
+//                sectionName = "Top Airing",
+//                modifier = modifier,
+//                isInDarkTheme = isInDarkTheme
+//            )
+//
+//
+//            LazyRow(
+//                modifier = modifier
+//                    .background(MaterialTheme.colorScheme.primary)
+//            ) {
+//                items(getTopAiring.data) { data ->
+//                    Spacer(modifier = modifier.width(20.dp))
+//                    ShowTopAnime(
+//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
+//                        modifier = modifier,
+//                        svgImageLoader = svgImageLoader
+//                    )
+//                }
+//                item {
+//                    Spacer(modifier = modifier.width(20.dp))
+//                }
+//
+//            }
+//
+//
+//
+//            Spacer(modifier = modifier.height(20.dp))
+//
+//        } else {
+//            ShowSectionName(
+//                sectionName = "Top Airing",
+//                modifier = modifier,
+//                isInDarkTheme = isInDarkTheme
+//            )
+//            Row(
+//                modifier = modifier
+//                    .height(300.dp)
+//                    .background(MaterialTheme.colorScheme.primary),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//                LoadingAnimation()
+//            }
+//
+//        }
+//        if (loadingSectionTopUpcoming.not() && !getTrendingAnime.data.isNullOrEmpty()) {
+//
+//            ShowSectionName(
+//                sectionName = "Top Upcoming",
+//                modifier = modifier,
+//                isInDarkTheme = isInDarkTheme
+//            )
+//
+//
+//            LazyRow(
+//                modifier = modifier
+//                    .background(MaterialTheme.colorScheme.primary)
+//            ) {
+//                items(getTopUpcoming.data) { data ->
+//                    Spacer(modifier = modifier.width(20.dp))
+//                    ShowTopAnime(
+//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
+//                        modifier = modifier,
+//                        svgImageLoader = svgImageLoader
+//                    )
+//                }
+//                item {
+//                    Spacer(modifier = modifier.width(20.dp))
+//                }
+//            }
+//
+//
+//
+//            Spacer(modifier = modifier.height(20.dp))
+//
+//        } else {
+//            ShowSectionName(
+//                sectionName = "Top Upcoming",
+//                modifier = modifier,
+//                isInDarkTheme = isInDarkTheme
+//            )
+//            Row(
+//                modifier = modifier
+//                    .height(300.dp)
+//                    .background(MaterialTheme.colorScheme.primary),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//                LoadingAnimation()
+//            }
+//
+//        }
+//    }
+//}
 
 @Stable
 @OptIn(ExperimentalFoundationApi::class)
@@ -802,6 +929,187 @@ private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkThe
     Spacer(modifier = modifier.height(20.dp))
 }
 
+//@Stable
+//@OptIn(ExperimentalFoundationApi::class)
+//@Composable
+//private fun ShowTopAnime(
+//    data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
+//    onNavigateToDetailScreen: (Int) -> Unit,
+//    modifier: Modifier,
+//    svgImageLoader: ImageLoader
+//) {
+//    val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
+//    var isCardClicked by remember { mutableStateOf(false) }
+//
+//    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+//    val value by rememberInfiniteTransition(label = "").animateFloat(
+//        initialValue = if (isCardClicked) 0.99f else 1f, // Изменяем значение в зависимости от нажатия на Card
+//        targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
+//        animationSpec = infiniteRepeatable(
+//            animation = tween(
+//                durationMillis = 600, easing = LinearEasing
+//            ), repeatMode = RepeatMode.Reverse
+//        ), label = ""
+//    )
+//
+//    Card(
+//        modifier = modifier
+//            .height(300.dp)
+//            .width(180.dp)
+//            .shadow(20.dp)
+//            .then(if (isCardClicked) {
+//                modifier.graphicsLayer {
+//                    scaleX = value
+//                    scaleY = value
+//                }
+//            } else {
+//                modifier
+//            })
+//            .clip(RoundedCornerShape(16.dp))
+//            .combinedClickable(onLongClick = {
+//                homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+//                    isCardClicked = true
+//                    homeScreenViewModel.onDialogLongClick(data.id ?: 0)
+//                    delay(3000L)
+//                    isCardClicked = false
+//                }
+//
+//            }) {
+//                onNavigateToDetailScreen(data.id)
+//
+//            },
+//        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
+//        shape = RectangleShape,
+//    ) {
+//        Box(
+//            contentAlignment = Alignment.BottomCenter,
+//            modifier = modifier.background(MaterialTheme.colorScheme.primary)
+//        ) {
+//            Box(
+//                modifier = modifier
+//                    .fillMaxSize()
+//                    .background(MaterialTheme.colorScheme.primary)
+//            ) {
+//                // Coil image loader
+//                Image(
+//                    painter = painter,
+//                    contentDescription = "Images for each Anime",
+//                    modifier = modifier
+//                        .aspectRatio(9f / 11f)
+//                        .clip(RoundedCornerShape(10.dp)),
+//                    contentScale = ContentScale.FillBounds
+//                )
+//
+//                Column(
+//                    modifier = modifier
+//                        .width(50.dp)
+//                        .clip(RoundedCornerShape(bottomEnd = 15.dp))
+//                        .background(scoreBoardColor)
+//                ) {
+//                    Row(
+//                        modifier = modifier
+//                            .fillMaxWidth()
+//                            .padding(top = 5.dp),
+//                        horizontalArrangement = Arrangement.Center
+//                    ) {
+//
+//                        Text(
+//                            text = formatScore(data.score),
+//                            color = Color.White,
+//                            fontSize = 15.sp,
+//                            fontWeight = FontWeight.Bold
+//                        )
+//                    }
+//                    Column(
+//                        modifier = modifier
+//                            .fillMaxWidth()
+//                            .height(50.dp),
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+//                        verticalArrangement = Arrangement.Top
+//                    ) {
+//                        Image(
+//                            modifier = modifier.size(25.dp), painter = rememberAsyncImagePainter(
+//                                model = R.drawable.usergroup, imageLoader = svgImageLoader
+//                            ), contentDescription = null
+//                        )
+//                        Text(
+//                            textAlign = TextAlign.Center,
+//                            text = formatScoredBy(data.scored_by),
+//                            color = Color.White,
+//                            fontSize = 8.sp,
+//                            fontWeight = FontWeight.Bold,
+//                            modifier = modifier
+//                        )
+//                    }
+//                }
+//
+//                AddFavorites(
+//                    mal_id = data.id,
+//                    title = data.title,
+//                    score = formatScore(data.score),
+//                    scoredBy = formatScoredBy(data.scored_by),
+//                    animeImage = data.images.jpg.image_url,
+//                    modifier = modifier,
+//                    status = data.status,
+//                    rating = data.rating ?: "N/A",
+//                    secondName = data.title_japanese,
+//                    airedFrom = data.aired.from,
+//                    type = data.type ?: "N/A",
+//                    svgImageLoader = svgImageLoader
+//                )
+//            }
+//            Column(
+//                modifier = modifier
+//            ) {
+//                Text(
+//                    text = data.title,
+//                    textAlign = TextAlign.Start,
+//                    modifier = modifier
+//                        .fillMaxWidth()
+//                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
+//                    lineHeight = 16.sp,
+//                    fontSize = 16.sp,
+//                    overflow = TextOverflow.Ellipsis,
+//                    minLines = 2,
+//                    maxLines = 2,
+//                    color = MaterialTheme.colorScheme.onPrimary,
+//                    fontFamily = evolventaBoldFamily,
+//                    fontWeight = FontWeight.W900
+//                )
+//
+//                Row(
+//                    modifier = modifier.fillMaxWidth(1f),
+//                    horizontalArrangement = Arrangement.Start
+//                ) {
+//                    Text(
+//                        text = "Status: " + data.status,
+//                        fontSize = 10.sp,
+//                        textAlign = TextAlign.Left,
+//                        modifier = modifier.padding(start = 10.dp),
+//                        color = MaterialTheme.colorScheme.inversePrimary
+//                    )
+//                }
+//                Row(
+//                    modifier = modifier
+//                        .fillMaxWidth(1f)
+//                        .padding(bottom = 10.dp),
+//                    horizontalArrangement = Arrangement.Start
+//                ) {
+//                    Text(
+//                        text = "Type: " + data.type,
+//                        fontSize = 10.sp,
+//                        textAlign = TextAlign.Left,
+//                        modifier = modifier.padding(start = 10.dp),
+//                        color = MaterialTheme.colorScheme.inversePrimary
+//                    )
+//                }
+//
+//            }
+//        }
+//    }
+//}
+
+
 @Stable
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -811,19 +1119,21 @@ private fun ShowTopAnime(
     modifier: Modifier,
     svgImageLoader: ImageLoader
 ) {
-    val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
+    val imageUrl = data.images?.webp?.image_url ?: ""
+    val painter = rememberAsyncImagePainter(model = imageUrl)
     var isCardClicked by remember { mutableStateOf(false) }
 
     val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
     val value by rememberInfiniteTransition(label = "").animateFloat(
-        initialValue = if (isCardClicked) 0.99f else 1f, // Изменяем значение в зависимости от нажатия на Card
-        targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
+        initialValue = if (isCardClicked) 0.99f else 1f,
+        targetValue = if (isCardClicked) 1f else 0.99f,
         animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 600, easing = LinearEasing
-            ), repeatMode = RepeatMode.Reverse
+            animation = tween(durationMillis = 600, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
         ), label = ""
     )
+
+    val animeId = data.id ?: return
 
     Card(
         modifier = modifier
@@ -839,18 +1149,19 @@ private fun ShowTopAnime(
                 modifier
             })
             .clip(RoundedCornerShape(16.dp))
-            .combinedClickable(onLongClick = {
-                homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    isCardClicked = true
-                    homeScreenViewModel.onDialogLongClick(data.id ?: 0)
-                    delay(3000L)
-                    isCardClicked = false
+            .combinedClickable(
+                onLongClick = {
+                    homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                        isCardClicked = true
+                        homeScreenViewModel.onDialogLongClick(animeId)
+                        delay(3000L)
+                        isCardClicked = false
+                    }
+                },
+                onClick = {
+                    onNavigateToDetailScreen(animeId)
                 }
-
-            }) {
-                onNavigateToDetailScreen(data.id)
-
-            },
+            ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RectangleShape,
     ) {
@@ -863,7 +1174,6 @@ private fun ShowTopAnime(
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.primary)
             ) {
-                // Coil image loader
                 Image(
                     painter = painter,
                     contentDescription = "Images for each Anime",
@@ -885,7 +1195,6 @@ private fun ShowTopAnime(
                             .padding(top = 5.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
-
                         Text(
                             text = formatScore(data.score),
                             color = Color.White,
@@ -901,13 +1210,16 @@ private fun ShowTopAnime(
                         verticalArrangement = Arrangement.Top
                     ) {
                         Image(
-                            modifier = modifier.size(25.dp), painter = rememberAsyncImagePainter(
-                                model = R.drawable.usergroup, imageLoader = svgImageLoader
-                            ), contentDescription = null
+                            modifier = modifier.size(25.dp),
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.usergroup,
+                                imageLoader = svgImageLoader
+                            ),
+                            contentDescription = null
                         )
                         Text(
                             textAlign = TextAlign.Center,
-                            text = formatScoredBy(data.scored_by),
+                            text = formatScoredBy(data.scored_by ),
                             color = Color.White,
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
@@ -917,25 +1229,26 @@ private fun ShowTopAnime(
                 }
 
                 AddFavorites(
-                    mal_id = data.id,
-                    title = data.title,
-                    score = formatScore(data.score),
-                    scoredBy = formatScoredBy(data.scored_by),
-                    animeImage = data.images.jpg.image_url,
+                    mal_id = animeId,
+                    title = data.title ?: "",
+                    score = formatScore(data.score ),
+                    scoredBy = formatScoredBy(data.scored_by ),
+                    animeImage = data.images?.jpg?.image_url ?: "",
                     modifier = modifier,
-                    status = data.status,
+                    status = data.status ?: "Unknown",
                     rating = data.rating ?: "N/A",
-                    secondName = data.title_japanese,
-                    airedFrom = data.aired.from,
+                    secondName = data.title_japanese ?: "",
+                    airedFrom = data.aired?.from ?: "Unknown",
                     type = data.type ?: "N/A",
                     svgImageLoader = svgImageLoader
                 )
             }
+
             Column(
                 modifier = modifier
             ) {
                 Text(
-                    text = data.title,
+                    text = data.title ?: "Unknown Title",
                     textAlign = TextAlign.Start,
                     modifier = modifier
                         .fillMaxWidth()
@@ -955,21 +1268,7 @@ private fun ShowTopAnime(
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Text(
-                        text = "Status: " + data.status,
-                        fontSize = 10.sp,
-                        textAlign = TextAlign.Left,
-                        modifier = modifier.padding(start = 10.dp),
-                        color = MaterialTheme.colorScheme.inversePrimary
-                    )
-                }
-                Row(
-                    modifier = modifier
-                        .fillMaxWidth(1f)
-                        .padding(bottom = 10.dp),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = "Type: " + data.type,
+                        text = "Status: ${data.status ?: "Unknown"}",
                         fontSize = 10.sp,
                         textAlign = TextAlign.Left,
                         modifier = modifier.padding(start = 10.dp),
@@ -977,6 +1276,20 @@ private fun ShowTopAnime(
                     )
                 }
 
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(1f)
+                        .padding(bottom = 10.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Type: ${data.type ?: "N/A"}",
+                        fontSize = 10.sp,
+                        textAlign = TextAlign.Left,
+                        modifier = modifier.padding(start = 10.dp),
+                        color = MaterialTheme.colorScheme.inversePrimary
+                    )
+                }
             }
         }
     }

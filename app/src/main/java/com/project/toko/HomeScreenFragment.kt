@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -69,7 +68,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
-import androidx.navigation.navArgument
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -101,81 +99,62 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val drawerViewModel: DrawerViewModel by activityViewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-                val isDark = darkThemeManager.isDarkThemeActive.value
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View = ComposeView(requireContext()).apply {
+        setContent {
+            val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+            val isDark = darkThemeManager.isDarkThemeActive.value
 
-                // Следим за drawerState и обновляем ViewModel
-                LaunchedEffect(drawerState.isOpen) {
-                    drawerViewModel.setDrawerState(drawerState.isOpen)
-                }
+            // Следим за drawerState и обновляем ViewModel
+            LaunchedEffect(drawerState.isOpen) {
+                drawerViewModel.setDrawerState(drawerState.isOpen)
+            }
 
 
-                Theme(
-                    darkTheme = isDark,
-                    systemUiController = rememberSystemUiController()
+            Theme(
+                darkTheme = isDark, systemUiController = rememberSystemUiController()
+            ) {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier
+                        .windowInsetsPadding(NavigationBarDefaults.windowInsets)
+                        .fillMaxSize(),
                 ) {
-                    // A surface container using the 'background' color from the theme
-                    Surface(
-                        modifier = Modifier
-                            .windowInsetsPadding(NavigationBarDefaults.windowInsets)
-                            .fillMaxSize(),
-                    ) {
-                        ModalNavigationDrawer(drawerState = drawerState,
-                            drawerContent = {
-                                ShowDrawerContent(
-                                    imageLoader = svgImageLoader,
-//                                componentActivity = componentActivity,
-                                    onThemeChange = {
-                                        darkThemeManager.toggleTheme()
-                                    },
-                                    darkTheme = { isDark },
-                                    svgImageLoader = svgImageLoader
-                                )
-                            }
-                        ) {
+                    ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
+                        ShowDrawerContent(imageLoader = svgImageLoader,
+                            onThemeChange = {
+                                darkThemeManager.toggleTheme()
+                            }, darkTheme = { isDark }, svgImageLoader = svgImageLoader
+                        )
+                    }) {
 
-                            val navController = remember {
-                                findNavController()
-                            }
-                                MainScreen(
-                                    onNavigateToDetailScreen = { detailScreenId ->
-                                        navController.navigate(
-                                            R.id.action_homeFragment_to_detailScreenFragment,
-                                            bundleOf("detail_screen_id" to detailScreenId),
-                                        )
-//
-
-                                    },
-//                    isInDarkTheme = isInDarkTheme,
-                                    isInDarkTheme = { false },
-                                    drawerState = drawerState,
-//                    svgImageLoader = svgImageLoader
-                                    svgImageLoader = svgImageLoader
-                                )
-
+                        val navController = remember {
+                            findNavController()
                         }
+                        MainScreen(
+                            onNavigateToDetailScreen = { detailScreenId ->
+                                navController.navigate(
+                                    R.id.action_homeFragment_to_detailScreenFragment,
+                                    bundleOf("detail_screen_id" to detailScreenId),
+                                )
+                            },
+                            isInDarkTheme = { isDark }, drawerState = drawerState,
+                            svgImageLoader = svgImageLoader
+                        )
+
                     }
                 }
-
             }
+
         }
+
     }
 
 
     @Composable
     fun ShowDrawerContent(
-        modifier: Modifier = Modifier,
-        imageLoader: ImageLoader,
-//    componentActivity: ComponentActivity,
-        onThemeChange: () -> Unit,
-        darkTheme: () -> Boolean,
-        svgImageLoader: ImageLoader
+        modifier: Modifier = Modifier, imageLoader: ImageLoader,
+        onThemeChange: () -> Unit, darkTheme: () -> Boolean, svgImageLoader: ImageLoader
     ) {
         val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
         val daoViewModel: DaoViewModel = hiltViewModel()
@@ -187,15 +166,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
         val context = LocalContext.current
 
-        val customModifier =
-            modifier
-                .fillMaxWidth(0.8f)
-                .height(70.dp)
-                .clip(CardDefaults.shape)
-                .background(MaterialTheme.colorScheme.onPrimaryContainer)
-                .clickable {
-                    daoViewModel.exportDB("Main.db", "com.project.toko")
-                }
+        val customModifier = modifier
+            .fillMaxWidth(0.8f)
+            .height(70.dp)
+            .clip(CardDefaults.shape)
+            .background(MaterialTheme.colorScheme.onPrimaryContainer)
+            .clickable {
+                daoViewModel.exportDB("Main.db", "com.project.toko")
+            }
 
 
         Column {
@@ -232,35 +210,31 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         )
                     },
                     selected = false,
-                    onClick = {
-                    },
+                    onClick = {},
                     badge = {
-                        Switch(checked = homeScreenViewModel.isNSFWActive.value,
-                            onCheckedChange = {
-                                homeScreenViewModel.saveNSFWData(it)
-                                homeScreenViewModel.isNSFWActive.value = it
-                                randomScreenViewModel.isNSFWActive.value = it
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                                checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                                checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                                uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                                uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                            ),
-                            thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
-                                {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SwitchDefaults.IconSize),
-                                        tint = MaterialTheme.colorScheme.onTertiaryContainer
-                                    )
-                                }
-                            } else {
-                                null
-                            })
+                        Switch(checked = homeScreenViewModel.isNSFWActive.value, onCheckedChange = {
+                            homeScreenViewModel.saveNSFWData(it)
+                            homeScreenViewModel.isNSFWActive.value = it
+                            randomScreenViewModel.isNSFWActive.value = it
+                        }, colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                            checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                            checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                            uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+                        ), thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
+                            {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                                    tint = MaterialTheme.colorScheme.onTertiaryContainer
+                                )
+                            }
+                        } else {
+                            null
+                        })
                     },
                 )
                 HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
@@ -289,14 +263,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.arrowdown, imageLoader = imageLoader
-                                ), contentDescription = null, modifier = modifier.size(17.dp),
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(17.dp),
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.arrowright, imageLoader = imageLoader
-                                ), contentDescription = null, modifier = modifier.size(17.dp),
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(17.dp),
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         }
@@ -327,7 +305,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.openbrowser, imageLoader = imageLoader
-                                ), contentDescription = null, modifier = modifier.size(30.dp),
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(30.dp),
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         },
@@ -357,7 +337,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.openbrowser, imageLoader = imageLoader
-                                ), contentDescription = null, modifier = modifier.size(30.dp),
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(30.dp),
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         },
@@ -387,7 +369,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(30.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
@@ -418,14 +402,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.arrowdown, imageLoader = imageLoader
-                                ), contentDescription = null, modifier = modifier.size(17.dp),
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(17.dp),
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.arrowright, imageLoader = imageLoader
-                                ), contentDescription = null, modifier = modifier.size(17.dp),
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(17.dp),
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         }
@@ -456,7 +444,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.openbrowser, imageLoader = imageLoader
-                                ), contentDescription = null, modifier = modifier.size(30.dp),
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(30.dp),
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         },
@@ -489,14 +479,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.arrowdown, imageLoader = imageLoader
-                                ), contentDescription = null, modifier = modifier.size(17.dp),
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(17.dp),
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = R.drawable.arrowright, imageLoader = imageLoader
-                                ), contentDescription = null, modifier = modifier.size(17.dp),
+                                ),
+                                contentDescription = null,
+                                modifier = modifier.size(17.dp),
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                             )
                         }
@@ -532,7 +526,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.export, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(30.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
@@ -548,19 +544,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = if (darkTheme()) R.drawable.sun else R.drawable.moon,
-                        imageLoader = svgImageLoader
-                    ),
+                Image(painter = rememberAsyncImagePainter(
+                    model = if (darkTheme()) R.drawable.sun else R.drawable.moon,
+                    imageLoader = svgImageLoader
+                ),
                     contentDescription = null,
                     modifier = modifier
                         .size(50.dp)
                         .padding(bottom = 10.dp, end = 5.dp)
                         .clickable {
                             onThemeChange()
-                        }
-                )
+                        })
             }
         }
 
@@ -577,7 +571,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 Box(
                     modifier = modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.4f), contentAlignment = Alignment.Center
+                        .fillMaxHeight(0.4f),
+                    contentAlignment = Alignment.Center
                 ) {
                     Card(
                         modifier = modifier.fillMaxSize(),
@@ -589,8 +584,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             modifier = modifier.fillMaxSize()
                         ) {
                             Row(
-                                modifier = modifier
-                                    .fillMaxHeight(0.4f),
+                                modifier = modifier.fillMaxHeight(0.4f),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center
                             ) {
@@ -704,18 +698,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     @Composable
     fun AnimeListTypesToDelete(
-        daoViewModel: DaoViewModel,
-        modifier: Modifier
+        daoViewModel: DaoViewModel, modifier: Modifier
     ) {
         val animeListTypes = AnimeStatus.values()
         val isDeleteDataOpen = remember { mutableStateOf(false) }
         val currentSelectedAnimeListType = daoViewModel.currentSelectedAnimeListType
-        val customModifier =
-            modifier
-                .fillMaxWidth(0.8f)
-                .height(70.dp)
-                .clip(CardDefaults.shape)
-                .background(MaterialTheme.colorScheme.onPrimaryContainer)
+        val customModifier = modifier
+            .fillMaxWidth(0.8f)
+            .height(70.dp)
+            .clip(CardDefaults.shape)
+            .background(MaterialTheme.colorScheme.onPrimaryContainer)
 
 
         animeListTypes.forEach { type ->
@@ -752,8 +744,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
 
             if (isDeleteDataOpen.value) {
-                DeleteDialog(
-                    modifier,
+                DeleteDialog(modifier,
                     customModifier,
                     isDeleteDataOpen,
                     currentSelectedAnimeListType.value,
@@ -809,7 +800,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Box(
                 modifier = modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.4f), contentAlignment = Alignment.Center
+                    .fillMaxHeight(0.4f),
+                contentAlignment = Alignment.Center
             ) {
                 Card(
                     modifier = modifier.fillMaxSize(),
@@ -821,8 +813,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         modifier = modifier.fillMaxSize()
                     ) {
                         Row(
-                            modifier = modifier
-                                .fillMaxHeight(0.4f),
+                            modifier = modifier.fillMaxHeight(0.4f),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
@@ -884,15 +875,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 }
 
 
-
 @Composable
 fun ShowDrawerContent(
-    modifier: Modifier = Modifier,
-    imageLoader: ImageLoader,
+    modifier: Modifier = Modifier, imageLoader: ImageLoader,
 //    componentActivity: ComponentActivity,
-    onThemeChange: () -> Unit,
-    darkTheme: () -> Boolean,
-    svgImageLoader: ImageLoader
+    onThemeChange: () -> Unit, darkTheme: () -> Boolean, svgImageLoader: ImageLoader
 ) {
     val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
     val daoViewModel: DaoViewModel = hiltViewModel()
@@ -904,15 +891,14 @@ fun ShowDrawerContent(
     val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    val customModifier =
-        modifier
-            .fillMaxWidth(0.8f)
-            .height(70.dp)
-            .clip(CardDefaults.shape)
-            .background(MaterialTheme.colorScheme.onPrimaryContainer)
-            .clickable {
-                daoViewModel.exportDB("Main.db", "com.project.toko")
-            }
+    val customModifier = modifier
+        .fillMaxWidth(0.8f)
+        .height(70.dp)
+        .clip(CardDefaults.shape)
+        .background(MaterialTheme.colorScheme.onPrimaryContainer)
+        .clickable {
+            daoViewModel.exportDB("Main.db", "com.project.toko")
+        }
 
 
     Column {
@@ -949,35 +935,31 @@ fun ShowDrawerContent(
                     )
                 },
                 selected = false,
-                onClick = {
-                },
+                onClick = {},
                 badge = {
-                    Switch(checked = homeScreenViewModel.isNSFWActive.value,
-                        onCheckedChange = {
-                            homeScreenViewModel.saveNSFWData(it)
-                            homeScreenViewModel.isNSFWActive.value = it
-                            randomScreenViewModel.isNSFWActive.value = it
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                            checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                            checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                            uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                        ),
-                        thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
-                            {
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(SwitchDefaults.IconSize),
-                                    tint = MaterialTheme.colorScheme.onTertiaryContainer
-                                )
-                            }
-                        } else {
-                            null
-                        })
+                    Switch(checked = homeScreenViewModel.isNSFWActive.value, onCheckedChange = {
+                        homeScreenViewModel.saveNSFWData(it)
+                        homeScreenViewModel.isNSFWActive.value = it
+                        randomScreenViewModel.isNSFWActive.value = it
+                    }, colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                        checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                        checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+                    ), thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
+                    } else {
+                        null
+                    })
                 },
             )
             HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
@@ -1006,14 +988,18 @@ fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowdown, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(17.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowright, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(17.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
@@ -1044,7 +1030,9 @@ fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(30.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
@@ -1074,7 +1062,9 @@ fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(30.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
@@ -1104,7 +1094,9 @@ fun ShowDrawerContent(
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.openbrowser, imageLoader = imageLoader
-                        ), contentDescription = null, modifier = modifier.size(30.dp),
+                        ),
+                        contentDescription = null,
+                        modifier = modifier.size(30.dp),
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                     )
                 },
@@ -1135,14 +1127,18 @@ fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowdown, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(17.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowright, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(17.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
@@ -1173,7 +1169,9 @@ fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(30.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(30.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     },
@@ -1206,14 +1204,18 @@ fun ShowDrawerContent(
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowdown, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(17.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.arrowright, imageLoader = imageLoader
-                            ), contentDescription = null, modifier = modifier.size(17.dp),
+                            ),
+                            contentDescription = null,
+                            modifier = modifier.size(17.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                         )
                     }
@@ -1249,7 +1251,9 @@ fun ShowDrawerContent(
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.export, imageLoader = imageLoader
-                        ), contentDescription = null, modifier = modifier.size(30.dp),
+                        ),
+                        contentDescription = null,
+                        modifier = modifier.size(30.dp),
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                     )
                 },
@@ -1265,19 +1269,17 @@ fun ShowDrawerContent(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.Bottom
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = if (darkTheme()) R.drawable.sun else R.drawable.moon,
-                    imageLoader = svgImageLoader
-                ),
+            Image(painter = rememberAsyncImagePainter(
+                model = if (darkTheme()) R.drawable.sun else R.drawable.moon,
+                imageLoader = svgImageLoader
+            ),
                 contentDescription = null,
                 modifier = modifier
                     .size(50.dp)
                     .padding(bottom = 10.dp, end = 5.dp)
                     .clickable {
                         onThemeChange()
-                    }
-            )
+                    })
         }
     }
 
@@ -1294,7 +1296,8 @@ fun ShowDrawerContent(
             Box(
                 modifier = modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.4f), contentAlignment = Alignment.Center
+                    .fillMaxHeight(0.4f),
+                contentAlignment = Alignment.Center
             ) {
                 Card(
                     modifier = modifier.fillMaxSize(),
@@ -1306,8 +1309,7 @@ fun ShowDrawerContent(
                         modifier = modifier.fillMaxSize()
                     ) {
                         Row(
-                            modifier = modifier
-                                .fillMaxHeight(0.4f),
+                            modifier = modifier.fillMaxHeight(0.4f),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
