@@ -338,8 +338,8 @@ private fun FavoriteAnimeListButton(
     isInDarkTheme: () -> Boolean
 ) {
     val colors =
-        remember { if (isInDarkTheme()) darkFavoriteTopBarColors else lightFavoriteTopBarColors }
-    val customModifier = remember {
+        if (isInDarkTheme()) darkFavoriteTopBarColors else lightFavoriteTopBarColors
+    val customModifier =
         if (selectedListType == listType) modifier
             .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
             .clickable { onClick() }
@@ -350,7 +350,7 @@ private fun FavoriteAnimeListButton(
             .clickable { onClick() }
             .background(colors[colorIndex])
             .animateContentSize()
-    }
+
 
     Box(modifier = customModifier) {
         TextButton(
