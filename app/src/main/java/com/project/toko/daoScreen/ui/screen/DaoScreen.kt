@@ -101,7 +101,7 @@ fun DaoScreen(
     modifier: Modifier = Modifier,
     isInDarkTheme: () -> Boolean,
     drawerState: DrawerState,
-    svgImageLoader: ImageLoader
+    svgImageLoader:() -> ImageLoader
 ) {
 
 
@@ -1246,7 +1246,7 @@ private fun FavoriteScreenCardBox(
 @Composable
 private fun TwoSortingButtons(
     modifier: Modifier,
-    svgImageLoader: ImageLoader,
+    svgImageLoader: () -> ImageLoader,
     leftSortingMenu: () -> MutableState<Boolean>,
     rightSortingMenu: () -> MutableState<Boolean>,
     isSortedAlphabetically: () -> MutableState<Boolean>,
@@ -1324,7 +1324,7 @@ private fun TwoSortingButtons(
                     if (isTvSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1333,7 +1333,7 @@ private fun TwoSortingButtons(
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.circle, imageLoader = svgImageLoader
+                                model = R.drawable.circle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1369,7 +1369,7 @@ private fun TwoSortingButtons(
                     if (isOnaSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1378,7 +1378,7 @@ private fun TwoSortingButtons(
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.circle, imageLoader = svgImageLoader
+                                model = R.drawable.circle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1412,7 +1412,7 @@ private fun TwoSortingButtons(
                     if (isOvaSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1421,7 +1421,7 @@ private fun TwoSortingButtons(
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.circle, imageLoader = svgImageLoader
+                                model = R.drawable.circle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1456,7 +1456,7 @@ private fun TwoSortingButtons(
                     if (isMovieSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1465,7 +1465,7 @@ private fun TwoSortingButtons(
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.circle, imageLoader = svgImageLoader
+                                model = R.drawable.circle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1501,7 +1501,7 @@ private fun TwoSortingButtons(
                     if (isSpecialSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1510,7 +1510,7 @@ private fun TwoSortingButtons(
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.circle, imageLoader = svgImageLoader
+                                model = R.drawable.circle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1546,7 +1546,7 @@ private fun TwoSortingButtons(
                     if (isMusicSelected().value) {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1555,7 +1555,7 @@ private fun TwoSortingButtons(
                     } else {
                         Image(
                             painter = rememberAsyncImagePainter(
-                                model = R.drawable.circle, imageLoader = svgImageLoader
+                                model = R.drawable.circle, imageLoader = svgImageLoader()
                             ),
                             contentDescription = null,
                             modifier = modifier.size(22.dp),
@@ -1585,7 +1585,7 @@ private fun TwoSortingButtons(
         ) {
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = R.drawable.threelines, imageLoader = svgImageLoader
+                    model = R.drawable.threelines, imageLoader = svgImageLoader()
                 ),
                 contentDescription = null,
                 modifier = modifier
@@ -1616,7 +1616,7 @@ private fun TwoSortingButtons(
                         if (isSortedAlphabetically().value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                                 ),
                                 contentDescription = null,
                                 modifier = modifier.size(22.dp),
@@ -1625,7 +1625,7 @@ private fun TwoSortingButtons(
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = R.drawable.circle, imageLoader = svgImageLoader
+                                    model = R.drawable.circle, imageLoader = svgImageLoader()
                                 ),
                                 contentDescription = null,
                                 modifier = modifier.size(22.dp),
@@ -1651,7 +1651,7 @@ private fun TwoSortingButtons(
                         if (isSortedByScore().value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                                 ),
                                 contentDescription = null,
                                 modifier = modifier.size(22.dp),
@@ -1660,7 +1660,7 @@ private fun TwoSortingButtons(
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = R.drawable.circle, imageLoader = svgImageLoader
+                                    model = R.drawable.circle, imageLoader = svgImageLoader()
                                 ),
                                 contentDescription = null,
                                 modifier = modifier.size(22.dp),
@@ -1687,7 +1687,7 @@ private fun TwoSortingButtons(
                         if (isSortedByUsers().value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                                 ),
                                 contentDescription = null,
                                 modifier = modifier.size(22.dp),
@@ -1696,7 +1696,7 @@ private fun TwoSortingButtons(
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = R.drawable.circle, imageLoader = svgImageLoader
+                                    model = R.drawable.circle, imageLoader = svgImageLoader()
                                 ),
                                 contentDescription = null,
                                 modifier = modifier.size(22.dp),
@@ -1725,7 +1725,7 @@ private fun TwoSortingButtons(
                         if (isAiredFrom().value) {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader
+                                    model = R.drawable.filledcircle, imageLoader = svgImageLoader()
                                 ),
                                 contentDescription = null,
                                 modifier = modifier.size(22.dp),
@@ -1734,7 +1734,7 @@ private fun TwoSortingButtons(
                         } else {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = R.drawable.circle, imageLoader = svgImageLoader
+                                    model = R.drawable.circle, imageLoader = svgImageLoader()
                                 ),
                                 contentDescription = null,
                                 modifier = modifier.size(22.dp),

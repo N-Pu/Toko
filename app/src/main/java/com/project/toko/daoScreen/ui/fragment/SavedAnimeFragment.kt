@@ -91,7 +91,7 @@ class SavedAnimeFragment
                         },
                         isInDarkTheme = { isDark },
                         drawerState = drawerState,
-                        svgImageLoader = svgImageLoader
+                        svgImageLoader = { svgImageLoader }
                     )
                 }
             }
