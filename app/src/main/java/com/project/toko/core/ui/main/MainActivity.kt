@@ -8,23 +8,14 @@ import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.collection.forEach
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
-import androidx.navigation.NavGraph
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.project.toko.R
 import com.project.toko.core.data.settings.DrawerViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -33,9 +24,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
 
     private val drawerViewModel: DrawerViewModel by viewModels()
-//    private val customDialogViewModel: CustomDialogViewModel by viewModels()
-
-//    private val bottomNavVisibilityViewModel: BottomNavVisibilityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,11 +84,6 @@ class MainActivity : AppCompatActivity() {
             }
 
 
-//    lifecycleScope.launch {
-//        bottomNavVisibilityViewModel.isBottomNavVisible.collect { isVisible ->
-//            if (isVisible) showBottomNav() else hideBottomNav()
-//        }
-//    }
             bottomNav.setupWithNavController(navController)
         }
     }
@@ -118,48 +101,3 @@ class MainActivity : AppCompatActivity() {
     }
 
 }
-
-
-//        setContent {
-//            val systemUiController = rememberSystemUiController(window)
-//            val splashShown = remember { mutableStateOf(false) }
-//            navController = rememberNavController()
-//            if (!splashShown.value) {
-//
-//                systemUiController.isNavigationBarVisible = false
-//                SplashTheme(
-//                    darkTheme = darkTheme.isDarkThemeActive.value,
-//                    systemUiController = systemUiController
-//                ) {
-//                    AnimatedSplashScreen(navController, svgImageLoader) {
-//                        splashShown.value = true
-//                    }
-//                }
-//            } else {
-//                systemUiController.isNavigationBarVisible = true
-//                Theme(
-//                    darkTheme = darkTheme.isDarkThemeActive.value,
-//                    systemUiController = systemUiController
-//                ) {
-//                    // A surface container using the 'background' color from the theme
-//                    Surface(
-//                        modifier = Modifier
-//                            .windowInsetsPadding(NavigationBarDefaults.windowInsets)
-//                            .fillMaxSize(),
-//                    ) {
-//                        AppActivator(
-//                            navController = navController,
-//                            modifier = Modifier,
-//                            componentActivity = this,
-//                            onThemeChange = {
-//                                darkTheme.isDarkThemeActive.value =
-//                                    !darkTheme.isDarkThemeActive.value
-//                                darkTheme.saveData(darkTheme.isDarkThemeActive.value)
-//                            },
-//                            isInDarkTheme = { darkTheme.isDarkThemeActive.value },
-//                            svgImageLoader = svgImageLoader
-//                        )
-//                    }
-//                }
-//            }
-//        }

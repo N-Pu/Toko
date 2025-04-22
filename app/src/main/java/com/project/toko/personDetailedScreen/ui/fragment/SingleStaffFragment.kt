@@ -1,4 +1,4 @@
-package com.project.toko
+package com.project.toko.personDetailedScreen.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.project.toko.R
 import com.project.toko.core.data.settings.SaveDarkModeManager
 import com.project.toko.core.ui.theme.Theme
 import com.project.toko.personDetailedScreen.ui.staffMemberFull.DisplayPersonFullScreen

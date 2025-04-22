@@ -1,4 +1,4 @@
-package com.project.toko
+package com.project.toko.homeScreen.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -71,6 +71,7 @@ import androidx.navigation.findNavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.project.toko.R
 import com.project.toko.core.data.settings.DrawerViewModel
 import com.project.toko.core.data.settings.SaveDarkModeManager
 import com.project.toko.core.domain.util.share.openSite
@@ -139,7 +140,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                                 )
                             },
                             isInDarkTheme = { isDark }, drawerState = drawerState,
-                            svgImageLoader = svgImageLoader
+                            svgImageLoader = { svgImageLoader }
                         )
 
                     }

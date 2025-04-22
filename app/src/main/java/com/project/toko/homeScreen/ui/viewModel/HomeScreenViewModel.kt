@@ -161,7 +161,7 @@ class HomeScreenViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             searchDebouncer.debounce(1000L).collectLatest { searchQuery ->
-                safeLaunch {  performSearch(searchQuery) }
+                safeLaunch { performSearch(searchQuery) }
             }
         }
     }
@@ -212,7 +212,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
 
-    private suspend fun performSearch(query: String?) {
+    private suspend fun performSearch(query: String?) = withContext(Dispatchers.IO) {
         try {
             // Existing code
             var currentQuery = query
@@ -261,6 +261,8 @@ class HomeScreenViewModel @Inject constructor(
 
                     // Cache the response
                     cachedSearch[requestKey] = response
+                } else {
+                    throw IllegalStateException("Response is null from malApiRepository.getAnimeSearchByName")
                 }
             }
         } catch (e: Exception) {
@@ -410,10 +412,8 @@ class HomeScreenViewModel @Inject constructor(
     }
 
 
-
-suspend fun addAllParams() {
-    try {
-        withContext(Dispatchers.IO) {
+    suspend fun addAllParams() = withContext(Dispatchers.IO) {
+        try {
             _genres.value = makeArrayToLinkWithCommas(arrayOfGenres.value)
             _selectedRating.value = preSelectedRating.value
             _selectedType.value = pre_selectedType.value
@@ -424,14 +424,12 @@ suspend fun addAllParams() {
             safeLaunch {
                 performSearch(searchText.value)
             }
-        }
-    } catch (e: Exception) {
-        withContext(Dispatchers.Main) {
-            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
         }
     }
-}
-
 
 
 //    suspend fun reloadAllParamsAndClearCache(query: String?) {
@@ -648,7 +646,8 @@ suspend fun addAllParams() {
                 action()
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, e.localizedMessage ?: "Error", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, e.localizedMessage ?: "Error", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }

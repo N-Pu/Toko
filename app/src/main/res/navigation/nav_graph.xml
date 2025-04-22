@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.project.toko.HomeScreenFragment"
+        android:name="com.project.toko.homeScreen.ui.fragment.HomeScreenFragment"
         android:label="Home">
         <action
             android:id="@+id/action_homeFragment_to_detailScreenFragment"
@@ -14,7 +14,7 @@
     <fragment
 
         android:id="@+id/singleStaffFragment"
-        android:name="com.project.toko.SingleStaffFragment"
+        android:name="com.project.toko.personDetailedScreen.ui.fragment.SingleStaffFragment"
         android:label="Staff">
         <argument
             android:name="single_staff_id"
@@ -28,7 +28,7 @@
     </fragment>
     <fragment
         android:id="@+id/randomAnimeFragment"
-        android:name="com.project.toko.RandomAnimeFragment"
+        android:name="com.project.toko.randomAnimeScreen.presentation_layer.fragment.RandomAnimeFragment"
         android:label="Random">
         <action
             android:id="@+id/action_randomAnimeFragment_to_detailScreenFragment"
@@ -55,7 +55,7 @@
     </fragment>
     <fragment
         android:id="@+id/wholeStaff"
-        android:name="com.project.toko.WholeStaffFragment"
+        android:name="com.project.toko.wholeStaffScreen.ui.fragment.WholeStaffFragment"
         android:label="WholeStaff">
 
 
@@ -65,7 +65,7 @@
     </fragment>
     <fragment
         android:id="@+id/wholeCast"
-        android:name="com.project.toko.WholeCastFragment"
+        android:name="com.project.toko.wholeCastScreen.ui.fragment.WholeCastFragment"
         android:label="WholeCast">
 
         <action
@@ -77,7 +77,7 @@
     </fragment>
     <fragment
         android:id="@+id/savedAnimeFragment"
-        android:name="com.project.toko.SavedAnimeFragment"
+        android:name="com.project.toko.daoScreen.ui.fragment.SavedAnimeFragment"
         android:label="Saved">
         <action
             android:id="@+id/action_savedAnimeFragment_to_detailScreenFragment"
@@ -93,7 +93,7 @@
 
     <fragment
         android:id="@+id/singleCharacterFragment"
-        android:name="com.project.toko.SingleCharacterFragment"
+        android:name="com.project.toko.characterDetailedScreen.ui.fragment.SingleCharacterFragment"
         android:label="Character">
         <argument
             android:name="single_character_id"
@@ -108,7 +108,7 @@
     </fragment>
     <fragment
         android:id="@+id/detailScreenFragment"
-        android:name="com.project.toko.DetailScreenFragment"
+        android:name="com.project.toko.detailScreen.ui.fragment.DetailScreenFragment"
         android:label="Detail">
         <argument
             android:name="detail_screen_id"

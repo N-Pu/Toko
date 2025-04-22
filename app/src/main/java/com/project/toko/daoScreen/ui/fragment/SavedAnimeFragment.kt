@@ -1,4 +1,4 @@
-package com.project.toko
+package com.project.toko.daoScreen.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -17,10 +16,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.project.toko.R
 import com.project.toko.core.data.settings.DrawerViewModel
 import com.project.toko.core.data.settings.SaveDarkModeManager
 import com.project.toko.core.ui.theme.Theme
 import com.project.toko.daoScreen.ui.screen.DaoScreen
+import com.project.toko.homeScreen.ui.fragment.ShowDrawerContent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

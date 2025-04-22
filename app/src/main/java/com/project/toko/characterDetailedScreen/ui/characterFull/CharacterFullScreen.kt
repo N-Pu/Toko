@@ -38,19 +38,17 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun DisplayCharacterFromId(
-    id: Int,
+    id: () -> Int,
     onNavigateToStaff: (Int) -> Unit,
     onNavigateToDetailScreen: (Int) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier, isInDarkTheme: () -> Boolean, svgImageLoader: ImageLoader
 ) {
     val characterViewModel: CharacterFullByIdViewModel = hiltViewModel()
-    val daoViewModel: DaoViewModel = hiltViewModel()
+
     val context = LocalContext.current
     LaunchedEffect(id) {
-        withContext(Dispatchers.IO) {
-            characterViewModel.loadAllInfo(id, context)
-        }
+            characterViewModel.loadAllInfo(id(), context)
     }
     val swipeRefreshState =
         rememberSwipeRefreshState(isRefreshing = characterViewModel.isLoading.value)
@@ -79,13 +77,12 @@ fun DisplayCharacterFromId(
                         ShowCharacterPicture(
                             painter = painter,
                             modifier = modifier,
-                            isDialogShown = isDialogShown
+                            isDialogShown = { isDialogShown }
                         )
                         ShowNamesAndInteractionIcons(
                             data = characterFullState!!,
                             modifier = modifier,
                             imageLoader = svgImageLoader,
-                            daoViewModel = daoViewModel,
                             characterViewModel = characterViewModel
                         )
                         ShowCharacterPictureAlbum(
@@ -130,7 +127,7 @@ fun DisplayCharacterFromId(
             },
             onLoad = {
                 characterViewModel.viewModelScope.launch {
-                    characterViewModel.loadAllInfo(id, context)
+                    characterViewModel.loadAllInfo(id(), context)
                 }
             },
             swipeRefreshState = swipeRefreshState

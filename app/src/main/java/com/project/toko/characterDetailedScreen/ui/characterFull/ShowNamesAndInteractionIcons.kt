@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
@@ -38,10 +39,9 @@ fun ShowNamesAndInteractionIcons(
     data: com.project.toko.characterDetailedScreen.data.model.characterFullModel.Data,
     modifier: Modifier,
     imageLoader: ImageLoader,
-    daoViewModel: DaoViewModel,
     characterViewModel: CharacterFullByIdViewModel
 ) {
-
+    val daoViewModel: DaoViewModel = hiltViewModel()
     val isCharacterInDao by daoViewModel.isCharacterInDao(data.mal_id)
         .collectAsStateWithLifecycle(
             initialValue = false
@@ -89,6 +89,8 @@ fun ShowNamesAndInteractionIcons(
                     .fillMaxWidth()
                     .padding(end = 60.dp)
             ) {
+
+
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = if (isCharacterInDao) R.drawable.favorite_touched else R.drawable.favorite_untouched,

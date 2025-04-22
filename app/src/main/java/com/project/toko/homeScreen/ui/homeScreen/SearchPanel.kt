@@ -62,7 +62,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     isInDarkTheme: () -> Boolean,
     drawerState: DrawerState,
-    svgImageLoader: ImageLoader
+    svgImageLoader:() -> ImageLoader
 ) {
     val viewModel: HomeScreenViewModel = hiltViewModel()
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
@@ -73,13 +73,11 @@ fun MainScreen(
         rememberSwipeRefreshState(isRefreshing = viewModel.isLoadingSearch.value)
 
     LaunchedEffect(key1 = switchIndicator.value) {
-        withContext(Dispatchers.IO) {
             if (switchIndicator.value.not()) {
                 viewModel.loadAllSections(context)
-                return@withContext
+                return@LaunchedEffect
             }
             viewModel.addAllParams()
-        }
     }
 
     PullToRefreshLayout(composable = {
@@ -187,7 +185,7 @@ fun MainScreen(
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = if (switchIndicator.value) R.drawable.search_back else R.drawable.search_home,
-                                    imageLoader = svgImageLoader
+                                    imageLoader = svgImageLoader()
                                 ),
                                 contentDescription = null,
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),

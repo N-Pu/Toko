@@ -69,7 +69,7 @@ fun GridAdder(
     modifier: Modifier,
     switch: () -> Boolean,
     isInDarkTheme: () -> Boolean,
-    svgImageLoader: ImageLoader,
+    svgImageLoader:() -> ImageLoader,
 ) {
     val viewModel: HomeScreenViewModel = hiltViewModel()
 //    val customDialogViewModel: CustomDialogViewModel = hiltViewModel()
@@ -121,7 +121,7 @@ fun GridAdder(
                 },
                 modifier = modifier,
                 isInDarkTheme = isInDarkTheme,
-                svgImageLoader = svgImageLoader
+                svgImageLoader = svgImageLoader()
             )
         }
     }
@@ -155,7 +155,7 @@ fun SearchScreen(
     viewModel: HomeScreenViewModel,
     newAnimeSearchModel: NewAnimeSearchModel,
     onNavigateToDetailScreen: (Int) -> Unit,
-    svgImageLoader: ImageLoader
+    svgImageLoader: () -> ImageLoader
 ) {
     var additionalDataRequested by remember { mutableStateOf(false) }
     val columnState = rememberLazyListState()
@@ -202,7 +202,7 @@ fun ShowMainScreen(
     modifier: Modifier = Modifier,
     isInDarkTheme: () -> Boolean,
     onNavigateToDetailScreen: (Int) -> Unit,
-    svgImageLoader: ImageLoader,
+    svgImageLoader: () -> ImageLoader,
     getTrendingAnime: NewAnimeSearchModel,
     getTopUpcoming: NewAnimeSearchModel,
     getTopAiring: NewAnimeSearchModel
@@ -536,7 +536,7 @@ private fun AnimeCardBox(
     data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier,
-    svgImageLoader: ImageLoader,
+    svgImageLoader: () ->ImageLoader,
     homeScreenViewModel: HomeScreenViewModel
 ) {
     val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
@@ -617,7 +617,7 @@ private fun AnimeCardBox(
                 ) {
                     Image(
                         modifier = Modifier.size(25.dp), painter = rememberAsyncImagePainter(
-                            model = R.drawable.usergroup, imageLoader = svgImageLoader
+                            model = R.drawable.usergroup, imageLoader = svgImageLoader()
                         ), contentDescription = null
                     )
                     Text(
@@ -632,18 +632,18 @@ private fun AnimeCardBox(
             }
 
             AddFavorites(
-                mal_id = data.id,
-                title = data.title,
-                score = formatScore(data.score),
-                scoredBy = formatScoredBy(data.scored_by),
-                animeImage = data.images.jpg.image_url,
+                mal_id = { data.id },
+                title = { data.title },
+                score = { formatScore(data.score) },
+                scoredBy = { formatScoredBy(data.scored_by) },
+                animeImage = { data.images.jpg.image_url },
                 modifier = Modifier,
-                status = data.status,
-                rating = data.rating ?: "N/A",
-                secondName = data.title_japanese,
-                airedFrom = data.aired.from,
-                type = data.type ?: "N/A",
-                svgImageLoader = svgImageLoader
+                status = { data.status },
+                rating = { data.rating ?: "N/A" },
+                secondName = { data.title_japanese },
+                airedFrom = { data.aired.from },
+                type = { data.type ?: "N/A" },
+                svgImageLoader =  svgImageLoader
             )
 
 
@@ -740,7 +740,7 @@ private fun ShowSection(
     data: AnimeItem,
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier,
-    svgImageLoader: ImageLoader
+    svgImageLoader:() -> ImageLoader
 ) {
     val painter = rememberAsyncImagePainter(model = data.animeImage)
     var isCardClicked by remember { mutableStateOf(false) }
@@ -836,7 +836,7 @@ private fun ShowSection(
                     ) {
                         Image(
                             modifier = modifier.size(25.dp), painter = rememberAsyncImagePainter(
-                                model = R.drawable.usergroup, imageLoader = svgImageLoader
+                                model = R.drawable.usergroup, imageLoader = svgImageLoader()
                             ), contentDescription = null
                         )
                         Text(
@@ -1117,10 +1117,9 @@ private fun ShowTopAnime(
     data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier,
-    svgImageLoader: ImageLoader
+    svgImageLoader: ()-> ImageLoader
 ) {
-    val imageUrl = data.images?.webp?.image_url ?: ""
-    val painter = rememberAsyncImagePainter(model = imageUrl)
+    val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
     var isCardClicked by remember { mutableStateOf(false) }
 
     val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
@@ -1213,7 +1212,7 @@ private fun ShowTopAnime(
                             modifier = modifier.size(25.dp),
                             painter = rememberAsyncImagePainter(
                                 model = R.drawable.usergroup,
-                                imageLoader = svgImageLoader
+                                imageLoader = svgImageLoader()
                             ),
                             contentDescription = null
                         )
@@ -1229,18 +1228,18 @@ private fun ShowTopAnime(
                 }
 
                 AddFavorites(
-                    mal_id = animeId,
-                    title = data.title ?: "",
-                    score = formatScore(data.score ),
-                    scoredBy = formatScoredBy(data.scored_by ),
-                    animeImage = data.images?.jpg?.image_url ?: "",
+                    mal_id = { animeId },
+                    title = { data.title ?: "" },
+                    score = { formatScore(data.score) },
+                    scoredBy = { formatScoredBy(data.scored_by) },
+                    animeImage = { data.images.jpg.image_url ?: "" },
                     modifier = modifier,
-                    status = data.status ?: "Unknown",
-                    rating = data.rating ?: "N/A",
-                    secondName = data.title_japanese ?: "",
-                    airedFrom = data.aired?.from ?: "Unknown",
-                    type = data.type ?: "N/A",
-                    svgImageLoader = svgImageLoader
+                    status = { data.status ?: "Unknown" },
+                    rating = { data.rating ?: "N/A" },
+                    secondName = { data.title_japanese ?: "" },
+                    airedFrom = { data.aired.from ?: "Unknown" },
+                    type = { data.type ?: "N/A" },
+                    svgImageLoader =  svgImageLoader
                 )
             }
 

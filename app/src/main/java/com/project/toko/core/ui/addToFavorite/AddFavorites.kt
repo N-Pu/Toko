@@ -56,22 +56,22 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AddFavorites(
-    mal_id: Int,
-    title: String,
-    score: String,
-    scoredBy: String,
-    animeImage: String,
+    mal_id: () -> Int,
+    title: () -> String,
+    score: () -> String,
+    scoredBy: () -> String,
+    animeImage: () -> String,
     modifier: Modifier,
-    rating: String,
-    status: String,
-    secondName: String?,
-    airedFrom: String?,
-    type: String,
-    svgImageLoader: ImageLoader
+    rating: () -> String,
+    status: () -> String,
+    secondName: () -> String?,
+    airedFrom: () -> String?,
+    type: () -> String,
+    svgImageLoader: () -> ImageLoader
 
 ) {
 
-    val daoViewModel : DaoViewModel = hiltViewModel()
+    val daoViewModel: DaoViewModel = hiltViewModel()
     var isExpanded by remember { mutableStateOf(false) }
     Box {
         Column(
@@ -83,12 +83,12 @@ fun AddFavorites(
 
             when {
                 daoViewModel.containsItemIdInCategory(
-                    id = mal_id,
+                    id = mal_id(),
                     AnimeStatus.WATCHING.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = R.drawable.add, imageLoader = svgImageLoader
+                            model = R.drawable.add, imageLoader = svgImageLoader()
                         ),
                         contentDescription = null,
                         modifier = modifier
@@ -102,12 +102,12 @@ fun AddFavorites(
                 }
 
                 daoViewModel.containsItemIdInCategory(
-                    id = mal_id,
+                    id = mal_id(),
                     AnimeStatus.COMPLETED.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = R.drawable.eyewhite, imageLoader = svgImageLoader
+                            model = R.drawable.eyewhite, imageLoader = svgImageLoader()
                         ),
                         contentDescription = null,
                         modifier = modifier
@@ -121,12 +121,12 @@ fun AddFavorites(
                 }
 
                 daoViewModel.containsItemIdInCategory(
-                    id = mal_id,
+                    id = mal_id(),
                     AnimeStatus.DROPPED.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = R.drawable.dropped, imageLoader = svgImageLoader
+                            model = R.drawable.dropped, imageLoader = svgImageLoader()
                         ),
                         contentDescription = null,
                         modifier = modifier
@@ -140,12 +140,12 @@ fun AddFavorites(
                 }
 
                 daoViewModel.containsItemIdInCategory(
-                    id = mal_id,
+                    id = mal_id(),
                     AnimeStatus.PLANNED.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = R.drawable.bookmarkfilled, imageLoader = svgImageLoader
+                            model = R.drawable.bookmarkfilled, imageLoader = svgImageLoader()
                         ),
                         contentDescription = null,
                         modifier = modifier
@@ -159,11 +159,11 @@ fun AddFavorites(
                 }
 
                 daoViewModel.containsInFavorite(
-                    id = mal_id
+                    id = mal_id()
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = R.drawable.favorite_touched, imageLoader = svgImageLoader
+                            model = R.drawable.favorite_touched, imageLoader = svgImageLoader()
                         ),
                         contentDescription = null,
                         modifier = modifier
@@ -172,7 +172,7 @@ fun AddFavorites(
                                 isExpanded = true
                             },
 
-                    )
+                        )
 
                 }
 
@@ -183,7 +183,7 @@ fun AddFavorites(
                             .clickable { isExpanded = true },
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.addpluscircle,
-                            imageLoader = svgImageLoader
+                            imageLoader = svgImageLoader()
                         ),
                         contentDescription = "Add circle"
                     )
@@ -212,7 +212,7 @@ fun AddFavorites(
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = if (daoViewModel.containsItemIdInCategory(
-                            id = mal_id,
+                            id = mal_id(),
                             AnimeStatus.PLANNED.route
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) Color(255, 152, 0, 255) else MaterialTheme.colorScheme.error,
@@ -220,40 +220,40 @@ fun AddFavorites(
             }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                     if (daoViewModel.containsItemIdInCategory(
-                            mal_id,
+                            mal_id(),
                             AnimeStatus.PLANNED.route
                         ).first()
                     ) {
                         daoViewModel.removeFromDataBase(
 
                             AnimeItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.PLANNED.route,
-                                type = type
+                                type = type()
                             )
                         )
                     } else {
                         daoViewModel.addToCategory(
                             AnimeItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.PLANNED.route,
-                                type = type
+                                type = type()
                             )
                         )
                     }
@@ -265,11 +265,11 @@ fun AddFavorites(
 
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = R.drawable.bookmarkfilled, imageLoader = svgImageLoader
+                        model = R.drawable.bookmarkfilled, imageLoader = svgImageLoader()
                     ), contentDescription = null, modifier = modifier.size(30.dp),
                     colorFilter =
                     if (daoViewModel.containsItemIdInCategory(
-                            id = mal_id,
+                            id = mal_id(),
                             AnimeStatus.PLANNED.route
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) ColorFilter.tint(
@@ -290,7 +290,7 @@ fun AddFavorites(
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = if (daoViewModel.containsItemIdInCategory(
-                            id = mal_id,
+                            id = mal_id(),
                             AnimeStatus.WATCHING.route
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) Color.Yellow else MaterialTheme.colorScheme.error,
@@ -298,40 +298,40 @@ fun AddFavorites(
             }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                     if (daoViewModel.containsItemIdInCategory(
-                            mal_id,
+                            mal_id(),
                             AnimeStatus.WATCHING.route
                         ).first()
                     ) {
                         daoViewModel.removeFromDataBase(
 
                             AnimeItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.WATCHING.route,
-                                type = type
+                                type = type()
                             )
                         )
                     } else {
                         daoViewModel.addToCategory(
                             AnimeItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.WATCHING.route,
-                                type = type
+                                type = type()
                             )
                         )
                     }
@@ -343,11 +343,11 @@ fun AddFavorites(
 
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = R.drawable.add, imageLoader = svgImageLoader
+                        model = R.drawable.add, imageLoader = svgImageLoader()
                     ), contentDescription = null, modifier = modifier.size(25.dp),
                     colorFilter =
                     if (daoViewModel.containsItemIdInCategory(
-                            id = mal_id,
+                            id = mal_id(),
                             AnimeStatus.WATCHING.route
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) ColorFilter.tint(Color.Yellow) else ColorFilter.tint(MaterialTheme.colorScheme.error)
@@ -360,7 +360,7 @@ fun AddFavorites(
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = if (daoViewModel.containsItemIdInCategory(
-                            id = mal_id,
+                            id = mal_id(),
                             AnimeStatus.COMPLETED.route
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
@@ -368,39 +368,39 @@ fun AddFavorites(
             }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                     if (daoViewModel.containsItemIdInCategory(
-                            mal_id,
+                            mal_id(),
                             AnimeStatus.COMPLETED.route
                         ).first()
                     ) {
                         daoViewModel.removeFromDataBase(
                             AnimeItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.COMPLETED.route,
-                                type = type
+                                type = type()
                             )
                         )
                     } else {
                         daoViewModel.addToCategory(
                             AnimeItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.COMPLETED.route,
-                                type = type
+                                type = type()
                             )
                         )
                     }
@@ -411,11 +411,11 @@ fun AddFavorites(
             ), trailingIcon = {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = R.drawable.eyewhite, imageLoader = svgImageLoader
+                        model = R.drawable.eyewhite, imageLoader = svgImageLoader()
                     ), contentDescription = null, modifier = modifier.size(22.dp),
                     colorFilter =
                     if (daoViewModel.containsItemIdInCategory(
-                            id = mal_id,
+                            id = mal_id(),
                             AnimeStatus.COMPLETED.route
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
@@ -430,7 +430,7 @@ fun AddFavorites(
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = if (daoViewModel.containsItemIdInCategory(
-                            id = mal_id,
+                            id = mal_id(),
                             AnimeStatus.DROPPED.route
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) Color.Red else MaterialTheme.colorScheme.error,
@@ -438,39 +438,39 @@ fun AddFavorites(
             }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                     if (daoViewModel.containsItemIdInCategory(
-                            mal_id,
+                            mal_id(),
                             AnimeStatus.DROPPED.route
                         ).first()
                     ) {
                         daoViewModel.removeFromDataBase(
                             AnimeItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.DROPPED.route,
-                                type = type
+                                type = type()
                             )
                         )
                     } else {
                         daoViewModel.addToCategory(
                             AnimeItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.DROPPED.route,
-                                type = type
+                                type = type()
                             )
                         )
                     }
@@ -481,11 +481,11 @@ fun AddFavorites(
             ), trailingIcon = {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = R.drawable.dropped, imageLoader = svgImageLoader
+                        model = R.drawable.dropped, imageLoader = svgImageLoader()
                     ), contentDescription = null, modifier = modifier.size(25.dp),
                     colorFilter =
                     if (daoViewModel.containsItemIdInCategory(
-                            id = mal_id,
+                            id = mal_id(),
                             AnimeStatus.DROPPED.route
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) ColorFilter.tint(Color.Red) else ColorFilter.tint(MaterialTheme.colorScheme.error)
@@ -499,42 +499,42 @@ fun AddFavorites(
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = if (daoViewModel.containsInFavorite(
-                            id = mal_id
+                            id = mal_id()
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
                 )
             }, onClick = {
                 daoViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    if (daoViewModel.containsInFavorite(mal_id).first()) {
+                    if (daoViewModel.containsInFavorite(mal_id()).first()) {
                         daoViewModel.removeFromFavorite(
                             FavoriteItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.DROPPED.route,
-                                type = type
+                                type = type()
                             )
                         )
                     } else {
                         daoViewModel.addToFavorite(
                             FavoriteItem(
-                                id = mal_id,
-                                animeName = title,
-                                score = score,
-                                scored_by = scoredBy,
-                                animeImage = animeImage,
-                                status = status,
-                                rating = rating,
-                                secondName = secondName ?: "N/A",
-                                airedFrom = airedFrom ?: "N/A",
+                                id = mal_id(),
+                                animeName = title(),
+                                score = score(),
+                                scored_by = scoredBy(),
+                                animeImage = animeImage(),
+                                status = status(),
+                                rating = rating(),
+                                secondName = secondName() ?: "N/A",
+                                airedFrom = airedFrom() ?: "N/A",
                                 category = AnimeStatus.DROPPED.route,
-                                type = type
+                                type = type()
                             )
                         )
                     }
@@ -545,14 +545,15 @@ fun AddFavorites(
             ), trailingIcon = {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model =   if (daoViewModel.containsInFavorite(
-                                id = mal_id
+                        model = if (daoViewModel.containsInFavorite(
+                                id = mal_id()
                             ).collectAsStateWithLifecycle(initialValue = false).value
-                        ) R.drawable.favorite_touched else R.drawable.favorite_untouched, imageLoader = svgImageLoader
+                        ) R.drawable.favorite_touched else R.drawable.favorite_untouched,
+                        imageLoader = svgImageLoader()
                     ), contentDescription = null, modifier = modifier.size(25.dp),
                     colorFilter =
                     if (daoViewModel.containsInFavorite(
-                            id = mal_id
+                            id = mal_id()
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) null else ColorFilter.tint(
                         MaterialTheme.colorScheme.error

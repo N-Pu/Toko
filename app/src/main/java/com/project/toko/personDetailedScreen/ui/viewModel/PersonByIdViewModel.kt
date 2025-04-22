@@ -15,31 +15,36 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class PersonByIdViewModel @Inject constructor(val malApiService: MalApiService) : ViewModel() {
-    private val _personFull = MutableStateFlow<com.project.toko.personDetailedScreen.data.model.personFullModel.Data?>(null)
-    private val personCache = mutableMapOf<Int, com.project.toko.personDetailedScreen.data.model.personFullModel.Data?>()
+    private val _personFull =
+        MutableStateFlow<com.project.toko.personDetailedScreen.data.model.personFullModel.Data?>(
+            null
+        )
+    private val personCache =
+        mutableMapOf<Int, com.project.toko.personDetailedScreen.data.model.personFullModel.Data?>()
     val personFull = _personFull.asStateFlow()
     private val _isLoading = mutableStateOf(false)
     var isLoading = _isLoading
     private val _loadedId = mutableIntStateOf(0)
-    val loadedId = _loadedId
+//    val loadedId = _loadedId
 
-    private suspend fun getPersonFromId(mal_id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = malApiService.getPersonFullFromId(mal_id)
-                if (response.isSuccessful) {
-                    val data = response.body()?.data
-                    personCache[mal_id] = data
-                    _loadedId.intValue = mal_id
-                    _personFull.value = data
-                }
-            } catch (e: Exception) {
-                Log.e("StaffFullByIdViewModel", e.message.toString())
+    private suspend fun getPersonFromId(mal_id: Int) = withContext(Dispatchers.IO) {
+        try {
+            val response = malApiService.getPersonFullFromId(mal_id)
+            if (response.isSuccessful) {
+                val data = response.body()?.data
+                personCache[mal_id] = data
+                _loadedId.intValue = mal_id
+                _personFull.value = data
+            } else {
+                throw IllegalArgumentException("Error response from server in person viewmodel")
             }
+        } catch (e: Exception) {
+            Log.e("StaffFullByIdViewModel", e.message.toString())
         }
     }
 
@@ -52,32 +57,33 @@ class PersonByIdViewModel @Inject constructor(val malApiService: MalApiService) 
         )
     val picturesList = _picturesList.asStateFlow()
 
-    private suspend fun getPicturesFromId(id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = malApiService.getPersonFullPictures(id)
-                if (response.isSuccessful) {
-                    val pictures = response.body()?.data ?: emptyList()
-                    picturesCache[id] = pictures
-                    _picturesList.value = pictures
-                }
-            } catch (e: Exception) {
-                Log.e("CharacterPicturesVM", e.message.toString())
+    private suspend fun getPicturesFromId(id: Int) = withContext(Dispatchers.IO) {
+        try {
+            val response = malApiService.getPersonFullPictures(id)
+            if (response.isSuccessful) {
+                val pictures = response.body()?.data ?: emptyList()
+                picturesCache[id] = pictures
+                _picturesList.value = pictures
+            } else {
+                throw IllegalArgumentException("Error image response from server in person viewmodel")
             }
+        } catch (e: Exception) {
+            Log.e("CharacterPicturesVM", e.message.toString())
         }
     }
 
 
-    suspend fun loadAllInfo(id: Int, context: Context) {
-        viewModelScope.launch {
-            if (isInternetAvailable(context)) {
-                _isLoading.value = true
-                delay(300L)
-                getPersonFromId(id)
-                delay(300L)
-                getPicturesFromId(id)
-                _isLoading.value = false
-            } else {
+    suspend fun loadAllInfo(id: Int, context: Context) = withContext(Dispatchers.IO) {
+        if (isInternetAvailable(context)) {
+            _isLoading.value = true
+            delay(300L)
+            getPersonFromId(id)
+            delay(300L)
+            getPicturesFromId(id)
+            _isLoading.value = false
+        } else {
+            withContext(Dispatchers.Main.immediate)
+            {
                 Toast.makeText(
                     context,
                     "No internet connection!",

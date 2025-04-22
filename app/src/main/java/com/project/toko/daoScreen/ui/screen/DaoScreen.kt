@@ -106,24 +106,24 @@ fun DaoScreen(
 
 
     var selectedListType by rememberSaveable { mutableStateOf(AnimeStatus.WATCHING) }
-    val arrayOfEntries = AnimeStatus.values()
+    val arrayOfEntries = remember { AnimeStatus.entries.toTypedArray() }
     val viewModel: DaoViewModel = hiltViewModel()
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
     val rightSortingMenu = remember { mutableStateOf(false) }
     val leftSortingMenu = remember { mutableStateOf(false) }
 
-    val isSortedAlphabetically = viewModel.isSortedAlphabetically
-    val isSortedByScore = viewModel.isSortedByScore
-    val isSortedByUsers = viewModel.isSortedByUsers
-    val isAiredFrom = viewModel.isAiredFrom
+    val isSortedAlphabetically = remember { viewModel.isSortedAlphabetically }
+    val isSortedByScore = remember { viewModel.isSortedByScore }
+    val isSortedByUsers = remember { viewModel.isSortedByUsers }
+    val isAiredFrom = remember { viewModel.isAiredFrom }
 
-    val selectedType = viewModel.selectedType
-    val isTvSelected = viewModel.isTvSelected
-    val isMovieSelected = viewModel.isMovieSelected
-    val isOvaSelected = viewModel.isOvaSelected
-    val isSpecialSelected = viewModel.isSpecialSelected
-    val isOnaSelected = viewModel.isOnaSelected
-    val isMusicSelected = viewModel.isMusicSelected
+    val selectedType = remember { viewModel.selectedType }
+    val isTvSelected = remember { viewModel.isTvSelected }
+    val isMovieSelected = remember { viewModel.isMovieSelected }
+    val isOvaSelected = remember { viewModel.isOvaSelected }
+    val isSpecialSelected = remember { viewModel.isSpecialSelected }
+    val isOnaSelected = remember { viewModel.isOnaSelected }
+    val isMusicSelected = remember { viewModel.isMusicSelected }
 
     val scope = rememberCoroutineScope()
 
@@ -156,9 +156,11 @@ fun DaoScreen(
                     tint = MaterialTheme.colorScheme.inversePrimary,
                     modifier = modifier
                         .size(30.dp)
-                        .clickable { scope.launch {
-                            drawerState.open()
-                        } }
+                        .clickable {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        }
                 )
                 Image(
                     painter = rememberAsyncImagePainter(model = R.drawable.tokominilogo),
@@ -300,7 +302,7 @@ fun DaoScreen(
                 )
 
                 AnimeStatus.FAVORITE -> FavoriteList(
-                 onNavigateToDetailScreen = onNavigateToDetailScreen,
+                    onNavigateToDetailScreen = onNavigateToDetailScreen,
                     daoViewModel = viewModel,
                     modifier = modifier,
                     isSortedAlphabetically = isSortedAlphabetically,
@@ -335,17 +337,20 @@ private fun FavoriteAnimeListButton(
     colorIndex: Int,
     isInDarkTheme: () -> Boolean
 ) {
-    val colors = if (isInDarkTheme()) darkFavoriteTopBarColors else lightFavoriteTopBarColors
-    val customModifier = if (selectedListType == listType) modifier
-        .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
-        .clickable { onClick() }
-        .fillMaxHeight(1f)
-        .background(colors[colorIndex])
-        .animateContentSize()
-    else modifier
-        .clickable { onClick() }
-        .background(colors[colorIndex])
-        .animateContentSize()
+    val colors =
+        remember { if (isInDarkTheme()) darkFavoriteTopBarColors else lightFavoriteTopBarColors }
+    val customModifier = remember {
+        if (selectedListType == listType) modifier
+            .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
+            .clickable { onClick() }
+            .fillMaxHeight(1f)
+            .background(colors[colorIndex])
+            .animateContentSize()
+        else modifier
+            .clickable { onClick() }
+            .background(colors[colorIndex])
+            .animateContentSize()
+    }
 
     Box(modifier = customModifier) {
         TextButton(
@@ -401,7 +406,7 @@ private fun DataAnimeList(
 
     var selectedAnime by daoViewModel.lastSwipedAnime
     var isDialogOpen by remember { mutableStateOf(false) }
-    var listOfCategory = AnimeStatus.values().dropLast(2)
+    var listOfCategory = remember { AnimeStatus.entries.dropLast(2) }
 
     LaunchedEffect(key1 = category) {
         val trimmedList = listOfCategory
@@ -585,7 +590,8 @@ private fun FavoriteList(
         .collectAsStateWithLifecycle(initialValue = emptyList())
 
     var isDialogOpen by remember { mutableStateOf(false) }
-    val listOfCategory = AnimeStatus.values().dropLast(2).filter { it.route != "Favorite" }
+    val listOfCategory =
+        remember { AnimeStatus.entries.dropLast(2).filter { it.route != "Favorite" } }
 
     Column(
         modifier = modifier

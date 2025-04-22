@@ -2,7 +2,7 @@ package com.project.toko.noId.presentation_layer.noId
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,7 +29,7 @@ fun NoId() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        BoxWithConstraints(
+        Box(
             modifier = Modifier
                 .clip(CardDefaults.shape)
                 .background(

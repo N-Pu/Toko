@@ -24,16 +24,14 @@ import androidx.compose.ui.unit.dp
 fun ShowCharacterPicture(
     painter: Painter,
     modifier: Modifier,
-    isDialogShown: MutableState<Boolean>
+    isDialogShown: () -> MutableState<Boolean>
 ) {
 
     Column(
         modifier = modifier
             .fillMaxWidth(0.5f)
             .fillMaxHeight()
-            .padding(horizontal = 20.dp)
-
-        ,
+            .padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
@@ -44,7 +42,7 @@ fun ShowCharacterPicture(
             modifier = modifier
                 .fillMaxSize()
                 .clip(CardDefaults.shape)
-                .combinedClickable(onLongClick = { isDialogShown.value = true }) { }
+                .combinedClickable(onLongClick = { isDialogShown().value = true }) { }
         )
     }
 }

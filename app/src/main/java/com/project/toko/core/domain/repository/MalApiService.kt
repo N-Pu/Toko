@@ -2,6 +2,8 @@ package com.project.toko.core.domain.repository
 
 
 import android.util.Log
+import com.project.toko.characterDetailedScreen.data.model.characterFullModel.CharacterFullModel
+import com.project.toko.characterDetailedScreen.data.model.characterPictures.CharacterPicturesModel
 import com.project.toko.detailScreen.data.model.detailModel.DetailScreenModel
 import com.project.toko.randomAnimeScreen.data.model.AnimeRandomModel
 import com.project.toko.detailScreen.data.model.castModel.CastModel
@@ -40,7 +42,7 @@ interface MalApiService {
         @Query("rating") rating: String? = null,
         @Query("order_by") orderBy: String? = null,
         @Query("sort") sort: String? = null,
-    ): Response<com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel>
+    ): Response<NewAnimeSearchModel>
 
     // Enum: "airing" "upcoming" "bypopularity" "favorite"
     @GET("${BASE_URL}v4/top/anime?")
@@ -48,24 +50,24 @@ interface MalApiService {
         @Query("filter") filter: String,
         @Query("limit") limit: Int,
         @Query("sfw") sfw: Boolean
-    ): Response<com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel>
+    ): Response<NewAnimeSearchModel>
 
 
     @GET("${BASE_URL}v4/anime/{id}/full")
-    suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<com.project.toko.detailScreen.data.model.detailModel.DetailScreenModel>
+    suspend fun getDetailsFromAnime(@Path("id") id: Int): Response<DetailScreenModel>
 
     @GET("${BASE_URL}v4/anime/{id}/pictures")
-    suspend fun getDetailScreenPictures(@Path("id") id: Int): Response<com.project.toko.detailScreen.data.model.pictureModel.DetailPicturesDataModel>
+    suspend fun getDetailScreenPictures(@Path("id") id: Int): Response<DetailPicturesDataModel>
 
 
     @GET("${BASE_URL}v4/anime/{id}/recommendations")
-    suspend fun getRecommendationsFromAnime(@Path("id") id: Int): Response<com.project.toko.detailScreen.data.model.recommendationsModel.RecommendationsModel>
+    suspend fun getRecommendationsFromAnime(@Path("id") id: Int): Response<RecommendationsModel>
 
     @GET("${BASE_URL}v4/random/anime")
     suspend fun getRandomAnime(@Query("sfw") sfw: Boolean): Response<AnimeRandomModel>
 
     @GET("${BASE_URL}v4/anime/{id}/characters")
-    suspend fun getCharactersFromId(@Path("id") id: Int): Response<com.project.toko.detailScreen.data.model.castModel.CastModel> {
+    suspend fun getCharactersFromId(@Path("id") id: Int): Response<CastModel> {
         try {
             return getCharactersFromId(id)
         } catch (e: HttpException) {
@@ -77,16 +79,16 @@ interface MalApiService {
     }
 
     @GET("${BASE_URL}v4/characters/{id}/full")
-    suspend fun getCharacterFullFromId(@Path("id") id: Int): Response<com.project.toko.characterDetailedScreen.data.model.characterFullModel.CharacterFullModel>
+    suspend fun getCharacterFullFromId(@Path("id") id: Int): Response<CharacterFullModel>
 
     @GET("${BASE_URL}v4/characters/{id}/pictures")
-    suspend fun getCharacterFullPictures(@Path("id") id: Int): Response<com.project.toko.characterDetailedScreen.data.model.characterPictures.CharacterPicturesModel>
+    suspend fun getCharacterFullPictures(@Path("id") id: Int): Response<CharacterPicturesModel>
 
     @GET("${BASE_URL}v4/people/{id}/pictures")
-    suspend fun getPersonFullPictures(@Path("id") id: Int): Response<com.project.toko.personDetailedScreen.data.model.personPictures.PersonPicturesModel>
+    suspend fun getPersonFullPictures(@Path("id") id: Int): Response<PersonPicturesModel>
 
     @GET("${BASE_URL}v4/anime/{id}/staff")
-    suspend fun getStaffFromId(@Path("id") id: Int): Response<com.project.toko.detailScreen.data.model.staffModel.StaffModel> {
+    suspend fun getStaffFromId(@Path("id") id: Int): Response<StaffModel> {
         try {
             return getStaffFromId(id)
         } catch (e: HttpException) {
@@ -98,7 +100,7 @@ interface MalApiService {
     }
 
     @GET("${BASE_URL}v4/people/{id}/full")
-    suspend fun getPersonFullFromId(@Path("id") id: Int): Response<com.project.toko.personDetailedScreen.data.model.personFullModel.PersonFullModel> {
+    suspend fun getPersonFullFromId(@Path("id") id: Int): Response<PersonFullModel> {
         var retryCount = 0
         while (retryCount < 3) { // повторяем запрос не более 3 раз
             try {
