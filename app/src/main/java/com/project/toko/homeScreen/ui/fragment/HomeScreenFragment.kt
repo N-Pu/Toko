@@ -903,7 +903,7 @@ fun ShowDrawerContent(
         }
 
 
-    Column {
+    Column(modifier = modifier) {
         Row {
             Spacer(
                 modifier = Modifier

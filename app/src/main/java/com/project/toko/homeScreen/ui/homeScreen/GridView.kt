@@ -34,14 +34,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -55,7 +53,6 @@ import com.project.toko.core.ui.theme.SectionColor
 import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.ui.theme.scoreBoardColor
 import com.project.toko.daoScreen.data.dao.AnimeItem
-import com.project.toko.detailScreen.ui.detailScreen.mainPage.custom.youtubePlayer.DetailScreenActivity
 import com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -69,7 +66,7 @@ fun GridAdder(
     modifier: Modifier,
     switch: () -> Boolean,
     isInDarkTheme: () -> Boolean,
-    svgImageLoader:() -> ImageLoader,
+    svgImageLoader: () -> ImageLoader,
 ) {
     val viewModel: HomeScreenViewModel = hiltViewModel()
 //    val customDialogViewModel: CustomDialogViewModel = hiltViewModel()
@@ -212,8 +209,10 @@ fun ShowMainScreen(
     val loadingSectionTopAiring by remember { viewModel.loadingSectionTopAiring }
     val loadingSectionTopUpcoming by remember { viewModel.loadingSectionTopUpcoming }
     val loadingSectionTopTrending by remember { viewModel.loadingSectionTopTrending }
-    val lastTenAnimeFromWatchingSection by viewModel.showListOfWatching().collectAsStateWithLifecycle(initialValue = emptyList())
-    val getJustTenAddedAnime by viewModel.showLastAdded().collectAsStateWithLifecycle(initialValue = emptyList())
+    val lastTenAnimeFromWatchingSection by viewModel.showListOfWatching()
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+    val getJustTenAddedAnime by viewModel.showLastAdded()
+        .collectAsStateWithLifecycle(initialValue = emptyList())
 
     Column(
         modifier = modifier
@@ -279,6 +278,7 @@ fun ShowMainScreen(
         }
     }
 }
+
 @Composable
 fun LoadingSection(
     title: String,
@@ -536,7 +536,7 @@ private fun AnimeCardBox(
     data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier,
-    svgImageLoader: () ->ImageLoader,
+    svgImageLoader: () -> ImageLoader,
     homeScreenViewModel: HomeScreenViewModel
 ) {
     val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
@@ -643,7 +643,7 @@ private fun AnimeCardBox(
                 secondName = { data.title_japanese },
                 airedFrom = { data.aired.from },
                 type = { data.type ?: "N/A" },
-                svgImageLoader =  svgImageLoader
+                svgImageLoader = svgImageLoader
             )
 
 
@@ -740,7 +740,7 @@ private fun ShowSection(
     data: AnimeItem,
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier,
-    svgImageLoader:() -> ImageLoader
+    svgImageLoader: () -> ImageLoader
 ) {
     val painter = rememberAsyncImagePainter(model = data.animeImage)
     var isCardClicked by remember { mutableStateOf(false) }
@@ -755,7 +755,6 @@ private fun ShowSection(
             ), repeatMode = RepeatMode.Reverse
         ), label = ""
     )
-    val context = LocalContext.current
     Card(
         modifier = modifier
             .height(300.dp)
@@ -779,10 +778,7 @@ private fun ShowSection(
 
             }) {
                 data.id?.let {
-                    val intent = Intent(context, DetailScreenActivity::class.java)
-                    intent.putExtra("id", it)
-                    context.startActivity(intent)
-//                onNavigateToDetailScreen(it)
+                    onNavigateToDetailScreen(it)
                 }
             },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -1117,7 +1113,7 @@ private fun ShowTopAnime(
     data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier,
-    svgImageLoader: ()-> ImageLoader
+    svgImageLoader: () -> ImageLoader
 ) {
     val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
     var isCardClicked by remember { mutableStateOf(false) }
@@ -1218,7 +1214,7 @@ private fun ShowTopAnime(
                         )
                         Text(
                             textAlign = TextAlign.Center,
-                            text = formatScoredBy(data.scored_by ),
+                            text = formatScoredBy(data.scored_by),
                             color = Color.White,
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
@@ -1239,7 +1235,7 @@ private fun ShowTopAnime(
                     secondName = { data.title_japanese ?: "" },
                     airedFrom = { data.aired.from ?: "Unknown" },
                     type = { data.type ?: "N/A" },
-                    svgImageLoader =  svgImageLoader
+                    svgImageLoader = svgImageLoader
                 )
             }
 

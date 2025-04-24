@@ -352,7 +352,7 @@ private fun TabSelectionMenu(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
 private fun ScoreBar(
     viewModel: HomeScreenViewModel,
