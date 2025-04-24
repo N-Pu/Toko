@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,15 +50,20 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -71,6 +77,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.toko.R
 import com.project.toko.core.data.settings.DrawerViewModel
@@ -126,7 +133,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         ShowDrawerContent(imageLoader = svgImageLoader,
                             onThemeChange = {
                                 darkThemeManager.toggleTheme()
-                            }, darkTheme = { isDark }, svgImageLoader = svgImageLoader
+                            }, darkTheme = { isDark }
                         )
                     }) {
 
@@ -153,502 +160,505 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
 
-    @Composable
-    fun ShowDrawerContent(
-        modifier: Modifier = Modifier, imageLoader: ImageLoader,
-        onThemeChange: () -> Unit, darkTheme: () -> Boolean, svgImageLoader: ImageLoader
-    ) {
-        val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
-        val daoViewModel: DaoViewModel = hiltViewModel()
-        val randomScreenViewModel: RandomAnimeViewModel = hiltViewModel()
+//    @Composable
+//    fun ShowDrawerContent(
+//        modifier: Modifier = Modifier, imageLoader: ImageLoader,
+//        onThemeChange: () -> Unit, darkTheme: () -> Boolean
+//    ) {
+//        val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+//        val daoViewModel: DaoViewModel = hiltViewModel()
+//        val randomScreenViewModel: RandomAnimeViewModel = hiltViewModel()
+//
+//        var isHelpFAQOpen by remember { mutableStateOf(false) }
+//        var isLegalOpen by remember { mutableStateOf(false) }
+//        var isDeleteDaoOpen by remember { mutableStateOf(false) }
+//        val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
+//        val context = LocalContext.current
+//
+//        val customModifier = modifier
+//            .fillMaxWidth(0.8f)
+//            .height(70.dp)
+//            .clip(CardDefaults.shape)
+//            .background(MaterialTheme.colorScheme.onPrimaryContainer)
+//            .clickable {
+//                daoViewModel.exportDB("Main.db", "com.project.toko")
+//            }
+//
+//
+//        Column {
+//            Row {
+//                Spacer(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(80.dp)
+//                        .background(Color.Transparent)
+//                )
+//            }
+//            Column(
+//                modifier = modifier
+//                    .fillMaxWidth(0.8f)
+//                    .fillMaxHeight(0.9f)
+//                    .clip(RoundedCornerShape(topEnd = 20.dp))
+//                    .background(MaterialTheme.colorScheme.surfaceTint)
+//                    .verticalScroll(rememberScrollState())
+//            ) {
+//                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//                NavigationDrawerItem(
+//                    colors = NavigationDrawerItemDefaults.colors(
+//                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+//                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+//                    ),
+//                    label = {
+//                        Text(
+//                            text = "NSFW",
+//                            fontWeight = FontWeight.ExtraBold,
+//                            fontSize = 22.sp,
+//                            modifier = modifier.padding(start = 20.dp),
+//                            color = MaterialTheme.colorScheme.onPrimary,
+//                            fontFamily = evolventaBoldFamily
+//                        )
+//                    },
+//                    selected = false,
+//                    onClick = {},
+//                    badge = {
+//                        Switch(checked = homeScreenViewModel.isNSFWActive.value, onCheckedChange = {
+//                            homeScreenViewModel.saveNSFWData(it)
+//                            homeScreenViewModel.isNSFWActive.value = it
+//                            randomScreenViewModel.isNSFWActive.value = it
+//                        }, colors = SwitchDefaults.colors(
+//                            checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+//                            checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+//                            checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+//                            uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+//                            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+//                            uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+//                        ), thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
+//                            {
+//                                Icon(
+//                                    imageVector = Icons.Filled.Check,
+//                                    contentDescription = null,
+//                                    modifier = Modifier.size(SwitchDefaults.IconSize),
+//                                    tint = MaterialTheme.colorScheme.onTertiaryContainer
+//                                )
+//                            }
+//                        } else {
+//                            null
+//                        })
+//                    },
+//                )
+//                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//                NavigationDrawerItem(
+//                    modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
+//                    colors = NavigationDrawerItemDefaults.colors(
+//                        selectedContainerColor = Color.Transparent,
+//                        unselectedContainerColor = Color.Transparent
+//                    ),
+//                    label = {
+//                        Text(
+//                            text = "Help/FAQ",
+//                            fontWeight = FontWeight.ExtraBold,
+//                            fontSize = 22.sp,
+//                            modifier = modifier.padding(start = 20.dp),
+//                            color = MaterialTheme.colorScheme.onPrimary,
+//                            fontFamily = evolventaBoldFamily
+//                        )
+//                    },
+//                    selected = false,
+//                    onClick = {
+//                        isHelpFAQOpen = !isHelpFAQOpen
+//                    },
+//                    badge = {
+//                        if (isHelpFAQOpen) {
+//                            Image(
+//                                painter = rememberAsyncImagePainter(
+//                                    model = R.drawable.arrowdown, imageLoader = imageLoader
+//                                ),
+//                                contentDescription = null,
+//                                modifier = modifier.size(17.dp),
+//                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                            )
+//                        } else {
+//                            Image(
+//                                painter = rememberAsyncImagePainter(
+//                                    model = R.drawable.arrowright, imageLoader = imageLoader
+//                                ),
+//                                contentDescription = null,
+//                                modifier = modifier.size(17.dp),
+//                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                            )
+//                        }
+//                    },
+//                )
+//                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//                if (isHelpFAQOpen) {
+//                    NavigationDrawerItem(
+//                        colors = NavigationDrawerItemDefaults.colors(
+//                            selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+//                            unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+//                        ),
+//                        label = {
+//                            Text(
+//                                text = "Future of the app",
+//                                fontWeight = FontWeight.ExtraBold,
+//                                fontSize = 22.sp,
+//                                modifier = modifier.padding(start = 20.dp),
+//                                color = MaterialTheme.colorScheme.onPrimary,
+//                                fontFamily = evolventaBoldFamily
+//                            )
+//                        },
+//                        selected = false,
+//                        onClick = {
+//                            context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/future?authuser=0")
+//                        },
+//                        badge = {
+//                            Image(
+//                                painter = rememberAsyncImagePainter(
+//                                    model = R.drawable.openbrowser, imageLoader = imageLoader
+//                                ),
+//                                contentDescription = null,
+//                                modifier = modifier.size(30.dp),
+//                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                            )
+//                        },
+//                    )
+//
+//                    Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//                    NavigationDrawerItem(
+//                        colors = NavigationDrawerItemDefaults.colors(
+//                            selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+//                            unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+//                        ),
+//                        label = {
+//                            Text(
+//                                text = "Bugs",
+//                                fontWeight = FontWeight.ExtraBold,
+//                                fontSize = 22.sp,
+//                                modifier = modifier.padding(start = 20.dp),
+//                                color = MaterialTheme.colorScheme.onPrimary,
+//                                fontFamily = evolventaBoldFamily
+//                            )
+//                        },
+//                        selected = false,
+//                        onClick = {
+//                            context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/bugs?authuser=0")
+//                        },
+//                        badge = {
+//                            Image(
+//                                painter = rememberAsyncImagePainter(
+//                                    model = R.drawable.openbrowser, imageLoader = imageLoader
+//                                ),
+//                                contentDescription = null,
+//                                modifier = modifier.size(30.dp),
+//                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                            )
+//                        },
+//                    )
+//                    Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//                }
+//                NavigationDrawerItem(
+//                    colors = NavigationDrawerItemDefaults.colors(
+//                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+//                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+//                    ),
+//                    label = {
+//                        Text(
+//                            text = "Contact Support",
+//                            fontWeight = FontWeight.ExtraBold,
+//                            fontSize = 22.sp,
+//                            modifier = modifier.padding(start = 20.dp),
+//                            color = MaterialTheme.colorScheme.onPrimary,
+//                            fontFamily = evolventaBoldFamily
+//                        )
+//                    },
+//                    selected = false,
+//                    onClick = {
+//                        context.openSite("https://discord.gg/arJvEJ6RJb")
+//                    },
+//                    badge = {
+//                        Image(
+//                            painter = rememberAsyncImagePainter(
+//                                model = R.drawable.openbrowser, imageLoader = imageLoader
+//                            ),
+//                            contentDescription = null,
+//                            modifier = modifier.size(30.dp),
+//                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                        )
+//                    },
+//                )
+//                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//                NavigationDrawerItem(
+//                    modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
+//                    colors = NavigationDrawerItemDefaults.colors(
+//                        selectedContainerColor = Color.Transparent,
+//                        unselectedContainerColor = Color.Transparent
+//                    ),
+//                    label = {
+//                        Text(
+//                            text = "Legal",
+//                            fontWeight = FontWeight.ExtraBold,
+//                            fontSize = 22.sp,
+//                            modifier = modifier.padding(start = 20.dp),
+//                            color = MaterialTheme.colorScheme.onPrimary,
+//                            fontFamily = evolventaBoldFamily
+//                        )
+//                    },
+//                    selected = false,
+//                    onClick = {
+//                        isLegalOpen = !isLegalOpen
+//                    },
+//                    badge = {
+//                        if (isLegalOpen) {
+//                            Image(
+//                                painter = rememberAsyncImagePainter(
+//                                    model = R.drawable.arrowdown, imageLoader = imageLoader
+//                                ),
+//                                contentDescription = null,
+//                                modifier = modifier.size(17.dp),
+//                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                            )
+//                        } else {
+//                            Image(
+//                                painter = rememberAsyncImagePainter(
+//                                    model = R.drawable.arrowright, imageLoader = imageLoader
+//                                ),
+//                                contentDescription = null,
+//                                modifier = modifier.size(17.dp),
+//                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                            )
+//                        }
+//                    },
+//                )
+//                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//                if (isLegalOpen) {
+//                    NavigationDrawerItem(
+//                        colors = NavigationDrawerItemDefaults.colors(
+//                            selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+//                            unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+//                        ),
+//                        label = {
+//                            Text(
+//                                text = "Resource",
+//                                fontWeight = FontWeight.ExtraBold,
+//                                fontSize = 22.sp,
+//                                modifier = modifier.padding(start = 20.dp),
+//                                color = MaterialTheme.colorScheme.onPrimary,
+//                                fontFamily = evolventaBoldFamily
+//                            )
+//                        },
+//                        selected = false,
+//                        onClick = {
+//                            context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/resource?authuser=0")
+//                        },
+//                        badge = {
+//                            Image(
+//                                painter = rememberAsyncImagePainter(
+//                                    model = R.drawable.openbrowser, imageLoader = imageLoader
+//                                ),
+//                                contentDescription = null,
+//                                modifier = modifier.size(30.dp),
+//                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                            )
+//                        },
+//                    )
+//                    Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//                }
+//
+//                NavigationDrawerItem(
+//                    modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
+//                    colors = NavigationDrawerItemDefaults.colors(
+//                        selectedContainerColor = Color.Transparent,
+//                        unselectedContainerColor = Color.Transparent
+//                    ),
+//                    label = {
+//                        Text(
+//                            text = "Data",
+//                            fontWeight = FontWeight.ExtraBold,
+//                            fontSize = 22.sp,
+//                            modifier = modifier.padding(start = 20.dp),
+//                            color = MaterialTheme.colorScheme.onPrimary,
+//                            fontFamily = evolventaBoldFamily
+//                        )
+//                    },
+//                    selected = false,
+//                    onClick = {
+//                        isDeleteDaoOpen = !isDeleteDaoOpen
+//                    },
+//                    badge = {
+//                        if (isDeleteDaoOpen) {
+//                            Image(
+//                                painter = rememberAsyncImagePainter(
+//                                    model = R.drawable.arrowdown, imageLoader = imageLoader
+//                                ),
+//                                contentDescription = null,
+//                                modifier = modifier.size(17.dp),
+//                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                            )
+//                        } else {
+//                            Image(
+//                                painter = rememberAsyncImagePainter(
+//                                    model = R.drawable.arrowright, imageLoader = imageLoader
+//                                ),
+//                                contentDescription = null,
+//                                modifier = modifier.size(17.dp),
+//                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                            )
+//                        }
+//                    },
+//                )
+//                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//                if (isDeleteDaoOpen) {
+//                    AnimeListTypesToDelete(daoViewModel = daoViewModel, modifier = modifier)
+//                }
+//
+//
+//
+//                NavigationDrawerItem(
+//                    colors = NavigationDrawerItemDefaults.colors(
+//                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+//                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+//                    ),
+//                    label = {
+//                        Text(
+//                            text = "Export Data",
+//                            fontWeight = FontWeight.ExtraBold,
+//                            fontSize = 22.sp,
+//                            modifier = modifier.padding(start = 20.dp),
+//                            color = MaterialTheme.colorScheme.onPrimary,
+//                            fontFamily = evolventaBoldFamily
+//                        )
+//                    },
+//                    selected = false,
+//                    onClick = {
+////                    onClickRequestPermission(componentActivity, isExportDataPopUpDialogOpen)
+//                    },
+//                    badge = {
+//                        Image(
+//                            painter = rememberAsyncImagePainter(
+//                                model = R.drawable.export, imageLoader = imageLoader
+//                            ),
+//                            contentDescription = null,
+//                            modifier = modifier.size(30.dp),
+//                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+//                        )
+//                    },
+//                )
+//                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+//
+//            }
+//            Column(
+//                modifier = modifier
+//                    .fillMaxHeight()
+//                    .fillMaxWidth(0.8f)
+//                    .background(MaterialTheme.colorScheme.surfaceTint),
+//                horizontalAlignment = Alignment.End,
+//                verticalArrangement = Arrangement.Bottom
+//            ) {
+//                Image(painter = rememberAsyncImagePainter(
+//                    model = if (darkTheme()) R.drawable.sun else R.drawable.moon,
+//                    imageLoader = svgImageLoader
+//                ),
+//                    contentDescription = null,
+//                    modifier = modifier
+//                        .size(50.dp)
+//                        .padding(bottom = 10.dp, end = 5.dp)
+//                        .clickable {
+//                            onThemeChange()
+//                        })
+//            }
+//        }
+//
+//
+//        if (isExportDataPopUpDialogOpen.value) {
+//            Dialog(
+//                onDismissRequest = {
+//                    isExportDataPopUpDialogOpen.value = false
+//                }, properties = DialogProperties(
+//                    dismissOnBackPress = true,
+//                    dismissOnClickOutside = true,
+//                )
+//            ) {
+//                Box(
+//                    modifier = modifier
+//                        .fillMaxWidth()
+//                        .fillMaxHeight(0.4f),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Card(
+//                        modifier = modifier.fillMaxSize(),
+//                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint)
+//                    ) {
+//                        Column(
+//                            horizontalAlignment = Alignment.CenterHorizontally,
+//                            verticalArrangement = Arrangement.SpaceAround,
+//                            modifier = modifier.fillMaxSize()
+//                        ) {
+//                            Row(
+//                                modifier = modifier.fillMaxHeight(0.4f),
+//                                verticalAlignment = Alignment.CenterVertically,
+//                                horizontalArrangement = Arrangement.Center
+//                            ) {
+//                                Text(
+//                                    text = "Export Data?",
+//                                    fontSize = 35.sp,
+//                                    fontWeight = FontWeight.ExtraBold,
+//                                    color = MaterialTheme.colorScheme.onPrimary,
+//                                    fontFamily = evolventaBoldFamily
+//                                )
+//                            }
+//                            Row(
+//                                modifier = customModifier,
+//                                verticalAlignment = Alignment.CenterVertically,
+//                                horizontalArrangement = Arrangement.Center
+//                            ) {
+//                                Text(
+//                                    text = "Save Data",
+//                                    fontSize = 22.sp,
+//                                    fontWeight = FontWeight.ExtraBold,
+//                                    color = Color.White,
+//                                    fontFamily = evolventaBoldFamily
+//                                )
+//                            }
+//                            Spacer(modifier = modifier.height(10.dp))
+//                            Row(
+//                                modifier = modifier
+//                                    .fillMaxWidth(0.8f)
+//                                    .height(70.dp)
+//                                    .clip(CardDefaults.shape)
+//                                    .border(
+//                                        4.dp,
+//                                        MaterialTheme.colorScheme.onPrimaryContainer,
+//                                        CardDefaults.shape
+//                                    )
+//                                    .clickable {
+//                                        Toast
+//                                            .makeText(
+//                                                context,
+//                                                "Will be added in next update!",
+//                                                Toast.LENGTH_LONG
+//                                            )
+//                                            .show()
+//                                    },
+//                                verticalAlignment = Alignment.CenterVertically,
+//                                horizontalArrangement = Arrangement.Center
+//                            ) {
+//                                Text(
+//                                    text = "Upload Data",
+//                                    fontSize = 22.sp,
+//                                    fontWeight = FontWeight.ExtraBold,
+//                                    color = MaterialTheme.colorScheme.onPrimary,
+//                                    fontFamily = evolventaBoldFamily
+//                                )
+//                            }
+//                            Spacer(modifier = modifier.height(20.dp))
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-        var isHelpFAQOpen by remember { mutableStateOf(false) }
-        var isLegalOpen by remember { mutableStateOf(false) }
-        var isDeleteDaoOpen by remember { mutableStateOf(false) }
-        val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
-        val context = LocalContext.current
-
-        val customModifier = modifier
-            .fillMaxWidth(0.8f)
-            .height(70.dp)
-            .clip(CardDefaults.shape)
-            .background(MaterialTheme.colorScheme.onPrimaryContainer)
-            .clickable {
-                daoViewModel.exportDB("Main.db", "com.project.toko")
-            }
 
 
-        Column {
-            Row {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .background(Color.Transparent)
-                )
-            }
-            Column(
-                modifier = modifier
-                    .fillMaxWidth(0.8f)
-                    .fillMaxHeight(0.9f)
-                    .clip(RoundedCornerShape(topEnd = 20.dp))
-                    .background(MaterialTheme.colorScheme.surfaceTint)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
-                            text = "NSFW",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {},
-                    badge = {
-                        Switch(checked = homeScreenViewModel.isNSFWActive.value, onCheckedChange = {
-                            homeScreenViewModel.saveNSFWData(it)
-                            homeScreenViewModel.isNSFWActive.value = it
-                            randomScreenViewModel.isNSFWActive.value = it
-                        }, colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                            checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                            checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                            uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                        ), thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
-                            {
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(SwitchDefaults.IconSize),
-                                    tint = MaterialTheme.colorScheme.onTertiaryContainer
-                                )
-                            }
-                        } else {
-                            null
-                        })
-                    },
-                )
-                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                NavigationDrawerItem(
-                    modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = Color.Transparent,
-                        unselectedContainerColor = Color.Transparent
-                    ),
-                    label = {
-                        Text(
-                            text = "Help/FAQ",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        isHelpFAQOpen = !isHelpFAQOpen
-                    },
-                    badge = {
-                        if (isHelpFAQOpen) {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = R.drawable.arrowdown, imageLoader = imageLoader
-                                ),
-                                contentDescription = null,
-                                modifier = modifier.size(17.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                            )
-                        } else {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = R.drawable.arrowright, imageLoader = imageLoader
-                                ),
-                                contentDescription = null,
-                                modifier = modifier.size(17.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                            )
-                        }
-                    },
-                )
-                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                if (isHelpFAQOpen) {
-                    NavigationDrawerItem(
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                            unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                        ),
-                        label = {
-                            Text(
-                                text = "Future of the app",
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 22.sp,
-                                modifier = modifier.padding(start = 20.dp),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontFamily = evolventaBoldFamily
-                            )
-                        },
-                        selected = false,
-                        onClick = {
-                            context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/future?authuser=0")
-                        },
-                        badge = {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = R.drawable.openbrowser, imageLoader = imageLoader
-                                ),
-                                contentDescription = null,
-                                modifier = modifier.size(30.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                            )
-                        },
-                    )
-
-                    Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                    NavigationDrawerItem(
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                            unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                        ),
-                        label = {
-                            Text(
-                                text = "Bugs",
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 22.sp,
-                                modifier = modifier.padding(start = 20.dp),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontFamily = evolventaBoldFamily
-                            )
-                        },
-                        selected = false,
-                        onClick = {
-                            context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/bugs?authuser=0")
-                        },
-                        badge = {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = R.drawable.openbrowser, imageLoader = imageLoader
-                                ),
-                                contentDescription = null,
-                                modifier = modifier.size(30.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                            )
-                        },
-                    )
-                    Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                }
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
-                            text = "Contact Support",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        context.openSite("https://discord.gg/arJvEJ6RJb")
-                    },
-                    badge = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    },
-                )
-                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                NavigationDrawerItem(
-                    modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = Color.Transparent,
-                        unselectedContainerColor = Color.Transparent
-                    ),
-                    label = {
-                        Text(
-                            text = "Legal",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        isLegalOpen = !isLegalOpen
-                    },
-                    badge = {
-                        if (isLegalOpen) {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = R.drawable.arrowdown, imageLoader = imageLoader
-                                ),
-                                contentDescription = null,
-                                modifier = modifier.size(17.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                            )
-                        } else {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = R.drawable.arrowright, imageLoader = imageLoader
-                                ),
-                                contentDescription = null,
-                                modifier = modifier.size(17.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                            )
-                        }
-                    },
-                )
-                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                if (isLegalOpen) {
-                    NavigationDrawerItem(
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                            unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                        ),
-                        label = {
-                            Text(
-                                text = "Resource",
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 22.sp,
-                                modifier = modifier.padding(start = 20.dp),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontFamily = evolventaBoldFamily
-                            )
-                        },
-                        selected = false,
-                        onClick = {
-                            context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/resource?authuser=0")
-                        },
-                        badge = {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = R.drawable.openbrowser, imageLoader = imageLoader
-                                ),
-                                contentDescription = null,
-                                modifier = modifier.size(30.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                            )
-                        },
-                    )
-                    Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                }
-
-                NavigationDrawerItem(
-                    modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = Color.Transparent,
-                        unselectedContainerColor = Color.Transparent
-                    ),
-                    label = {
-                        Text(
-                            text = "Data",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        isDeleteDaoOpen = !isDeleteDaoOpen
-                    },
-                    badge = {
-                        if (isDeleteDaoOpen) {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = R.drawable.arrowdown, imageLoader = imageLoader
-                                ),
-                                contentDescription = null,
-                                modifier = modifier.size(17.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                            )
-                        } else {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = R.drawable.arrowright, imageLoader = imageLoader
-                                ),
-                                contentDescription = null,
-                                modifier = modifier.size(17.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                            )
-                        }
-                    },
-                )
-                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                if (isDeleteDaoOpen) {
-                    AnimeListTypesToDelete(daoViewModel = daoViewModel, modifier = modifier)
-                }
-
-
-
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
-                            text = "Export Data",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-//                    onClickRequestPermission(componentActivity, isExportDataPopUpDialogOpen)
-                    },
-                    badge = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.export, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    },
-                )
-                HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-
-            }
-            Column(
-                modifier = modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(0.8f)
-                    .background(MaterialTheme.colorScheme.surfaceTint),
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                Image(painter = rememberAsyncImagePainter(
-                    model = if (darkTheme()) R.drawable.sun else R.drawable.moon,
-                    imageLoader = svgImageLoader
-                ),
-                    contentDescription = null,
-                    modifier = modifier
-                        .size(50.dp)
-                        .padding(bottom = 10.dp, end = 5.dp)
-                        .clickable {
-                            onThemeChange()
-                        })
-            }
-        }
-
-
-        if (isExportDataPopUpDialogOpen.value) {
-            Dialog(
-                onDismissRequest = {
-                    isExportDataPopUpDialogOpen.value = false
-                }, properties = DialogProperties(
-                    dismissOnBackPress = true,
-                    dismissOnClickOutside = true,
-                )
-            ) {
-                Box(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.4f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Card(
-                        modifier = modifier.fillMaxSize(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint)
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.SpaceAround,
-                            modifier = modifier.fillMaxSize()
-                        ) {
-                            Row(
-                                modifier = modifier.fillMaxHeight(0.4f),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = "Export Data?",
-                                    fontSize = 35.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    fontFamily = evolventaBoldFamily
-                                )
-                            }
-                            Row(
-                                modifier = customModifier,
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = "Save Data",
-                                    fontSize = 22.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = Color.White,
-                                    fontFamily = evolventaBoldFamily
-                                )
-                            }
-                            Spacer(modifier = modifier.height(10.dp))
-                            Row(
-                                modifier = modifier
-                                    .fillMaxWidth(0.8f)
-                                    .height(70.dp)
-                                    .clip(CardDefaults.shape)
-                                    .border(
-                                        4.dp,
-                                        MaterialTheme.colorScheme.onPrimaryContainer,
-                                        CardDefaults.shape
-                                    )
-                                    .clickable {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                "Will be added in next update!",
-                                                Toast.LENGTH_LONG
-                                            )
-                                            .show()
-                                    },
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = "Upload Data",
-                                    fontSize = 22.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    fontFamily = evolventaBoldFamily
-                                )
-                            }
-                            Spacer(modifier = modifier.height(20.dp))
-                        }
-                    }
-                }
-            }
-        }
-    }
 
 // Storage Permissions
 //private const val REQUEST_EXTERNAL_STORAGE = 1
@@ -874,44 +884,38 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
     }
+
 }
 
 
 @Composable
 fun ShowDrawerContent(
-    modifier: Modifier = Modifier, imageLoader: ImageLoader,
-//    componentActivity: ComponentActivity,
-    onThemeChange: () -> Unit, darkTheme: () -> Boolean, svgImageLoader: ImageLoader
+    modifier: Modifier = Modifier,
+    imageLoader: ImageLoader,
+    onThemeChange: () -> Unit,
+    darkTheme: () -> Boolean
 ) {
     val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
     val daoViewModel: DaoViewModel = hiltViewModel()
     val randomScreenViewModel: RandomAnimeViewModel = hiltViewModel()
-
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp.dp
+    // State management
     var isHelpFAQOpen by remember { mutableStateOf(false) }
     var isLegalOpen by remember { mutableStateOf(false) }
     var isDeleteDaoOpen by remember { mutableStateOf(false) }
     val isExportDataPopUpDialogOpen = remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
-    val customModifier = modifier
-        .fillMaxWidth(0.8f)
-        .height(70.dp)
-        .clip(CardDefaults.shape)
-        .background(MaterialTheme.colorScheme.onPrimaryContainer)
-        .clickable {
-            daoViewModel.exportDB("Main.db", "com.project.toko")
-        }
+    Column(modifier = Modifier.height(screenHeight).width(screenWidth)) {
+        // Header spacer
+        Spacer(modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .background(Color.Transparent))
 
-
-    Column(modifier = modifier) {
-        Row {
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .background(Color.Transparent)
-            )
-        }
+        // Main drawer content
         Column(
             modifier = modifier
                 .fillMaxWidth(0.8f)
@@ -920,457 +924,434 @@ fun ShowDrawerContent(
                 .background(MaterialTheme.colorScheme.surfaceTint)
                 .verticalScroll(rememberScrollState())
         ) {
-            HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-            NavigationDrawerItem(
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                    unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                ),
-                label = {
-                    Text(
-                        text = "NSFW",
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = evolventaBoldFamily
-                    )
-                },
-                selected = false,
-                onClick = {},
-                badge = {
-                    Switch(checked = homeScreenViewModel.isNSFWActive.value, onCheckedChange = {
-                        homeScreenViewModel.saveNSFWData(it)
-                        homeScreenViewModel.isNSFWActive.value = it
-                        randomScreenViewModel.isNSFWActive.value = it
-                    }, colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                        checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                        checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                        uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
-                        uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
-                    ), thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
-                        {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = null,
-                                modifier = Modifier.size(SwitchDefaults.IconSize),
-                                tint = MaterialTheme.colorScheme.onTertiaryContainer
-                            )
-                        }
-                    } else {
-                        null
-                    })
-                },
+            DividerSection()
+
+            // NSFW toggle
+            NsfwToggleSection(
+                modifier = modifier,
+                homeScreenViewModel = homeScreenViewModel,
+                randomScreenViewModel = randomScreenViewModel
             )
-            HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-            NavigationDrawerItem(
-                modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = Color.Transparent,
-                    unselectedContainerColor = Color.Transparent
-                ),
-                label = {
-                    Text(
-                        text = "Help/FAQ",
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = evolventaBoldFamily
-                    )
-                },
-                selected = false,
-                onClick = {
-                    isHelpFAQOpen = !isHelpFAQOpen
-                },
-                badge = {
-                    if (isHelpFAQOpen) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.arrowdown, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(17.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    } else {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.arrowright, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(17.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    }
-                },
+
+            DividerSection()
+
+            // Help/FAQ section
+            ExpandableSection(
+                modifier = modifier,
+                title = "Help/FAQ",
+                isExpanded = isHelpFAQOpen,
+                imageLoader = imageLoader,
+                onClick = { isHelpFAQOpen = !isHelpFAQOpen }
             )
-            HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+
             if (isHelpFAQOpen) {
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
-                            text = "Future of the app",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/future?authuser=0")
-                    },
-                    badge = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    },
-                )
-
-                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
-                            text = "Bugs",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/bugs?authuser=0")
-                    },
-                    badge = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    },
-                )
-                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+                HelpFaqContent(modifier, imageLoader)
             }
-            NavigationDrawerItem(
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                    unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                ),
-                label = {
-                    Text(
-                        text = "Contact Support",
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = evolventaBoldFamily
-                    )
-                },
-                selected = false,
-                onClick = {
-                    context.openSite("https://discord.gg/arJvEJ6RJb")
-                },
-                badge = {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = R.drawable.openbrowser, imageLoader = imageLoader
-                        ),
-                        contentDescription = null,
-                        modifier = modifier.size(30.dp),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                    )
-                },
+
+            // Contact Support
+            NavigationItemWithIcon(
+                modifier = modifier,
+                title = "Contact Support",
+                imageLoader = imageLoader,
+                iconRes = R.drawable.openbrowser,
+                onClick = { context.openSite("https://discord.gg/arJvEJ6RJb") }
             )
-            HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-            NavigationDrawerItem(
-                modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = Color.Transparent,
-                    unselectedContainerColor = Color.Transparent
-                ),
-                label = {
-                    Text(
-                        text = "Legal",
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = evolventaBoldFamily
-                    )
-                },
-                selected = false,
-                onClick = {
-                    isLegalOpen = !isLegalOpen
-                },
-                badge = {
-                    if (isLegalOpen) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.arrowdown, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(17.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    } else {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.arrowright, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(17.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    }
-                },
+
+            DividerSection()
+
+            // Legal section
+            ExpandableSection(
+                modifier = modifier,
+                title = "Legal",
+                isExpanded = isLegalOpen,
+                imageLoader = imageLoader,
+                onClick = { isLegalOpen = !isLegalOpen }
             )
-            HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+
             if (isLegalOpen) {
-                NavigationDrawerItem(
-                    colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                        unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
-                    ),
-                    label = {
-                        Text(
-                            text = "Resource",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp,
-                            modifier = modifier.padding(start = 20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontFamily = evolventaBoldFamily
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/resource?authuser=0")
-                    },
-                    badge = {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.openbrowser, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(30.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    },
-                )
-                Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+                LegalContent(modifier, imageLoader)
             }
 
-            NavigationDrawerItem(
-                modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = Color.Transparent,
-                    unselectedContainerColor = Color.Transparent
-                ),
-                label = {
-                    Text(
-                        text = "Data",
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = evolventaBoldFamily
-                    )
-                },
-                selected = false,
-                onClick = {
-                    isDeleteDaoOpen = !isDeleteDaoOpen
-                },
-                badge = {
-                    if (isDeleteDaoOpen) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.arrowdown, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(17.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    } else {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.arrowright, imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = modifier.size(17.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                        )
-                    }
-                },
+            // Data section
+            ExpandableSection(
+                modifier = modifier,
+                title = "Data",
+                isExpanded = isDeleteDaoOpen,
+                imageLoader = imageLoader,
+                onClick = { isDeleteDaoOpen = !isDeleteDaoOpen }
             )
-            Divider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
+
+            DividerSection()
+
             if (isDeleteDaoOpen) {
                 AnimeListTypesToDelete(daoViewModel = daoViewModel, modifier = modifier)
             }
 
+            // Export Data
+            NavigationItemWithIcon(
+                modifier = modifier,
+                title = "Export Data",
+                imageLoader = imageLoader,
+                iconRes = R.drawable.export,
+                onClick = { /* Handle export */ }
+            )
 
+            DividerSection()
+        }
 
-            NavigationDrawerItem(
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-                    unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+        // Theme toggle at bottom
+        ThemeToggleSection(
+            modifier = modifier,
+            imageLoader = imageLoader,
+            darkTheme = darkTheme,
+            onThemeChange = onThemeChange
+        )
+    }
+
+    // Export Data Dialog
+    if (isExportDataPopUpDialogOpen.value) {
+        ExportDataDialog(
+            modifier = modifier,
+            onDismiss = { isExportDataPopUpDialogOpen.value = false },
+            onExport = { daoViewModel.exportDB("Main.db", "com.project.toko") }
+        )
+    }
+}
+
+@Composable
+private fun DividerSection() {
+    HorizontalDivider(
+        thickness = 3.dp,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+}
+
+@Composable
+private fun NsfwToggleSection(
+    modifier: Modifier,
+    homeScreenViewModel: HomeScreenViewModel,
+    randomScreenViewModel: RandomAnimeViewModel
+) {
+    NavigationDrawerItem(
+        colors = NavigationDrawerItemDefaults.colors(
+            selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+            unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+        ),
+        label = {
+            Text(
+                text = "NSFW",
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 22.sp,
+                modifier = modifier.padding(start = 20.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
+            )
+        },
+        selected = false,
+        onClick = {},
+        badge = {
+            Switch(
+                checked = homeScreenViewModel.isNSFWActive.value,
+                onCheckedChange = {
+                    homeScreenViewModel.saveNSFWData(it)
+                    homeScreenViewModel.isNSFWActive.value = it
+                    randomScreenViewModel.isNSFWActive.value = it
+                },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                    checkedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                    checkedBorderColor = MaterialTheme.colorScheme.inversePrimary,
+                    uncheckedThumbColor = MaterialTheme.colorScheme.inversePrimary,
+                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
+                    uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
                 ),
-                label = {
+                thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    }
+                } else {
+                    null
+                }
+            )
+        },
+    )
+}
+
+@Composable
+private fun ExpandableSection(
+    modifier: Modifier,
+    title: String,
+    isExpanded: Boolean,
+    imageLoader: ImageLoader,
+    onClick: () -> Unit
+) {
+    NavigationDrawerItem(
+        modifier = modifier.background(MaterialTheme.colorScheme.inverseSurface),
+        colors = NavigationDrawerItemDefaults.colors(
+            selectedContainerColor = Color.Transparent,
+            unselectedContainerColor = Color.Transparent
+        ),
+        label = {
+            Text(
+                text = title,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 22.sp,
+                modifier = modifier.padding(start = 20.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
+            )
+        },
+        selected = false,
+        onClick = onClick,
+        badge = {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = if (isExpanded) R.drawable.arrowdown else R.drawable.arrowright,
+                    imageLoader = imageLoader
+                ),
+                contentDescription = null,
+                modifier = modifier.size(17.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+            )
+        },
+    )
+}
+
+@Composable
+private fun NavigationItemWithIcon(
+    modifier: Modifier,
+    title: String,
+    imageLoader: ImageLoader,
+    iconRes: Int,
+    onClick: () -> Unit
+) {
+    NavigationDrawerItem(
+        colors = NavigationDrawerItemDefaults.colors(
+            selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+            unselectedContainerColor = MaterialTheme.colorScheme.surfaceTint
+        ),
+        label = {
+            Text(
+                text = title,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 22.sp,
+                modifier = modifier.padding(start = 20.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily
+            )
+        },
+        selected = false,
+        onClick = onClick,
+        badge = {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = iconRes,
+                    imageLoader = imageLoader
+                ),
+                contentDescription = null,
+                modifier = modifier.size(30.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+            )
+        },
+    )
+}
+
+@Composable
+private fun HelpFaqContent(
+    modifier: Modifier,
+    imageLoader: ImageLoader,
+) {
+    val context = LocalContext.current
+    NavigationItemWithIcon(
+        modifier = modifier,
+        title = "Future of the app",
+        imageLoader = imageLoader,
+        iconRes = R.drawable.openbrowser,
+        onClick = { context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/future?authuser=0") }
+    )
+
+    DividerSection()
+
+    NavigationItemWithIcon(
+        modifier = modifier,
+        title = "Bugs",
+        imageLoader = imageLoader,
+        iconRes = R.drawable.openbrowser,
+        onClick = { context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/bugs?authuser=0") }
+    )
+
+    DividerSection()
+}
+
+@Composable
+private fun LegalContent(
+    modifier: Modifier,
+    imageLoader: ImageLoader,
+
+) {
+    val context = LocalContext.current
+    NavigationItemWithIcon(
+        modifier = modifier,
+        title = "Resource",
+        imageLoader = imageLoader,
+        iconRes = R.drawable.openbrowser,
+        onClick = { context.openSite("https://sites.google.com/view/toko-yourownanimelibrary/resource?authuser=0") }
+    )
+
+    DividerSection()
+}
+
+@Composable
+private fun ThemeToggleSection(
+    modifier: Modifier,
+    imageLoader: ImageLoader,
+    darkTheme: () -> Boolean,
+    onThemeChange: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxHeight()
+            .fillMaxWidth(0.8f)
+            .background(MaterialTheme.colorScheme.surfaceTint),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(
+                model = if (darkTheme()) R.drawable.sun else R.drawable.moon,
+                imageLoader = imageLoader
+            ),
+            contentDescription = null,
+            modifier = modifier
+                .size(50.dp)
+                .padding(bottom = 10.dp, end = 5.dp)
+                .clickable { onThemeChange() }
+        )
+    }
+
+}
+
+@Composable
+private fun ExportDataDialog(
+    modifier: Modifier,
+    onDismiss: () -> Unit,
+    onExport: () -> Unit
+
+) {
+    val context = LocalContext.current
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+        )
+    ) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.4f),
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = modifier.fillMaxSize(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceAround,
+                    modifier = modifier.fillMaxSize()
+                ) {
+                    // Dialog title
                     Text(
-                        text = "Export Data",
+                        text = "Export Data?",
+                        fontSize = 35.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = 22.sp,
-                        modifier = modifier.padding(start = 20.dp),
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontFamily = evolventaBoldFamily
                     )
-                },
-                selected = false,
-                onClick = {
-//                    onClickRequestPermission(componentActivity, isExportDataPopUpDialogOpen)
-                },
-                badge = {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = R.drawable.export, imageLoader = imageLoader
-                        ),
-                        contentDescription = null,
-                        modifier = modifier.size(30.dp),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+
+                    // Save Data button
+                    ButtonSection(
+                        modifier = modifier,
+                        text = "Save Data",
+                        backgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        onClick = onExport
                     )
-                },
-            )
-            HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
 
-        }
-        Column(
-            modifier = modifier
-                .fillMaxHeight()
-                .fillMaxWidth(0.8f)
-                .background(MaterialTheme.colorScheme.surfaceTint),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            Image(painter = rememberAsyncImagePainter(
-                model = if (darkTheme()) R.drawable.sun else R.drawable.moon,
-                imageLoader = svgImageLoader
-            ),
-                contentDescription = null,
-                modifier = modifier
-                    .size(50.dp)
-                    .padding(bottom = 10.dp, end = 5.dp)
-                    .clickable {
-                        onThemeChange()
-                    })
-        }
-    }
+                    Spacer(modifier = modifier.height(10.dp))
 
+                    // Upload Data button
+                    ButtonSection(
+                        modifier = modifier,
+                        text = "Upload Data",
+                        backgroundColor = MaterialTheme.colorScheme.surfaceTint,
+                        borderColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        onClick = {
+                            Toast.makeText(
+                                context,
+                                "Will be added in next update!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    )
 
-    if (isExportDataPopUpDialogOpen.value) {
-        Dialog(
-            onDismissRequest = {
-                isExportDataPopUpDialogOpen.value = false
-            }, properties = DialogProperties(
-                dismissOnBackPress = true,
-                dismissOnClickOutside = true,
-            )
-        ) {
-            Box(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.4f),
-                contentAlignment = Alignment.Center
-            ) {
-                Card(
-                    modifier = modifier.fillMaxSize(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint)
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceAround,
-                        modifier = modifier.fillMaxSize()
-                    ) {
-                        Row(
-                            modifier = modifier.fillMaxHeight(0.4f),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "Export Data?",
-                                fontSize = 35.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontFamily = evolventaBoldFamily
-                            )
-                        }
-                        Row(
-                            modifier = customModifier,
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "Save Data",
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.White,
-                                fontFamily = evolventaBoldFamily
-                            )
-                        }
-                        Spacer(modifier = modifier.height(10.dp))
-                        Row(
-                            modifier = modifier
-                                .fillMaxWidth(0.8f)
-                                .height(70.dp)
-                                .clip(CardDefaults.shape)
-                                .border(
-                                    4.dp,
-                                    MaterialTheme.colorScheme.onPrimaryContainer,
-                                    CardDefaults.shape
-                                )
-                                .clickable {
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            "Will be added in next update!",
-                                            Toast.LENGTH_LONG
-                                        )
-                                        .show()
-                                },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "Upload Data",
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontFamily = evolventaBoldFamily
-                            )
-                        }
-                        Spacer(modifier = modifier.height(20.dp))
-                    }
+                    Spacer(modifier = modifier.height(20.dp))
                 }
             }
         }
     }
 }
+
+@Composable
+private fun ButtonSection(
+    modifier: Modifier,
+    text: String,
+    backgroundColor: Color,
+    borderColor: Color? = null,
+    onClick: () -> Unit
+) {
+    val buttonModifier = modifier
+        .fillMaxWidth(0.8f)
+        .height(70.dp)
+        .clip(CardDefaults.shape)
+        .then(
+            if (borderColor != null) {
+                modifier.border(4.dp, borderColor, CardDefaults.shape)
+            } else {
+                Modifier
+            }
+        )
+        .background(backgroundColor)
+        .clickable(onClick = onClick)
+
+    Box(
+        modifier = buttonModifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = if (borderColor != null) MaterialTheme.colorScheme.onPrimary else Color.White,
+            fontFamily = evolventaBoldFamily
+        )
+    }
+}
+
+@Composable
+fun NewDrawerContent(
+    modifier: Modifier = Modifier, imageLoader: ImageLoader,
+    onThemeChange: () -> Unit, darkTheme: () -> Boolean
+) {
+    Row(modifier = modifier.background(Color.Red)) {
+
+    }
+}
+
+
+

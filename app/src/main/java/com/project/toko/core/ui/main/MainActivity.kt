@@ -25,7 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
-    private val drawerViewModel: DrawerViewModel by viewModels()
+//    private val drawerViewModel: DrawerViewModel by viewModels()
 
     @Inject
     lateinit var darkThemeManager: SaveDarkModeManager
@@ -84,11 +84,11 @@ private fun setupNavigation() {
     }
 
     // Drawer наблюдение
-    lifecycleScope.launch {
-        drawerViewModel.isDrawerOpen.collect { isOpen ->
-            if (isOpen) hideBottomNav() else showBottomNav()
-        }
-    }
+//    lifecycleScope.launch {
+//        drawerViewModel.isDrawerOpen.collect { isOpen ->
+//            if (isOpen) hideBottomNav() else showBottomNav()
+//        }
+//    }
 }
 
     private fun observeThemeChanges() {

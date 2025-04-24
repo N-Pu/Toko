@@ -4,10 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
@@ -39,7 +35,7 @@ class SavedAnimeFragment
 ) {
 
     @Inject
-    lateinit var svgImageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     @Inject
     lateinit var darkThemeManager: SaveDarkModeManager
@@ -68,13 +64,12 @@ class SavedAnimeFragment
                     modifier = Modifier,
                     drawerContent = {
                         ShowDrawerContent(
-                            imageLoader = svgImageLoader,
+                            imageLoader = imageLoader,
 //                                componentActivity = componentActivity,
                             onThemeChange = {
                                 darkThemeManager.toggleTheme()
                             },
                             darkTheme = { isDark },
-                            svgImageLoader = svgImageLoader
                         )
                     }
                 ) {
@@ -99,11 +94,19 @@ class SavedAnimeFragment
                         },
                         isInDarkTheme = { isDark },
                         drawerState = drawerState,
-                        svgImageLoader = { svgImageLoader }
+                        svgImageLoader = { imageLoader }
                     )
                 }
+
+
             }
+
+
         }
+
     }
 
 }
+
+
+
