@@ -66,6 +66,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import coil.ImageLoader
@@ -104,7 +105,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     ): View = ComposeView(requireContext()).apply {
         setContent {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-            val isDark = darkThemeManager.isDarkThemeActive.value
+            val isDark by darkThemeManager.isDarkThemeActive.collectAsStateWithLifecycle()
 
             // Следим за drawerState и обновляем ViewModel
             LaunchedEffect(drawerState.isOpen) {

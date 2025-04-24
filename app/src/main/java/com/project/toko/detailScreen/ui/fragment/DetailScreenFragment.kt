@@ -110,7 +110,7 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
 
         val composeView = view.findViewById<ComposeView>(R.id.compose_view)
         composeView.setContent {
-            val isDark = darkThemeManager.isDarkThemeActive.value
+            val isDark by darkThemeManager.isDarkThemeActive.collectAsStateWithLifecycle()
 
             Theme(darkTheme = isDark, systemUiController = rememberSystemUiController()) {
                 val navController = remember { findNavController() }

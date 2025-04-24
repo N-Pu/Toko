@@ -3,6 +3,7 @@ package com.project.toko.core.data.settings
 import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.edit
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,7 +11,7 @@ import javax.inject.Singleton
 class SaveDarkModeManager @Inject constructor(
     private val sharedPreferences: SharedPreferences
 ) {
-    private val _isDarkThemeActive = mutableStateOf(loadData())
+    private val _isDarkThemeActive = MutableStateFlow(loadData())
     val isDarkThemeActive get() = _isDarkThemeActive
 
     fun toggleTheme() {

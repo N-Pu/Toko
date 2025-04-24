@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.findNavController
 import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -36,7 +38,7 @@ class SingleStaffFragment : Fragment(R.layout.fragment_single_staff) {
         savedInstanceState: Bundle?
     ): View = ComposeView(requireContext()).apply {
         setContent {
-            val isDark = darkThemeManager.isDarkThemeActive.value
+            val isDark by darkThemeManager.isDarkThemeActive.collectAsStateWithLifecycle()
             Theme(
                 darkTheme = isDark,
                 systemUiController = rememberSystemUiController()

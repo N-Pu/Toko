@@ -8,11 +8,13 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.findNavController
 import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -46,7 +48,7 @@ class SavedAnimeFragment
     ): View = ComposeView(requireContext()).apply {
         setContent {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-            val isDark = darkThemeManager.isDarkThemeActive.value
+            val isDark by darkThemeManager.isDarkThemeActive.collectAsStateWithLifecycle()
 
             // Следим за drawerState и обновляем ViewModel
             LaunchedEffect(drawerState.isOpen) {

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="light_green">#68BDAD</color>
-    <color name="light_pink">#D87DC3</color>
+<!--    <color name="light_green">#68BDAD</color>-->
+<!--    <color name="light_pink">#D87DC3</color>-->
+
+    <color name="icon_color">#414141</color> <!-- Цвет по умолчанию (тёмный) -->
+    <color name="bottom_nav_bar_color">#FFFFFF</color> <!-- Цвет по умолчанию (тёмный) -->
+
 </resources>

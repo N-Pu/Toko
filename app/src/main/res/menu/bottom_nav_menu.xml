@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/homeFragment"
-        android:icon="@drawable/vector"
+        android:icon="@drawable/selector_home"
         android:title="" />
 
     <item
         android:id="@+id/savedAnimeFragment"
-        android:icon="@drawable/favorite_untouched"
+        android:icon="@drawable/selector_saved"
         android:title=""
         />
 
     <item
         android:id="@+id/randomAnimeFragment"
-        android:icon="@drawable/export"
+        android:icon="@drawable/shuffle"
         android:title="" />
 </menu>

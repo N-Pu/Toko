@@ -3,89 +3,108 @@ package com.project.toko.core.ui.main
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.project.toko.R
 import com.project.toko.core.data.settings.DrawerViewModel
+import com.project.toko.core.data.settings.SaveDarkModeManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
     private lateinit var bottomNav: BottomNavigationView
-
     private val drawerViewModel: DrawerViewModel by viewModels()
 
+    @Inject
+    lateinit var darkThemeManager: SaveDarkModeManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) {
-//        window.decorView.systemUiVisibility =
-//            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-//                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            bottomNav = findViewById(R.id.bottom_nav)
-//        requestedOrientation =
-//            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT // locked screen for the time being
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        setupNavigation()
+        observeThemeChanges()
+    }
 
-            bottomNav.labelVisibilityMode = BottomNavigationView.LABEL_VISIBILITY_UNLABELED
+private fun setupNavigation() {
+    bottomNav = findViewById(R.id.bottom_nav)
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    bottomNav.labelVisibilityMode = BottomNavigationView.LABEL_VISIBILITY_UNLABELED
 
-            val navHostFragment =
-                supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-            val navController = navHostFragment.navController
+    val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+    val navController = navHostFragment.navController
 
-            navController.addOnDestinationChangedListener { controller, destination, _ ->
-
-                Log.d("NavDebug", "Current destination: ${destination.label}")
-
-                val childFragmentManager = navHostFragment.childFragmentManager
-                val count = childFragmentManager.backStackEntryCount
-                Log.d("NavDebug", "Back stack entry count: $count")
-
-                for (i in 0 until count) {
-                    val entry = childFragmentManager.getBackStackEntryAt(i)
-                    Log.d("NavDebug", "[$i]: ${entry.name}")
-                }
-                val current = controller.currentBackStackEntry
-                val previous = controller.previousBackStackEntry
-
-                Log.d("NavDebug", "Current destination: ${destination.label}")
-                Log.d("NavDebug", "Current entry: ${current?.destination?.label}")
-                Log.d("NavDebug", "Previous entry: ${previous?.destination?.label}")
-
-                when (destination.id) {
-                    R.id.detailScreenFragment,
-                    R.id.singleCharacterFragment,
-                    R.id.singleStaffFragment,
-                    R.id.wholeCast,
-                    R.id.wholeStaff -> hideBottomNav()
-
-                    else -> showBottomNav()
+    // Анимация + навигация вручную
+    bottomNav.setOnItemSelectedListener { item ->
+        val handled = NavigationUI.onNavDestinationSelected(item, navController)
+        if (handled) {
+            val menuView = bottomNav.getChildAt(0) as? ViewGroup
+            menuView?.let {
+                for (i in 0 until it.childCount) {
+                    val itemView = it.getChildAt(i)
+                    val menuItem = bottomNav.menu.getItem(i)
+                    if (menuItem.itemId == item.itemId) {
+                        itemView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction {
+                            itemView.animate().scaleX(1f).scaleY(1f).duration = 150
+                        }.start()
+                        break
+                    }
                 }
             }
-            // Подписка на drawer state
-            lifecycleScope.launch {
-                drawerViewModel.isDrawerOpen.collect { isOpen ->
-                    if (isOpen) hideBottomNav() else showBottomNav()
-                }
-            }
-
-
-            bottomNav.setupWithNavController(navController)
         }
+        handled
+    }
+
+    // Скрытие BottomNav на некоторых экранах
+    navController.addOnDestinationChangedListener { _, destination, _ ->
+        when (destination.id) {
+            R.id.detailScreenFragment,
+            R.id.singleCharacterFragment,
+            R.id.singleStaffFragment,
+            R.id.wholeCast,
+            R.id.wholeStaff -> hideBottomNav()
+            else -> showBottomNav()
+        }
+    }
+
+    // Drawer наблюдение
+    lifecycleScope.launch {
+        drawerViewModel.isDrawerOpen.collect { isOpen ->
+            if (isOpen) hideBottomNav() else showBottomNav()
+        }
+    }
+}
+
+    private fun observeThemeChanges() {
+        lifecycleScope.launch {
+            darkThemeManager.isDarkThemeActive.collect { isDarkTheme ->
+                applyTheme(isDarkTheme)
+            }
+        }
+    }
+    private fun applyTheme(isDarkTheme: Boolean) {
+       if (isDarkTheme) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+        delegate.applyDayNight() // Немедленное применение
     }
 
     private fun hideBottomNav() {
@@ -99,5 +118,5 @@ class MainActivity : AppCompatActivity() {
         bottomNav.clearAnimation()
         bottomNav.animate().translationY(0f).alpha(1f).setDuration(300).start()
     }
-
 }
+

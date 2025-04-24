@@ -23,7 +23,7 @@ android {
     defaultConfig {
         applicationId "com.project.toko"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 15
         versionName "1.14"
 
@@ -45,15 +45,17 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
+
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = "17"
     }
     buildFeatures {
         compose true
-        viewBinding true // for dao
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion '1.5.14'
+        viewBinding true
     }
     packagingOptions {
         resources {
@@ -146,5 +148,4 @@ dependencies {
 
 
     implementation ("androidx.hilt:hilt-navigation-fragment:1.2.0")
-
 }

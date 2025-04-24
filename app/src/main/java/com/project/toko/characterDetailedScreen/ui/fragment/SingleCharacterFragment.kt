@@ -5,10 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.findNavController
 import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -38,7 +40,7 @@ class SingleCharacterFragment : Fragment(R.layout.fragment_single_character) {
         savedInstanceState: Bundle?
     ): View = ComposeView(requireContext()).apply {
         setContent {
-            val isDark = darkThemeManager.isDarkThemeActive.value
+            val isDark by darkThemeManager.isDarkThemeActive.collectAsStateWithLifecycle()
             val navController = remember { findNavController() }
             Theme(
                 darkTheme = isDark,
