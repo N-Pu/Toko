@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
@@ -20,11 +22,11 @@ import androidx.navigation.findNavController
 import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.toko.R
+import com.project.toko.ShowDrawerContent
 import com.project.toko.core.data.settings.DrawerViewModel
 import com.project.toko.core.data.settings.SaveDarkModeManager
 import com.project.toko.core.ui.theme.Theme
 import com.project.toko.daoScreen.ui.screen.DaoScreen
-import com.project.toko.homeScreen.ui.fragment.ShowDrawerContent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -63,13 +65,15 @@ class SavedAnimeFragment
                 ModalNavigationDrawer(drawerState = drawerState,
                     modifier = Modifier,
                     drawerContent = {
-                        ShowDrawerContent(
-                            imageLoader = imageLoader,
-//                                componentActivity = componentActivity,
+
+
+                        ShowDrawerContent(imageLoader = imageLoader,
                             onThemeChange = {
                                 darkThemeManager.toggleTheme()
-                            },
-                            darkTheme = { isDark },
+                            }, darkTheme = { isDark },
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .fillMaxWidth(0.9f)
                         )
                     }
                 ) {

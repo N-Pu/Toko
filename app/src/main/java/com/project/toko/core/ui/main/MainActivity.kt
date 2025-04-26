@@ -9,7 +9,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -25,71 +28,118 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
-//    private val drawerViewModel: DrawerViewModel by viewModels()
+    private val drawerViewModel: DrawerViewModel by viewModels()
 
     @Inject
     lateinit var darkThemeManager: SaveDarkModeManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        setupInsets(findViewById(R.id.nav_host_fragment))
 
         setupNavigation()
         observeThemeChanges()
     }
 
-private fun setupNavigation() {
-    bottomNav = findViewById(R.id.bottom_nav)
-    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-    bottomNav.labelVisibilityMode = BottomNavigationView.LABEL_VISIBILITY_UNLABELED
+    private fun setupInsets(view: View) {
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Apply the insets as a margin to the view. This solution sets
+            // only the bottom, left, and right dimensions, but you can apply whichever
+            // insets are appropriate to your layout. You can also update the view padding
+            // if that's more appropriate.
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = insets.left
+                bottomMargin = insets.bottom
+                rightMargin = insets.right
+            }
 
-    val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-    val navController = navHostFragment.navController
+            // Return CONSUMED if you don't want the window insets to keep passing
+            // down to descendant views.
+            WindowInsetsCompat.CONSUMED
+        }
+    }
 
-    // Анимация + навигация вручную
-    bottomNav.setOnItemSelectedListener { item ->
-        val handled = NavigationUI.onNavDestinationSelected(item, navController)
-        if (handled) {
-            val menuView = bottomNav.getChildAt(0) as? ViewGroup
-            menuView?.let {
-                for (i in 0 until it.childCount) {
-                    val itemView = it.getChildAt(i)
-                    val menuItem = bottomNav.menu.getItem(i)
-                    if (menuItem.itemId == item.itemId) {
-                        itemView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction {
-                            itemView.animate().scaleX(1f).scaleY(1f).duration = 150
-                        }.start()
-                        break
+    private fun setupNavigation() {
+        bottomNav = findViewById(R.id.bottom_nav)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        bottomNav.labelVisibilityMode = BottomNavigationView.LABEL_VISIBILITY_UNLABELED
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // Анимация + навигация вручную
+        bottomNav.setOnItemSelectedListener { item ->
+            val handled = NavigationUI.onNavDestinationSelected(item, navController)
+            if (handled) {
+                val menuView = bottomNav.getChildAt(0) as? ViewGroup
+                menuView?.let {
+                    for (i in 0 until it.childCount) {
+                        val itemView = it.getChildAt(i)
+                        val menuItem = bottomNav.menu.getItem(i)
+                        if (menuItem.itemId == item.itemId) {
+                            itemView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150)
+                                .withEndAction {
+                                    itemView.animate().scaleX(1f).scaleY(1f).duration = 150
+                                }.start()
+                            break
+                        }
                     }
                 }
             }
+            handled
         }
-        handled
-    }
 
-    // Скрытие BottomNav на некоторых экранах
-    navController.addOnDestinationChangedListener { _, destination, _ ->
-        when (destination.id) {
-            R.id.detailScreenFragment,
-            R.id.singleCharacterFragment,
-            R.id.singleStaffFragment,
-            R.id.wholeCast,
-            R.id.wholeStaff -> hideBottomNav()
-            else -> showBottomNav()
+        // Скрытие BottomNav на некоторых экранах
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.detailScreenFragment,
+                R.id.singleCharacterFragment,
+                R.id.singleStaffFragment,
+                R.id.wholeCast,
+                R.id.wholeStaff -> hideBottomNav()
+
+                R.id.homeFragment -> {
+                    val button = bottomNav.menu.getItem(0)
+                    bottomNav.menu.getItem(1).isChecked = false
+                    bottomNav.menu.getItem(2).isChecked = false
+                    button.isChecked = true
+
+                    showBottomNav()
+                }
+
+                R.id.savedAnimeFragment -> {
+                    val button = bottomNav.menu.getItem(1)
+                    bottomNav.menu.getItem(0).isChecked = false
+                    bottomNav.menu.getItem(2).isChecked = false
+                    button.isChecked = true
+                    showBottomNav()
+                }
+
+                R.id.randomAnimeFragment -> {
+                    val button = bottomNav.menu.getItem(2)
+                    bottomNav.menu.getItem(0).isChecked = false
+                    bottomNav.menu.getItem(1).isChecked = false
+                    button.isChecked = true
+                    showBottomNav()
+                }
+            }
+        }
+
+        // Drawer наблюдение
+        lifecycleScope.launch {
+            drawerViewModel.isDrawerOpen.collect { isOpen ->
+                if (isOpen) hideBottomNav() else showBottomNav()
+            }
         }
     }
-
-    // Drawer наблюдение
-//    lifecycleScope.launch {
-//        drawerViewModel.isDrawerOpen.collect { isOpen ->
-//            if (isOpen) hideBottomNav() else showBottomNav()
-//        }
-//    }
-}
 
     private fun observeThemeChanges() {
         lifecycleScope.launch {
@@ -98,8 +148,9 @@ private fun setupNavigation() {
             }
         }
     }
+
     private fun applyTheme(isDarkTheme: Boolean) {
-       if (isDarkTheme) {
+        if (isDarkTheme) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

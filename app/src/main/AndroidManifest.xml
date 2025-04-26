@@ -32,16 +32,11 @@
         android:windowSoftInputMode="adjustResize"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".detailScreen.ui.detailScreen.mainPage.custom.youtubePlayer.DetailScreenActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat"
-            />
-        <activity
-            android:theme="@style/Theme.AppCompat"
             android:name=".core.ui.main.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:screenOrientation="unspecified"
-            android:exported="true">
+            android:theme="@style/Theme.AppCompat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
