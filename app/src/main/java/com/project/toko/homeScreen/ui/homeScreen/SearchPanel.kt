@@ -175,7 +175,7 @@ fun MainScreen(
                         onValueChange = viewModel::onSearchTextChange,
                         modifier = modifier
                             .clip(RoundedCornerShape(30.dp))
-                            .height(55.dp)
+                            .height(50.dp)
                             .fillMaxWidth(),
                         prefix = {
                             Icon(Icons.Filled.Search, "Search Icon", tint = iconColorInSearchPanel)
@@ -190,7 +190,7 @@ fun MainScreen(
                                 contentDescription = null,
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
                                 modifier = modifier
-                                    .fillMaxHeight(0.55f)
+                                    .fillMaxHeight(0.5f)
                                     .clickable {
                                         switchIndicator.value = !switchIndicator.value
                                     }

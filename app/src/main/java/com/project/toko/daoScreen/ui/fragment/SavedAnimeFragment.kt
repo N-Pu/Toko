@@ -22,7 +22,7 @@ import androidx.navigation.findNavController
 import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.toko.R
-import com.project.toko.ShowDrawerContent
+import com.project.toko.core.ui.ShowDrawerContent
 import com.project.toko.core.data.settings.DrawerViewModel
 import com.project.toko.core.data.settings.SaveDarkModeManager
 import com.project.toko.core.ui.theme.Theme

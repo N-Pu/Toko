@@ -534,14 +534,12 @@ class HomeScreenViewModel @Inject constructor(
     val selectedAnimeId: StateFlow<Int?> = _selectedAnimeId.asStateFlow()
 
 
-    fun onDialogLongClick(animeId: Int) {
+    suspend fun onDialogLongClick(animeId: Int) = withContext(Dispatchers.IO) {
         try {
-            viewModelScope.launch(Dispatchers.IO) {
-                _selectedAnimeId.value = animeId
-                isDialogShown = true
-            }
+            _selectedAnimeId.value = animeId
+            isDialogShown = true
         } catch (e: Exception) {
-            viewModelScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 Toast.makeText(
                     context, e.message, Toast.LENGTH_SHORT
                 ).show()

@@ -12,6 +12,10 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,6 +57,7 @@ import com.project.toko.core.ui.theme.SectionColor
 import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.ui.theme.scoreBoardColor
 import com.project.toko.daoScreen.data.dao.AnimeItem
+import com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData
 import com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -93,6 +98,7 @@ fun GridAdder(
             getTopUpcoming = getTopUpcoming,
             getTrendingAnime = getTrendingAnime
         )
+
     }
 
 
@@ -146,6 +152,53 @@ fun <T> AnimeHorizontalSection(
 }
 
 
+//@Stable
+//@Composable
+//fun SearchScreen(
+//    viewModel: HomeScreenViewModel,
+//    newAnimeSearchModel: NewAnimeSearchModel,
+//    onNavigateToDetailScreen: (Int) -> Unit,
+//    svgImageLoader: () -> ImageLoader
+//) {
+//    var additionalDataRequested by remember { mutableStateOf(false) }
+//    val columnState = rememberLazyListState()
+//
+//    LaunchedEffect(key1 = !columnState.canScrollForward && newAnimeSearchModel.pagination.has_next_page) {
+//        withContext(Dispatchers.IO) {
+//            additionalDataRequested = true
+//            delay(300) // Измените задержку по вашему усмотрению
+//            viewModel.loadNextPage()
+//            additionalDataRequested = false
+//        }
+//    }
+//
+//    LazyColumn(
+//        modifier = Modifier.fillMaxSize(),
+//        state = columnState
+//    ) {
+//        items(newAnimeSearchModel.data.chunked(2)) { rowData ->
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                rowData.forEach { data ->
+//                    val cardModifier = Modifier
+//                        .weight(1f)
+//                        .padding(vertical = 10.dp) // Add your desired padding here
+//                    AnimeCardBox(
+//                        data = data,
+//                        onNavigateToDetailScreen = onNavigateToDetailScreen,
+//                        modifier = cardModifier,
+//                        svgImageLoader = svgImageLoader,
+//                        homeScreenViewModel = viewModel
+//                    )
+//                }
+//            }
+//        }
+//    }
+//
+//}
 @Stable
 @Composable
 fun SearchScreen(
@@ -155,8 +208,7 @@ fun SearchScreen(
     svgImageLoader: () -> ImageLoader
 ) {
     var additionalDataRequested by remember { mutableStateOf(false) }
-    val columnState = rememberLazyListState()
-
+    val columnState = rememberLazyGridState()
     LaunchedEffect(key1 = !columnState.canScrollForward && newAnimeSearchModel.pagination.has_next_page) {
         withContext(Dispatchers.IO) {
             additionalDataRequested = true
@@ -166,32 +218,24 @@ fun SearchScreen(
         }
     }
 
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(140.dp),
         modifier = Modifier.fillMaxSize(),
-        state = columnState
+        state = columnState,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        items(newAnimeSearchModel.data.chunked(2)) { rowData ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                rowData.forEach { data ->
-                    val cardModifier = Modifier
-                        .weight(1f)
-                        .padding(vertical = 10.dp) // Add your desired padding here
-                    AnimeCardBox(
-                        data = data,
-                        onNavigateToDetailScreen = onNavigateToDetailScreen,
-                        modifier = cardModifier,
-                        svgImageLoader = svgImageLoader,
-                        homeScreenViewModel = viewModel
-                    )
-                }
-            }
+        items(newAnimeSearchModel.data) { data ->
+            AnimeCardBox(
+                data = data,
+                onNavigateToDetailScreen = onNavigateToDetailScreen,
+//                modifier = cardModifier,
+                svgImageLoader = svgImageLoader,
+                homeScreenViewModel = viewModel
+            )
         }
-    }
 
+
+    }
 }
 
 @Composable
@@ -218,6 +262,7 @@ fun ShowMainScreen(
         modifier = modifier
             .verticalScroll(scroll)
             .fillMaxSize()
+            .padding(bottom = 50.dp)
             .background(MaterialTheme.colorScheme.primary)
     ) {
         AnimeHorizontalSection(
@@ -535,7 +580,7 @@ fun LoadingSection(
 private fun AnimeCardBox(
     data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
     onNavigateToDetailScreen: (Int) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     svgImageLoader: () -> ImageLoader,
     homeScreenViewModel: HomeScreenViewModel
 ) {
@@ -758,7 +803,7 @@ private fun ShowSection(
     Card(
         modifier = modifier
             .height(300.dp)
-            .width(180.dp)
+            .width(170.dp)
             .shadow(20.dp)
             .then(if (isCardClicked) {
                 modifier.graphicsLayer {
@@ -785,13 +830,11 @@ private fun ShowSection(
         shape = RectangleShape,
     ) {
         Box(
-            contentAlignment = Alignment.BottomCenter,
+            contentAlignment = Alignment.BottomEnd,
             modifier = modifier.background(MaterialTheme.colorScheme.primary)
         ) {
             Box(
                 modifier = modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.primary)
             ) {
                 // Coil image loader
                 Image(
@@ -845,17 +888,21 @@ private fun ShowSection(
                         )
                     }
                 }
-
             }
-            Column(
-                modifier = modifier
-            ) {
+
+        }
+        Column(
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                ) {
                 Text(
                     text = data.animeName,
                     textAlign = TextAlign.Start,
                     modifier = modifier
-                        .fillMaxWidth()
-                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
+                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp)
+                    ,
                     lineHeight = 16.sp,
                     fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
@@ -865,35 +912,37 @@ private fun ShowSection(
                     fontFamily = evolventaBoldFamily,
                     fontWeight = FontWeight.W900
                 )
-
-                Row(
-                    modifier = modifier.fillMaxWidth(1f),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = "Status: " + data.status,
-                        fontSize = 10.sp,
-                        textAlign = TextAlign.Left,
-                        modifier = modifier.padding(start = 10.dp),
-                        color = MaterialTheme.colorScheme.inversePrimary
-                    )
-                }
-                Row(
-                    modifier = modifier
-                        .fillMaxWidth(1f)
-                        .padding(bottom = 10.dp),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = "Type: " + data.type,
-                        fontSize = 10.sp,
-                        textAlign = TextAlign.Left,
-                        modifier = modifier.padding(start = 10.dp),
-                        color = MaterialTheme.colorScheme.inversePrimary
-                    )
-                }
-
             }
+
+            Row(
+                modifier = modifier
+                    ,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = "Status: " + data.status,
+                    fontSize = 10.sp,
+                    textAlign = TextAlign.Left,
+                    modifier = modifier.padding(start = 10.dp),
+                    color = MaterialTheme.colorScheme.inversePrimary
+                )
+            }
+            Row(
+                modifier = modifier
+
+                    .padding(bottom = 10.dp)
+                  ,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = "Type: " + data.type,
+                    fontSize = 10.sp,
+                    textAlign = TextAlign.Left,
+                    modifier = modifier.padding(start = 10.dp),
+                    color = MaterialTheme.colorScheme.inversePrimary
+                )
+            }
+
         }
     }
 
@@ -1110,7 +1159,7 @@ private fun ShowSectionName(sectionName: String, modifier: Modifier, isInDarkThe
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ShowTopAnime(
-    data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
+    data: AnimeSearchData,
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier,
     svgImageLoader: () -> ImageLoader
@@ -1128,12 +1177,11 @@ private fun ShowTopAnime(
         ), label = ""
     )
 
-    val animeId = data.id ?: return
 
     Card(
         modifier = modifier
             .height(300.dp)
-            .width(180.dp)
+            .width(170.dp)
             .shadow(20.dp)
             .then(if (isCardClicked) {
                 modifier.graphicsLayer {
@@ -1144,31 +1192,29 @@ private fun ShowTopAnime(
                 modifier
             })
             .clip(RoundedCornerShape(16.dp))
-            .combinedClickable(
-                onLongClick = {
-                    homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                        isCardClicked = true
-                        homeScreenViewModel.onDialogLongClick(animeId)
-                        delay(3000L)
-                        isCardClicked = false
-                    }
-                },
-                onClick = {
-                    onNavigateToDetailScreen(animeId)
+            .combinedClickable(onLongClick = {
+                homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                    isCardClicked = true
+                    delay(3000L)
+                    isCardClicked = false
                 }
-            ),
+
+            }) {
+                data.id?.let {
+                    onNavigateToDetailScreen(it)
+                }
+            },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RectangleShape,
     ) {
         Box(
-            contentAlignment = Alignment.BottomCenter,
+            contentAlignment = Alignment.BottomEnd,
             modifier = modifier.background(MaterialTheme.colorScheme.primary)
         ) {
             Box(
                 modifier = modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.primary)
             ) {
+                // Coil image loader
                 Image(
                     painter = painter,
                     contentDescription = "Images for each Anime",
@@ -1190,11 +1236,12 @@ private fun ShowTopAnime(
                             .padding(top = 5.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
+
                         Text(
                             text = formatScore(data.score),
                             color = Color.White,
                             fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                     Column(
@@ -1205,12 +1252,9 @@ private fun ShowTopAnime(
                         verticalArrangement = Arrangement.Top
                     ) {
                         Image(
-                            modifier = modifier.size(25.dp),
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.usergroup,
-                                imageLoader = svgImageLoader()
-                            ),
-                            contentDescription = null
+                            modifier = modifier.size(25.dp), painter = rememberAsyncImagePainter(
+                                model = R.drawable.usergroup, imageLoader = svgImageLoader()
+                            ), contentDescription = null
                         )
                         Text(
                             textAlign = TextAlign.Center,
@@ -1222,32 +1266,35 @@ private fun ShowTopAnime(
                         )
                     }
                 }
-
                 AddFavorites(
-                    mal_id = { animeId },
-                    title = { data.title ?: "" },
+                    mal_id = { data.id },
+                    title = { data.title },
                     score = { formatScore(data.score) },
                     scoredBy = { formatScoredBy(data.scored_by) },
-                    animeImage = { data.images.jpg.image_url ?: "" },
+                    animeImage = { data.images.jpg.image_url  },
                     modifier = modifier,
-                    status = { data.status ?: "Unknown" },
+                    status = { data.status  },
                     rating = { data.rating ?: "N/A" },
-                    secondName = { data.title_japanese ?: "" },
-                    airedFrom = { data.aired.from ?: "Unknown" },
-                    type = { data.type ?: "N/A" },
+                    secondName = { data.title_japanese },
+                    airedFrom = { data.aired.from },
+                    type = { data.type },
                     svgImageLoader = svgImageLoader
                 )
             }
 
-            Column(
-                modifier = modifier
+        }
+        Column(
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
             ) {
                 Text(
-                    text = data.title ?: "Unknown Title",
+                    text = data.title,
                     textAlign = TextAlign.Start,
                     modifier = modifier
-                        .fillMaxWidth()
-                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
+                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp)
+                    ,
                     lineHeight = 16.sp,
                     fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
@@ -1257,35 +1304,37 @@ private fun ShowTopAnime(
                     fontFamily = evolventaBoldFamily,
                     fontWeight = FontWeight.W900
                 )
-
-                Row(
-                    modifier = modifier.fillMaxWidth(1f),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = "Status: ${data.status ?: "Unknown"}",
-                        fontSize = 10.sp,
-                        textAlign = TextAlign.Left,
-                        modifier = modifier.padding(start = 10.dp),
-                        color = MaterialTheme.colorScheme.inversePrimary
-                    )
-                }
-
-                Row(
-                    modifier = modifier
-                        .fillMaxWidth(1f)
-                        .padding(bottom = 10.dp),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Text(
-                        text = "Type: ${data.type ?: "N/A"}",
-                        fontSize = 10.sp,
-                        textAlign = TextAlign.Left,
-                        modifier = modifier.padding(start = 10.dp),
-                        color = MaterialTheme.colorScheme.inversePrimary
-                    )
-                }
             }
+
+            Row(
+                modifier = modifier
+                ,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = "Status: " + data.status,
+                    fontSize = 10.sp,
+                    textAlign = TextAlign.Left,
+                    modifier = modifier.padding(start = 10.dp),
+                    color = MaterialTheme.colorScheme.inversePrimary
+                )
+            }
+            Row(
+                modifier = modifier
+
+                    .padding(bottom = 10.dp)
+                ,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = "Type: " + data.type,
+                    fontSize = 10.sp,
+                    textAlign = TextAlign.Left,
+                    modifier = modifier.padding(start = 10.dp),
+                    color = MaterialTheme.colorScheme.inversePrimary
+                )
+            }
+
         }
     }
 }
