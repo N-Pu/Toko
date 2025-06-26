@@ -3,6 +3,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Pagination(
     @SerializedName("has_next_page") val has_next_page: Boolean,
-    @SerializedName("items") val items: com.project.toko.homeScreen.data.model.newAnimeSearchModel.Items,
-    @SerializedName("last_visible_page") val last_visible_page: Int
+    @SerializedName("items") val items: Items,
+    @SerializedName("last_visible_page") val last_visible_page: Int,
+    @SerializedName("current_page") val current_page : Int
 )

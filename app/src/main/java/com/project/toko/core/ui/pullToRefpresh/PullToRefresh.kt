@@ -19,10 +19,7 @@ fun PullToRefreshLayout(
             backgroundColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.primary
         )
-    }, state = swipeRefreshState, onRefresh =
-    {
-        onLoad()
-    }
+    }, state = swipeRefreshState, onRefresh = { onLoad() }
     ) {
         composable()
     }

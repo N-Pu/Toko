@@ -1,9 +1,12 @@
 package com.project.toko.detailScreen.ui.fragment
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -42,7 +45,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.project.toko.R
-import com.project.toko.core.data.settings.SaveDarkModeManager
+import com.project.toko.core.data.settings.darkMode.SaveDarkModeManager
 import com.project.toko.core.ui.animations.LoadingAnimation
 import com.project.toko.core.ui.expandableText.ExpandableText
 import com.project.toko.core.ui.pullToRefpresh.PullToRefreshLayout
@@ -103,17 +106,19 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         fullScreenContainer = view.findViewById(R.id.full_screen_view_container)
 
         val composeView = view.findViewById<ComposeView>(R.id.compose_view)
-        composeView.setContent {
-            val isDark by darkThemeManager.isDarkThemeActive.collectAsStateWithLifecycle()
+        val currentNavController = findNavController()
 
+        composeView.setContent {
+            val navController = remember { currentNavController }
+            val isDark by darkThemeManager.isDarkThemeActive.collectAsStateWithLifecycle()
             Theme(darkTheme = isDark, systemUiController = rememberSystemUiController()) {
-                val navController = remember { findNavController() }
 
                 DetailScreen(
                     onNavigateToDetailOnCharacter = { characterId ->
@@ -167,11 +172,15 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
                     },
                     onLeavingFragment = {
                         youTubePlayerView.release()
+                    },
+                    onNavigateBack = {
+                        navController.navigateUp()
                     }
                 )
             }
         }
     }
+
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
@@ -188,7 +197,8 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
         onExitFullScreen: () -> Unit,
         onEnterFullScreen: (View) -> Unit,
         onYouTubePlayerView: (YouTubePlayerView) -> Unit,
-        onLeavingFragment: () -> Unit
+        onLeavingFragment: () -> Unit,
+        onNavigateBack: () -> Unit,
     ) {
 
         val viewModel: DetailScreenViewModel = hiltViewModel()
@@ -214,7 +224,9 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
             ImageRequest.Builder(LocalContext.current).data(detailData?.images?.jpg?.large_image_url)
                 .size(Size.ORIGINAL).crossfade(true).build()
         )
-
+        BackHandler(enabled = true) {
+            onNavigateBack()
+        }
         if (viewModel.isLoading.value.not()
         ) {
             PullToRefreshLayout(composable = {
@@ -296,26 +308,13 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
                         text = detailData?.synopsis, title = "Synopsis", modifier = modifier
                     )
 
-
-//            FullScreenYoutubeActivity().YoutubePlayerSecond(
-//                detailData?.trailer?.youtube_id ?: "",
-//                LocalLifecycleOwner.current,
-//                modifier
-//            )
-
-//            YoutubePlayer(
-//                detailData?.trailer?.youtube_id ?: "",
-//                LocalLifecycleOwner.current,
-//                modifier
-//            )
-
                     detailData?.trailer?.youtube_id?.let {
                         YoutubePlayer(
                             youtubeVideoId = it,
                             onExitFullScreen = onExitFullScreen,
                             onEnterFullScreen = onEnterFullScreen,
                             onYouTubePlayerView = onYouTubePlayerView,
-                            onLeavingFragment = onLeavingFragment
+                            onLeavingFragment = onLeavingFragment,
                         )
                     }
 
@@ -362,5 +361,6 @@ class DetailScreenFragment : Fragment(R.layout.fragment_detail_screen) {
 
 
     }
+
 }
 

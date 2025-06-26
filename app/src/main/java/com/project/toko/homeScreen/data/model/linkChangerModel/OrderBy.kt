@@ -1,7 +1,7 @@
 package com.project.toko.homeScreen.data.model.linkChangerModel
 
 
-data class OrderBy(val orderBy: String, var isOrdered: Boolean = false)
+data class OrderBy(val name: String)
 
 fun getOrderBy() =
     listOf(

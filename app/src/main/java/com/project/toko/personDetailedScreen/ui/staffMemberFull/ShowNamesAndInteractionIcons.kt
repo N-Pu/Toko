@@ -28,7 +28,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.domain.util.share.shareLink
-import com.project.toko.daoScreen.ui.daoViewModel.DaoViewModel
+import com.project.toko.savedScreen.ui.daoViewModel.DaoViewModel
 import com.project.toko.personDetailedScreen.data.dao.PersonItem
 import com.project.toko.personDetailedScreen.ui.viewModel.PersonByIdViewModel
 import kotlinx.coroutines.launch

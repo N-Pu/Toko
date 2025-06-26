@@ -15,7 +15,7 @@ import androidx.navigation.findNavController
 import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.toko.R
-import com.project.toko.core.data.settings.SaveDarkModeManager
+import com.project.toko.core.data.settings.darkMode.SaveDarkModeManager
 import com.project.toko.core.ui.theme.Theme
 import com.project.toko.personDetailedScreen.ui.staffMemberFull.DisplayPersonFullScreen
 import dagger.hilt.android.AndroidEntryPoint

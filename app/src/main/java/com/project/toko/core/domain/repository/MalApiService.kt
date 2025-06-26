@@ -27,6 +27,30 @@ interface MalApiService {
     companion object {
         const val BASE_URL = "https://api.jikan.moe/"
     }
+//    @GET("${BASE_URL}v4/anime")
+//    suspend fun getAnimeList(
+//        @Query("page") page: Int,
+//        @Query("limit") limit: Int = 25,
+//    ): NewAnimeSearchModel
+
+    @GET("${BASE_URL}v4/anime")
+    suspend fun searchAnimeByName(
+//        @Header("If-None-Match") eTag: String?,
+        @Query("page") page: Int,
+        @Query("limit") limit: Int = 25,
+        @Query("sfw") sfw: Boolean? = null,
+        @Query("q") query: String? = null,
+        @Query("type") type: String? = null,
+        @Query("genres") genres: String? = null,
+        @Query("min_score") min_score: String? = null,
+        @Query("max_score") max_score: String? = null,
+        @Query("rating") rating: String? = null,
+        @Query("order_by") orderBy: String? = null,
+        @Query("sort") sort: String? = null,
+    ):
+//            ResponseStatus<
+                    NewAnimeSearchModel
+//                    >
 
     //added header for caching (return here afterwards)
     @GET("${BASE_URL}v4/anime?")

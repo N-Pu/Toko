@@ -1,14 +1,8 @@
 package com.project.toko.homeScreen.data.model.linkChangerModel
 
-
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-
-
 data class Genre(
     val name: String,
-    val id: Int,
-    val isSelected: MutableState<Boolean> = mutableStateOf(false)
+    val id: Int
 )
 
 fun getGenres(): List<Genre> {

@@ -10,16 +10,18 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.project.toko.R
+import com.project.toko.core.MainViewModel
 import com.project.toko.core.data.settings.DrawerViewModel
-import com.project.toko.core.data.settings.SaveDarkModeManager
+import com.project.toko.core.data.settings.darkMode.SaveDarkModeManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,6 +31,8 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
     private val drawerViewModel: DrawerViewModel by viewModels()
+
+    private val mainViewModel: MainViewModel by viewModels()
 
     @Inject
     lateinit var darkThemeManager: SaveDarkModeManager
@@ -42,9 +46,20 @@ class MainActivity : AppCompatActivity() {
 //        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setupInsets(findViewById(R.id.nav_host_fragment))
-
+        observeBottomNavVisibility()
         setupNavigation()
         observeThemeChanges()
+    }
+
+
+    private fun observeBottomNavVisibility() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.bottomBarVisibility.collect { isVisible ->
+                    if (isVisible) showBottomNav() else hideBottomNav()
+                }
+            }
+        }
     }
 
     private fun setupInsets(view: View) {
@@ -72,7 +87,8 @@ class MainActivity : AppCompatActivity() {
         bottomNav.labelVisibilityMode = BottomNavigationView.LABEL_VISIBILITY_UNLABELED
 
         val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                    as NavHostFragment
         val navController = navHostFragment.navController
 
         // Анимация + навигация вручную
@@ -104,7 +120,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.singleCharacterFragment,
                 R.id.singleStaffFragment,
                 R.id.wholeCast,
-                R.id.wholeStaff -> hideBottomNav()
+                R.id.wholeStaff ->
+//                    hideBottomNav()
+                    mainViewModel.hideBottomBar()
 
                 R.id.homeFragment -> {
                     val button = bottomNav.menu.getItem(0)
@@ -112,7 +130,8 @@ class MainActivity : AppCompatActivity() {
                     bottomNav.menu.getItem(2).isChecked = false
                     button.isChecked = true
 
-                    showBottomNav()
+                    mainViewModel.showBottomBar()
+//                    showBottomNav()
                 }
 
                 R.id.savedAnimeFragment -> {
@@ -120,7 +139,9 @@ class MainActivity : AppCompatActivity() {
                     bottomNav.menu.getItem(0).isChecked = false
                     bottomNav.menu.getItem(2).isChecked = false
                     button.isChecked = true
-                    showBottomNav()
+
+                    mainViewModel.showBottomBar()
+//                    showBottomNav()
                 }
 
                 R.id.randomAnimeFragment -> {
@@ -128,7 +149,9 @@ class MainActivity : AppCompatActivity() {
                     bottomNav.menu.getItem(0).isChecked = false
                     bottomNav.menu.getItem(1).isChecked = false
                     button.isChecked = true
-                    showBottomNav()
+
+                    mainViewModel.showBottomBar()
+//                    showBottomNav()
                 }
             }
         }
@@ -136,7 +159,13 @@ class MainActivity : AppCompatActivity() {
         // Drawer наблюдение
         lifecycleScope.launch {
             drawerViewModel.isDrawerOpen.collect { isOpen ->
-                if (isOpen) hideBottomNav() else showBottomNav()
+                if (isOpen)
+                    mainViewModel.hideBottomBar()
+//                    hideBottomNav()
+                else
+
+                mainViewModel.showBottomBar()
+//                        showBottomNav()
             }
         }
     }
@@ -160,14 +189,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideBottomNav() {
         bottomNav.clearAnimation()
-        bottomNav.animate().translationY(bottomNav.height.toFloat()).alpha(0f).setDuration(300)
-            .withEndAction { bottomNav.visibility = View.GONE }.start()
+        bottomNav
+            .animate()
+            .translationY(bottomNav.height.toFloat())
+            .alpha(0f)
+            .setDuration(300)
+            .withEndAction { bottomNav.visibility = View.GONE }
+            .start()
     }
 
     private fun showBottomNav() {
         bottomNav.visibility = View.VISIBLE
         bottomNav.clearAnimation()
-        bottomNav.animate().translationY(0f).alpha(1f).setDuration(300).start()
+        bottomNav.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .setDuration(300)
+            .start()
     }
 }
 

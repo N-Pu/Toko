@@ -2,7 +2,9 @@ package com.project.toko.homeScreen.data.model.linkChangerModel
 
 
 
-data class Rating(val ratingName: String, var isSelected: Boolean = false)
+data class Rating(val name: String
+//                  , var isSelected: Boolean = false
+)
 
 fun getRating(): List<Rating> {
     return listOf(

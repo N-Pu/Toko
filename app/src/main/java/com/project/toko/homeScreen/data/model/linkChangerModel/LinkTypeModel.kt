@@ -1,7 +1,7 @@
 package com.project.toko.homeScreen.data.model.linkChangerModel
 
 
-data class Types(val typeName: String, var isSelected: Boolean = false)
+data class Types(val name: String)
 
 fun getTypes(): List<Types> {
     return listOf(

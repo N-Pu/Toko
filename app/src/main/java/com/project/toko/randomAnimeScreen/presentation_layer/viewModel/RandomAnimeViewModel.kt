@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
+import com.project.toko.core.data.settings.nsfw.SafeForWorkManager
 import com.project.toko.core.domain.repository.MalApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +15,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class RandomAnimeViewModel @Inject constructor(private val malApiService: MalApiService) :
+class RandomAnimeViewModel @Inject constructor(
+    private val malApiService: MalApiService,
+    private val safeForWorkManager: SafeForWorkManager) :
     ViewModel() {
     private var isSearching = false
     private val _animeDetails = MutableStateFlow<com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData?>(null)
@@ -31,6 +34,9 @@ class RandomAnimeViewModel @Inject constructor(private val malApiService: MalApi
 //            onTapRandomAnime()
 //        }
 //    }
+
+
+
     suspend fun onTapRandomAnime() = withContext(Dispatchers.IO) {
         if (isSearching) return@withContext
             try {
@@ -47,5 +53,12 @@ class RandomAnimeViewModel @Inject constructor(private val malApiService: MalApi
             } finally {
                 isSearching = false
             }
+    }
+
+    val sfwState = safeForWorkManager.isNSFWActive
+
+
+    fun toggleSFW(){
+        safeForWorkManager.toggleSFW()
     }
 }

@@ -1,9 +1,12 @@
 package com.project.toko.homeScreen.ui.homeScreen
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +30,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +42,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -56,42 +59,43 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.compose.DialogHost
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import com.alexstyl.swipeablecard.Direction
+import com.alexstyl.swipeablecard.ExperimentalSwipeableCardApi
+import com.alexstyl.swipeablecard.rememberSwipeableCardState
+import com.alexstyl.swipeablecard.swipableCard
 import com.project.toko.R
+import com.project.toko.core.domain.util.connectionCheck.isInternetAvailable
 import com.project.toko.core.ui.autoResizedText.AutoResizedText
 import com.project.toko.core.ui.theme.evolventaBoldFamily
-import com.project.toko.daoScreen.data.dao.AnimeItem
-import com.project.toko.daoScreen.data.dao.FavoriteItem
-import com.project.toko.daoScreen.ui.daoViewModel.DaoViewModel
-import com.project.toko.daoScreen.data.model.AnimeStatus
+import com.project.toko.dataBase.search.data.db.entity.AnimeEntity
+import com.project.toko.dataBase.search.data.db.entity.Genre
+import com.project.toko.savedScreen.data.dao.AnimeItem
+import com.project.toko.savedScreen.data.dao.FavoriteItem
+import com.project.toko.savedScreen.ui.daoViewModel.DaoViewModel
+import com.project.toko.savedScreen.data.model.AnimeStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalSwipeableCardApi::class)
 @Composable
 fun CustomDialog(
     onDismiss: () -> Unit,
-    data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
+    data: AnimeEntity,
     onNavigateToDetailScreen: (Int) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     isInDarkTheme: () -> Boolean,
     svgImageLoader: ImageLoader
 ) {
 
-    val painter = rememberAsyncImagePainter(model = data.images.jpg.large_image_url)
+    val painter = rememberAsyncImagePainter(model = data.images?.jpg?.large_image_url)
     val localDensity = LocalConfiguration.current
-    val isSynopsisEmpty = data.synopsis.isNullOrEmpty()
-    val isGenresEmpty = data.genres.isEmpty()
+    val isSynopsisEmpty = remember { data.synopsis.isNullOrEmpty() }
+    val isGenresEmpty = remember { data.genres?.isEmpty() }
     val weight = remember { localDensity.screenWidthDp.dp - 50.dp }
-//    var genreHeight by remember {
-//        mutableStateOf(0.dp)
-//    }
-//    val synopsisHeight = remember {
-//        mutableStateOf(0.dp)
-//    }
-
-
     val height = remember {
         var currentHeight = 550.dp
 
@@ -100,15 +104,17 @@ fun CustomDialog(
 //            currentHeight -= synopsisHeight.value
             currentHeight -= 160.dp
         }
-        if (isGenresEmpty) {
+        if (isGenresEmpty == true) {
             currentHeight -= 60.dp
         }
         currentHeight
     }
+    val context = LocalContext.current
+    val swipeState = rememberSwipeableCardState()
 
     Dialog(
         onDismissRequest = {
-            onDismiss.invoke()
+            onDismiss()
         }, properties = DialogProperties(
             dismissOnBackPress = true,
             dismissOnClickOutside = true,
@@ -116,12 +122,53 @@ fun CustomDialog(
         )
     ) {
         Box(
-            modifier = modifier
-                .width(weight)
-                .height(height)
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }) {
+                    onDismiss()
+                }, contentAlignment = Alignment.Center
         ) {
             Card(
-                modifier = modifier,
+                modifier = modifier
+                    .width(weight)
+                    .height(height)
+                    // for MutableInteractionSource to work and card for not being clicked
+                    .clickable { }
+                    .swipableCard(
+                        blockedDirections = listOf(Direction.Down, Direction.Left, Direction.Right),
+                        state = swipeState, onSwiped = { direction ->
+                            when (direction) {
+                                Direction.Up -> {
+                                    if (isInternetAvailable(context)) {
+                                        onNavigateToDetailScreen(data.mal_id)
+                                    } else {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "No internet connection!",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                    }
+                                }
+
+                                else -> {}
+                            }
+                        },
+                        onSwipeCancel = {
+                            if (!isInternetAvailable(context)) {
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "No internet connection!",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                            }
+                        }
+                    ),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Column(
@@ -131,7 +178,7 @@ fun CustomDialog(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = data.title,
+                        text = data.title ?: "N/A",
                         fontSize = 18.sp,
 
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -164,9 +211,10 @@ fun CustomDialog(
                     ) {
                         DisplayDialogPicture(
                             painter,
-                            data.id,
+                            data.mal_id,
                             onNavigateToDetailScreen = onNavigateToDetailScreen,
-                            modifier = modifier
+                            modifier = modifier,
+                            onDismiss = onDismiss
                         )
                     }
                     Column(
@@ -174,16 +222,16 @@ fun CustomDialog(
                     ) {
 
                         ScoreLabel(modifier = modifier)
-                        ScoreNumber(modifier = modifier, score = data.score)
-                        ScoreByNumber(modifier = modifier, scoreBy = data.scored_by)
+                        ScoreNumber(modifier = modifier, score = data.score ?: 0f)
+                        ScoreByNumber(modifier = modifier, scoreBy = data.scored_by ?: 0f)
 
                         Spacer(modifier = modifier.height(10.dp))
 
-                        RankedLine(rank = data.rank, modifier = modifier)
-                        PopularityLine(popularity = data.popularity, modifier = modifier)
-                        MembersLine(members = data.members, modifier = modifier)
+                        RankedLine(rank = data.rank ?: 0, modifier = modifier)
+                        PopularityLine(popularity = data.popularity ?: 0, modifier = modifier)
+                        MembersLine(members = data.members ?: 0, modifier = modifier)
                         YearTypeStudio(data = data, modifier = modifier)
-                        EpisodesLabel(episodes = data.episodes, modifier = modifier)
+                        EpisodesLabel(episodes = data.episodes ?: 0, modifier = modifier)
                         AddToDataBaseRow(
                             modifier = modifier,
                             data = data,
@@ -199,12 +247,12 @@ fun CustomDialog(
                         .padding(top = 5.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    StatusLine(data.status, modifier)
+                    StatusLine(data.status ?: "N/A", modifier)
                     RatingLine(rating = data.rating ?: "N/A", modifier = modifier)
                 }
 
                 CheckGenresSize(
-                    numbOfGenres = data.genres.size, genres = data.genres, modifier = modifier
+                    numbOfGenres = data.genres?.size, genres = data.genres, modifier = modifier
                 )
                 Synopsis(
                     modifier = modifier,
@@ -377,7 +425,7 @@ private fun ScoreByNumber(modifier: Modifier, scoreBy: Float) {
 
 @Composable
 private fun YearTypeStudio(
-    data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData?,
+    data: AnimeEntity?,
     modifier: Modifier
 ) {
     val isStudioEmpty = data?.studios.isNullOrEmpty()
@@ -465,7 +513,7 @@ private fun EpisodesLabel(episodes: Int, modifier: Modifier) {
 @Composable
 private fun AddToDataBaseRow(
     modifier: Modifier,
-    data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
+    data: AnimeEntity,
     isInDarkTheme: () -> Boolean,
     svgImageLoader: ImageLoader
 ) {
@@ -497,7 +545,7 @@ private fun AddToDataBaseRow(
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
                 color = if (daoViewModel.containsItemIdInCategory(
-                        id = data.id,
+                        id = data.mal_id,
                         AnimeStatus.WATCHING.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) Color.Yellow else MaterialTheme.colorScheme.primary,
@@ -505,39 +553,39 @@ private fun AddToDataBaseRow(
         }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                 if (daoViewModel.containsItemIdInCategory(
-                        data.id,
+                        data.mal_id,
                         AnimeStatus.WATCHING.route
                     ).first()
                 ) {
                     daoViewModel.removeFromDataBase(
                         AnimeItem(
-                            data.id,
-                            data.title,
+                            data.mal_id,
+                            data.title ?: "N/A",
                             data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
+                            data.scored_by?.toInt().toString(),
+                            data.images?.jpg?.large_image_url ?: "N/A",
+                            data.status ?: "N/A",
                             data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
+                            data.title_japanese ?: "N/A",
+                            airedFrom = data.aired?.from ?: "N/A",
                             category = AnimeStatus.WATCHING.route,
-                            type = data.type
+                            type = data.type ?: "N/A"
                         )
                     )
                 } else {
                     daoViewModel.addToCategory(
                         AnimeItem(
-                            data.id,
-                            data.title,
+                            data.mal_id,
+                            data.title ?: "N/A",
                             data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
+                            data.scored_by?.toInt().toString(),
+                            data.images?.jpg?.large_image_url ?: "N/A",
+                            data.status ?: "N/A",
                             data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
+                            data.title_japanese ?: "N/A",
+                            airedFrom = data.aired?.from ?: "N/A",
                             category = AnimeStatus.WATCHING.route,
-                            type = data.type
+                            type = data.type ?: "N/A"
                         )
                     )
                 }
@@ -552,7 +600,7 @@ private fun AddToDataBaseRow(
                 ), contentDescription = null, modifier = modifier.size(25.dp),
                 colorFilter =
                 if (daoViewModel.containsItemIdInCategory(
-                        id = data.id,
+                        id = data.mal_id,
                         AnimeStatus.WATCHING.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) ColorFilter.tint(Color.Yellow) else ColorFilter.tint(MaterialTheme.colorScheme.primary)
@@ -565,7 +613,7 @@ private fun AddToDataBaseRow(
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
                 color = if (daoViewModel.containsItemIdInCategory(
-                        id = data.id,
+                        id = data.mal_id,
                         AnimeStatus.COMPLETED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
@@ -573,39 +621,39 @@ private fun AddToDataBaseRow(
         }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                 if (daoViewModel.containsItemIdInCategory(
-                        data.id,
+                        data.mal_id,
                         AnimeStatus.COMPLETED.route
                     ).first()
                 ) {
                     daoViewModel.removeFromDataBase(
                         AnimeItem(
-                            data.id,
-                            data.title,
+                            data.mal_id,
+                            data.title ?: "N/A",
                             data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
+                            data.scored_by?.toInt().toString(),
+                            data.images?.jpg?.large_image_url ?: "N/A",
+                            data.status ?: "N/A",
                             data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
+                            data.title_japanese ?: "N/A",
+                            airedFrom = data.aired?.from ?: "N/A",
                             category = AnimeStatus.COMPLETED.route,
-                            type = data.type
+                            type = data.type ?: "N/A"
                         )
                     )
                 } else {
                     daoViewModel.addToCategory(
                         AnimeItem(
-                            data.id,
-                            data.title,
+                            data.mal_id,
+                            data.title ?: "N/A",
                             data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
+                            data.scored_by?.toInt().toString(),
+                            data.images?.jpg?.large_image_url ?: "N/A",
+                            data.status ?: "N/A",
                             data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
+                            data.title_japanese ?: "N/A",
+                            airedFrom = data.aired?.from ?: "N/A",
                             category = AnimeStatus.COMPLETED.route,
-                            type = data.type
+                            type = data.type ?: "N/A"
                         )
                     )
                 }
@@ -620,7 +668,7 @@ private fun AddToDataBaseRow(
                 ), contentDescription = null, modifier = modifier.size(22.dp),
                 colorFilter =
                 if (daoViewModel.containsItemIdInCategory(
-                        id = data.id,
+                        id = data.mal_id,
                         AnimeStatus.COMPLETED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) ColorFilter.tint(MaterialTheme.colorScheme.secondary) else ColorFilter.tint(
@@ -635,7 +683,7 @@ private fun AddToDataBaseRow(
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
                 color = if (daoViewModel.containsItemIdInCategory(
-                        id = data.id,
+                        id = data.mal_id,
                         AnimeStatus.DROPPED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) Color.Red else MaterialTheme.colorScheme.primary,
@@ -643,39 +691,39 @@ private fun AddToDataBaseRow(
         }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                 if (daoViewModel.containsItemIdInCategory(
-                        data.id,
+                        data.mal_id,
                         AnimeStatus.DROPPED.route
                     ).first()
                 ) {
                     daoViewModel.removeFromDataBase(
                         AnimeItem(
-                            data.id,
-                            data.title,
+                            data.mal_id,
+                            data.title ?: "N/A",
                             data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
+                            data.scored_by?.toInt().toString(),
+                            data.images?.jpg?.large_image_url ?: "N/A",
+                            data.status ?: "N/A",
                             data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
+                            data.title_japanese ?: "N/A",
+                            airedFrom = data.aired?.from ?: "N/A",
                             category = AnimeStatus.DROPPED.route,
-                            type = data.type
+                            type = data.type ?: "N/A"
                         )
                     )
                 } else {
                     daoViewModel.addToCategory(
                         AnimeItem(
-                            data.id,
-                            data.title,
+                            data.mal_id,
+                            data.title ?: "N/A",
                             data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
+                            data.scored_by?.toInt().toString(),
+                            data.images?.jpg?.large_image_url ?: "N/A",
+                            data.status ?: "N/A",
                             data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
+                            data.title_japanese ?: "N/A",
+                            airedFrom = data.aired?.from ?: "N/A",
                             category = AnimeStatus.DROPPED.route,
-                            type = data.type
+                            type = data.type ?: "N/A"
                         )
                     )
                 }
@@ -690,7 +738,7 @@ private fun AddToDataBaseRow(
                 ), contentDescription = null, modifier = modifier.size(25.dp),
                 colorFilter =
                 if (daoViewModel.containsItemIdInCategory(
-                        id = data.id,
+                        id = data.mal_id,
                         AnimeStatus.DROPPED.route
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) ColorFilter.tint(Color.Red) else ColorFilter.tint(MaterialTheme.colorScheme.primary)
@@ -703,45 +751,45 @@ private fun AddToDataBaseRow(
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
                 color = if (daoViewModel.containsInFavorite(
-                        id = data.id
+                        id = data.mal_id
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) Color.Red else MaterialTheme.colorScheme.primary,
             )
         }, modifier = modifier.weight(1f), onClick = {
             daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                 if (daoViewModel.containsInFavorite(
-                        data.id
+                        data.mal_id
                     ).first()
                 ) {
                     daoViewModel.removeFromFavorite(
                         FavoriteItem(
-                            data.id,
-                            data.title,
+                            data.mal_id,
+                            data.title ?: "N/A",
                             data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
+                            data.scored_by?.toInt().toString(),
+                            data.images?.jpg?.large_image_url ?: "N/A",
+                            data.status ?: "N/A",
                             data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
+                            data.title_japanese ?: "N/A",
+                            airedFrom = data.aired?.from ?: "N/A",
                             category = AnimeStatus.DROPPED.route,
-                            type = data.type
+                            type = data.type ?: "N/A"
                         )
                     )
                 } else {
                     daoViewModel.addToFavorite(
                         FavoriteItem(
-                            data.id,
-                            data.title,
+                            data.mal_id,
+                            data.title ?: "N/A",
                             data.score.toString(),
-                            data.scored_by.toInt().toString(),
-                            data.images.jpg.large_image_url,
-                            data.status,
+                            data.scored_by?.toInt().toString(),
+                            data.images?.jpg?.large_image_url ?: "N/A",
+                            data.status ?: "N/A",
                             data.rating ?: "N/A",
-                            data.title_japanese,
-                            airedFrom = data.aired.from,
+                            data.title_japanese ?: "N/A",
+                            airedFrom = data.aired?.from ?: "N/A",
                             category = AnimeStatus.DROPPED.route,
-                            type = data.type
+                            type = data.type ?: "N/A"
                         )
                     )
                 }
@@ -754,14 +802,14 @@ private fun AddToDataBaseRow(
                 modifier = modifier.size(25.dp),
                 painter = rememberAsyncImagePainter(
                     model = if (daoViewModel.containsInFavorite(
-                            id = data.id
+                            id = data.mal_id
                         ).collectAsStateWithLifecycle(initialValue = false).value
                     ) R.drawable.favorite_touched else
                         R.drawable.favorite_untouched, imageLoader = svgImageLoader
                 ),
                 contentDescription = null,
                 colorFilter = if (daoViewModel.containsInFavorite(
-                        id = data.id
+                        id = data.mal_id
                     ).collectAsStateWithLifecycle(initialValue = false).value
                 ) null else ColorFilter.tint(
                     MaterialTheme.colorScheme.primary
@@ -789,7 +837,7 @@ private fun AddToDataBaseRow(
                 .background(
                     if (daoViewModel
                             .containsItemIdInCategory(
-                                id = data.id,
+                                id = data.mal_id,
                                 AnimeStatus.PLANNED.route
                             )
                             .collectAsStateWithLifecycle(initialValue = false).value
@@ -806,44 +854,44 @@ private fun AddToDataBaseRow(
                     daoViewModel.viewModelScope.launch(Dispatchers.IO) {
                         if (daoViewModel
                                 .containsItemIdInCategory(
-                                    data.id,
+                                    data.mal_id,
                                     AnimeStatus.PLANNED.route
                                 )
                                 .first()
                         ) {
                             daoViewModel.removeFromDataBase(
                                 AnimeItem(
-                                    data.id,
-                                    data.title,
+                                    data.mal_id,
+                                    data.title ?: "N/A",
                                     data.score.toString(),
                                     data.scored_by
-                                        .toInt()
+                                        ?.toInt()
                                         .toString(),
-                                    data.images.jpg.large_image_url,
-                                    data.status,
+                                    data.images?.jpg?.large_image_url ?: "N/A",
+                                    data.status ?: "N/A",
                                     data.rating ?: "N/A",
-                                    data.title_japanese,
-                                    airedFrom = data.aired.from,
+                                    data.title_japanese ?: "N/A",
+                                    airedFrom = data.aired?.from ?: "N/A",
                                     category = AnimeStatus.PLANNED.route,
-                                    type = data.type
+                                    type = data.type ?: "N/A"
                                 )
                             )
                         } else {
                             daoViewModel.addToCategory(
                                 AnimeItem(
-                                    data.id,
-                                    data.title,
+                                    data.mal_id,
+                                    data.title ?: "N/A",
                                     data.score.toString(),
                                     data.scored_by
-                                        .toInt()
+                                        ?.toInt()
                                         .toString(),
-                                    data.images.jpg.large_image_url,
-                                    data.status,
+                                    data.images?.jpg?.large_image_url ?: "N/A",
+                                    data.status ?: "N/A",
                                     data.rating ?: "N/A",
-                                    data.title_japanese,
-                                    airedFrom = data.aired.from,
+                                    data.title_japanese ?: "N/A",
+                                    airedFrom = data.aired?.from ?: "N/A",
                                     category = AnimeStatus.PLANNED.route,
-                                    type = data.type
+                                    type = data.type ?: "N/A"
                                 )
                             )
                         }
@@ -869,7 +917,7 @@ private fun AddToDataBaseRow(
         ) {
             when {
                 daoViewModel.containsItemIdInCategory(
-                    id = data.id,
+                    id = data.mal_id,
                     AnimeStatus.WATCHING.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
@@ -887,7 +935,7 @@ private fun AddToDataBaseRow(
                 }
 
                 daoViewModel.containsItemIdInCategory(
-                    id = data.id,
+                    id = data.mal_id,
                     AnimeStatus.COMPLETED.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
@@ -905,7 +953,7 @@ private fun AddToDataBaseRow(
                 }
 
                 daoViewModel.containsItemIdInCategory(
-                    id = data.id,
+                    id = data.mal_id,
                     AnimeStatus.DROPPED.route
                 ).collectAsStateWithLifecycle(initialValue = false).value -> {
                     Image(
@@ -1015,7 +1063,7 @@ private fun ColoredBox(
 
 @Composable
 private fun DisplayCustomGenres(
-    genres: List<com.project.toko.homeScreen.data.model.newAnimeSearchModel.Genre>,
+    genres: List<Genre?>?,
     modifier: Modifier
 ) {
     Row(
@@ -1027,12 +1075,12 @@ private fun DisplayCustomGenres(
             )
             .padding(0.dp, 10.dp, 0.dp, 0.dp), horizontalArrangement = Arrangement.Center
     ) {
-        genres.forEachIndexed { index, genre ->
+        genres?.forEachIndexed { index, genre ->
             if (index != 0) {
                 Spacer(modifier = modifier.width(8.dp))
             }
             ColoredBox(
-                text = genre.name, modifier
+                text = genre?.name ?: "N/A", modifier
             )
         }
     }
@@ -1093,7 +1141,11 @@ private fun Synopsis(
 
 @Composable
 private fun DisplayDialogPicture(
-    painter: Painter, id: Int, onNavigateToDetailScreen: (Int) -> Unit, modifier: Modifier
+    painter: Painter,
+    id: Int,
+    onNavigateToDetailScreen: (Int) -> Unit,
+    modifier: Modifier,
+    onDismiss: () -> Unit
 ) {
 
 
@@ -1107,6 +1159,7 @@ private fun DisplayDialogPicture(
             .fillMaxSize()
             .clip(CardDefaults.shape)
             .clickable {
+                onDismiss()
                 onNavigateToDetailScreen(id)
             },
         alignment = Alignment.Center,
@@ -1116,7 +1169,7 @@ private fun DisplayDialogPicture(
 @Composable
 private fun CheckGenresSize(
     numbOfGenres: Int?,
-    genres: List<com.project.toko.homeScreen.data.model.newAnimeSearchModel.Genre>,
+    genres: List<Genre?>?,
     modifier: Modifier
 ) {
     if (numbOfGenres != null) {
@@ -1126,7 +1179,7 @@ private fun CheckGenresSize(
             )
         } else {
             DisplayCustomGenres(
-                genres = genres.take(3), modifier = modifier
+                genres = genres?.take(3), modifier = modifier
             )
         }
     }

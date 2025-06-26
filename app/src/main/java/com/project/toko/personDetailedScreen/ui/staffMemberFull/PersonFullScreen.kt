@@ -36,7 +36,7 @@ import com.project.toko.core.ui.theme.BackArrowSecondCastColor
 import com.project.toko.core.ui.theme.DarkBackArrowCastColor
 import com.project.toko.core.ui.theme.DarkBackArrowSecondCastColor
 import com.project.toko.core.ui.theme.evolventaBoldFamily
-import com.project.toko.daoScreen.ui.daoViewModel.DaoViewModel
+import com.project.toko.savedScreen.ui.daoViewModel.DaoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

@@ -34,12 +34,12 @@ import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
-import com.project.toko.daoScreen.data.dao.AnimeItem
+import com.project.toko.savedScreen.data.dao.AnimeItem
 import com.project.toko.core.domain.util.share.shareLink
-import com.project.toko.daoScreen.data.dao.FavoriteItem
-import com.project.toko.daoScreen.ui.daoViewModel.DaoViewModel
+import com.project.toko.savedScreen.data.dao.FavoriteItem
+import com.project.toko.savedScreen.ui.daoViewModel.DaoViewModel
 import com.project.toko.detailScreen.ui.viewModel.DetailScreenViewModel
-import com.project.toko.daoScreen.data.model.AnimeStatus
+import com.project.toko.savedScreen.data.model.AnimeStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

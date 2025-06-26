@@ -77,7 +77,7 @@
     </fragment>
     <fragment
         android:id="@+id/savedAnimeFragment"
-        android:name="com.project.toko.daoScreen.ui.fragment.SavedAnimeFragment"
+        android:name="com.project.toko.savedScreen.ui.fragment.SavedAnimeFragment"
         android:label="Saved">
         <action
             android:id="@+id/action_savedAnimeFragment_to_detailScreenFragment"

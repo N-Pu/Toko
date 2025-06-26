@@ -40,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,26 +47,29 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
 import com.project.toko.core.domain.util.share.openSite
 import com.project.toko.core.ui.appConstraction.AnimeListTypesToDelete
 import com.project.toko.core.ui.theme.evolventaBoldFamily
-import com.project.toko.daoScreen.ui.daoViewModel.DaoViewModel
-import com.project.toko.homeScreen.ui.viewModel.HomeScreenViewModel
-import com.project.toko.randomAnimeScreen.presentation_layer.viewModel.RandomAnimeViewModel
+import com.project.toko.dataBase.search.ui.viewmodel.AnimeViewModel
+import com.project.toko.savedScreen.ui.daoViewModel.DaoViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun ShowDrawerContent(
     modifier: Modifier = Modifier,
     imageLoader: ImageLoader,
     onThemeChange: () -> Unit,
-    darkTheme: () -> Boolean
+    darkTheme: () -> Boolean,
+    toggleSFW: () -> Unit,
+    toggleState: () -> StateFlow<Boolean>
 ) {
-    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
     val daoViewModel: DaoViewModel = hiltViewModel()
-    val randomScreenViewModel: RandomAnimeViewModel = hiltViewModel()
+//    val randomScreenViewModel: RandomAnimeViewModel = hiltViewModel()
     val context = LocalContext.current
     var isHelpFAQOpen by remember { mutableStateOf(false) }
     var isLegalOpen by remember { mutableStateOf(false) }
@@ -98,8 +100,8 @@ fun ShowDrawerContent(
             // NSFW toggle
             NsfwToggleSection(
                 modifier = Modifier,
-                homeScreenViewModel = homeScreenViewModel,
-                randomScreenViewModel = randomScreenViewModel
+                toggleSfw = toggleSFW,
+                toggleState = toggleState
             )
 
             DividerSection()
@@ -353,10 +355,11 @@ private fun DividerSection() {
 
 @Composable
 private fun NsfwToggleSection(
-    modifier: Modifier,
-    homeScreenViewModel: HomeScreenViewModel,
-    randomScreenViewModel: RandomAnimeViewModel
+    modifier: Modifier = Modifier,
+    toggleSfw : () -> Unit,
+    toggleState: () -> StateFlow<Boolean>
 ) {
+    val toggle by toggleState().collectAsStateWithLifecycle()
     NavigationDrawerItem(
         colors = NavigationDrawerItemDefaults.colors(
             selectedContainerColor = MaterialTheme.colorScheme.surfaceTint,
@@ -364,7 +367,7 @@ private fun NsfwToggleSection(
         ),
         label = {
             Text(
-                text = "NSFW",
+                text = "SFW",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 modifier = modifier.padding(start = 20.dp),
@@ -376,11 +379,13 @@ private fun NsfwToggleSection(
         onClick = {},
         badge = {
             Switch(
-                checked = homeScreenViewModel.isNSFWActive.value,
+                checked =
+                toggle,
                 onCheckedChange = {
-                    homeScreenViewModel.saveNSFWData(it)
-                    homeScreenViewModel.isNSFWActive.value = it
-                    randomScreenViewModel.isNSFWActive.value = it
+                    toggleSfw()
+//                    homeScreenViewModel.saveNSFWData(it)
+//                    homeScreenViewModel.isNSFWActive.value = it
+//                    randomScreenViewModel.isNSFWActive.value = it
                 },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.inversePrimary,
@@ -390,7 +395,7 @@ private fun NsfwToggleSection(
                     uncheckedTrackColor = MaterialTheme.colorScheme.surfaceTint,
                     uncheckedBorderColor = MaterialTheme.colorScheme.inversePrimary,
                 ),
-                thumbContent = if (homeScreenViewModel.isNSFWActive.value) {
+                thumbContent = if (toggle) {
                     {
                         Icon(
                             imageVector = Icons.Filled.Check,

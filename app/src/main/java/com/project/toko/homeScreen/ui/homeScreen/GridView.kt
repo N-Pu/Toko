@@ -1,6 +1,6 @@
 package com.project.toko.homeScreen.ui.homeScreen
 
-import android.content.Intent
+import android.util.Log
 import com.project.toko.homeScreen.ui.viewModel.HomeScreenViewModel
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -11,25 +11,28 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,51 +47,64 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
+import com.project.toko.core.MainViewModel
 import com.project.toko.core.ui.addToFavorite.AddFavorites
-import com.project.toko.core.ui.animations.LoadingAnimation
 import com.project.toko.core.ui.theme.DarkSectionColor
 import com.project.toko.core.ui.theme.SectionColor
 import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.ui.theme.scoreBoardColor
-import com.project.toko.daoScreen.data.dao.AnimeItem
+import com.project.toko.dataBase.search.data.db.entity.AnimeEntity
+import com.project.toko.dataBase.search.ui.viewmodel.AnimeDialogState
+import com.project.toko.dataBase.search.ui.viewmodel.AnimeViewModel
+import com.project.toko.dataBase.search.ui.viewmodel.InitialState
+import com.project.toko.dataBase.search.ui.viewmodel.PaginationState
+import com.project.toko.dataBase.search.ui.viewmodel.ScrollBehavior
+import com.project.toko.savedScreen.data.dao.AnimeItem
 import com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData
 import com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel
+import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Locale
 
 @Composable
 fun GridAdder(
     onNavigateToDetailScreen: (Int) -> Unit,
-    modifier: Modifier,
     switch: () -> Boolean,
     isInDarkTheme: () -> Boolean,
     svgImageLoader: () -> ImageLoader,
+    animeViewModel: AnimeViewModel,
+    viewModel: HomeScreenViewModel,
+    mainViewModel: MainViewModel
 ) {
-    val viewModel: HomeScreenViewModel = hiltViewModel()
-//    val customDialogViewModel: CustomDialogViewModel = hiltViewModel()
-
-    val newAnimeSearchModel by viewModel.animeSearch.collectAsStateWithLifecycle()
     val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
     val getTopUpcoming by viewModel.topUpcomingAnime.collectAsStateWithLifecycle()
     val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
+    val dialog by animeViewModel.dialogState.collectAsStateWithLifecycle()
+    val state by animeViewModel.animeEntityList.collectAsStateWithLifecycle()
+    val lazyListState = rememberLazyListState()
+
+    val a : Sequence<Int> = emptySequence()
 
     if (switch()) {
-        if (viewModel.isLoadingSearch.value.not()) {
-            SearchScreen(
-                viewModel, newAnimeSearchModel, onNavigateToDetailScreen, svgImageLoader
-            )
-        } else {
-            LoadingAnimation()
-        }
+        SearchScreen(
+            onNavigateToDetailScreen, svgImageLoader,
+            animeViewModel, state, lazyListState,
+            mainViewModel
+        )
     } else {
         ShowMainScreen(
             isInDarkTheme = isInDarkTheme,
@@ -96,37 +112,63 @@ fun GridAdder(
             svgImageLoader = svgImageLoader,
             getTopAiring = getTopAiring,
             getTopUpcoming = getTopUpcoming,
-            getTrendingAnime = getTrendingAnime
+            getTrendingAnime = getTrendingAnime,
         )
 
     }
+    when (dialog) {
+        is AnimeDialogState.Error -> {
+            val error = (dialog as AnimeDialogState.Error).exception.message
+            ErrorDialog(text = error, onDismissDialog = { animeViewModel.dismissDialog() })
+        }
 
+        AnimeDialogState.Hidden -> Unit
+        AnimeDialogState.Loading -> {
+            Dialog(
+                onDismissRequest = {
+                    animeViewModel.dismissDialog()
+                }, properties = DialogProperties(
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = true,
+                    usePlatformDefaultWidth = false
+                )
+            ) {
+                CircularProgressIndicator()
+            }
+        }
 
-    if (viewModel.isDialogShown) {
-        val selectedAnime =
-            newAnimeSearchModel.data.find { it.id == viewModel.selectedAnimeId.value }
-        val selectedTrending =
-            getTrendingAnime.data.find { it.id == viewModel.selectedAnimeId.value }
-        val selectedAiring = getTopAiring.data.find { it.id == viewModel.selectedAnimeId.value }
-        val selectedUpcoming =
-            getTopUpcoming.data.find { it.id == viewModel.selectedAnimeId.value }
-
-        val selectedData = selectedAnime ?: selectedTrending ?: selectedAiring ?: selectedUpcoming
-
-        selectedData?.let { data ->
-
-
+        is AnimeDialogState.Shown -> {
+            val animeEntity = (dialog as AnimeDialogState.Shown).anime
             CustomDialog(
-                data = data,
+                data = animeEntity,
                 onNavigateToDetailScreen = onNavigateToDetailScreen,
                 onDismiss = {
-                    viewModel.onDialogDismiss()
+                    animeViewModel.dismissDialog()
                 },
-                modifier = modifier,
                 isInDarkTheme = isInDarkTheme,
                 svgImageLoader = svgImageLoader()
             )
         }
+    }
+}
+
+@Composable
+private fun ErrorDialog(modifier: Modifier = Modifier, onDismissDialog: () -> Unit, text: String?) {
+    Dialog(
+        onDismissRequest = {
+            onDismissDialog()
+        }, properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Card(modifier = modifier.size(200.dp)) {
+            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Error: $text!")
+            }
+        }
+
     }
 }
 
@@ -152,91 +194,281 @@ fun <T> AnimeHorizontalSection(
 }
 
 
-//@Stable
-//@Composable
-//fun SearchScreen(
-//    viewModel: HomeScreenViewModel,
-//    newAnimeSearchModel: NewAnimeSearchModel,
-//    onNavigateToDetailScreen: (Int) -> Unit,
-//    svgImageLoader: () -> ImageLoader
-//) {
-//    var additionalDataRequested by remember { mutableStateOf(false) }
-//    val columnState = rememberLazyListState()
-//
-//    LaunchedEffect(key1 = !columnState.canScrollForward && newAnimeSearchModel.pagination.has_next_page) {
-//        withContext(Dispatchers.IO) {
-//            additionalDataRequested = true
-//            delay(300) // Измените задержку по вашему усмотрению
-//            viewModel.loadNextPage()
-//            additionalDataRequested = false
-//        }
-//    }
-//
-//    LazyColumn(
-//        modifier = Modifier.fillMaxSize(),
-//        state = columnState
-//    ) {
-//        items(newAnimeSearchModel.data.chunked(2)) { rowData ->
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ) {
-//                rowData.forEach { data ->
-//                    val cardModifier = Modifier
-//                        .weight(1f)
-//                        .padding(vertical = 10.dp) // Add your desired padding here
-//                    AnimeCardBox(
-//                        data = data,
-//                        onNavigateToDetailScreen = onNavigateToDetailScreen,
-//                        modifier = cardModifier,
-//                        svgImageLoader = svgImageLoader,
-//                        homeScreenViewModel = viewModel
-//                    )
-//                }
-//            }
-//        }
-//    }
-//
-//}
-@Stable
+
 @Composable
 fun SearchScreen(
-    viewModel: HomeScreenViewModel,
-    newAnimeSearchModel: NewAnimeSearchModel,
     onNavigateToDetailScreen: (Int) -> Unit,
-    svgImageLoader: () -> ImageLoader
+    svgImageLoader: () -> ImageLoader,
+    animeViewModel: AnimeViewModel,
+    state: InitialState,
+    lazyListState: LazyListState,
+    mainViewModel: MainViewModel
 ) {
-    var additionalDataRequested by remember { mutableStateOf(false) }
-    val columnState = rememberLazyGridState()
-    LaunchedEffect(key1 = !columnState.canScrollForward && newAnimeSearchModel.pagination.has_next_page) {
-        withContext(Dispatchers.IO) {
-            additionalDataRequested = true
-            delay(300) // Измените задержку по вашему усмотрению
-            viewModel.loadNextPage()
-            additionalDataRequested = false
+    val scrollBehavior by animeViewModel.scrollBehavior.collectAsStateWithLifecycle()
+    val showLoader by animeViewModel.showLoader.collectAsStateWithLifecycle()
+
+    LaunchedEffect(scrollBehavior) {
+        when (scrollBehavior) {
+            ScrollBehavior.SCROLL_TO_TOP -> lazyListState.scrollToItem(0)
+            ScrollBehavior.KEEP_POSITION -> Unit
         }
+        animeViewModel.resetScrollBehavior()
     }
 
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(140.dp),
-        modifier = Modifier.fillMaxSize(),
-        state = columnState,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        items(newAnimeSearchModel.data) { data ->
-            AnimeCardBox(
-                data = data,
-                onNavigateToDetailScreen = onNavigateToDetailScreen,
-//                modifier = cardModifier,
-                svgImageLoader = svgImageLoader,
-                homeScreenViewModel = viewModel
-            )
+    LaunchedEffect(lazyListState) {
+        snapshotFlow { lazyListState.firstVisibleItemScrollOffset }
+            .distinctUntilChanged()
+            .pairWithPrevious()
+            .collect { (prevOffset, currOffset) ->
+                when {
+                    currOffset > prevOffset -> {
+                        // Скролл вниз
+                        mainViewModel.hideBottomBar()
+                    }
+
+                    currOffset < prevOffset -> {
+                        // Скролл вверх
+                        mainViewModel.showBottomBar()
+                    }
+                }
+            }
+    }
+
+    when (state) {
+        InitialState.Empty -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Nothing was found")
+            }
         }
 
+        is InitialState.Error -> {
+            val errorState = (state as InitialState.Error).error.message
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
 
+                Column(
+                    modifier = Modifier
+                        .sizeIn(
+                            minHeight = 100.dp,
+                            minWidth = 160.dp,
+                            maxWidth = 180.dp,
+                            maxHeight = 120.dp
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    if (errorState != null) {
+                        Text(text = errorState, overflow = TextOverflow.Ellipsis, maxLines = 3)
+                    }
+                    Button(colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.secondary,
+                        disabledContentColor = MaterialTheme.colorScheme.primary
+                    ), onClick = {
+                        animeViewModel.viewModelScope.launch {
+                            animeViewModel.refresh()
+                        }
+                    }) {
+                        Text(text = "Reload?")
+                    }
+                }
+
+            }
+        }
+
+        InitialState.Initial -> Spacer(modifier = Modifier.fillMaxSize())
+        InitialState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .shadow(20.dp)
+                        .height(60.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.onTertiaryContainer)
+                        .sizeIn(
+                            minHeight = 60.dp,
+                            minWidth = 60.dp,
+                            maxWidth = 80.dp,
+                            maxHeight = 80.dp
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+            }
+        }
+
+        is InitialState.Success -> {
+            val data = (state as InitialState.Success).data
+
+            val shouldStartPaginate by remember {
+                derivedStateOf {
+                    lazyListState.reachedBottom()
+                }
+            }
+
+            LaunchedEffect(shouldStartPaginate) {
+                if (shouldStartPaginate && animeViewModel.hasNextPage()) {
+                    Log.d("compose", "Paginating...")
+                    animeViewModel.paginate()
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = lazyListState
+            ) {
+                items(data.chunked(2)) { rowData ->
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        rowData.forEach { anime ->
+                            AnimeCardBox(
+                                data = anime,
+                                onNavigateToDetailScreen = onNavigateToDetailScreen,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(vertical = 10.dp),
+                                svgImageLoader = svgImageLoader,
+                                animeViewModel = animeViewModel
+                            )
+
+                        }
+                        if (rowData.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+
+                item {
+                    Row(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .heightIn(min = 20.dp)
+                    ) {
+                        when (showLoader) {
+                            PaginationState.Empty -> Unit
+                            is PaginationState.Error -> {
+                                val errorLoaderState =
+                                    (showLoader as PaginationState.Error).error.message
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+
+                                    Column(
+                                        modifier = Modifier
+                                            .sizeIn(
+                                                minHeight = 100.dp,
+                                                minWidth = 160.dp,
+                                                maxWidth = 180.dp,
+                                                maxHeight = 120.dp
+                                            ),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        if (errorLoaderState != null) {
+                                            Text(
+                                                text = errorLoaderState,
+                                                overflow = TextOverflow.Ellipsis,
+                                                maxLines = 3
+                                            )
+                                        }
+                                        Button(colors = ButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.secondary,
+                                            contentColor = MaterialTheme.colorScheme.primary,
+                                            disabledContainerColor = MaterialTheme.colorScheme.secondary,
+                                            disabledContentColor = MaterialTheme.colorScheme.primary
+                                        ), onClick = {
+                                            animeViewModel.viewModelScope.launch {
+                                                animeViewModel.paginate()
+                                            }
+                                        }) {
+                                            Text(text = "Reload?")
+                                        }
+                                    }
+
+                                }
+                            }
+
+                            PaginationState.Loading -> {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+
+                                    Box(
+                                        modifier = Modifier
+                                            .shadow(20.dp)
+                                            .height(60.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(MaterialTheme.colorScheme.onTertiaryContainer)
+                                            .sizeIn(
+                                                minHeight = 60.dp,
+                                                minWidth = 60.dp,
+                                                maxWidth = 80.dp,
+                                                maxHeight = 80.dp
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
+
+                                }
+                            }
+                        }
+                        Spacer(
+                            modifier = Modifier
+                                .height(110.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
 }
+
+fun <T> Flow<T>.pairWithPrevious(): Flow<Pair<T, T>> = flow {
+    var previous: T? = null
+    collect { value ->
+        val prev = previous
+        if (prev != null) emit(prev to value)
+        previous = value
+    }
+}
+
+
+fun LazyListState.reachedBottom(): Boolean {
+    val visibleItemsInfo = layoutInfo.visibleItemsInfo // Get the visible items
+    return if (layoutInfo.totalItemsCount == 0) {
+        false // Return false if there are no items
+    } else {
+        val lastVisibleItem = visibleItemsInfo.last() // Get the last visible item
+        val viewportHeight =
+            layoutInfo.viewportEndOffset +
+                    layoutInfo.viewportStartOffset // Calculate the viewport height
+
+        // Check if the last visible item is the last item in the list and fully visible
+        // This indicates that the user has scrolled to the bottom
+        (lastVisibleItem.index + 1 == layoutInfo.totalItemsCount &&
+                lastVisibleItem.offset + lastVisibleItem.size <= viewportHeight)
+    }
+}
+
 
 @Composable
 fun ShowMainScreen(
@@ -246,7 +478,7 @@ fun ShowMainScreen(
     svgImageLoader: () -> ImageLoader,
     getTrendingAnime: NewAnimeSearchModel,
     getTopUpcoming: NewAnimeSearchModel,
-    getTopAiring: NewAnimeSearchModel
+    getTopAiring: NewAnimeSearchModel,
 ) {
     val scroll = rememberScrollState()
     val viewModel: HomeScreenViewModel = hiltViewModel()
@@ -284,7 +516,7 @@ fun ShowMainScreen(
                 ShowTopAnime(data, onNavigateToDetailScreen, modifier, svgImageLoader)
             }
         } else {
-            LoadingSection("Trending", modifier, isInDarkTheme)
+            LoadingPlacer(modifier, "Trending", isInDarkTheme)
         }
 
         AnimeHorizontalSection(
@@ -306,7 +538,7 @@ fun ShowMainScreen(
                 ShowTopAnime(data, onNavigateToDetailScreen, modifier, svgImageLoader)
             }
         } else {
-            LoadingSection("Top Airing", modifier, isInDarkTheme)
+            LoadingPlacer(modifier, "Top Airing", isInDarkTheme)
         }
 
         if (!loadingSectionTopUpcoming && !getTopUpcoming.data.isNullOrEmpty()) {
@@ -319,273 +551,53 @@ fun ShowMainScreen(
                 ShowTopAnime(data, onNavigateToDetailScreen, modifier, svgImageLoader)
             }
         } else {
-            LoadingSection("Top Upcoming", modifier, isInDarkTheme)
+            LoadingPlacer(modifier, "Top Upcoming", isInDarkTheme)
         }
     }
 }
 
 @Composable
-fun LoadingSection(
-    title: String,
-    modifier: Modifier,
+fun LoadingPlacer(
+    modifier: Modifier = Modifier,
+    sectionTitle: String,
     isInDarkTheme: () -> Boolean
 ) {
-    ShowSectionName(
-        sectionName = title,
-        modifier = modifier,
-        isInDarkTheme = isInDarkTheme
-    )
-    Row(
-        modifier = modifier
-            .height(300.dp)
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+    ShowSectionName(sectionTitle, modifier, isInDarkTheme)
+    LazyRow(
+        modifier = modifier.background(MaterialTheme.colorScheme.primary),
+        userScrollEnabled = false
     ) {
-        LoadingAnimation()
+        items(count = 5) { item ->
+            Spacer(modifier = Modifier.width(20.dp))
+            Card(
+                modifier = modifier
+                    .height(300.dp)
+                    .width(170.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .shimmer(),
+                colors = CardDefaults.cardColors(containerColor = Color.LightGray),
+                shape = RectangleShape,
+            ) {
+
+            }
+        }
+        item { Spacer(modifier = Modifier.width(20.dp)) }
     }
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
-
-//@Composable
-//fun ShowMainScreen(
-//    modifier: Modifier = Modifier,
-//    isInDarkTheme: () -> Boolean,
-//    onNavigateToDetailScreen: (Int) -> Unit,
-//    svgImageLoader: ImageLoader,
-//    getTrendingAnime: NewAnimeSearchModel,
-//    getTopUpcoming: NewAnimeSearchModel,
-//    getTopAiring: NewAnimeSearchModel
-//) {
-//
-//    val scroll = rememberScrollState()
-//    val viewModel: HomeScreenViewModel = hiltViewModel()
-//    val loadingSectionTopAiring by remember { viewModel.loadingSectionTopAiring }
-//    val loadingSectionTopUpcoming by remember { viewModel.loadingSectionTopUpcoming }
-//    val loadingSectionTopTrending by remember { viewModel.loadingSectionTopTrending }
-//    val lastTenAnimeFromWatchingSection by
-//    viewModel.showListOfWatching().collectAsStateWithLifecycle(
-//        initialValue = emptyList()
-//    )
-//    val getJustTenAddedAnime by
-//    viewModel.showLastAdded().collectAsStateWithLifecycle(
-//        initialValue = emptyList()
-//    )
-//
-//    Column(
-//        modifier = modifier
-//            .verticalScroll(scroll)
-//            .fillMaxSize()
-//            .background(MaterialTheme.colorScheme.primary)
-//    ) {
-//        if (lastTenAnimeFromWatchingSection.isNotEmpty()) {
-//
-//            ShowSectionName(
-//                sectionName = "Now Watching ",
-//                modifier = modifier,
-//                isInDarkTheme = isInDarkTheme
-//            )
-//            LazyRow(
-//                modifier = modifier
-//                    .background(MaterialTheme.colorScheme.primary)
-//            ) {
-//                items(lastTenAnimeFromWatchingSection) { data ->
-//                    Spacer(modifier = modifier.width(20.dp))
-//                    ShowSection(
-//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-//                        modifier = modifier,
-//                        svgImageLoader = svgImageLoader
-//                    )
-//                }
-//                item {
-//                    Spacer(modifier = modifier.width(20.dp))
-//                }
-//            }
-//            Spacer(modifier = modifier.height(20.dp))
-//
-//        }
-//        if (loadingSectionTopTrending.not() && !getTrendingAnime.data.isNullOrEmpty()) {
-//
-//            ShowSectionName(
-//                sectionName = "Trending",
-//                modifier = modifier,
-//                isInDarkTheme = isInDarkTheme
-//            )
-//
-//
-//            LazyRow(
-//                modifier = modifier
-//                    .background(MaterialTheme.colorScheme.primary)
-//            ) {
-//                items(getTrendingAnime.data) { data ->
-//                    Spacer(modifier = modifier.width(20.dp))
-//                    ShowTopAnime(
-//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-//                        modifier = modifier,
-//                        svgImageLoader = svgImageLoader
-//                    )
-//                }
-//                item {
-//                    Spacer(modifier = modifier.width(20.dp))
-//                }
-//            }
-//            Spacer(modifier = modifier.height(20.dp))
-//
-//        } else {
-//            ShowSectionName(
-//                sectionName = "Trending",
-//                modifier = modifier,
-//                isInDarkTheme = isInDarkTheme
-//            )
-//            Row(
-//                modifier = modifier
-//                    .height(300.dp)
-//                    .background(MaterialTheme.colorScheme.primary),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.Center
-//            ) {
-//                LoadingAnimation()
-//            }
-//        }
-//        if (getJustTenAddedAnime.isNotEmpty()) {
-//
-//            ShowSectionName(
-//                sectionName = "Just Added",
-//                modifier = modifier,
-//                isInDarkTheme = isInDarkTheme
-//            )
-//
-//
-//            LazyRow(
-//                modifier = modifier
-//                    .background(MaterialTheme.colorScheme.primary)
-//            ) {
-//                items(getJustTenAddedAnime) { data ->
-//                    Spacer(modifier = modifier.width(20.dp))
-//                    ShowSection(
-//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-//                        modifier = modifier,
-//                        svgImageLoader = svgImageLoader
-//                    )
-//                }
-//                item {
-//                    Spacer(modifier = modifier.width(20.dp))
-//                }
-//            }
-//            Spacer(modifier = modifier.height(20.dp))
-//
-//        }
-//        if (loadingSectionTopAiring.not() && !getTrendingAnime.data.isNullOrEmpty()) {
-//
-//            ShowSectionName(
-//                sectionName = "Top Airing",
-//                modifier = modifier,
-//                isInDarkTheme = isInDarkTheme
-//            )
-//
-//
-//            LazyRow(
-//                modifier = modifier
-//                    .background(MaterialTheme.colorScheme.primary)
-//            ) {
-//                items(getTopAiring.data) { data ->
-//                    Spacer(modifier = modifier.width(20.dp))
-//                    ShowTopAnime(
-//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-//                        modifier = modifier,
-//                        svgImageLoader = svgImageLoader
-//                    )
-//                }
-//                item {
-//                    Spacer(modifier = modifier.width(20.dp))
-//                }
-//
-//            }
-//
-//
-//
-//            Spacer(modifier = modifier.height(20.dp))
-//
-//        } else {
-//            ShowSectionName(
-//                sectionName = "Top Airing",
-//                modifier = modifier,
-//                isInDarkTheme = isInDarkTheme
-//            )
-//            Row(
-//                modifier = modifier
-//                    .height(300.dp)
-//                    .background(MaterialTheme.colorScheme.primary),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.Center
-//            ) {
-//                LoadingAnimation()
-//            }
-//
-//        }
-//        if (loadingSectionTopUpcoming.not() && !getTrendingAnime.data.isNullOrEmpty()) {
-//
-//            ShowSectionName(
-//                sectionName = "Top Upcoming",
-//                modifier = modifier,
-//                isInDarkTheme = isInDarkTheme
-//            )
-//
-//
-//            LazyRow(
-//                modifier = modifier
-//                    .background(MaterialTheme.colorScheme.primary)
-//            ) {
-//                items(getTopUpcoming.data) { data ->
-//                    Spacer(modifier = modifier.width(20.dp))
-//                    ShowTopAnime(
-//                        data = data, onNavigateToDetailScreen = onNavigateToDetailScreen,
-//                        modifier = modifier,
-//                        svgImageLoader = svgImageLoader
-//                    )
-//                }
-//                item {
-//                    Spacer(modifier = modifier.width(20.dp))
-//                }
-//            }
-//
-//
-//
-//            Spacer(modifier = modifier.height(20.dp))
-//
-//        } else {
-//            ShowSectionName(
-//                sectionName = "Top Upcoming",
-//                modifier = modifier,
-//                isInDarkTheme = isInDarkTheme
-//            )
-//            Row(
-//                modifier = modifier
-//                    .height(300.dp)
-//                    .background(MaterialTheme.colorScheme.primary),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.Center
-//            ) {
-//                LoadingAnimation()
-//            }
-//
-//        }
-//    }
-//}
 
 @Stable
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AnimeCardBox(
-    data: com.project.toko.homeScreen.data.model.newAnimeSearchModel.AnimeSearchData,
+    data: AnimeEntity,
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier = Modifier,
     svgImageLoader: () -> ImageLoader,
-    homeScreenViewModel: HomeScreenViewModel
+    animeViewModel: AnimeViewModel
 ) {
-    val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
-    var isCardClicked by remember { mutableStateOf(false) }
+    val isCardClicked by remember { mutableStateOf(false) }
     val value by rememberInfiniteTransition(label = "").animateFloat(
         initialValue = if (isCardClicked) 0.99f else 1f, // Изменяем значение в зависимости от нажатия на Card
         targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
@@ -595,6 +607,7 @@ private fun AnimeCardBox(
             ), repeatMode = RepeatMode.Reverse
         ), label = ""
     )
+    val coroutine = rememberCoroutineScope()
 
 
     Card(
@@ -611,27 +624,36 @@ private fun AnimeCardBox(
             })
             .clip(RoundedCornerShape(16.dp))
             .combinedClickable(onLongClick = {
-                homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    isCardClicked = true
-                    homeScreenViewModel.onDialogLongClick(data.id)
-                    delay(3000L)
-                    isCardClicked = false
+                Log.d("LONG CLICK", "LONG CLICK TRIGGERED")
+                coroutine.launch(Dispatchers.IO) {
+                    animeViewModel.showDialogForAnime(data.mal_id)
                 }
 
-            }) { onNavigateToDetailScreen(data.id) },
+            }) { onNavigateToDetailScreen(data.mal_id) },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onTertiaryContainer),
         shape = RectangleShape,
     ) {
         Box {
-            // Coil image loader
-            Image(
-                painter = painter,
-                contentDescription = "Images for each Anime",
-                modifier = Modifier
-                    .aspectRatio(9f / 11f)
-                    .clip(RoundedCornerShape(10.dp)),
-                contentScale = ContentScale.FillBounds
-            )
+            SubcomposeAsyncImage(modifier = Modifier
+                .aspectRatio(9f / 11f)
+                .clip(RoundedCornerShape(10.dp)),
+                contentScale = ContentScale.FillBounds,
+                model = data.images?.webp?.image_url,
+                contentDescription = "Anime poster",
+                loading = { Spacer(modifier = Modifier.fillMaxSize().background(Color.Gray).shimmer()) },
+                error = {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Color.White
+                            )
+                    ) {
+                        Text(text = "Error while loading image")
+                    }
+                }
+                )
 
             Column(
                 modifier = Modifier
@@ -667,7 +689,11 @@ private fun AnimeCardBox(
                     )
                     Text(
                         textAlign = TextAlign.Center,
-                        text = formatScoredBy(data.scored_by),
+                        text =
+//                        formatScoredBy(
+                        data.scored_by.toString()
+//                        )
+                        ,
                         color = Color.White,
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
@@ -677,16 +703,22 @@ private fun AnimeCardBox(
             }
 
             AddFavorites(
-                mal_id = { data.id },
-                title = { data.title },
+                mal_id = { data.mal_id },
+                title = { data.title ?: "N/A" },
                 score = { formatScore(data.score) },
-                scoredBy = { formatScoredBy(data.scored_by) },
-                animeImage = { data.images.jpg.image_url },
+                scoredBy = {
+//                    formatScoredBy(
+                    data.scored_by.toString()
+//                )
+                },
+                animeImage = {
+                    data.images?.jpg?.image_url ?: "No image"
+                },
                 modifier = Modifier,
-                status = { data.status },
+                status = { data.status ?: "N/A" },
                 rating = { data.rating ?: "N/A" },
                 secondName = { data.title_japanese },
-                airedFrom = { data.aired.from },
+                airedFrom = { data.aired?.from },
                 type = { data.type ?: "N/A" },
                 svgImageLoader = svgImageLoader
             )
@@ -695,7 +727,7 @@ private fun AnimeCardBox(
         }
         Row(modifier = Modifier.height(50.dp)) {
             Text(
-                text = data.title,
+                text = data.title ?: "N/A",
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -753,6 +785,114 @@ private fun AnimeCardBox(
 //                color = MaterialTheme.colorScheme.inversePrimary
 //            )
 //        }
+    }
+}
+
+
+@Stable
+@Composable
+private fun LoadingCardPlacer(
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier
+            .shimmer()
+            .padding(horizontal = 10.dp)
+            .shadow(20.dp)
+            .clip(RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onTertiaryContainer),
+        shape = RectangleShape,
+    ) {
+        Box {
+
+            Column(
+                modifier = Modifier
+                    .width(50.dp)
+                    .clip(RoundedCornerShape(bottomEnd = 15.dp))
+                    .background(scoreBoardColor)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 5.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    Text(
+                        text = "",
+                        color = Color.White,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    Box(modifier = Modifier.size(25.dp))
+//                    Image(
+//                        modifier = Modifier.size(25.dp), painter = rememberAsyncImagePainter(
+//                            model = R.drawable.usergroup, imageLoader = svgImageLoader()
+//                        ), contentDescription = null
+//                    )
+                    Text(
+                        textAlign = TextAlign.Center,
+                        text =
+//                        formatScoredBy(
+                        "    data.scored_by.toString()"
+//                        )
+                        ,
+                        color = Color.White,
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                    )
+                }
+            }
+
+        }
+        Row(modifier = Modifier.height(50.dp)) {
+            Text(
+                text = "N/A",
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
+                lineHeight = 16.sp,
+                fontSize = 16.sp,
+                overflow = TextOverflow.Ellipsis,
+                minLines = 2,
+                maxLines = 2,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontFamily = evolventaBoldFamily,
+                fontWeight = FontWeight.W900
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp), horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = "Status: ",
+                fontSize = 10.sp,
+                textAlign = TextAlign.Left,
+                modifier = Modifier.padding(start = 10.dp),
+                color = MaterialTheme.colorScheme.inversePrimary
+            )
+            Text(
+                text = "Type: ",
+                fontSize = 10.sp,
+                textAlign = TextAlign.Left,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp),
+                color = MaterialTheme.colorScheme.inversePrimary
+            )
+        }
     }
 }
 
@@ -894,15 +1034,15 @@ private fun ShowSection(
         Column(
             verticalArrangement = Arrangement.Bottom
         ) {
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
                 Text(
                     text = data.animeName,
                     textAlign = TextAlign.Start,
                     modifier = modifier
-                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp)
-                    ,
+                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
                     lineHeight = 16.sp,
                     fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
@@ -915,8 +1055,7 @@ private fun ShowSection(
             }
 
             Row(
-                modifier = modifier
-                    ,
+                modifier = modifier,
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
@@ -930,8 +1069,7 @@ private fun ShowSection(
             Row(
                 modifier = modifier
 
-                    .padding(bottom = 10.dp)
-                  ,
+                    .padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
@@ -1271,9 +1409,9 @@ private fun ShowTopAnime(
                     title = { data.title },
                     score = { formatScore(data.score) },
                     scoredBy = { formatScoredBy(data.scored_by) },
-                    animeImage = { data.images.jpg.image_url  },
+                    animeImage = { data.images.jpg.image_url },
                     modifier = modifier,
-                    status = { data.status  },
+                    status = { data.status },
                     rating = { data.rating ?: "N/A" },
                     secondName = { data.title_japanese },
                     airedFrom = { data.aired.from },
@@ -1286,15 +1424,15 @@ private fun ShowTopAnime(
         Column(
             verticalArrangement = Arrangement.Bottom
         ) {
-            Row(modifier = Modifier
-                .fillMaxWidth()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
                 Text(
                     text = data.title,
                     textAlign = TextAlign.Start,
                     modifier = modifier
-                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp)
-                    ,
+                        .padding(end = 5.dp, top = 5.dp, bottom = 5.dp, start = 10.dp),
                     lineHeight = 16.sp,
                     fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
@@ -1307,8 +1445,7 @@ private fun ShowTopAnime(
             }
 
             Row(
-                modifier = modifier
-                ,
+                modifier = modifier,
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
@@ -1322,8 +1459,7 @@ private fun ShowTopAnime(
             Row(
                 modifier = modifier
 
-                    .padding(bottom = 10.dp)
-                ,
+                    .padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(

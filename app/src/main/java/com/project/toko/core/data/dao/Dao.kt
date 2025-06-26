@@ -5,8 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.project.toko.characterDetailedScreen.data.model.dao.CharacterItem
-import com.project.toko.daoScreen.data.dao.AnimeItem
-import com.project.toko.daoScreen.data.dao.FavoriteItem
+import com.project.toko.savedScreen.data.dao.AnimeItem
+import com.project.toko.savedScreen.data.dao.FavoriteItem
 import com.project.toko.personDetailedScreen.data.dao.PersonItem
 import kotlinx.coroutines.flow.Flow
 

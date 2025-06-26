@@ -34,12 +34,12 @@ import com.alexstyl.swipeablecard.ExperimentalSwipeableCardApi
 import com.alexstyl.swipeablecard.rememberSwipeableCardState
 import com.alexstyl.swipeablecard.swipableCard
 import com.project.toko.core.domain.util.connectionCheck.isInternetAvailable
-import com.project.toko.daoScreen.data.dao.AnimeItem
+import com.project.toko.savedScreen.data.dao.AnimeItem
 import com.project.toko.randomAnimeScreen.presentation_layer.viewModel.RandomAnimeViewModel
 import com.project.toko.core.ui.theme.DialogColor
 import com.project.toko.core.ui.theme.evolventaBoldFamily
-import com.project.toko.daoScreen.ui.daoViewModel.DaoViewModel
-import com.project.toko.daoScreen.data.model.AnimeStatus
+import com.project.toko.savedScreen.ui.daoViewModel.DaoViewModel
+import com.project.toko.savedScreen.data.model.AnimeStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

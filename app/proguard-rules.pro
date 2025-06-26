@@ -21,42 +21,12 @@
 #-renamesourcefileattribute SourceFile
 
 
-
-
-#-keepclassmembers class * {
-#    java.util.List *;
-#}
-
-
-
-
-# Оставить все лямбды Compose (часто удаляются)
-#-keepclassmembers class * {
-#    @androidx.compose.runtime.Composable *;
-#}
-#-keep class ** {
-#    @androidx.compose.runtime.Composable <methods>;
-#}
-#-keepclassmembers class * implements kotlin.jvm.functions.Function1 {
-#    *;
-#}
-
 # Retrofit
 -keep class com.project.toko.** { *; }
 -keepclassmembers class * {
     @com.google.gson.annotations.SerializedName <fields>;
 }
 
-# Gson
-#-keepattributes Signature
-#-keepattributes *Annotation*
-#-keep class com.google.gson.** { *; }
-
-# Kotlin metadata
-#-keep class kotlin.Metadata { *; }
-
-# Для data-классов с вложенными моделями
-#-keepclasseswithmembers class * {
-#    <init>(...);
-#}
-
+# Для Gson
+-keep class com.google.gson.** { *; }
+#-keep class com.project.toko.**.model.** { *; }

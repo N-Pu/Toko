@@ -7,12 +7,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.delay
 import okhttp3.Cache
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -39,6 +43,7 @@ object MalApiModule {
         return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
     }
 
+
     @Provides
     @Singleton
     fun provideHttpClient(
@@ -49,7 +54,31 @@ object MalApiModule {
             .cache(cache)
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(httpLoggingInterceptor)
+//            .addInterceptor(request)
+            .addInterceptor(httpLoggingInterceptor).addInterceptor { chain ->
+                val request = chain.request()
+                // Retry up to 3 times on failure
+                var response: Response? = null
+                var retryCount = 0
+                var lastException: Exception? = null
+
+                while (retryCount < 3) {
+                    try {
+                        response = chain.proceed(request)
+                        if (response.isSuccessful) {
+                            return@addInterceptor response
+                        }
+                    } catch (e: Exception) {
+                        lastException = e
+                    }
+                    retryCount++
+                    if (retryCount < 3) {
+//                        delay(1000L * retryCount) // Exponential backoff
+                    }
+                }
+
+                throw lastException ?: IOException("Failed after 3 retries")
+            }
             .build()
     }
 
@@ -64,5 +93,6 @@ object MalApiModule {
             .create(MalApiService::class.java)
     }
 }
+
 
 

@@ -31,7 +31,7 @@ import com.project.toko.characterDetailedScreen.data.model.dao.CharacterItem
 import com.project.toko.characterDetailedScreen.ui.viewModel.CharacterFullByIdViewModel
 import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.domain.util.share.shareLink
-import com.project.toko.daoScreen.ui.daoViewModel.DaoViewModel
+import com.project.toko.savedScreen.ui.daoViewModel.DaoViewModel
 import kotlinx.coroutines.launch
 
 @Composable
