@@ -75,6 +75,7 @@ import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -97,7 +98,6 @@ fun GridAdder(
     val state by animeViewModel.animeEntityList.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
 
-    val a : Sequence<Int> = emptySequence()
 
     if (switch()) {
         SearchScreen(
@@ -192,7 +192,6 @@ fun <T> AnimeHorizontalSection(
         Spacer(modifier = Modifier.height(20.dp))
     }
 }
-
 
 
 @Composable
@@ -450,6 +449,16 @@ fun <T> Flow<T>.pairWithPrevious(): Flow<Pair<T, T>> = flow {
         previous = value
     }
 }
+//    .retry(3) { e -> (e is java.lang.IllegalArgumentException).also { if (it) delay(1000) } }
+//    .retryWhen { cause: Throwable, attempt: Long ->
+//        if (cause is IllegalArgumentException) {
+//            delay(1000)
+//            true
+//        } else false
+//    }
+    .catch { error ->
+        Log.e("pairWithPrevious()", error.toString())
+    }
 
 
 fun LazyListState.reachedBottom(): Boolean {
@@ -640,7 +649,14 @@ private fun AnimeCardBox(
                 contentScale = ContentScale.FillBounds,
                 model = data.images?.webp?.image_url,
                 contentDescription = "Anime poster",
-                loading = { Spacer(modifier = Modifier.fillMaxSize().background(Color.Gray).shimmer()) },
+                loading = {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Gray)
+                            .shimmer()
+                    )
+                },
                 error = {
                     Box(
                         contentAlignment = Alignment.Center,
@@ -653,7 +669,7 @@ private fun AnimeCardBox(
                         Text(text = "Error while loading image")
                     }
                 }
-                )
+            )
 
             Column(
                 modifier = Modifier
