@@ -46,8 +46,8 @@ class HomeScreenViewModel @Inject constructor(
 
 
 
-    private val _isTabMenuOpen = mutableStateOf(false)
-    val isTabMenuOpen = _isTabMenuOpen
+//    private val _isTabMenuOpen = mutableStateOf(false)
+//    val isTabMenuOpen = _isTabMenuOpen
 
 
     private val _topTrendingAnime = MutableStateFlow(emptyNewAnimeSearchModel)

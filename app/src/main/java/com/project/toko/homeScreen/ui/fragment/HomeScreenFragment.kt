@@ -65,8 +65,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             val animeViewModel: AnimeViewModel = hiltViewModel()
             val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
 
+            var switchIndicator = remember { animeViewModel.switchIndicator }
+
             LaunchedEffect(drawerState.isOpen) {
                 drawerViewModel.setDrawerState(drawerState.isOpen)
+            }
+
+            LaunchedEffect(key1 = switchIndicator.value) {
+                if (switchIndicator.value.not()) {
+                    homeScreenViewModel.loadAllSections(context)
+                    return@LaunchedEffect
+                }
             }
 
             Theme(
@@ -88,7 +97,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                                 modifier = Modifier
                                     .fillMaxHeight()
                                     .fillMaxWidth(0.9f),
-                                toggleSFW = { animeViewModel.toggleSFW()},
+                                toggleSFW = { animeViewModel.toggleSFW() },
                                 toggleState = {
                                     animeViewModel.sfwState
                                 }
@@ -107,9 +116,54 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             drawerState = drawerState,
                             svgImageLoader = { svgImageLoader },
                             animeViewModel = animeViewModel,
-                            viewModel= homeScreenViewModel,
-                            mainViewModel = mainViewModel
+                            viewModel = homeScreenViewModel,
+                            mainViewModel = mainViewModel,
+                            onClickFilterTypes = { selectedTypeName, types ->
+                                selectedTypeName.value =
+                                    if (types.name == selectedTypeName.value) null else types.name
+                                animeViewModel.updateFilter { this.copy(type = selectedTypeName.value) }
+                                switchIndicator.value = true
+                            },
+                            onClickOrderBy = { selectedFilterOrderBy, types ->
 
+                                selectedFilterOrderBy.value =
+                                    if (types.name == selectedFilterOrderBy.value) null else types.name
+                                animeViewModel.updateFilter { this.copy(orderBy = selectedFilterOrderBy.value) }
+                                switchIndicator.value = true
+
+                            },
+//                            updateSelectedFilterGenres = {},
+                            onClickGenres = { selectedGenreIds, genre ->
+
+                                // Обновляем выбранные жанры
+                                selectedGenreIds.value = if (genre.id in selectedGenreIds.value) {
+                                    selectedGenreIds.value - genre.id
+                                } else {
+                                    selectedGenreIds.value + genre.id
+                                }
+                                // Отправляем ID жанра в ViewModel
+                                animeViewModel.onGenreChange(genre.id)
+
+                                // Обновляем индикатор изменений
+                                switchIndicator.value = true
+                            },
+                            onClickRating = { selectedRating, rating ->
+
+                                selectedRating.value =
+                                    if (rating.name == selectedRating.value) null else rating.name
+                                animeViewModel.updateFilter { this.copy(rating = selectedRating.value) }
+                                switchIndicator.value = true
+                            },
+
+                            onCurrentScore = { range ->
+                                animeViewModel.updateFilter {
+                                    this.copy(
+                                        min_score = range.minScore,
+                                        max_score = range.maxScore
+                                    )
+                                }
+                            },
+                            switchIndicator = switchIndicator
                         )
                     }
 

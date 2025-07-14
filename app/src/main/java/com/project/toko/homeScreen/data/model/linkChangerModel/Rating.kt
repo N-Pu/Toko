@@ -1,10 +1,12 @@
 package com.project.toko.homeScreen.data.model.linkChangerModel
 
+import com.project.toko.homeScreen.ui.homeScreen.FilterItem
 
 
-data class Rating(val name: String
+data class Rating(
+    override val name: String
 //                  , var isSelected: Boolean = false
-)
+): FilterItem
 
 fun getRating(): List<Rating> {
     return listOf(

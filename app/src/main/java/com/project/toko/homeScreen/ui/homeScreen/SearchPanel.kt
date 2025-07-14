@@ -1,5 +1,6 @@
 package com.project.toko.homeScreen.ui.homeScreen
 
+import android.util.Log
 import com.project.toko.homeScreen.ui.viewModel.HomeScreenViewModel
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -8,7 +9,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerSnapDistance
@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,14 +34,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -52,6 +48,10 @@ import com.project.toko.core.ui.theme.SearchBarColor
 import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.ui.theme.iconColorInSearchPanel
 import com.project.toko.dataBase.search.ui.viewmodel.AnimeViewModel
+import com.project.toko.homeScreen.data.model.linkChangerModel.Genre
+import com.project.toko.homeScreen.data.model.linkChangerModel.OrderBy
+import com.project.toko.homeScreen.data.model.linkChangerModel.Rating
+import com.project.toko.homeScreen.data.model.linkChangerModel.Types
 import com.project.toko.homeScreen.data.model.linkChangerModel.getGenres
 import com.project.toko.homeScreen.data.model.linkChangerModel.getOrderBy
 import com.project.toko.homeScreen.data.model.linkChangerModel.getRating
@@ -69,11 +69,17 @@ fun MainScreen(
     drawerState: DrawerState,
     animeViewModel: AnimeViewModel,
     viewModel: HomeScreenViewModel,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    onClickOrderBy: (MutableState<String?>, OrderBy) -> Unit,
+    onClickFilterTypes: (MutableState<String?>, Types) -> Unit,
+    onClickGenres: (MutableState<Set<Int>>, Genre) -> Unit,
+    onClickRating: (MutableState<String?>, Rating) -> Unit,
+    onCurrentScore : (ScoreRange) -> Unit,
+    switchIndicator: MutableState<Boolean>
 ) {
-    val switchIndicator = remember { animeViewModel.switchIndicator }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+
+    val drawerCoroutineScope = rememberCoroutineScope()
+    val refreshCoroutineScope = rememberCoroutineScope()
     var query by rememberSaveable { mutableStateOf("") }
 
     var refreshState by rememberSaveable { mutableStateOf(false) }
@@ -81,14 +87,6 @@ fun MainScreen(
         rememberSwipeRefreshState(
             isRefreshing = refreshState
         )
-
-    LaunchedEffect(key1 = switchIndicator.value) {
-        if (switchIndicator.value.not()) {
-            viewModel.loadAllSections(context)
-            return@LaunchedEffect
-        }
-    }
-
 
 
 
@@ -125,8 +123,12 @@ fun MainScreen(
                         modifier = modifier
                             .size(30.dp)
                             .clickable {
-                                scope.launch(Dispatchers.IO) {
-                                    drawerState.open()
+                                drawerCoroutineScope.launch {
+                                    try {
+                                        drawerState.open()
+                                    } catch (e: Throwable) {
+                                        Log.e("TAG", coroutineContext.toString() + " " + e.message)
+                                    }
                                 }
                             }
                     )
@@ -186,7 +188,7 @@ fun MainScreen(
                                     .fillMaxHeight(0.5f)
                                     .clickable {
                                         switchIndicator.value = !switchIndicator.value
-                                        if (!switchIndicator.value){
+                                        if (!switchIndicator.value) {
                                             mainViewModel.showBottomBar()
                                         }
                                     }
@@ -206,9 +208,11 @@ fun MainScreen(
             }
 
             TabSelectionMenu(
-                viewModel,
-                modifier,
-                animeViewModel
+                onClickFilterTypes = onClickFilterTypes,
+                onClickOrderBy = onClickOrderBy,
+                onClickRating = onClickRating,
+                onClickGenres = onClickGenres,
+                onCurrentScore = onCurrentScore
             ) { switchIndicator }
 
             GridAdder(
@@ -224,11 +228,19 @@ fun MainScreen(
 
         }
     }, onLoad = {
-        animeViewModel.viewModelScope.launch {
-            refreshState = true
-            animeViewModel.refresh()
-            refreshState = false
+
+        refreshCoroutineScope.launch(Dispatchers.IO) {
+            try {
+                refreshState = true
+                animeViewModel.refresh()
+            } catch (e: Throwable) {
+                Log.e("TAG", coroutineContext.toString() + " " + e.message)
+            } finally {
+                refreshState = false
+            }
         }
+
+
     }, swipeRefreshState = swipeRefreshState)
 
 }
@@ -237,30 +249,29 @@ fun MainScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TabSelectionMenu(
-    viewModel: HomeScreenViewModel,
-    modifier: Modifier,
-    animeViewModel: AnimeViewModel,
+    modifier: Modifier = Modifier,
+    onClickFilterTypes: (MutableState<String?>, Types) -> Unit,
+    onClickRating: (MutableState<String?>, Rating) -> Unit,
+    onClickOrderBy: (MutableState<String?>, OrderBy) -> Unit,
+    onClickGenres: (MutableState<Set<Int>>, Genre) -> Unit,
+    onCurrentScore : (ScoreRange) -> Unit,
     switchIndicator: () -> MutableState<Boolean>,
 ) {
-    val isTabMenuOpen = remember { viewModel.isTabMenuOpen }
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-    var sizeOfCurrentComposable by remember {
-        mutableStateOf(IntSize.Zero)
-    }
-
-    val tabItems = remember {
-        returnListOfTabItems()
-    }
+    var isTabMenuOpen by rememberSaveable { mutableStateOf(false) }
+    val tabItems = remember { returnListOfTabItems() }
     val pagerState = rememberPagerState { tabItems.size }
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    val selectedTypeName = rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedGenreIds = rememberSaveable { mutableStateOf<Set<Int>>(emptySet()) }
+    val selectedOrderBy = rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedRating = rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedIndex = rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(selectedTabIndex) {
         pagerState.animateScrollToPage(selectedTabIndex)
     }
-    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
-        if (!pagerState.isScrollInProgress) {
-            selectedTabIndex = pagerState.currentPage
-        }
-    }
+
+
     Row(
         horizontalArrangement = Arrangement.Center, modifier = modifier
             .fillMaxWidth()
@@ -274,7 +285,7 @@ private fun TabSelectionMenu(
             containerColor = Color.Transparent,
             indicator = { tabPositions ->
                 if (selectedTabIndex < tabPositions.size) {
-                    TabRowDefaults.Indicator(
+                    SecondaryIndicator(
                         modifier = modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -287,10 +298,10 @@ private fun TabSelectionMenu(
                     selected = index == selectedTabIndex,
                     onClick = {
                         if (selectedTabIndex == index) {
-                            isTabMenuOpen.value = !isTabMenuOpen.value
+                            isTabMenuOpen = !isTabMenuOpen
                         } else {
                             selectedTabIndex = index
-                            isTabMenuOpen.value = true
+                            isTabMenuOpen = true
                         }
                     },
                     selectedContentColor = MaterialTheme.colorScheme.primary,
@@ -309,14 +320,11 @@ private fun TabSelectionMenu(
         }
     }
     Spacer(modifier = modifier.height(20.dp))
-    if (isTabMenuOpen.value) {
+    if (isTabMenuOpen) {
         Box(modifier = modifier.animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow))) {
             HorizontalPager(
                 state = pagerState, modifier = modifier
                     .fillMaxWidth()
-                    .onSizeChanged {
-                        sizeOfCurrentComposable = it
-                    }
                     .animateContentSize(animationSpec = spring(stiffness = Spring.StiffnessVeryLow))
             ) { index ->
                 FlowRow(
@@ -327,37 +335,38 @@ private fun TabSelectionMenu(
                     content = {
                         when (tabItems[index]) {
                             tabItems[0] -> {
-                                ShowTypes(
-                                    switchIndicator = switchIndicator,
-                                    animeViewModel = animeViewModel
+                                ShowTabInsides(
+                                    isTouched = { it.name == selectedTypeName.value },
+                                    onClick = { onClickFilterTypes(selectedTypeName, it) },
+                                    list = getTypes()
                                 )
                             }
-
                             tabItems[1] -> {
                                 ShowGenres(
-                                    switchIndicator = switchIndicator,
-                                    viewModel = animeViewModel
+                                    isTouched = { it.id in selectedGenreIds.value },
+                                    onClick = { onClickGenres(selectedGenreIds, it) },
+                                    list = getGenres()
                                 )
                             }
-
                             tabItems[2] -> {
-                                ShowRating(
-                                    switchIndicator = switchIndicator,
-                                    animeViewModel = animeViewModel
+                                ShowTabInsides(
+                                    isTouched = { it.name == selectedRating.value },
+                                    onClick = { onClickRating(selectedRating, it) },
+                                    list = getRating()
                                 )
                             }
-
                             tabItems[3] -> {
                                 ScoreBar(
-                                    animeViewModel = animeViewModel,
-                                    switchIndicator = switchIndicator
+                                    switchIndicator = switchIndicator,
+                                    selectedIndex = selectedIndex,
+                                    onCurrentScore = onCurrentScore,
                                 )
                             }
-
                             tabItems[4] -> {
-                                ShowOrderBy(
-                                    animeViewModel = animeViewModel,
-                                    switchIndicator = switchIndicator
+                                ShowTabInsides(
+                                    isTouched = { it.name == selectedOrderBy.value },
+                                    onClick = { onClickOrderBy(selectedOrderBy, it) },
+                                    list = getOrderBy()
                                 )
                             }
                         }
@@ -377,9 +386,10 @@ data class ScoreRange(
 
 @Composable
 private fun ScoreBar(
-    animeViewModel: AnimeViewModel,
     modifier: Modifier = Modifier,
-    switchIndicator: () -> MutableState<Boolean>
+    onCurrentScore : (ScoreRange) -> Unit,
+    switchIndicator: () -> MutableState<Boolean>,
+    selectedIndex: MutableState<Int>,
 ) {
     // Все возможные диапазоны оценок
     val scoreRanges = remember {
@@ -398,17 +408,15 @@ private fun ScoreBar(
         )
     }
 
-    // Сохраняем выбранный индекс
-    var selectedIndex by rememberSaveable { mutableStateOf(0) }
 
-    val pagerState = rememberPagerState(initialPage = selectedIndex) { scoreRanges.size }
+    val pagerState = rememberPagerState(initialPage = selectedIndex.value) { scoreRanges.size }
     val fling = PagerDefaults.flingBehavior(
         state = pagerState,
         pagerSnapDistance = PagerSnapDistance.atMost(10)
     )
 
     // Цвет круга в зависимости от выбранного значения
-    val circleColor = when (selectedIndex) {
+    val circleColor = when (selectedIndex.value) {
         0 -> Color(0f, 0f, 0f, 0.3f)  // Серый для "—"
         1, 2, 3 -> Color(255, 77, 87)  // Красный для 1-3
         4, 5, 6 -> Color(255, 160, 0)   // Оранжевый для 4-6
@@ -417,13 +425,15 @@ private fun ScoreBar(
 
     // Обновляем ViewModel при изменении выбора
     LaunchedEffect(pagerState.currentPage) {
-        selectedIndex = pagerState.currentPage
-        val range = scoreRanges[selectedIndex]
-//        viewModel.onScoreChange(range.minScore, range.maxScore)
-        animeViewModel.updateFilter {
-            this.copy(min_score = range.minScore, max_score = range.maxScore)
+        selectedIndex.value = pagerState.currentPage
+        val range = scoreRanges[selectedIndex.value]
+        onCurrentScore(range)
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage != 0) {
+            switchIndicator().value = true
         }
-        switchIndicator().value = true
     }
 
     HorizontalPager(
@@ -433,24 +443,22 @@ private fun ScoreBar(
             .drawBehind {
                 drawCircle(
                     color = circleColor,
-                    radius = 75.dp.toPx(),
+                    radius = 100.dp.toPx(),
                 )
             },
         contentPadding = PaddingValues(horizontal = 110.dp),
         flingBehavior = fling
     ) { page ->
-        val isSelected = page == pagerState.currentPage
-        val textColor = if (isSelected) MaterialTheme.colorScheme.primary else Color(189, 189, 189)
-
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = modifier.fillMaxSize()
         ) {
             Text(
+                modifier =  modifier.animateContentSize(),
                 text = scoreRanges[page].display,
-                fontSize = if (isSelected) 100.sp else 80.sp,
-                color = textColor,
-                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Bold,
+                fontSize = if (page == pagerState.currentPage) 120.sp else 80.sp,
+                color = if (page == pagerState.currentPage) MaterialTheme.colorScheme.primary else Color(189, 189, 189),
+                fontWeight = if (page == pagerState.currentPage) FontWeight.ExtraBold else FontWeight.Bold,
                 maxLines = 1,
                 fontFamily = evolventaBoldFamily
             )
@@ -458,18 +466,18 @@ private fun ScoreBar(
     }
 }
 
+
+
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ShowGenres(
+private fun <T : FilterItem> ShowGenres(
     modifier: Modifier = Modifier,
-    switchIndicator: () -> MutableState<Boolean>,
-    viewModel: AnimeViewModel,
+    isTouched: (T) -> Boolean,
+    onClick: (T) -> Unit,
+    list: List<T>
 ) {
-    // Сохраняем только выбранные ID жанров
-    var selectedGenreIds by rememberSaveable { mutableStateOf<Set<Int>>(emptySet()) }
-
-    val genreList = remember { getGenres() }
-
+    val genreList = remember { list }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -480,20 +488,9 @@ private fun ShowGenres(
             genreList.forEach { genre ->
                 ButtonCreator(
                     text = genre.name,
-                    isTouched = { genre.id in selectedGenreIds },
+                    isTouched = { isTouched(genre) },
                     onClick = {
-                        // Обновляем выбранные жанры
-                        selectedGenreIds = if (genre.id in selectedGenreIds) {
-                            selectedGenreIds - genre.id
-                        } else {
-                            selectedGenreIds + genre.id
-                        }
-
-                        // Отправляем ID жанра в ViewModel
-                        viewModel.onGenreChange(genre.id)
-
-                        // Обновляем индикатор изменений
-                        switchIndicator().value = true
+                        onClick(genre)
                     },
                     modifier = modifier,
                 )
@@ -509,13 +506,13 @@ private fun ShowGenres(
 
 @Composable
 private fun ButtonCreator(
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
     isTouched: () -> Boolean,
-    modifier: Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(CircleShape)
             .background(
                 if (isTouched()) {
@@ -538,32 +535,21 @@ private fun ButtonCreator(
     )
 }
 
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ShowRating(
+private fun <T : FilterItem> ShowTabInsides(
     modifier: Modifier = Modifier,
-    animeViewModel: AnimeViewModel,
-    switchIndicator: () -> MutableState<Boolean>
+    isTouched: (T) -> Boolean,
+    onClick: (T) -> Unit,
+    list: List<T>
 ) {
-    val ratingList = remember {
-        getRating()
-    }
-    var selectedRating by rememberSaveable {
-        mutableStateOf<String?>(null)
-    }
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxWidth()
-    ) {
-        ratingList.forEach { rating ->
+    FlowRow(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
+        list.forEach { item ->
             ButtonCreator(
-                isTouched = { rating.name == selectedRating },
-                onClick = {
-                    selectedRating = if (rating.name == selectedRating) null else rating.name
-//                    viewModel.onRatingChange(selectedRating)
-                    animeViewModel.updateFilter { this.copy(rating = selectedRating) }
-                    switchIndicator().value = true
-                },
-                text = rating.name,
+                isTouched = { isTouched(item) },
+                onClick = { onClick(item) },
+                text = item.name,
                 modifier = modifier
             )
             Spacer(
@@ -576,76 +562,6 @@ private fun ShowRating(
 }
 
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun ShowTypes(
-    modifier: Modifier = Modifier,
-    animeViewModel: AnimeViewModel,
-    switchIndicator: () -> MutableState<Boolean>
-) {
-    // Сохраняем только выбранное имя типа (String), а не весь объект Types
-    var selectedTypeName by rememberSaveable { mutableStateOf<String?>(null) }
-
-    // Получаем список типов
-    val typeList = remember { getTypes() }
-
-    FlowRow(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
-        typeList.forEach { type ->
-            ButtonCreator(
-                isTouched = { type.name == selectedTypeName },
-                onClick = {
-                    selectedTypeName =
-                        if (type.name == selectedTypeName) null else type.name
-//                    animeViewModel.onTypeChange(selectedTypeName)
-                    animeViewModel.updateFilter { this.copy(type = selectedTypeName) }
-                    switchIndicator().value = true
-                },
-                text = type.name,
-                modifier = modifier
-            )
-            Spacer(
-                modifier = modifier
-                    .width(8.dp)
-                    .height(50.dp)
-            )
-        }
-    }
-}
-
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun ShowOrderBy(
-    animeViewModel: AnimeViewModel,
-    modifier: Modifier = Modifier,
-    switchIndicator: () -> MutableState<Boolean>
-) {
-    // Сохраняем только выбранное имя типа (String), а не весь объект Types
-    var selectedOrderBy by rememberSaveable { mutableStateOf<String?>(null) }
-
-    // Получаем список типов
-    val orderByList = remember { getOrderBy() }
-
-    FlowRow(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
-        orderByList.forEach { type ->
-            ButtonCreator(
-                isTouched = { type.name == selectedOrderBy },
-                onClick = {
-                    selectedOrderBy =
-                        if (type.name == selectedOrderBy) null else type.name
-//                    animeViewModel.onOrderByChange(selectedOrderBy)
-                    animeViewModel.updateFilter { this.copy(orderBy = selectedOrderBy) }
-                    switchIndicator().value = true
-                },
-                text = type.name,
-                modifier = modifier
-            )
-            Spacer(
-                modifier = modifier
-                    .width(8.dp)
-                    .height(50.dp)
-            )
-        }
-    }
-
+interface FilterItem {
+    val name: String
 }

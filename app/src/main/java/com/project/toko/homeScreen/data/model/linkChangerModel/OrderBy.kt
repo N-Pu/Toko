@@ -1,7 +1,9 @@
 package com.project.toko.homeScreen.data.model.linkChangerModel
 
+import com.project.toko.homeScreen.ui.homeScreen.FilterItem
 
-data class OrderBy(val name: String)
+
+data class OrderBy(override val name: String): FilterItem
 
 fun getOrderBy() =
     listOf(

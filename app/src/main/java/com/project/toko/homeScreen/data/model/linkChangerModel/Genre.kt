@@ -1,9 +1,11 @@
 package com.project.toko.homeScreen.data.model.linkChangerModel
 
+import com.project.toko.homeScreen.ui.homeScreen.FilterItem
+
 data class Genre(
-    val name: String,
+    override val name: String,
     val id: Int
-)
+): FilterItem
 
 fun getGenres(): List<Genre> {
     return listOf(

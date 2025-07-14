@@ -1,7 +1,9 @@
 package com.project.toko.homeScreen.data.model.linkChangerModel
 
+import com.project.toko.homeScreen.ui.homeScreen.FilterItem
 
-data class Types(val name: String)
+
+data class Types(override val name: String): FilterItem
 
 fun getTypes(): List<Types> {
     return listOf(

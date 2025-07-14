@@ -15,7 +15,10 @@ import com.project.toko.dataBase.search.data.db.entity.SearchQueryEntity
 
 // AppDatabase.kt
 @Database(
-    entities = [AnimeEntity::class, SearchQueryEntity::class, PaginationEntity::class, AnimeOrderEntity::class],
+    entities = [AnimeEntity::class,
+        SearchQueryEntity::class,
+        PaginationEntity::class,
+        AnimeOrderEntity::class],
     version = 1,
     exportSchema = false
 )

@@ -30,8 +30,6 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 
-
-
 //sealed class AnimeDialogState {
 //    data object Hidden : AnimeDialogState()
 //    data object Loading : AnimeDialogState()
@@ -200,6 +198,9 @@ sealed class AnimeDialogState {
 
 enum class ScrollBehavior { KEEP_POSITION, SCROLL_TO_TOP }
 
+
+private const val TAG = "AnimeViewModel"
+
 @HiltViewModel
 class AnimeViewModel @Inject constructor(
     private val getAnimeListUseCase: GetAnimeListUseCase,
@@ -252,9 +253,9 @@ class AnimeViewModel @Inject constructor(
 
     // Actions
     suspend fun refresh() {
-        deleteDataByFilterParam(_filterParams)
-        _refreshEvents.emit(Unit)
-    }
+            deleteDataByFilterParam(_filterParams)
+            _refreshEvents.emit(Unit)
+        }
 
     fun updateFilter(update: FilterParams.() -> FilterParams) {
         _filterParams.update { it.update() }
@@ -272,8 +273,7 @@ class AnimeViewModel @Inject constructor(
     // Pagination
     suspend fun hasNextPage(): Boolean = hasNextPageUseCase(_filterParams.value)
 
-    suspend fun paginate() = paginationUseCase(_filterParams.value,_showLoader)
-
+    suspend fun paginate() = paginationUseCase(_filterParams.value, _showLoader)
 
 
     suspend fun showDialogForAnime(malId: Int) {
@@ -281,7 +281,6 @@ class AnimeViewModel @Inject constructor(
     }
 
     fun dismissDialog() = dismissDialogUseCase(_dialogState)
-
 
 
     fun toggleSFW() {
@@ -310,19 +309,20 @@ class AnimeViewModel @Inject constructor(
 }
 
 
-sealed class PaginationState{
-    data object Loading: PaginationState()
-    data object Empty: PaginationState()
-    data class Error(val error: Throwable): PaginationState()
+sealed class PaginationState {
+    data object Loading : PaginationState()
+    data object Empty : PaginationState()
+    data class Error(val error: Throwable) : PaginationState()
 }
 
-sealed class InitialState{
+sealed class InitialState {
     data object Initial : InitialState() // Начальное состояние (еще не загружали)
     data object Loading : InitialState() // Полноэкранная загрузка (первый запрос)
     data object Empty : InitialState()
     data class Success(
         val data: List<AnimeEntity>,
     ) : InitialState()
+
     data class Error(
         val error: Throwable,
     ) : InitialState()
