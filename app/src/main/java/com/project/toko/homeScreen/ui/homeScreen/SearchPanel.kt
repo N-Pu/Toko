@@ -1,10 +1,11 @@
 package com.project.toko.homeScreen.ui.homeScreen
 
 import android.util.Log
-import com.project.toko.homeScreen.ui.viewModel.HomePageViewModel
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -76,9 +78,9 @@ fun MainScreen(
     switchIndicator: MutableState<Boolean>,
     hideBottomBar: () -> Unit,
     showBottomBar: () -> Unit,
-    getTrendingAnime : @Composable () -> NewAnimeSearchModel,
-    getTopAiring : @Composable () -> NewAnimeSearchModel,
-    getTopUpcoming : @Composable () -> NewAnimeSearchModel,
+    getTrendingAnime: @Composable () -> NewAnimeSearchModel,
+    getTopAiring: @Composable () -> NewAnimeSearchModel,
+    getTopUpcoming: @Composable () -> NewAnimeSearchModel,
 ) {
 
     val drawerCoroutineScope = rememberCoroutineScope()
@@ -158,9 +160,7 @@ fun MainScreen(
                     OutlinedTextField(
                         placeholder = { Text(text = "Search...", color = iconColorInSearchPanel) },
                         value = query, onValueChange = {
-
                             query = it
-
                             if (query.isBlank()) {
                                 catalogSearchViewModel.updateFilter {
                                     this.copy(query = null)
@@ -347,15 +347,16 @@ private fun TabSelectionMenu(
                                     list = getTypes()
                                 )
                             }
-
                             tabItems[1] -> {
-                                ShowGenres(
+                                ShowTabInsides(
+                                    modifier = Modifier
+                                        .height(310.dp)
+                                        .verticalScroll(rememberScrollState()),
                                     isTouched = { it.id in selectedGenreIds.value },
                                     onClick = { onClickGenres(selectedGenreIds, it) },
                                     list = getGenres()
                                 )
                             }
-
                             tabItems[2] -> {
                                 ShowTabInsides(
                                     isTouched = { it.name == selectedRating.value },
@@ -363,7 +364,6 @@ private fun TabSelectionMenu(
                                     list = getRating()
                                 )
                             }
-
                             tabItems[3] -> {
                                 ScoreBar(
                                     switchIndicator = switchIndicator,
@@ -371,7 +371,6 @@ private fun TabSelectionMenu(
                                     onCurrentScore = onCurrentScore,
                                 )
                             }
-
                             tabItems[4] -> {
                                 ShowTabInsides(
                                     isTouched = { it.name == selectedOrderBy.value },
@@ -417,21 +416,12 @@ private fun ScoreBar(
             ScoreRange("10", "9.000", "10.000")
         )
     }
-
-
     val pagerState = rememberPagerState(initialPage = selectedIndex.value) { scoreRanges.size }
     val fling = PagerDefaults.flingBehavior(
         state = pagerState,
         pagerSnapDistance = PagerSnapDistance.atMost(10)
     )
 
-    // Цвет круга в зависимости от выбранного значения
-    val circleColor = when (selectedIndex.value) {
-        0 -> Color(0f, 0f, 0f, 0.3f)  // Серый для "—"
-        1, 2, 3 -> Color(255, 77, 87)  // Красный для 1-3
-        4, 5, 6 -> Color(255, 160, 0)   // Оранжевый для 4-6
-        else -> MaterialTheme.colorScheme.onPrimaryContainer // Зеленый для 7-10
-    }
 
     // Обновляем ViewModel при изменении выбора
     LaunchedEffect(pagerState.currentPage) {
@@ -446,6 +436,18 @@ private fun ScoreBar(
         }
     }
 
+
+    val transition = updateTransition(targetState = selectedIndex.value, label = "transition")
+    val circleColor by transition.animateColor(label = "color change transition") {
+        when (it) {
+            0 -> Color(0f, 0f, 0f, 0.3f)  // Серый для "—"
+            1, 2, 3 -> Color(255, 77, 87)  // Красный для 1-3
+            4, 5, 6 -> Color(255, 160, 0)   // Оранжевый для 4-6
+            else -> MaterialTheme.colorScheme.onPrimaryContainer // Зеленый для 7-10
+        }
+    }
+
+
     HorizontalPager(
         state = pagerState,
         modifier = modifier
@@ -456,8 +458,9 @@ private fun ScoreBar(
                     radius = 100.dp.toPx(),
                 )
             },
-        contentPadding = PaddingValues(horizontal = 110.dp),
-        flingBehavior = fling
+        contentPadding = PaddingValues(horizontal = 80.dp),
+        flingBehavior = fling,
+        pageSpacing = 30.dp
     ) { page ->
         Box(
             contentAlignment = Alignment.Center,
@@ -474,6 +477,8 @@ private fun ScoreBar(
                 ),
                 fontWeight = if (page == pagerState.currentPage) FontWeight.ExtraBold else FontWeight.Bold,
                 maxLines = 1,
+                minLines = 1,
+                softWrap = false,
                 fontFamily = evolventaBoldFamily
             )
         }
@@ -481,39 +486,18 @@ private fun ScoreBar(
 }
 
 
-@OptIn(ExperimentalLayoutApi::class)
+@Preview(device = "id:Nexus One")
+@Preview(device = "id:Nexus S")
+@Preview(device = "id:pixel_3a")
+@Preview(device = "id:pixel_6_pro")
 @Composable
-private fun <T : FilterItem> ShowGenres(
-    modifier: Modifier = Modifier,
-    isTouched: (T) -> Boolean,
-    onClick: (T) -> Unit,
-    list: List<T>
-) {
-    val genreList = remember { list }
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .height(310.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        FlowRow(horizontalArrangement = Arrangement.Center) {
-            genreList.forEach { genre ->
-                ButtonCreator(
-                    text = genre.name,
-                    isTouched = { isTouched(genre) },
-                    onClick = {
-                        onClick(genre)
-                    },
-                    modifier = modifier,
-                )
-                Spacer(
-                    modifier = modifier
-                        .width(8.dp)
-                        .height(50.dp)
-                )
-            }
-        }
-    }
+private fun PreviewScoreBar() {
+    val selectedIndex = rememberSaveable { mutableIntStateOf(10) }
+    ScoreBar(
+        onCurrentScore = {},
+        switchIndicator = { mutableStateOf(false) },
+        selectedIndex = selectedIndex
+    )
 }
 
 @Composable
@@ -562,10 +546,9 @@ private fun <T : FilterItem> ShowTabInsides(
                 isTouched = { isTouched(item) },
                 onClick = { onClick(item) },
                 text = item.name,
-                modifier = modifier
             )
             Spacer(
-                modifier = modifier
+                modifier = Modifier
                     .width(8.dp)
                     .height(50.dp)
             )
