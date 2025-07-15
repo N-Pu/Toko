@@ -54,9 +54,7 @@ import com.project.toko.R
 import com.project.toko.core.domain.util.share.openSite
 import com.project.toko.core.ui.appConstraction.AnimeListTypesToDelete
 import com.project.toko.core.ui.theme.evolventaBoldFamily
-import com.project.toko.dataBase.search.ui.viewmodel.AnimeViewModel
 import com.project.toko.savedScreen.ui.daoViewModel.DaoViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable

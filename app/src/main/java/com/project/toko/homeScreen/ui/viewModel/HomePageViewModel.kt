@@ -3,9 +3,7 @@ package com.project.toko.homeScreen.ui.viewModel
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.project.toko.core.domain.util.connectionCheck.isInternetAvailable
 import com.project.toko.core.data.dao.MainDb
@@ -20,7 +18,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(
+class HomePageViewModel @Inject constructor(
     private val malApiRepository: MalApiService,
     private val dao: MainDb,
     @ApplicationContext private val context: Context
@@ -37,17 +35,10 @@ class HomeScreenViewModel @Inject constructor(
         )
 
 
-    private val _isLoadingSearch = mutableStateOf(false)
-    var isLoadingSearch = _isLoadingSearch
-
 
     private val _isNSFWActive = mutableStateOf(false)
 
 
-
-
-//    private val _isTabMenuOpen = mutableStateOf(false)
-//    val isTabMenuOpen = _isTabMenuOpen
 
 
     private val _topTrendingAnime = MutableStateFlow(emptyNewAnimeSearchModel)
@@ -105,9 +96,6 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-
-    var isDialogShown by mutableStateOf(false)
-        private set
 
 
     fun showListOfWatching(): Flow<List<AnimeItem>> {

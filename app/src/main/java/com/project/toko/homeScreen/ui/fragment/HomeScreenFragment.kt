@@ -29,14 +29,14 @@ import androidx.navigation.fragment.findNavController
 import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.project.toko.R
-import com.project.toko.core.MainViewModel
+import com.project.toko.core.BottomBarViewModel
 import com.project.toko.core.data.settings.DrawerViewModel
 import com.project.toko.core.data.settings.darkMode.SaveDarkModeManager
 import com.project.toko.core.ui.ShowDrawerContent
 import com.project.toko.core.ui.theme.Theme
-import com.project.toko.dataBase.search.ui.viewmodel.AnimeViewModel
+import com.project.toko.dataBase.search.ui.viewmodel.CatalogSearchViewModel
 import com.project.toko.homeScreen.ui.homeScreen.MainScreen
-import com.project.toko.homeScreen.ui.viewModel.HomeScreenViewModel
+import com.project.toko.homeScreen.ui.viewModel.HomePageViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -51,7 +51,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private val drawerViewModel: DrawerViewModel by activityViewModels()
 
-    private val mainViewModel: MainViewModel by activityViewModels()
+    private val bottomBarViewModel: BottomBarViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,10 +62,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val isDark by darkThemeManager.isDarkThemeActive.collectAsStateWithLifecycle()
-            val animeViewModel: AnimeViewModel = hiltViewModel()
-            val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+            val catalogSearchViewModel: CatalogSearchViewModel = hiltViewModel()
+            val homePageViewModel: HomePageViewModel = hiltViewModel()
 
-            var switchIndicator = remember { animeViewModel.switchIndicator }
+            val switchIndicator = remember { catalogSearchViewModel.switchIndicator }
 
             LaunchedEffect(drawerState.isOpen) {
                 drawerViewModel.setDrawerState(drawerState.isOpen)
@@ -73,7 +73,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
             LaunchedEffect(key1 = switchIndicator.value) {
                 if (switchIndicator.value.not()) {
-                    homeScreenViewModel.loadAllSections(context)
+                    homePageViewModel.loadAllSections(context)
                     return@LaunchedEffect
                 }
             }
@@ -97,9 +97,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                                 modifier = Modifier
                                     .fillMaxHeight()
                                     .fillMaxWidth(0.9f),
-                                toggleSFW = { animeViewModel.toggleSFW() },
+                                toggleSFW = { catalogSearchViewModel.toggleSFW() },
                                 toggleState = {
-                                    animeViewModel.sfwState
+                                    catalogSearchViewModel.sfwState
                                 }
                             )
                         }
@@ -115,24 +115,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             isInDarkTheme = { isDark },
                             drawerState = drawerState,
                             svgImageLoader = { svgImageLoader },
-                            animeViewModel = animeViewModel,
-                            viewModel = homeScreenViewModel,
-                            mainViewModel = mainViewModel,
+                            catalogSearchViewModel = catalogSearchViewModel,
                             onClickFilterTypes = { selectedTypeName, types ->
                                 selectedTypeName.value =
                                     if (types.name == selectedTypeName.value) null else types.name
-                                animeViewModel.updateFilter { this.copy(type = selectedTypeName.value) }
+                                catalogSearchViewModel.updateFilter { this.copy(type = selectedTypeName.value) }
                                 switchIndicator.value = true
                             },
                             onClickOrderBy = { selectedFilterOrderBy, types ->
 
                                 selectedFilterOrderBy.value =
                                     if (types.name == selectedFilterOrderBy.value) null else types.name
-                                animeViewModel.updateFilter { this.copy(orderBy = selectedFilterOrderBy.value) }
+                                catalogSearchViewModel.updateFilter { this.copy(orderBy = selectedFilterOrderBy.value) }
                                 switchIndicator.value = true
 
                             },
-//                            updateSelectedFilterGenres = {},
                             onClickGenres = { selectedGenreIds, genre ->
 
                                 // Обновляем выбранные жанры
@@ -142,7 +139,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                                     selectedGenreIds.value + genre.id
                                 }
                                 // Отправляем ID жанра в ViewModel
-                                animeViewModel.onGenreChange(genre.id)
+                                catalogSearchViewModel.onGenreChange(genre.id)
 
                                 // Обновляем индикатор изменений
                                 switchIndicator.value = true
@@ -151,19 +148,30 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                                 selectedRating.value =
                                     if (rating.name == selectedRating.value) null else rating.name
-                                animeViewModel.updateFilter { this.copy(rating = selectedRating.value) }
+                                catalogSearchViewModel.updateFilter { this.copy(rating = selectedRating.value) }
                                 switchIndicator.value = true
                             },
 
                             onCurrentScore = { range ->
-                                animeViewModel.updateFilter {
+                                catalogSearchViewModel.updateFilter {
                                     this.copy(
                                         min_score = range.minScore,
                                         max_score = range.maxScore
                                     )
                                 }
                             },
-                            switchIndicator = switchIndicator
+                            switchIndicator = switchIndicator,
+                            hideBottomBar = { bottomBarViewModel.hideBottomBar() },
+                            showBottomBar = { bottomBarViewModel.showBottomBar() },
+                            getTrendingAnime = {
+                                homePageViewModel.topTrendingAnime.collectAsStateWithLifecycle().value
+                            },
+                            getTopAiring = {
+                                homePageViewModel.topAiringAnime.collectAsStateWithLifecycle().value
+                            },
+                            getTopUpcoming = {
+                                homePageViewModel.topUpcomingAnime.collectAsStateWithLifecycle().value
+                            },
                         )
                     }
 

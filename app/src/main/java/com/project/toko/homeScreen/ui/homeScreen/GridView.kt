@@ -1,7 +1,7 @@
 package com.project.toko.homeScreen.ui.homeScreen
 
 import android.util.Log
-import com.project.toko.homeScreen.ui.viewModel.HomeScreenViewModel
+import com.project.toko.homeScreen.ui.viewModel.HomePageViewModel
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -56,7 +56,6 @@ import coil.ImageLoader
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.project.toko.R
-import com.project.toko.core.MainViewModel
 import com.project.toko.core.ui.addToFavorite.AddFavorites
 import com.project.toko.core.ui.theme.DarkSectionColor
 import com.project.toko.core.ui.theme.SectionColor
@@ -64,7 +63,7 @@ import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.ui.theme.scoreBoardColor
 import com.project.toko.dataBase.search.data.db.entity.AnimeEntity
 import com.project.toko.dataBase.search.ui.viewmodel.AnimeDialogState
-import com.project.toko.dataBase.search.ui.viewmodel.AnimeViewModel
+import com.project.toko.dataBase.search.ui.viewmodel.CatalogSearchViewModel
 import com.project.toko.dataBase.search.ui.viewmodel.InitialState
 import com.project.toko.dataBase.search.ui.viewmodel.PaginationState
 import com.project.toko.dataBase.search.ui.viewmodel.ScrollBehavior
@@ -87,23 +86,25 @@ fun GridAdder(
     switch: () -> Boolean,
     isInDarkTheme: () -> Boolean,
     svgImageLoader: () -> ImageLoader,
-    animeViewModel: AnimeViewModel,
-    viewModel: HomeScreenViewModel,
-    mainViewModel: MainViewModel
+    catalogSearchViewModel: CatalogSearchViewModel,
+    hideBottomBar: () -> Unit,
+    showBottomBar: () -> Unit,
+    getTrendingAnime: @Composable () -> NewAnimeSearchModel,
+    getTopAiring: @Composable () -> NewAnimeSearchModel,
+    getTopUpcoming: @Composable () -> NewAnimeSearchModel,
 ) {
-    val getTrendingAnime by viewModel.topTrendingAnime.collectAsStateWithLifecycle()
-    val getTopUpcoming by viewModel.topUpcomingAnime.collectAsStateWithLifecycle()
-    val getTopAiring by viewModel.topAiringAnime.collectAsStateWithLifecycle()
-    val dialog by animeViewModel.dialogState.collectAsStateWithLifecycle()
-    val state by animeViewModel.animeEntityList.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
-
-
+    val scrollState = rememberScrollState()
     if (switch()) {
+        val state by catalogSearchViewModel.animeEntityList.collectAsStateWithLifecycle()
         SearchScreen(
-            onNavigateToDetailScreen, svgImageLoader,
-            animeViewModel, state, lazyListState,
-            mainViewModel
+            onNavigateToDetailScreen,
+            svgImageLoader,
+            catalogSearchViewModel,
+            state,
+            lazyListState,
+            hideBottomBar,
+            showBottomBar
         )
     } else {
         ShowMainScreen(
@@ -113,20 +114,22 @@ fun GridAdder(
             getTopAiring = getTopAiring,
             getTopUpcoming = getTopUpcoming,
             getTrendingAnime = getTrendingAnime,
+            scrollState =  scrollState
         )
-
     }
+
+    val dialog by catalogSearchViewModel.dialogState.collectAsStateWithLifecycle()
     when (dialog) {
         is AnimeDialogState.Error -> {
             val error = (dialog as AnimeDialogState.Error).exception.message
-            ErrorDialog(text = error, onDismissDialog = { animeViewModel.dismissDialog() })
+            ErrorDialog(text = error, onDismissDialog = { catalogSearchViewModel.dismissDialog() })
         }
 
         AnimeDialogState.Hidden -> Unit
         AnimeDialogState.Loading -> {
             Dialog(
                 onDismissRequest = {
-                    animeViewModel.dismissDialog()
+                    catalogSearchViewModel.dismissDialog()
                 }, properties = DialogProperties(
                     dismissOnBackPress = true,
                     dismissOnClickOutside = true,
@@ -143,7 +146,7 @@ fun GridAdder(
                 data = animeEntity,
                 onNavigateToDetailScreen = onNavigateToDetailScreen,
                 onDismiss = {
-                    animeViewModel.dismissDialog()
+                    catalogSearchViewModel.dismissDialog()
                 },
                 isInDarkTheme = isInDarkTheme,
                 svgImageLoader = svgImageLoader()
@@ -198,20 +201,21 @@ fun <T> AnimeHorizontalSection(
 fun SearchScreen(
     onNavigateToDetailScreen: (Int) -> Unit,
     svgImageLoader: () -> ImageLoader,
-    animeViewModel: AnimeViewModel,
+    catalogSearchViewModel: CatalogSearchViewModel,
     state: InitialState,
     lazyListState: LazyListState,
-    mainViewModel: MainViewModel
+    hideBottomBar: () -> Unit,
+    showBottomBar: () -> Unit
 ) {
-    val scrollBehavior by animeViewModel.scrollBehavior.collectAsStateWithLifecycle()
-    val showLoader by animeViewModel.showLoader.collectAsStateWithLifecycle()
+    val scrollBehavior by catalogSearchViewModel.scrollBehavior.collectAsStateWithLifecycle()
+    val showLoader by catalogSearchViewModel.showLoader.collectAsStateWithLifecycle()
 
     LaunchedEffect(scrollBehavior) {
         when (scrollBehavior) {
             ScrollBehavior.SCROLL_TO_TOP -> lazyListState.scrollToItem(0)
             ScrollBehavior.KEEP_POSITION -> Unit
         }
-        animeViewModel.resetScrollBehavior()
+        catalogSearchViewModel.resetScrollBehavior()
     }
 
     LaunchedEffect(lazyListState) {
@@ -222,12 +226,12 @@ fun SearchScreen(
                 when {
                     currOffset > prevOffset -> {
                         // Скролл вниз
-                        mainViewModel.hideBottomBar()
+                        hideBottomBar()
                     }
 
                     currOffset < prevOffset -> {
                         // Скролл вверх
-                        mainViewModel.showBottomBar()
+                        showBottomBar()
                     }
                 }
             }
@@ -268,8 +272,8 @@ fun SearchScreen(
                         disabledContainerColor = MaterialTheme.colorScheme.secondary,
                         disabledContentColor = MaterialTheme.colorScheme.primary
                     ), onClick = {
-                        animeViewModel.viewModelScope.launch {
-                            animeViewModel.refresh()
+                        catalogSearchViewModel.viewModelScope.launch {
+                            catalogSearchViewModel.refresh()
                         }
                     }) {
                         Text(text = "Reload?")
@@ -319,9 +323,9 @@ fun SearchScreen(
             }
 
             LaunchedEffect(shouldStartPaginate) {
-                if (shouldStartPaginate && animeViewModel.hasNextPage()) {
+                if (shouldStartPaginate && catalogSearchViewModel.hasNextPage()) {
                     Log.d("compose", "Paginating...")
-                    animeViewModel.paginate()
+                    catalogSearchViewModel.paginate()
                 }
             }
 
@@ -339,7 +343,7 @@ fun SearchScreen(
                                     .weight(1f)
                                     .padding(vertical = 10.dp),
                                 svgImageLoader = svgImageLoader,
-                                animeViewModel = animeViewModel
+                                catalogSearchViewModel = catalogSearchViewModel
                             )
 
                         }
@@ -390,8 +394,8 @@ fun SearchScreen(
                                             disabledContainerColor = MaterialTheme.colorScheme.secondary,
                                             disabledContentColor = MaterialTheme.colorScheme.primary
                                         ), onClick = {
-                                            animeViewModel.viewModelScope.launch {
-                                                animeViewModel.paginate()
+                                            catalogSearchViewModel.viewModelScope.launch {
+                                                catalogSearchViewModel.paginate()
                                             }
                                         }) {
                                             Text(text = "Reload?")
@@ -485,23 +489,22 @@ fun ShowMainScreen(
     isInDarkTheme: () -> Boolean,
     onNavigateToDetailScreen: (Int) -> Unit,
     svgImageLoader: () -> ImageLoader,
-    getTrendingAnime: NewAnimeSearchModel,
-    getTopUpcoming: NewAnimeSearchModel,
-    getTopAiring: NewAnimeSearchModel,
+    getTrendingAnime: @Composable () -> NewAnimeSearchModel,
+    getTopUpcoming: @Composable () -> NewAnimeSearchModel,
+    getTopAiring: @Composable () -> NewAnimeSearchModel,
+    scrollState :  ScrollState
 ) {
-    val scroll = rememberScrollState()
-    val viewModel: HomeScreenViewModel = hiltViewModel()
-    val loadingSectionTopAiring by remember { viewModel.loadingSectionTopAiring }
-    val loadingSectionTopUpcoming by remember { viewModel.loadingSectionTopUpcoming }
-    val loadingSectionTopTrending by remember { viewModel.loadingSectionTopTrending }
+    val viewModel: HomePageViewModel = hiltViewModel()
+    val loadingSectionTopAiring by remember { mutableStateOf(false) }
+    val loadingSectionTopUpcoming by remember { mutableStateOf(false) }
+    val loadingSectionTopTrending by remember { mutableStateOf(false) }
     val lastTenAnimeFromWatchingSection by viewModel.showListOfWatching()
         .collectAsStateWithLifecycle(initialValue = emptyList())
     val getJustTenAddedAnime by viewModel.showLastAdded()
         .collectAsStateWithLifecycle(initialValue = emptyList())
-
     Column(
         modifier = modifier
-            .verticalScroll(scroll)
+            .verticalScroll(scrollState)
             .fillMaxSize()
             .padding(bottom = 50.dp)
             .background(MaterialTheme.colorScheme.primary)
@@ -515,9 +518,9 @@ fun ShowMainScreen(
             ShowSection(data, onNavigateToDetailScreen, modifier, svgImageLoader)
         }
 
-        if (!loadingSectionTopTrending && !getTrendingAnime.data.isNullOrEmpty()) {
+        if (!loadingSectionTopTrending && getTrendingAnime().data.isNotEmpty()) {
             AnimeHorizontalSection(
-                items = getTrendingAnime.data,
+                items = getTrendingAnime().data,
                 modifier = modifier,
                 isInDarkTheme = isInDarkTheme,
                 sectionTitle = "Trending"
@@ -537,9 +540,9 @@ fun ShowMainScreen(
             ShowSection(data, onNavigateToDetailScreen, modifier, svgImageLoader)
         }
 
-        if (!loadingSectionTopAiring && !getTopAiring.data.isNullOrEmpty()) {
+        if (!loadingSectionTopAiring && getTopAiring().data.isNotEmpty()) {
             AnimeHorizontalSection(
-                items = getTopAiring.data,
+                items = getTopAiring().data,
                 modifier = modifier,
                 isInDarkTheme = isInDarkTheme,
                 sectionTitle = "Top Airing"
@@ -550,9 +553,9 @@ fun ShowMainScreen(
             LoadingPlacer(modifier, "Top Airing", isInDarkTheme)
         }
 
-        if (!loadingSectionTopUpcoming && !getTopUpcoming.data.isNullOrEmpty()) {
+        if (!loadingSectionTopUpcoming && getTopUpcoming().data.isNotEmpty()) {
             AnimeHorizontalSection(
-                items = getTopUpcoming.data,
+                items = getTopUpcoming().data,
                 modifier = modifier,
                 isInDarkTheme = isInDarkTheme,
                 sectionTitle = "Top Upcoming"
@@ -576,7 +579,7 @@ fun LoadingPlacer(
         modifier = modifier.background(MaterialTheme.colorScheme.primary),
         userScrollEnabled = false
     ) {
-        items(count = 5) { item ->
+        items(count = 5) {
             Spacer(modifier = Modifier.width(20.dp))
             Card(
                 modifier = modifier
@@ -604,7 +607,7 @@ private fun AnimeCardBox(
     onNavigateToDetailScreen: (Int) -> Unit,
     modifier: Modifier = Modifier,
     svgImageLoader: () -> ImageLoader,
-    animeViewModel: AnimeViewModel
+    catalogSearchViewModel: CatalogSearchViewModel
 ) {
     val isCardClicked by remember { mutableStateOf(false) }
     val value by rememberInfiniteTransition(label = "").animateFloat(
@@ -635,7 +638,7 @@ private fun AnimeCardBox(
             .combinedClickable(onLongClick = {
                 Log.d("LONG CLICK", "LONG CLICK TRIGGERED")
                 coroutine.launch(Dispatchers.IO) {
-                    animeViewModel.showDialogForAnime(data.mal_id)
+                    catalogSearchViewModel.showDialogForAnime(data.mal_id)
                 }
 
             }) { onNavigateToDetailScreen(data.mal_id) },
@@ -946,7 +949,7 @@ private fun ShowSection(
     val painter = rememberAsyncImagePainter(model = data.animeImage)
     var isCardClicked by remember { mutableStateOf(false) }
 
-    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+    val homePageViewModel: HomePageViewModel = hiltViewModel()
     val value by rememberInfiniteTransition(label = "").animateFloat(
         initialValue = if (isCardClicked) 0.99f else 1f, // Изменяем значение в зависимости от нажатия на Card
         targetValue = if (isCardClicked) 1f else 0.99f, // Изменяем значение в зависимости от нажатия на Card
@@ -971,7 +974,7 @@ private fun ShowSection(
             })
             .clip(RoundedCornerShape(16.dp))
             .combinedClickable(onLongClick = {
-                homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                homePageViewModel.viewModelScope.launch(Dispatchers.IO) {
                     isCardClicked = true
                     delay(3000L)
                     isCardClicked = false
@@ -1321,7 +1324,7 @@ private fun ShowTopAnime(
     val painter = rememberAsyncImagePainter(model = data.images.webp.image_url)
     var isCardClicked by remember { mutableStateOf(false) }
 
-    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+    val homePageViewModel: HomePageViewModel = hiltViewModel()
     val value by rememberInfiniteTransition(label = "").animateFloat(
         initialValue = if (isCardClicked) 0.99f else 1f,
         targetValue = if (isCardClicked) 1f else 0.99f,
@@ -1347,7 +1350,7 @@ private fun ShowTopAnime(
             })
             .clip(RoundedCornerShape(16.dp))
             .combinedClickable(onLongClick = {
-                homeScreenViewModel.viewModelScope.launch(Dispatchers.IO) {
+                homePageViewModel.viewModelScope.launch(Dispatchers.IO) {
                     isCardClicked = true
                     delay(3000L)
                     isCardClicked = false

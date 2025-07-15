@@ -19,7 +19,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.project.toko.R
-import com.project.toko.core.MainViewModel
+import com.project.toko.core.BottomBarViewModel
 import com.project.toko.core.data.settings.DrawerViewModel
 import com.project.toko.core.data.settings.darkMode.SaveDarkModeManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
     private val drawerViewModel: DrawerViewModel by viewModels()
 
-    private val mainViewModel: MainViewModel by viewModels()
+    private val bottomBarViewModel: BottomBarViewModel by viewModels()
 
     @Inject
     lateinit var darkThemeManager: SaveDarkModeManager
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     private fun observeBottomNavVisibility() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainViewModel.bottomBarVisibility.collect { isVisible ->
+                bottomBarViewModel.bottomBarVisibility.collect { isVisible ->
                     if (isVisible) showBottomNav() else hideBottomNav()
                 }
             }
@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.wholeCast,
                 R.id.wholeStaff ->
 //                    hideBottomNav()
-                    mainViewModel.hideBottomBar()
+                    bottomBarViewModel.hideBottomBar()
 
                 R.id.homeFragment -> {
                     val button = bottomNav.menu.getItem(0)
@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                     bottomNav.menu.getItem(2).isChecked = false
                     button.isChecked = true
 
-                    mainViewModel.showBottomBar()
+                    bottomBarViewModel.showBottomBar()
 //                    showBottomNav()
                 }
 
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
                     bottomNav.menu.getItem(2).isChecked = false
                     button.isChecked = true
 
-                    mainViewModel.showBottomBar()
+                    bottomBarViewModel.showBottomBar()
 //                    showBottomNav()
                 }
 
@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity() {
                     bottomNav.menu.getItem(1).isChecked = false
                     button.isChecked = true
 
-                    mainViewModel.showBottomBar()
+                    bottomBarViewModel.showBottomBar()
 //                    showBottomNav()
                 }
             }
@@ -160,11 +160,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             drawerViewModel.isDrawerOpen.collect { isOpen ->
                 if (isOpen)
-                    mainViewModel.hideBottomBar()
+                    bottomBarViewModel.hideBottomBar()
 //                    hideBottomNav()
                 else
 
-                mainViewModel.showBottomBar()
+                bottomBarViewModel.showBottomBar()
 //                        showBottomNav()
             }
         }

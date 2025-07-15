@@ -1,7 +1,7 @@
 package com.project.toko.homeScreen.ui.homeScreen
 
 import android.util.Log
-import com.project.toko.homeScreen.ui.viewModel.HomeScreenViewModel
+import com.project.toko.homeScreen.ui.viewModel.HomePageViewModel
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -41,13 +41,12 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.project.toko.R
-import com.project.toko.core.MainViewModel
 import com.project.toko.core.ui.pullToRefpresh.PullToRefreshLayout
 import com.project.toko.core.ui.theme.DarkSearchBarColor
 import com.project.toko.core.ui.theme.SearchBarColor
 import com.project.toko.core.ui.theme.evolventaBoldFamily
 import com.project.toko.core.ui.theme.iconColorInSearchPanel
-import com.project.toko.dataBase.search.ui.viewmodel.AnimeViewModel
+import com.project.toko.dataBase.search.ui.viewmodel.CatalogSearchViewModel
 import com.project.toko.homeScreen.data.model.linkChangerModel.Genre
 import com.project.toko.homeScreen.data.model.linkChangerModel.OrderBy
 import com.project.toko.homeScreen.data.model.linkChangerModel.Rating
@@ -56,6 +55,7 @@ import com.project.toko.homeScreen.data.model.linkChangerModel.getGenres
 import com.project.toko.homeScreen.data.model.linkChangerModel.getOrderBy
 import com.project.toko.homeScreen.data.model.linkChangerModel.getRating
 import com.project.toko.homeScreen.data.model.linkChangerModel.getTypes
+import com.project.toko.homeScreen.data.model.newAnimeSearchModel.NewAnimeSearchModel
 import com.project.toko.homeScreen.data.model.tabRow.returnListOfTabItems
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,15 +67,18 @@ fun MainScreen(
     isInDarkTheme: () -> Boolean,
     svgImageLoader: () -> ImageLoader,
     drawerState: DrawerState,
-    animeViewModel: AnimeViewModel,
-    viewModel: HomeScreenViewModel,
-    mainViewModel: MainViewModel,
+    catalogSearchViewModel: CatalogSearchViewModel,
     onClickOrderBy: (MutableState<String?>, OrderBy) -> Unit,
     onClickFilterTypes: (MutableState<String?>, Types) -> Unit,
     onClickGenres: (MutableState<Set<Int>>, Genre) -> Unit,
     onClickRating: (MutableState<String?>, Rating) -> Unit,
-    onCurrentScore : (ScoreRange) -> Unit,
-    switchIndicator: MutableState<Boolean>
+    onCurrentScore: (ScoreRange) -> Unit,
+    switchIndicator: MutableState<Boolean>,
+    hideBottomBar: () -> Unit,
+    showBottomBar: () -> Unit,
+    getTrendingAnime : @Composable () -> NewAnimeSearchModel,
+    getTopAiring : @Composable () -> NewAnimeSearchModel,
+    getTopUpcoming : @Composable () -> NewAnimeSearchModel,
 ) {
 
     val drawerCoroutineScope = rememberCoroutineScope()
@@ -159,11 +162,11 @@ fun MainScreen(
                             query = it
 
                             if (query.isBlank()) {
-                                animeViewModel.updateFilter {
+                                catalogSearchViewModel.updateFilter {
                                     this.copy(query = null)
                                 }
                             } else {
-                                animeViewModel.updateFilter {
+                                catalogSearchViewModel.updateFilter {
                                     this.copy(query = query)
                                 }
                             }
@@ -189,7 +192,7 @@ fun MainScreen(
                                     .clickable {
                                         switchIndicator.value = !switchIndicator.value
                                         if (!switchIndicator.value) {
-                                            mainViewModel.showBottomBar()
+                                            showBottomBar()
                                         }
                                     }
                             )
@@ -220,9 +223,12 @@ fun MainScreen(
                 switch = { switchIndicator.value },
                 isInDarkTheme = isInDarkTheme,
                 svgImageLoader = svgImageLoader,
-                animeViewModel = animeViewModel,
-                viewModel = viewModel,
-                mainViewModel = mainViewModel
+                catalogSearchViewModel = catalogSearchViewModel,
+                hideBottomBar = hideBottomBar,
+                showBottomBar = showBottomBar,
+                getTrendingAnime = getTrendingAnime,
+                getTopAiring = getTopAiring,
+                getTopUpcoming = getTopUpcoming,
             )
 
 
@@ -232,7 +238,7 @@ fun MainScreen(
         refreshCoroutineScope.launch(Dispatchers.IO) {
             try {
                 refreshState = true
-                animeViewModel.refresh()
+                catalogSearchViewModel.refresh()
             } catch (e: Throwable) {
                 Log.e("TAG", coroutineContext.toString() + " " + e.message)
             } finally {
@@ -254,7 +260,7 @@ private fun TabSelectionMenu(
     onClickRating: (MutableState<String?>, Rating) -> Unit,
     onClickOrderBy: (MutableState<String?>, OrderBy) -> Unit,
     onClickGenres: (MutableState<Set<Int>>, Genre) -> Unit,
-    onCurrentScore : (ScoreRange) -> Unit,
+    onCurrentScore: (ScoreRange) -> Unit,
     switchIndicator: () -> MutableState<Boolean>,
 ) {
     var isTabMenuOpen by rememberSaveable { mutableStateOf(false) }
@@ -341,6 +347,7 @@ private fun TabSelectionMenu(
                                     list = getTypes()
                                 )
                             }
+
                             tabItems[1] -> {
                                 ShowGenres(
                                     isTouched = { it.id in selectedGenreIds.value },
@@ -348,6 +355,7 @@ private fun TabSelectionMenu(
                                     list = getGenres()
                                 )
                             }
+
                             tabItems[2] -> {
                                 ShowTabInsides(
                                     isTouched = { it.name == selectedRating.value },
@@ -355,6 +363,7 @@ private fun TabSelectionMenu(
                                     list = getRating()
                                 )
                             }
+
                             tabItems[3] -> {
                                 ScoreBar(
                                     switchIndicator = switchIndicator,
@@ -362,6 +371,7 @@ private fun TabSelectionMenu(
                                     onCurrentScore = onCurrentScore,
                                 )
                             }
+
                             tabItems[4] -> {
                                 ShowTabInsides(
                                     isTouched = { it.name == selectedOrderBy.value },
@@ -387,7 +397,7 @@ data class ScoreRange(
 @Composable
 private fun ScoreBar(
     modifier: Modifier = Modifier,
-    onCurrentScore : (ScoreRange) -> Unit,
+    onCurrentScore: (ScoreRange) -> Unit,
     switchIndicator: () -> MutableState<Boolean>,
     selectedIndex: MutableState<Int>,
 ) {
@@ -454,10 +464,14 @@ private fun ScoreBar(
             modifier = modifier.fillMaxSize()
         ) {
             Text(
-                modifier =  modifier.animateContentSize(),
+                modifier = modifier.animateContentSize(),
                 text = scoreRanges[page].display,
                 fontSize = if (page == pagerState.currentPage) 120.sp else 80.sp,
-                color = if (page == pagerState.currentPage) MaterialTheme.colorScheme.primary else Color(189, 189, 189),
+                color = if (page == pagerState.currentPage) MaterialTheme.colorScheme.primary else Color(
+                    189,
+                    189,
+                    189
+                ),
                 fontWeight = if (page == pagerState.currentPage) FontWeight.ExtraBold else FontWeight.Bold,
                 maxLines = 1,
                 fontFamily = evolventaBoldFamily
@@ -465,8 +479,6 @@ private fun ScoreBar(
         }
     }
 }
-
-
 
 
 @OptIn(ExperimentalLayoutApi::class)

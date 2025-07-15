@@ -202,7 +202,7 @@ enum class ScrollBehavior { KEEP_POSITION, SCROLL_TO_TOP }
 private const val TAG = "AnimeViewModel"
 
 @HiltViewModel
-class AnimeViewModel @Inject constructor(
+class CatalogSearchViewModel @Inject constructor(
     private val getAnimeListUseCase: GetAnimeListUseCase,
     private val hasNextPageUseCase: CheckNextPageExistsUseCase,
     private val paginationUseCase: PaginationUseCase,
